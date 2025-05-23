@@ -1,0 +1,1366 @@
+openapi: 3.0.3
+info:
+  title: Portal de Benefícios KNN API
+  description: |
+    API para o Portal de Benefícios KNN, permitindo que alunos da KNN Idiomas acessem promoções
+    exclusivas de parceiros comerciais através de códigos de validação temporários.
+  version: 1.0.0
+  contact:
+    name: Equipe de TI KNN Idiomas
+    email: ti@knnidiomas.com.br
+
+servers:
+  - url: https://api.knnidiomas.com.br/v1
+    description: Ambiente de produção
+  - url: http://localhost:8000/v1
+    description: Ambiente de desenvolvimento local
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT com claim 'role' (student|partner|admin)
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: INVALID_CODE
+            msg:
+              type: string
+              example: Código expirado ou já usado
+          required:
+            - code
+            - msg
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          description: Dados da resposta (varia conforme endpoint)
+        msg:
+          type: string
+          default: ok
+      required:
+        - data
+        - msg
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        mode:
+          type: string
+          enum: [normal, degraded]
+          description: Modo de operação (normal ou contingência)
+      required:
+        - status
+        - mode
+
+    Partner:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        trade_name:
+          type: string
+          example: Livraria Cultura
+        category:
+          type: string
+          example: Livraria
+        address:
+          type: string
+          example: Av. Paulista, 2073 - São Paulo/SP
+        active:
+          type: boolean
+          default: true
+      required:
+        - id
+        - trade_name
+        - category
+        - address
+        - active
+
+    PartnerDetail:
+      allOf:
+        - $ref: '#/components/schemas/Partner'
+        - type: object
+          properties:
+            promotions:
+              type: array
+              items:
+                $ref: '#/components/schemas/Promotion'
+
+    Promotion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        partner_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          example: 20% de desconto em livros de idiomas
+        type:
+          type: string
+          example: discount
+        valid_from:
+          type: string
+          format: date-time
+        valid_to:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+          default: true
+      required:
+        - id
+        - partner_id
+        - title
+        - type
+        - valid_from
+        - valid_to
+        - active
+
+    Student:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        cpf_hash:
+          type: string
+          format: sha256
+        name:
+          type: string
+          example: João da Silva
+        email:
+          type: string
+          format: email
+        course:
+          type: string
+          example: Inglês Avançado
+        active_until:
+          type: string
+          format: date
+      required:
+        - id
+        - cpf_hash
+        - name
+        - email
+        - course
+        - active_until
+
+    ValidationCode:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        student_id:
+          type: string
+          format: uuid
+        partner_id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          pattern: '^[0-9]{6}$'
+          example: '123456'
+        expires:
+          type: string
+          format: date-time
+        used_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - id
+        - student_id
+        - partner_id
+        - code
+        - expires
+
+    Redemption:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        validation_code_id:
+          type: string
+          format: uuid
+        value:
+          type: number
+          format: float
+          example: 50.00
+        used_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - validation_code_id
+        - value
+        - used_at
+
+    RedeemRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: '^[0-9]{6}$'
+          example: '123456'
+        cpf:
+          type: string
+          pattern: '^[0-9]{11}$'
+          example: '12345678901'
+      required:
+        - code
+        - cpf
+
+    ValidationCodeRequest:
+      type: object
+      properties:
+        partner_id:
+          type: string
+          format: uuid
+      required:
+        - partner_id
+
+    PromotionRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 20% de desconto em livros de idiomas
+        type:
+          type: string
+          example: discount
+        valid_from:
+          type: string
+          format: date-time
+        valid_to:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+          default: true
+      required:
+        - title
+        - type
+        - valid_from
+        - valid_to
+
+    NotificationRequest:
+      type: object
+      properties:
+        target:
+          type: string
+          enum: [students, partners]
+        filter:
+          type: object
+          description: Filtros para selecionar destinatários
+        message:
+          type: string
+        type:
+          type: string
+          enum: [email, push, both]
+          default: both
+      required:
+        - target
+        - message
+
+    Metrics:
+      type: object
+      properties:
+        active_students:
+          type: integer
+          example: 1250
+        codes_generated:
+          type: integer
+          example: 3456
+        codes_redeemed:
+          type: integer
+          example: 2789
+        top_partners:
+          type: array
+          items:
+            type: object
+            properties:
+              partner_id:
+                type: string
+                format: uuid
+              trade_name:
+                type: string
+              redemptions:
+                type: integer
+            required:
+              - partner_id
+              - trade_name
+              - redemptions
+      required:
+        - active_students
+        - codes_generated
+        - codes_redeemed
+        - top_partners
+
+    RedemptionHistory:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          partner:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              trade_name:
+                type: string
+            required:
+              - id
+              - trade_name
+          promotion:
+            type: object
+            properties:
+              title:
+                type: string
+            required:
+              - title
+          value:
+            type: number
+            format: float
+          used_at:
+            type: string
+            format: date-time
+        required:
+          - id
+          - partner
+          - promotion
+          - value
+          - used_at
+
+    FavoritePartners:
+      type: array
+      items:
+        $ref: '#/components/schemas/Partner'
+
+  parameters:
+    CategoryParam:
+      name: cat
+      in: query
+      description: Filtro por categoria de parceiro
+      schema:
+        type: string
+    
+    OrderParam:
+      name: ord
+      in: query
+      description: Ordenação dos resultados
+      schema:
+        type: string
+        enum: [name_asc, name_desc, category_asc, category_desc]
+    
+    PaginationLimit:
+      name: limit
+      in: query
+      description: Número máximo de itens por página
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+    
+    PaginationOffset:
+      name: offset
+      in: query
+      description: Offset para paginação
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    
+    DateRangeParam:
+      name: range
+      in: query
+      description: Período para relatório (formato YYYY-MM)
+      required: true
+      schema:
+        type: string
+        pattern: '^[0-9]{4}-[0-9]{2}$'
+        example: '2025-05'
+    
+    EntityParam:
+      name: entity
+      in: path
+      description: Tipo de entidade
+      required: true
+      schema:
+        type: string
+        enum: [students, partners, promotions, validation_codes, redemptions]
+    
+    IdParam:
+      name: id
+      in: path
+      description: ID do recurso
+      required: true
+      schema:
+        type: string
+        format: uuid
+    
+    PartnerIdParam:
+      name: pid
+      in: path
+      description: ID do parceiro
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+security:
+  - bearerAuth: []
+
+paths:
+  /health:
+    get:
+      summary: Verifica o status da API
+      description: Endpoint público para verificar se a API está operacional e em qual modo
+      security: []
+      responses:
+        '200':
+          description: API operacional
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /partners:
+    get:
+      summary: Lista parceiros
+      description: Retorna lista de parceiros com filtros e paginação
+      tags:
+        - student
+      parameters:
+        - $ref: '#/components/parameters/CategoryParam'
+        - $ref: '#/components/parameters/OrderParam'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: Lista de parceiros
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Partner'
+                          total:
+                            type: integer
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /partners/{id}:
+    get:
+      summary: Detalhes do parceiro
+      description: Retorna detalhes do parceiro e suas promoções ativas
+      tags:
+        - student
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Detalhes do parceiro
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PartnerDetail'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Parceiro não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /validation-codes:
+    post:
+      summary: Gera código de validação
+      description: Gera um código de validação de 6 dígitos que expira em 3 minutos
+      tags:
+        - student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationCodeRequest'
+      responses:
+        '201':
+          description: Código gerado com sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            example: '123456'
+                          expires:
+                            type: string
+                            format: date-time
+                        required:
+                          - code
+                          - expires
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Parceiro não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /students/me/history:
+    get:
+      summary: Histórico de resgates
+      description: Retorna o histórico de resgates do aluno
+      tags:
+        - student
+      parameters:
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: Histórico de resgates
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            $ref: '#/components/schemas/RedemptionHistory'
+                          total:
+                            type: integer
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /students/me/fav:
+    get:
+      summary: Lista parceiros favoritos
+      description: Retorna a lista de parceiros favoritos do aluno
+      tags:
+        - student
+      responses:
+        '200':
+          description: Lista de parceiros favoritos
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/FavoritePartners'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      summary: Adiciona parceiro aos favoritos
+      description: Adiciona um parceiro à lista de favoritos do aluno
+      tags:
+        - student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partner_id:
+                  type: string
+                  format: uuid
+              required:
+                - partner_id
+      responses:
+        '201':
+          description: Parceiro adicionado aos favoritos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Parceiro não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /students/me/fav/{pid}:
+    delete:
+      summary: Remove parceiro dos favoritos
+      description: Remove um parceiro da lista de favoritos do aluno
+      tags:
+        - student
+      parameters:
+        - $ref: '#/components/parameters/PartnerIdParam'
+      responses:
+        '200':
+          description: Parceiro removido dos favoritos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Parceiro não encontrado nos favoritos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /partner/redeem:
+    post:
+      summary: Resgata código de validação
+      description: Resgata um código de validação gerado por um aluno
+      tags:
+        - partner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RedeemRequest'
+      responses:
+        '200':
+          description: Código resgatado com sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          student:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              course:
+                                type: string
+                            required:
+                              - name
+                              - course
+                          promotion:
+                            type: object
+                            properties:
+                              title:
+                                type: string
+                            required:
+                              - title
+                        required:
+                          - student
+                          - promotion
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Código não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '410':
+          description: Código expirado ou promoção inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit excedido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /partner/promotions:
+    get:
+      summary: Lista promoções do parceiro
+      description: Retorna a lista de promoções do parceiro
+      tags:
+        - partner
+      parameters:
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: Lista de promoções
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Promotion'
+                          total:
+                            type: integer
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      summary: Cria nova promoção
+      description: Cria uma nova promoção para o parceiro
+      tags:
+        - partner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromotionRequest'
+      responses:
+        '201':
+          description: Promoção criada com sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Promotion'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /partner/promotions/{id}:
+    put:
+      summary: Atualiza promoção
+      description: Atualiza uma promoção existente do parceiro
+      tags:
+        - partner
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromotionRequest'
+      responses:
+        '200':
+          description: Promoção atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Promotion'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Promoção não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      summary: Desativa promoção
+      description: Desativa uma promoção existente do parceiro
+      tags:
+        - partner
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Promoção desativada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Promoção não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /partner/reports:
+    get:
+      summary: Relatório de uso
+      description: Retorna relatório de uso das promoções do parceiro
+      tags:
+        - partner
+      parameters:
+        - $ref: '#/components/parameters/DateRangeParam'
+      responses:
+        '200':
+          description: Relatório de uso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          period:
+                            type: string
+                            example: '2025-05'
+                          total_codes:
+                            type: integer
+                          total_redemptions:
+                            type: integer
+                          promotions:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  format: uuid
+                                title:
+                                  type: string
+                                redemptions:
+                                  type: integer
+                              required:
+                                - id
+                                - title
+                                - redemptions
+                        required:
+                          - period
+                          - total_codes
+                          - total_redemptions
+                          - promotions
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Parâmetro de data inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/{entity}:
+    get:
+      summary: Lista entidades
+      description: Retorna lista de entidades (students, partners, promotions, etc.)
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/EntityParam'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: Lista de entidades
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              oneOf:
+                                - $ref: '#/components/schemas/Student'
+                                - $ref: '#/components/schemas/Partner'
+                                - $ref: '#/components/schemas/Promotion'
+                                - $ref: '#/components/schemas/ValidationCode'
+                                - $ref: '#/components/schemas/Redemption'
+                          total:
+                            type: integer
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entidade não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      summary: Cria nova entidade
+      description: Cria uma nova entidade (student, partner, promotion, etc.)
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/EntityParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Student'
+                - $ref: '#/components/schemas/Partner'
+                - $ref: '#/components/schemas/Promotion'
+      responses:
+        '201':
+          description: Entidade criada com sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        oneOf:
+                          - $ref: '#/components/schemas/Student'
+                          - $ref: '#/components/schemas/Partner'
+                          - $ref: '#/components/schemas/Promotion'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entidade não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/{entity}/{id}:
+    put:
+      summary: Atualiza entidade
+      description: Atualiza uma entidade existente (student, partner, promotion, etc.)
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/EntityParam'
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Student'
+                - $ref: '#/components/schemas/Partner'
+                - $ref: '#/components/schemas/Promotion'
+      responses:
+        '200':
+          description: Entidade atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        oneOf:
+                          - $ref: '#/components/schemas/Student'
+                          - $ref: '#/components/schemas/Partner'
+                          - $ref: '#/components/schemas/Promotion'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entidade não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      summary: Remove/inativa entidade
+      description: Remove ou inativa uma entidade existente (student, partner, promotion, etc.)
+      tags:
+        - admin
+      parameters:
+        - $ref: '#/components/parameters/EntityParam'
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Entidade removida/inativada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entidade não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/metrics:
+    get:
+      summary: KPIs do sistema
+      description: Retorna métricas e KPIs do sistema
+      tags:
+        - admin
+      responses:
+        '200':
+          description: Métricas do sistema
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Metrics'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/notifications:
+    post:
+      summary: Envia notificações
+      description: Envia notificações push/e-mail para alunos ou parceiros
+      tags:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+      responses:
+        '202':
+          description: Notificações enfileiradas com sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          recipients:
+                            type: integer
+                            description: Número de destinatários
+                          message_id:
+                            type: string
+                            format: uuid
+                            description: ID da mensagem para rastreamento
+                        required:
+                          - recipients
+                          - message_id
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
