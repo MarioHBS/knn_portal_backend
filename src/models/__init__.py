@@ -19,6 +19,7 @@ class ErrorResponse(BaseModel):
 class Student(BaseModel):
     """Modelo para alunos."""
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
     cpf_hash: str
     name: str
     email: str
@@ -31,6 +32,7 @@ class Student(BaseModel):
 class Partner(BaseModel):
     """Modelo para parceiros."""
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
     trade_name: str
     category: str
     address: str
@@ -42,6 +44,7 @@ class Partner(BaseModel):
 class Promotion(BaseModel):
     """Modelo para promoções."""
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
     partner_id: str
     title: str
     type: str
@@ -55,6 +58,7 @@ class Promotion(BaseModel):
 class ValidationCode(BaseModel):
     """Modelo para códigos de validação."""
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
     student_id: str
     partner_id: str
     code_hash: str
@@ -172,7 +176,7 @@ class FavoritesResponse(BaseResponse):
     """Modelo para resposta de favoritos."""
     data: List[Partner]
 
-class EntityResponse(BaseResponse):
+class EntityResponse(BaseModel):
     """Modelo para resposta de entidade."""
     data: dict
 

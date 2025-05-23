@@ -24,21 +24,17 @@ class PostgresClient:
             raise
     
     @staticmethod
-    async def get_document(table: str, doc_id: str) -> Optional[Dict[str, Any]]:
+    async def get_document(table: str, doc_id: str, tenant_id: str) -> Optional[Dict[str, Any]]:
         """
-        Obtém um documento do PostgreSQL.
+        Obtém um documento do PostgreSQL filtrando por tenant_id.
         """
         try:
             conn = await PostgresClient.get_connection()
             try:
-                # Construir query
-                query = f"SELECT * FROM {table} WHERE id = $1"
-                
-                # Executar query
-                row = await conn.fetchrow(query, doc_id)
-                
+                # Query com chave composta
+                query = f"SELECT * FROM {table} WHERE id = $1 AND tenant_id = $2"
+                row = await conn.fetchrow(query, doc_id, tenant_id)
                 if row:
-                    # Converter para dicionário
                     return dict(row)
                 return None
             finally:
@@ -46,88 +42,40 @@ class PostgresClient:
         except Exception as e:
             logger.error(f"Erro ao obter documento {table}/{doc_id}: {str(e)}")
             raise
-    
+
     @staticmethod
     async def query_documents(
         table: str, 
+        tenant_id: str,
         filters: Optional[List[Tuple[str, str, Any]]] = None, 
         order_by: Optional[List[Tuple[str, str]]] = None,
         limit: int = 20,
         offset: int = 0
     ) -> Dict[str, Any]:
         """
-        Consulta documentos no PostgreSQL com filtros e ordenação.
-        
-        Args:
-            table: Nome da tabela
-            filters: Lista de tuplas (campo, operador, valor)
-            order_by: Lista de tuplas (campo, direção)
-            limit: Limite de documentos
-            offset: Offset para paginação
-        
-        Returns:
-            Dict com items, total, limit e offset
+        Consulta documentos no PostgreSQL filtrando por tenant_id.
         """
         try:
             conn = await PostgresClient.get_connection()
             try:
-                # Construir query base
-                query = f"SELECT * FROM {table}"
-                count_query = f"SELECT COUNT(*) FROM {table}"
-                
-                # Aplicar filtros
-                params = []
+                query = f"SELECT * FROM {table} WHERE tenant_id = $1"
+                params = [tenant_id]
+                param_idx = 2
                 if filters:
-                    where_clauses = []
-                    for i, (field, op, value) in enumerate(filters):
-                        # Converter operadores do Firestore para SQL
-                        sql_op = "="
-                        if op == "==": sql_op = "="
-                        elif op == "!=": sql_op = "!="
-                        elif op == "<": sql_op = "<"
-                        elif op == "<=": sql_op = "<="
-                        elif op == ">": sql_op = ">"
-                        elif op == ">=": sql_op = ">="
-                        
-                        where_clauses.append(f"{field} {sql_op} ${i+1}")
-                        params.append(value)
-                    
-                    if where_clauses:
-                        where_clause = " WHERE " + " AND ".join(where_clauses)
-                        query += where_clause
-                        count_query += where_clause
-                
-                # Aplicar ordenação
+                    for f in filters:
+                        query += f" AND {f[0]} {f[1]} ${param_idx}"
+                        params.append(f[2])
+                        param_idx += 1
                 if order_by:
-                    order_clauses = []
-                    for field, direction in order_by:
-                        # Converter direção para SQL
-                        sql_direction = "ASC" if direction == "ASCENDING" else "DESC"
-                        order_clauses.append(f"{field} {sql_direction}")
-                    
-                    if order_clauses:
-                        query += " ORDER BY " + ", ".join(order_clauses)
-                
-                # Aplicar paginação
+                    order_str = ", ".join([f"{o[0]} {o[1]}" for o in order_by])
+                    query += f" ORDER BY {order_str}"
                 query += f" LIMIT {limit} OFFSET {offset}"
-                
-                # Executar queries
-                total = await conn.fetchval(count_query, *params)
                 rows = await conn.fetch(query, *params)
-                
-                # Converter para dicionários
-                items = [dict(row) for row in rows]
-                
-                return {
-                    "items": items,
-                    "total": total,
-                    "limit": limit,
-                    "offset": offset
-                }
+                return {"data": [dict(r) for r in rows]}
             finally:
                 await conn.close()
         except Exception as e:
-            logger.error(f"Erro ao consultar documentos em {table}: {str(e)}")
+            logger.error(f"Erro ao consultar documentos {table}: {str(e)}")
             raise
     
     @staticmethod

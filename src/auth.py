@@ -26,6 +26,7 @@ class JWTPayload(BaseModel):
     """Modelo para o payload do JWT."""
     sub: str
     role: str
+    tenant: str
     exp: int
     iat: int
     iss: Optional[str] = None

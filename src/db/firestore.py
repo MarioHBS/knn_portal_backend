@@ -32,27 +32,51 @@ except Exception as e:
         logger.error(f"Erro ao inicializar Firestore com emulador: {str(e)}")
         db = None
 
+# Helpers multi-tenant
+
+def fs_doc(col: str, id: str, tenant: str):
+    return db.collection(col).document(f"{tenant}_{id}")
+
+def fs_query(col: str, tenant: str):
+    return db.collection(col).where("tenant_id", "==", tenant)
+
 class FirestoreClient:
     """Cliente para acesso ao Firestore."""
     
     @staticmethod
-    async def get_document(collection: str, doc_id: str) -> Optional[Dict[str, Any]]:
+    async def get_document(collection: str, doc_id: str, tenant_id: str) -> Optional[Dict[str, Any]]:
         """
-        Obtém um documento do Firestore.
+        Obtém um documento do Firestore filtrando por tenant_id.
         """
         if not db:
             logger.error("Firestore não inicializado")
             return None
-        
         try:
-            doc_ref = db.collection(collection).document(doc_id)
+            doc_ref = fs_doc(collection, doc_id, tenant_id)
             doc = doc_ref.get()
-            
             if doc.exists:
                 return {**doc.to_dict(), "id": doc.id}
             return None
         except Exception as e:
             logger.error(f"Erro ao obter documento {collection}/{doc_id}: {str(e)}")
+            raise
+
+    @staticmethod
+    async def query_documents(collection: str, tenant_id: str, **kwargs) -> List[Dict[str, Any]]:
+        """
+        Consulta documentos filtrando por tenant_id.
+        """
+        if not db:
+            logger.error("Firestore não inicializado")
+            return []
+        try:
+            query = fs_query(collection, tenant_id)
+            for k, v in kwargs.items():
+                query = query.where(k, "==", v)
+            docs = query.stream()
+            return [{**d.to_dict(), "id": d.id} for d in docs]
+        except Exception as e:
+            logger.error(f"Erro ao consultar documentos {collection}: {str(e)}")
             raise
     
     @staticmethod

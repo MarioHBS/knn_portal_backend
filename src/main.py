@@ -108,6 +108,28 @@ async def validation_error_handler(request: Request, exc):
         content={"error": {"code": "VALIDATION_ERROR", "msg": "Dados inválidos"}}
     )
 
+# Middleware para injetar tenant_id do JWT
+from fastapi import HTTPException
+from src.auth import security, JWTPayload, jwt, JWTError
+
+@app.middleware("http")
+async def with_tenant(request: Request, call_next):
+    # Extrai o token Bearer
+    authorization: str = request.headers.get("authorization")
+    if not authorization or not authorization.lower().startswith("bearer "):
+        return JSONResponse(status_code=400, content={"error": {"msg": "Token JWT ausente"}})
+    token = authorization.split(" ", 1)[1]
+    try:
+        # Decodifica o JWT (ajuste conforme sua função de verificação)
+        payload = jwt.decode(token, options={"verify_signature": False})
+        tenant = payload.get("tenant")
+        if not tenant:
+            return JSONResponse(status_code=400, content={"error": {"msg": "tenant missing"}})
+        request.state.tenant = tenant
+    except JWTError:
+        return JSONResponse(status_code=400, content={"error": {"msg": "JWT inválido"}})
+    return await call_next(request)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("src.main:app", host="0.0.0.0", port=8080, reload=DEBUG)
