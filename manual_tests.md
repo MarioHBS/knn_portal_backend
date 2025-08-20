@@ -49,6 +49,21 @@ complementando os testes automatizados no script test_endpoints.py.
 - [ ] Desativar promoção (DELETE /partner/promotions/{id})
 - [ ] Ver relatório de uso (GET /partner/reports?range=2025-05)
 
+## Testes de Perfil Funcionário (Employee)
+
+- [ ] Listar parceiros (GET /employees/partners)
+- [ ] Filtrar parceiros por categoria (GET /employees/partners?cat=Livraria)
+- [ ] Ordenar parceiros (GET /employees/partners?ord=name_asc)
+- [ ] Ver detalhes de um parceiro (GET /employees/partners/{id})
+- [ ] Verificar se promoções são filtradas para funcionários (target_profile=employee ou both)
+- [ ] Gerar código de validação (POST /employees/validation-codes)
+- [ ] Verificar se o código expira após 3 minutos
+- [ ] Ver histórico de resgates (GET /employees/me/history)
+- [ ] Ver favoritos (GET /employees/me/fav)
+- [ ] Adicionar parceiro aos favoritos (POST /employees/me/fav)
+- [ ] Remover parceiro dos favoritos (DELETE /employees/me/fav/{pid})
+- [ ] Verificar se funcionário inativo não pode gerar códigos
+
 ## Testes de Perfil Administrador (Admin)
 
 - [ ] Listar estudantes (GET /admin/students)

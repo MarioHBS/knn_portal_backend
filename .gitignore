@@ -48,7 +48,12 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+
+# Documentos técnicos não versionados
+relatorio_tecnico.md
+lista_tarefas_implementacao.md
 .pytest_cache/
+.ruff_cache/
 
 # Translations
 *.mo
@@ -62,9 +67,6 @@ local_settings.py
 instance/
 .webassets-cache
 
-# Scrapy stuff:
-.scrapy
-
 # Sphinx documentation
 docs/_build/
 
@@ -74,22 +76,12 @@ docs/_build/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# IPython
-profile_default/
-ipython_config.py
-
 # pyenv
 .python-version
 
 # pipenv
 Pipfile.lock
 
-# poetry
-poetry.lock
-
-# mypy
-.mypy_cache/
-.dmypy.json
 
 # Pyre type checker
 .pyre/

@@ -110,10 +110,17 @@ KNN_TEST_MODE=true python run_server.py
 
 ### Testes
 
-Para executar todos os testes automatizados:
+Para executar todos os testes automatizados (incluindo linting com Ruff):
 
 ```
 ./run_tests.sh
+```
+
+Para executar apenas o linting:
+
+```
+ruff check src/
+ruff format src/
 ```
 
 Para testes manuais, siga as instruções em `manual_tests.md`.

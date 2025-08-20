@@ -21,7 +21,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Token JWT com claim 'role' (student|partner|admin)
+      description: Token JWT com claim 'role' (student|partner|admin|employee)
 
   schemas:
     Error:
@@ -128,6 +128,11 @@ components:
         active:
           type: boolean
           default: true
+        target_profile:
+          type: string
+          enum: [student, employee, both]
+          description: Perfil alvo da promoção
+          example: student
       required:
         - id
         - partner_id
@@ -136,6 +141,7 @@ components:
         - valid_from
         - valid_to
         - active
+        - target_profile
 
     Student:
       type: object
@@ -165,6 +171,45 @@ components:
         - email
         - course
         - active_until
+
+    Employee:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenant_id:
+          type: string
+          format: uuid
+        cpf_hash:
+          type: string
+          format: sha256
+        name:
+          type: string
+          example: Maria Santos
+        email:
+          type: string
+          format: email
+        department:
+          type: string
+          example: Recursos Humanos
+        active:
+          type: boolean
+          default: true
+        favorite_partners:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Lista de IDs dos parceiros favoritos
+      required:
+        - id
+        - tenant_id
+        - cpf_hash
+        - name
+        - email
+        - department
+        - active
 
     ValidationCode:
       type: object
@@ -749,6 +794,316 @@ paths:
                 $ref: '#/components/schemas/Error'
         '404':
           description: Parceiro não encontrado nos favoritos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # Endpoints para funcionários (employee)
+  /employees/partners:
+    get:
+      summary: Lista parceiros (funcionários)
+      description: Retorna lista de parceiros com filtros e paginação para funcionários
+      tags:
+        - employee
+      parameters:
+        - $ref: '#/components/parameters/CategoryParam'
+        - $ref: '#/components/parameters/OrderParam'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: Lista de parceiros
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Partner'
+                          total:
+                            type: integer
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /employees/partners/{id}:
+    get:
+      summary: Detalhes do parceiro (funcionários)
+      description: Retorna detalhes de um parceiro específico e suas promoções ativas para funcionários
+      tags:
+        - employee
+      parameters:
+        - $ref: '#/components/parameters/PartnerIdParam'
+      responses:
+        '200':
+          description: Detalhes do parceiro
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PartnerDetail'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Parceiro não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /employees/validation-codes:
+    post:
+      summary: Gera código de validação (funcionários)
+      description: Gera um código de validação de 6 dígitos com validade de 3 minutos para funcionários
+      tags:
+        - employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationCodeRequest'
+      responses:
+        '200':
+          description: Código gerado com sucesso
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            example: "123456"
+                          expires:
+                            type: string
+                            format: date-time
+                          partner_id:
+                            type: string
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (funcionário inativo ou role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Parceiro não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /employees/me/history:
+    get:
+      summary: Histórico de resgates (funcionários)
+      description: Retorna o histórico de códigos de validação gerados pelo funcionário
+      tags:
+        - employee
+      parameters:
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: Histórico de resgates
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/HistoryItem'
+                          total:
+                            type: integer
+                          limit:
+                            type: integer
+                          offset:
+                            type: integer
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /employees/me/fav:
+    get:
+      summary: Lista parceiros favoritos (funcionários)
+      description: Retorna a lista de parceiros favoritos do funcionário
+      tags:
+        - employee
+      responses:
+        '200':
+          description: Lista de parceiros favoritos
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Partner'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Funcionário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Adiciona parceiro aos favoritos (funcionários)
+      description: Adiciona um parceiro à lista de favoritos do funcionário
+      tags:
+        - employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partner_id:
+                  type: string
+                  description: ID do parceiro
+              required:
+                - partner_id
+      responses:
+        '200':
+          description: Parceiro adicionado aos favoritos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Parceiro ou funcionário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /employees/me/fav/{partner_id}:
+    delete:
+      summary: Remove parceiro dos favoritos (funcionários)
+      description: Remove um parceiro da lista de favoritos do funcionário
+      tags:
+        - employee
+      parameters:
+        - name: partner_id
+          in: path
+          required: true
+          description: ID do parceiro
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Parceiro removido dos favoritos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Funcionário não encontrado
           content:
             application/json:
               schema:
