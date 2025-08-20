@@ -2,12 +2,14 @@
 Utilitários para logging estruturado com mascaramento de CPF.
 """
 import re
-import structlog
 from typing import Any, Dict, Union
 
+import structlog
+
 # Padrão para identificar CPFs em strings
-CPF_PATTERN = re.compile(r'\b\d{11}\b')
+CPF_PATTERN = re.compile(r"\b\d{11}\b")
 CPF_MASKED = "***********"
+
 
 def mask_cpf(text: str) -> str:
     """
@@ -15,7 +17,10 @@ def mask_cpf(text: str) -> str:
     """
     return CPF_PATTERN.sub(CPF_MASKED, text)
 
-def mask_cpf_in_log(log_event: Union[Dict[str, Any], str]) -> Union[Dict[str, Any], str]:
+
+def mask_cpf_in_log(
+    log_event: Union[Dict[str, Any], str]
+) -> Union[Dict[str, Any], str]:
     """
     Mascara CPFs em eventos de log, seja dicionário ou string.
     """
@@ -35,6 +40,7 @@ def mask_cpf_in_log(log_event: Union[Dict[str, Any], str]) -> Union[Dict[str, An
         return mask_cpf(log_event)
     return log_event
 
+
 # Configuração do structlog
 def configure_logging():
     """
@@ -48,14 +54,19 @@ def configure_logging():
             # Processor personalizado para mascarar CPFs
             lambda logger, method_name, event_dict: {
                 "event": mask_cpf_in_log(event_dict.get("event", "")),
-                **mask_cpf_in_log({k: v for k, v in event_dict.items() if k != "event"})
+                **mask_cpf_in_log(
+                    {k: v for k, v in event_dict.items() if k != "event"}
+                ),
             },
-            structlog.processors.JSONRenderer()
+            structlog.processors.JSONRenderer(),
         ],
         logger_factory=structlog.PrintLoggerFactory(),
-        wrapper_class=structlog.make_filtering_bound_logger(structlog.get_logger().level),
+        wrapper_class=structlog.make_filtering_bound_logger(
+            structlog.get_logger().level
+        ),
         cache_logger_on_first_use=True,
     )
+
 
 # Obter logger configurado
 logger = structlog.get_logger()

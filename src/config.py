@@ -2,7 +2,6 @@
 Configurações e variáveis de ambiente para o Portal de Benefícios KNN.
 """
 import os
-from typing import List
 
 # Configurações da API
 API_VERSION = "v1"
@@ -15,10 +14,7 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 PORT = int(os.getenv("PORT", "8080"))
 
 # Configurações de CORS
-CORS_ORIGINS = [
-    "https://portal.knnidiomas.com.br",
-    "http://localhost:5173"
-]
+CORS_ORIGINS = ["https://portal.knnidiomas.com.br", "http://localhost:5173"]
 
 # Configurações de autenticação
 JWKS_URL = os.getenv("JWKS_URL", "https://auth.knnidiomas.com.br/.well-known/jwks.json")
@@ -28,15 +24,17 @@ JWT_ALGORITHM = "RS256"
 # Configurações de banco de dados
 FIRESTORE_PROJECT = os.getenv("FIRESTORE_PROJECT", "knn-portal-dev")
 POSTGRES_CONNECTION_STRING = os.getenv(
-    "POSTGRES_CONNECTION_STRING", 
-    "postgresql://postgres:postgres@localhost:5432/knn_portal"
+    "POSTGRES_CONNECTION_STRING",
+    "postgresql://postgres:postgres@localhost:5432/knn_portal",
 )
 
 # Configurações de segurança
 CPF_HASH_SALT = os.getenv("CPF_HASH_SALT", "knn-dev-salt")
 
 # Configurações de circuit breaker
-CIRCUIT_BREAKER_THRESHOLD = 3  # Número de falhas consecutivas para ativar o circuit breaker
+CIRCUIT_BREAKER_THRESHOLD = (
+    3  # Número de falhas consecutivas para ativar o circuit breaker
+)
 CIRCUIT_BREAKER_TIMEOUT = 300  # Tempo em segundos para tentar novamente o Firestore
 
 # Configurações de rate limit

@@ -12,6 +12,7 @@ from typing import Dict, Any, List
 BASE_URL = "http://localhost:8080/v1"
 STUDENT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHVkZW50LWlkIiwicm9sZSI6InN0dWRlbnQiLCJleHAiOjE3MTY5OTIwMDAsImlhdCI6MTcxNjkwNTYwMH0.8Uj7hl5vYGnEZQGR5QeQQOdTKB4ZXEfEiqxJxlE5Pjw"
 PARTNER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYXJ0bmVyLWlkIiwicm9sZSI6InBhcnRuZXIiLCJleHAiOjE3MTY5OTIwMDAsImlhdCI6MTcxNjkwNTYwMH0.Hn5Fq5qSVBN5QjuoYd2KBjTIGJJoV9OQh-VzpNqJrSs"
+EMPLOYEE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlbXBsb3llZS1pZCIsInJvbGUiOiJlbXBsb3llZSIsImV4cCI6MTcxNjk5MjAwMCwiaWF0IjoxNzE2OTA1NjAwfQ.Kj8Hn5Fq5qSVBN5QjuoYd2KBjTIGJJoV9OQh-VzpNqJ"
 ADMIN_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi1pZCIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTcxNjk5MjAwMCwiaWF0IjoxNzE2OTA1NjAwfQ.jQyOq0-KnzH0vqBQwKsqzTBGzKqGLYVj9WdAZKbK5Hs"
 
 # Função para fazer requisições HTTP
@@ -170,6 +171,48 @@ async def test_partner_endpoints():
     # Obter relatório
     await make_request("GET", "/partner/reports", token=PARTNER_TOKEN, params={"range": "2025-05"})
 
+# Testes de Endpoints para Funcionários
+async def test_employee_endpoints():
+    """Testa endpoints para funcionários."""
+    print("\n=== TESTES DE ENDPOINTS PARA FUNCIONÁRIOS ===")
+    
+    # Listar parceiros
+    partners_response = await make_request("GET", "/employees/partners", token=EMPLOYEE_TOKEN)
+    
+    # Obter detalhes de um parceiro
+    if "data" in partners_response and "items" in partners_response["data"] and partners_response["data"]["items"]:
+        partner_id = partners_response["data"]["items"][0]["id"]
+        await make_request("GET", f"/employees/partners/{partner_id}", token=EMPLOYEE_TOKEN)
+    else:
+        print("Não foi possível obter ID de parceiro para teste de detalhes")
+    
+    # Gerar código de validação
+    if "data" in partners_response and "items" in partners_response["data"] and partners_response["data"]["items"]:
+        partner_id = partners_response["data"]["items"][0]["id"]
+        await make_request("POST", "/employees/validation-codes", token=EMPLOYEE_TOKEN, data={"partner_id": partner_id})
+    else:
+        print("Não foi possível obter ID de parceiro para teste de geração de código")
+    
+    # Obter histórico de resgates
+    await make_request("GET", "/employees/me/history", token=EMPLOYEE_TOKEN)
+    
+    # Obter favoritos
+    await make_request("GET", "/employees/me/fav", token=EMPLOYEE_TOKEN)
+    
+    # Adicionar favorito
+    if "data" in partners_response and "items" in partners_response["data"] and partners_response["data"]["items"]:
+        partner_id = partners_response["data"]["items"][0]["id"]
+        await make_request("POST", "/employees/me/fav", token=EMPLOYEE_TOKEN, data={"partner_id": partner_id})
+    else:
+        print("Não foi possível obter ID de parceiro para teste de adição de favorito")
+    
+    # Remover favorito
+    if "data" in partners_response and "items" in partners_response["data"] and partners_response["data"]["items"]:
+        partner_id = partners_response["data"]["items"][0]["id"]
+        await make_request("DELETE", f"/employees/me/fav/{partner_id}", token=EMPLOYEE_TOKEN)
+    else:
+        print("Não foi possível obter ID de parceiro para teste de remoção de favorito")
+
 # Testes de Endpoints para Administradores
 async def test_admin_endpoints():
     """Testa endpoints para administradores."""
@@ -243,6 +286,9 @@ async def main():
     
     # Testar endpoints para parceiros
     await test_partner_endpoints()
+    
+    # Testar endpoints para funcionários
+    await test_employee_endpoints()
     
     # Testar endpoints para administradores
     await test_admin_endpoints()

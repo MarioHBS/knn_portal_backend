@@ -128,6 +128,96 @@ def client():
             "msg": "ok"
         }
     
+    # Rotas para funcionários (employee)
+    @app.get("/v1/employees/partners")
+    async def employee_list_partners(current_user = Depends(lambda: get_current_user(role="employee"))):
+        return {
+            "data": {
+                "items": [
+                    {"id": str(uuid.uuid4()), "trade_name": "Parceiro 1", "category": "Livraria", "address": "Endereço 1", "active": True},
+                    {"id": str(uuid.uuid4()), "trade_name": "Parceiro 2", "category": "Restaurante", "address": "Endereço 2", "active": True}
+                ],
+                "total": 2,
+                "limit": 20,
+                "offset": 0
+            },
+            "msg": "ok"
+        }
+    
+    @app.get("/v1/employees/partners/{id}")
+    async def employee_get_partner(id: str, current_user = Depends(lambda: get_current_user(role="employee"))):
+        if id == "not-found":
+            raise HTTPException(status_code=404, detail={"error": {"code": "NOT_FOUND", "msg": "Parceiro não encontrado"}})
+        return {
+            "data": {
+                "id": id,
+                "trade_name": "Parceiro Teste",
+                "category": "Livraria",
+                "address": "Endereço Teste",
+                "active": True,
+                "promotions": [
+                    {
+                        "id": str(uuid.uuid4()),
+                        "title": "Promoção para Funcionários",
+                        "type": "discount",
+                        "target_profile": "employee",
+                        "valid_from": datetime.now().isoformat(),
+                        "valid_to": (datetime.now() + timedelta(days=30)).isoformat(),
+                        "active": True
+                    }
+                ]
+            },
+            "msg": "ok"
+        }
+    
+    @app.post("/v1/employees/validation-codes")
+    async def employee_create_validation_code(current_user = Depends(lambda: get_current_user(role="employee"))):
+        return {
+            "data": {
+                "code": "123456",
+                "expires": (datetime.now() + timedelta(minutes=3)).isoformat(),
+                "partner_id": str(uuid.uuid4())
+            },
+            "msg": "ok"
+        }
+    
+    @app.get("/v1/employees/me/history")
+    async def employee_history(current_user = Depends(lambda: get_current_user(role="employee"))):
+        return {
+            "data": {
+                "items": [
+                    {
+                        "id": str(uuid.uuid4()),
+                        "partner_name": "Parceiro Teste",
+                        "code": "123456",
+                        "created_at": datetime.now().isoformat(),
+                        "used_at": None
+                    }
+                ],
+                "total": 1,
+                "limit": 20,
+                "offset": 0
+            },
+            "msg": "ok"
+        }
+    
+    @app.get("/v1/employees/me/fav")
+    async def employee_get_favorites(current_user = Depends(lambda: get_current_user(role="employee"))):
+        return {
+            "data": [
+                {"id": str(uuid.uuid4()), "trade_name": "Parceiro Favorito", "category": "Livraria", "address": "Endereço", "active": True}
+            ],
+            "msg": "ok"
+        }
+    
+    @app.post("/v1/employees/me/fav")
+    async def employee_add_favorite(current_user = Depends(lambda: get_current_user(role="employee"))):
+        return {"data": {}, "msg": "ok"}
+    
+    @app.delete("/v1/employees/me/fav/{partner_id}")
+    async def employee_remove_favorite(partner_id: str, current_user = Depends(lambda: get_current_user(role="employee"))):
+        return {"data": {}, "msg": "ok"}
+
     # Rota admin para testes
     @app.get("/v1/admin/metrics")
     async def admin_metrics(current_user = Depends(lambda: get_current_user(role="admin"))):
@@ -442,3 +532,96 @@ def test_cpf_masking_in_logs():
     masked_text = mask_cpf_in_log(log_text)
     assert "CPF: ***********" in masked_text
     assert "Nome: Test" in masked_text
+
+
+# Testes de Endpoints para Funcionários
+def test_employee_list_partners(client):
+    """Teste de listagem de parceiros para funcionários"""
+    response = client.get("/v1/employees/partners", headers={"Authorization": "Bearer valid-employee"})
+    assert response.status_code == 200
+    assert "data" in response.json()
+    assert "items" in response.json()["data"]
+    assert len(response.json()["data"]["items"]) == 2
+
+
+def test_employee_get_partner_details(client):
+    """Teste de detalhes do parceiro para funcionários"""
+    partner_id = str(uuid.uuid4())
+    response = client.get(f"/v1/employees/partners/{partner_id}", headers={"Authorization": "Bearer valid-employee"})
+    assert response.status_code == 200
+    assert "data" in response.json()
+    assert "promotions" in response.json()["data"]
+    # Verificar se a promoção é específica para funcionários
+    promotions = response.json()["data"]["promotions"]
+    if promotions:
+        assert promotions[0]["target_profile"] == "employee"
+
+
+def test_employee_partner_not_found(client):
+    """Teste de parceiro não encontrado para funcionários"""
+    response = client.get("/v1/employees/partners/not-found", headers={"Authorization": "Bearer valid-employee"})
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "NOT_FOUND"
+
+
+def test_employee_create_validation_code(client):
+    """Teste de geração de código de validação para funcionários"""
+    response = client.post(
+        "/v1/employees/validation-codes",
+        json={"partner_id": str(uuid.uuid4())},
+        headers={"Authorization": "Bearer valid-employee"}
+    )
+    assert response.status_code == 200
+    assert "code" in response.json()["data"]
+    assert "expires" in response.json()["data"]
+    assert len(response.json()["data"]["code"]) == 6
+
+
+def test_employee_history(client):
+    """Teste de histórico de resgates para funcionários"""
+    response = client.get("/v1/employees/me/history", headers={"Authorization": "Bearer valid-employee"})
+    assert response.status_code == 200
+    assert "data" in response.json()
+    assert "items" in response.json()["data"]
+    assert "total" in response.json()["data"]
+
+
+def test_employee_get_favorites(client):
+    """Teste de listagem de favoritos para funcionários"""
+    response = client.get("/v1/employees/me/fav", headers={"Authorization": "Bearer valid-employee"})
+    assert response.status_code == 200
+    assert "data" in response.json()
+    assert isinstance(response.json()["data"], list)
+
+
+def test_employee_add_favorite(client):
+    """Teste de adição de favorito para funcionários"""
+    response = client.post(
+        "/v1/employees/me/fav",
+        json={"partner_id": str(uuid.uuid4())},
+        headers={"Authorization": "Bearer valid-employee"}
+    )
+    assert response.status_code == 200
+    assert response.json()["msg"] == "ok"
+
+
+def test_employee_remove_favorite(client):
+    """Teste de remoção de favorito para funcionários"""
+    partner_id = str(uuid.uuid4())
+    response = client.delete(
+        f"/v1/employees/me/fav/{partner_id}",
+        headers={"Authorization": "Bearer valid-employee"}
+    )
+    assert response.status_code == 200
+    assert response.json()["msg"] == "ok"
+
+
+def test_employee_wrong_role_access(client):
+    """Teste de acesso negado para endpoints de funcionário com role incorreta"""
+    # Tentar acessar endpoint de funcionário com token de estudante
+    response = client.get("/v1/employees/partners", headers={"Authorization": "Bearer valid-student"})
+    assert response.status_code == 403
+    
+    # Tentar acessar endpoint de funcionário com token de parceiro
+    response = client.get("/v1/employees/partners", headers={"Authorization": "Bearer valid-partner"})
+    assert response.status_code == 403

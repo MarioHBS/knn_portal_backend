@@ -4,6 +4,11 @@
 # Configurar ambiente de teste
 export KNN_TEST_MODE=true
 
+# Executar linting com Ruff
+echo "Executando linting com Ruff..."
+ruff check src/
+ruff format --check src/
+
 # Gerar dados de teste
 echo "Gerando dados de teste..."
 python3 generate_test_data.py
