@@ -152,24 +152,52 @@ components:
         cpf_hash:
           type: string
           format: sha256
-        name:
+        nome_aluno:
           type: string
           example: João da Silva
-        email:
+        curso:
+          type: string
+          example: SEEDS 1
+        ocupacao_aluno:
+          type: string
+          example: Estudante
+          nullable: true
+        email_aluno:
           type: string
           format: email
-        course:
+          nullable: true
+        celular_aluno:
           type: string
-          example: Inglês Avançado
+          example: 98999123456
+          nullable: true
+        cep_aluno:
+          type: string
+          example: 65000-000
+          nullable: true
+        bairro:
+          type: string
+          example: Centro
+          nullable: true
+        complemento_aluno:
+          type: string
+          example: Apt 101
+          nullable: true
+        nome_responsavel:
+          type: string
+          example: Maria da Silva
+          nullable: true
+        email_responsavel:
+          type: string
+          format: email
+          nullable: true
         active_until:
           type: string
           format: date
       required:
         - id
         - cpf_hash
-        - name
-        - email
-        - course
+        - nome_aluno
+        - curso
         - active_until
 
     Employee:
@@ -270,13 +298,13 @@ components:
           type: string
           pattern: '^[0-9]{6}$'
           example: '123456'
-        cpf:
+        cnpj:
           type: string
-          pattern: '^[0-9]{11}$'
-          example: '12345678901'
+          pattern: '^[0-9]{14}$'
+          example: '12345678000195'
       required:
         - code
-        - cpf
+        - cnpj
 
     ValidationCodeRequest:
       type: object
