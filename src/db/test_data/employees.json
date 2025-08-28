@@ -1,0 +1,50 @@
+[
+  {
+    "id": "employee_001",
+    "nome": "Carlos Administrador",
+    "email": "carlos.admin@escola.com",
+    "telefone": "(11) 99999-0001",
+    "cargo": "Administrador",
+    "departamento": "Administração",
+    "ativo": true,
+    "tenant_id": "test-tenant",
+    "created_at": "2024-01-10T08:00:00",
+    "updated_at": "2024-01-10T08:00:00"
+  },
+  {
+    "id": "employee_002",
+    "nome": "Maria Professora",
+    "email": "maria.prof@escola.com",
+    "telefone": "(11) 88888-0002",
+    "cargo": "Professora",
+    "departamento": "Educação",
+    "ativo": true,
+    "tenant_id": "test-tenant",
+    "created_at": "2024-01-11T09:30:00",
+    "updated_at": "2024-01-11T09:30:00"
+  },
+  {
+    "id": "employee_003",
+    "nome": "José Coordenador",
+    "email": "jose.coord@escola.com",
+    "telefone": "(11) 77777-0003",
+    "cargo": "Coordenador",
+    "departamento": "Coordenação",
+    "ativo": true,
+    "tenant_id": "test-tenant",
+    "created_at": "2024-01-12T10:15:00",
+    "updated_at": "2024-01-12T10:15:00"
+  },
+  {
+    "id": "employee_004",
+    "nome": "Ana Secretária",
+    "email": "ana.sec@escola.com",
+    "telefone": "(11) 66666-0004",
+    "cargo": "Secretária",
+    "departamento": "Secretaria",
+    "ativo": false,
+    "tenant_id": "test-tenant",
+    "created_at": "2024-01-13T11:45:00",
+    "updated_at": "2024-01-15T14:20:00"
+  }
+]

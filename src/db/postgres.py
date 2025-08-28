@@ -2,7 +2,7 @@
 Implementação da camada de acesso ao PostgreSQL.
 """
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import asyncpg
 
@@ -28,7 +28,7 @@ class PostgresClient:
     @staticmethod
     async def get_document(
         table: str, doc_id: str, tenant_id: str
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Obtém um documento do PostgreSQL filtrando por tenant_id.
         """
@@ -51,11 +51,11 @@ class PostgresClient:
     async def query_documents(
         table: str,
         tenant_id: str,
-        filters: Optional[List[Tuple[str, str, Any]]] = None,
-        order_by: Optional[List[Tuple[str, str]]] = None,
+        filters: list[tuple[str, str, Any]] | None = None,
+        order_by: list[tuple[str, str]] | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Consulta documentos no PostgreSQL filtrando por tenant_id.
         """
@@ -83,7 +83,7 @@ class PostgresClient:
             raise
 
     @staticmethod
-    async def create_document(table: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_document(table: str, data: dict[str, Any]) -> dict[str, Any]:
         """
         Cria um documento no PostgreSQL.
         """
@@ -116,8 +116,8 @@ class PostgresClient:
 
     @staticmethod
     async def update_document(
-        table: str, doc_id: str, data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        table: str, doc_id: str, data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Atualiza um documento no PostgreSQL.
         """
@@ -172,7 +172,7 @@ class PostgresClient:
             raise
 
     @staticmethod
-    async def execute_transaction(queries: List[Dict[str, Any]]) -> bool:
+    async def execute_transaction(queries: list[dict[str, Any]]) -> bool:
         """
         Executa uma transação no PostgreSQL.
 

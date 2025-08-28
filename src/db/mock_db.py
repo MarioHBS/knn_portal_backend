@@ -1,11 +1,12 @@
 """
 Script para simular o comportamento do Firestore e PostgreSQL para testes locais.
 """
+
 import json
 import os
 import time
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # Diretório para armazenar dados simulados
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_data")
@@ -20,7 +21,7 @@ class MockFirestore:
     """
 
     @staticmethod
-    def get_collection_data(collection: str) -> List[Dict[str, Any]]:
+    def get_collection_data(collection: str) -> list[dict[str, Any]]:
         """
         Obtém dados de uma coleção.
         """
@@ -35,7 +36,7 @@ class MockFirestore:
             return []
 
     @staticmethod
-    def save_collection_data(collection: str, data: List[Dict[str, Any]]) -> bool:
+    def save_collection_data(collection: str, data: list[dict[str, Any]]) -> bool:
         """
         Salva dados em uma coleção.
         """
@@ -49,7 +50,9 @@ class MockFirestore:
             return False
 
     @staticmethod
-    async def get_document(collection: str, doc_id: str) -> Optional[Dict[str, Any]]:
+    async def get_document(
+        collection: str, doc_id: str, tenant_id: str | None = None
+    ) -> dict[str, Any] | None:
         """
         Obtém um documento do Firestore simulado.
         """
@@ -63,6 +66,9 @@ class MockFirestore:
         # Buscar documento pelo ID
         for item in items:
             if item.get("id") == doc_id:
+                # Verificar tenant_id se fornecido
+                if tenant_id and item.get("tenant_id") != tenant_id:
+                    continue
                 return item
 
         return None
@@ -70,11 +76,12 @@ class MockFirestore:
     @staticmethod
     async def query_documents(
         collection: str,
-        filters: Optional[List[tuple]] = None,
-        order_by: Optional[List[tuple]] = None,
+        filters: list[tuple] | None = None,
+        order_by: list[tuple] | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> Dict[str, Any]:
+        tenant_id: str | None = None,
+    ) -> dict[str, Any]:
         """
         Consulta documentos no Firestore simulado.
         """
@@ -93,22 +100,20 @@ class MockFirestore:
                 for field, op, value in filters:
                     item_value = item.get(field)
 
-                    if op == "==" and item_value != value:
-                        match = False
-                        break
-                    elif op == "!=" and item_value == value:
-                        match = False
-                        break
-                    elif op == "<" and (item_value is None or item_value >= value):
-                        match = False
-                        break
-                    elif op == "<=" and (item_value is None or item_value > value):
-                        match = False
-                        break
-                    elif op == ">" and (item_value is None or item_value <= value):
-                        match = False
-                        break
-                    elif op == ">=" and (item_value is None or item_value < value):
+                    if (
+                        op == "=="
+                        and item_value != value
+                        or op == "!="
+                        and item_value == value
+                        or op == "<"
+                        and (item_value is None or item_value >= value)
+                        or op == "<="
+                        and (item_value is None or item_value > value)
+                        or op == ">"
+                        and (item_value is None or item_value <= value)
+                        or op == ">="
+                        and (item_value is None or item_value < value)
+                    ):
                         match = False
                         break
 
@@ -116,6 +121,10 @@ class MockFirestore:
                     filtered_items.append(item)
 
             items = filtered_items
+
+        # Filtrar por tenant_id se fornecido
+        if tenant_id:
+            items = [item for item in items if item.get("tenant_id") == tenant_id]
 
         # Aplicar ordenação
         if order_by:
@@ -133,8 +142,11 @@ class MockFirestore:
 
     @staticmethod
     async def create_document(
-        collection: str, data: Dict[str, Any], doc_id: Optional[str] = None
-    ) -> Dict[str, Any]:
+        collection: str,
+        data: dict[str, Any],
+        doc_id: str | None = None,
+        tenant_id: str | None = None,
+    ) -> dict[str, Any]:
         """
         Cria um documento no Firestore simulado.
         """
@@ -148,6 +160,10 @@ class MockFirestore:
         # Adicionar timestamp de criação
         data["created_at"] = datetime.now().isoformat()
 
+        # Adicionar tenant_id se fornecido
+        if tenant_id:
+            data["tenant_id"] = tenant_id
+
         # Adicionar documento
         items.append(data)
 
@@ -158,8 +174,11 @@ class MockFirestore:
 
     @staticmethod
     async def update_document(
-        collection: str, doc_id: str, data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        collection: str,
+        doc_id: str,
+        data: dict[str, Any],
+        tenant_id: str | None = None,
+    ) -> dict[str, Any]:
         """
         Atualiza um documento no Firestore simulado.
         """
@@ -177,6 +196,10 @@ class MockFirestore:
         updated_item = None
         for i, item in enumerate(items):
             if item.get("id") == doc_id:
+                # Verificar tenant_id se fornecido
+                if tenant_id and item.get("tenant_id") != tenant_id:
+                    continue
+
                 # Atualizar campos
                 for key, value in data.items():
                     item[key] = value
@@ -215,6 +238,58 @@ class MockFirestore:
 
         return False
 
+    @staticmethod
+    async def count_documents(
+        collection: str,
+        filters: list[tuple] | None = None,
+        tenant_id: str | None = None,
+    ) -> int:
+        """
+        Conta documentos no Firestore simulado.
+        """
+        # Simular falha se o modo de falha estiver ativado
+        if FIRESTORE_FAILURE_MODE:
+            raise Exception("Falha simulada no Firestore")
+
+        # Obter dados da coleção
+        items = MockFirestore.get_collection_data(collection)
+
+        # Aplicar filtros
+        if filters:
+            filtered_items = []
+            for item in items:
+                match = True
+                for field, op, value in filters:
+                    item_value = item.get(field)
+
+                    if (
+                        op == "=="
+                        and item_value != value
+                        or op == "!="
+                        and item_value == value
+                        or op == "<"
+                        and (item_value is None or item_value >= value)
+                        or op == "<="
+                        and (item_value is None or item_value > value)
+                        or op == ">"
+                        and (item_value is None or item_value <= value)
+                        or op == ">="
+                        and (item_value is None or item_value < value)
+                    ):
+                        match = False
+                        break
+
+                if match:
+                    filtered_items.append(item)
+
+            items = filtered_items
+
+        # Filtrar por tenant_id se fornecido
+        if tenant_id:
+            items = [item for item in items if item.get("tenant_id") == tenant_id]
+
+        return len(items)
+
 
 class MockPostgres:
     """
@@ -222,46 +297,56 @@ class MockPostgres:
     """
 
     @staticmethod
-    async def get_document(table: str, doc_id: str) -> Optional[Dict[str, Any]]:
+    async def get_document(
+        table: str, doc_id: str, tenant_id: str | None = None
+    ) -> dict[str, Any] | None:
         """
         Obtém um documento do PostgreSQL simulado.
         """
         # Usar a mesma implementação do Firestore simulado
-        return await MockFirestore.get_document(table, doc_id)
+        return await MockFirestore.get_document(table, doc_id, tenant_id)
 
     @staticmethod
     async def query_documents(
         table: str,
-        filters: Optional[List[tuple]] = None,
-        order_by: Optional[List[tuple]] = None,
+        filters: list[tuple] | None = None,
+        order_by: list[tuple] | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> Dict[str, Any]:
+        tenant_id: str | None = None,
+    ) -> dict[str, Any]:
         """
         Consulta documentos no PostgreSQL simulado.
         """
         # Usar a mesma implementação do Firestore simulado
         return await MockFirestore.query_documents(
-            table, filters, order_by, limit, offset
+            table, filters, order_by, limit, offset, tenant_id
         )
 
     @staticmethod
-    async def create_document(table: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_document(
+        table: str, data: dict[str, Any], tenant_id: str | None = None
+    ) -> dict[str, Any]:
         """
         Cria um documento no PostgreSQL simulado.
         """
         # Usar a mesma implementação do Firestore simulado
-        return await MockFirestore.create_document(table, data, data.get("id"))
+        return await MockFirestore.create_document(
+            table, data, data.get("id"), tenant_id
+        )
 
     @staticmethod
     async def update_document(
-        table: str, doc_id: str, data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        table: str,
+        doc_id: str,
+        data: dict[str, Any],
+        tenant_id: str | None = None,
+    ) -> dict[str, Any]:
         """
         Atualiza um documento no PostgreSQL simulado.
         """
         # Usar a mesma implementação do Firestore simulado
-        return await MockFirestore.update_document(table, doc_id, data)
+        return await MockFirestore.update_document(table, doc_id, data, tenant_id)
 
     @staticmethod
     async def delete_document(table: str, doc_id: str) -> bool:
@@ -270,6 +355,18 @@ class MockPostgres:
         """
         # Usar a mesma implementação do Firestore simulado
         return await MockFirestore.delete_document(table, doc_id)
+
+    @staticmethod
+    async def count_documents(
+        table: str,
+        filters: list[tuple] | None = None,
+        tenant_id: str | None = None,
+    ) -> int:
+        """
+        Conta documentos no PostgreSQL simulado.
+        """
+        # Usar a mesma implementação do Firestore simulado
+        return await MockFirestore.count_documents(table, filters, tenant_id)
 
 
 class MockCircuitBreaker:

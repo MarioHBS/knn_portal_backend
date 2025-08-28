@@ -2,7 +2,7 @@
 Implementação da camada de acesso ao Firestore.
 """
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -54,7 +54,7 @@ class FirestoreClient:
     @staticmethod
     async def get_document(
         collection: str, doc_id: str, tenant_id: str
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Obtém um documento do Firestore filtrando por tenant_id.
         """
@@ -73,32 +73,12 @@ class FirestoreClient:
 
     @staticmethod
     async def query_documents(
-        collection: str, tenant_id: str, **kwargs
-    ) -> List[Dict[str, Any]]:
-        """
-        Consulta documentos filtrando por tenant_id.
-        """
-        if not db:
-            logger.error("Firestore não inicializado")
-            return []
-        try:
-            query = fs_query(collection, tenant_id)
-            for k, v in kwargs.items():
-                query = query.where(k, "==", v)
-            docs = query.stream()
-            return [{**d.to_dict(), "id": d.id} for d in docs]
-        except Exception as e:
-            logger.error(f"Erro ao consultar documentos {collection}: {str(e)}")
-            raise
-
-    @staticmethod
-    async def query_documents(
         collection: str,
-        filters: Optional[List[tuple]] = None,
-        order_by: Optional[List[tuple]] = None,
+        filters: list[tuple] | None = None,
+        order_by: list[tuple] | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Consulta documentos no Firestore com filtros e ordenação.
 
@@ -127,7 +107,7 @@ class FirestoreClient:
 
             # Contar total (antes de aplicar limit/offset)
             total_query = query
-            total_docs = len([d for d in total_query.stream()])
+            total_docs = len(list(total_query.stream()))
 
             # Aplicar ordenação
             if order_by:
@@ -138,10 +118,10 @@ class FirestoreClient:
             if offset > 0:
                 # No Firestore, precisamos usar cursor para offset
                 # Simplificação: obtemos todos e aplicamos slice
-                all_docs = [d for d in query.limit(offset + limit).stream()]
+                all_docs = list(query.limit(offset + limit).stream())
                 docs = all_docs[offset : offset + limit]
             else:
-                docs = [d for d in query.limit(limit).stream()]
+                docs = list(query.limit(limit).stream())
 
             # Converter para dicionários
             items = [{**doc.to_dict(), "id": doc.id} for doc in docs]
@@ -158,8 +138,8 @@ class FirestoreClient:
 
     @staticmethod
     async def create_document(
-        collection: str, data: Dict[str, Any], doc_id: Optional[str] = None
-    ) -> Dict[str, Any]:
+        collection: str, data: dict[str, Any], doc_id: str | None = None
+    ) -> dict[str, Any]:
         """
         Cria um documento no Firestore.
         """
@@ -188,8 +168,8 @@ class FirestoreClient:
 
     @staticmethod
     async def update_document(
-        collection: str, doc_id: str, data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        collection: str, doc_id: str, data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Atualiza um documento no Firestore.
         """
@@ -229,7 +209,7 @@ class FirestoreClient:
             raise
 
     @staticmethod
-    async def batch_operation(operations: List[Dict[str, Any]]) -> bool:
+    async def batch_operation(operations: list[dict[str, Any]]) -> bool:
         """
         Executa operações em lote no Firestore.
 

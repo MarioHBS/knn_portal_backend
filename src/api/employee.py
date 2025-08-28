@@ -7,7 +7,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from src.auth import JWTPayload, validate_employee_role
-from src.db import firestore_client, with_circuit_breaker
+from src.db import firestore_client, postgres_client, with_circuit_breaker
 from src.models import (
     PartnerListResponse,
 )
@@ -37,24 +37,46 @@ async def list_partners(
         if cat:
             filters["category"] = cat
 
-        # Buscar parceiros
-        partners_data = await with_circuit_breaker(
-            firestore_client.query_documents,
-            "partners",
-            filters=filters,
-            order_by=ord,
-            limit=limit,
-            offset=offset,
-            tenant_id=current_user.tenant_id,
-        )
+        # Preparar filtros para query
+        query_filters = []
+        if cat:
+            query_filters.append(("category", "==", cat))
+        query_filters.append(("active", "==", True))
 
-        # Contar total
-        total = await with_circuit_breaker(
-            firestore_client.count_documents,
-            "partners",
-            filters=filters,
-            tenant_id=current_user.tenant_id,
-        )
+        # Preparar ordenação
+        order_by = []
+        if ord == "name":
+            order_by.append(("trade_name", "ASCENDING"))
+        elif ord == "category":
+            order_by.append(("category", "ASCENDING"))
+        else:
+            order_by.append(("trade_name", "ASCENDING"))
+
+        # Buscar parceiros com circuit breaker
+        async def firestore_query():
+            return await firestore_client.query_documents(
+                "partners",
+                filters=query_filters,
+                order_by=order_by,
+                limit=limit,
+                offset=offset,
+                tenant_id=current_user.tenant,
+            )
+
+        async def postgres_query():
+            return await postgres_client.query_documents(
+                "partners",
+                filters=query_filters,
+                order_by=order_by,
+                limit=limit,
+                offset=offset,
+                tenant_id=current_user.tenant,
+            )
+
+        result = await with_circuit_breaker(firestore_query, postgres_query)
+        
+        partners_data = result.get("items", [])
+        total = result.get("total", 0)
 
         return PartnerListResponse(
             data={
