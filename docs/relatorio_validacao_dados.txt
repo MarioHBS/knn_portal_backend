@@ -1,0 +1,46 @@
+================================================================================
+RELATÓRIO DE VALIDAÇÃO DOS DADOS LIMPOS
+================================================================================
+Data da validação: 2025-08-20 10:40:00
+Arquivo analisado: sources/database_students_clean.csv
+
+📊 SCORE DE QUALIDADE DOS DADOS: 98.02% 🟢 EXCELENTE
+
+📈 ESTATÍSTICAS GERAIS:
+  • Total de registros: 100
+
+📧 EMAILS:
+  • Válidos: 141 (99.3%)
+  • Inválidos: 1 (0.7%)
+
+📱 TELEFONES:
+  • Formatados: 82 (100.0%)
+  • Não formatados: 0 (0.0%)
+
+📍 CEPS:
+  • Válidos: 96 (100.0%)
+  • Inválidos: 0 (0.0%)
+
+🔍 CAMPOS COM VALORES VAZIOS:
+  • Contratos: 10 registros (10.0%)
+  • Sexo do aluno: 100 registros (100.0%)
+  • Ocupação do aluno: 11 registros (11.0%)
+  • Email do aluno: 17 registros (17.0%)
+  • Celular do aluno: 18 registros (18.0%)
+  • CEP do aluno: 4 registros (4.0%)
+  • Complemento do aluno: 76 registros (76.0%)
+  • Nome do responsável: 37 registros (37.0%)
+  • Email do responsável: 41 registros (41.0%)
+
+💡 RECOMENDAÇÕES:
+  ⚠️  Ainda existem emails inválidos que precisam de correção manual
+  ⚠️  Existem campos críticos vazios (Nome ou Email do aluno)
+  ✅ Os dados estão em excelente qualidade para uso em produção!
+
+================================================================================
+RESUMO DA VALIDAÇÃO:
+================================================================================
+✅ Dados carregados e validados com sucesso
+✅ Score de qualidade calculado
+✅ Relatório de validação gerado
+✅ Dados prontos para análise de qualidade

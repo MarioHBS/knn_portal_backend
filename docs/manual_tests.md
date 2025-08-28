@@ -1,21 +1,21 @@
-"""
-Documentação de Testes Manuais para o Portal de Benefícios KNN
+# Documentação de Testes Manuais para o Portal de Benefícios KNN
 
-Este documento descreve os procedimentos para testes manuais do Portal de Benefícios KNN,
-complementando os testes automatizados no script test_endpoints.py.
-"""
+Este documento descreve os procedimentos para testes manuais do Portal de
+Benefícios KNN, complementando os testes automatizados no script
+test_endpoints.py.
 
-# Preparação para Testes
+## Test Preparation
 
 1. Inicie o servidor FastAPI:
-   ```
+
+   ```bash
    python run_server.py
    ```
 
 2. Acesse a documentação Swagger:
-   http://localhost:8080/v1/docs
+   <http://localhost:8080/v1/docs>
 
-# Testes Manuais por Perfil
+## Testes Manuais por Perfil
 
 ## Testes Gerais
 
@@ -55,14 +55,16 @@ complementando os testes automatizados no script test_endpoints.py.
 - [ ] Filtrar parceiros por categoria (GET /employees/partners?cat=Livraria)
 - [ ] Ordenar parceiros (GET /employees/partners?ord=name_asc)
 - [ ] Ver detalhes de um parceiro (GET /employees/partners/{id})
-- [ ] Verificar se promoções são filtradas para funcionários (target_profile=employee ou both)
+- [ ] Verificar se promoções são filtradas para funcionários
+      (target_profile=employee ou both)
 - [ ] Gerar código de validação (POST /employees/validation-codes)
 - [ ] Verificar se o código expira após 3 minutos
 - [ ] Ver histórico de resgates (GET /employees/me/history)
 - [ ] Ver favoritos (GET /employees/me/fav)
 - [ ] Adicionar parceiro aos favoritos (POST /employees/me/fav)
 - [ ] Remover parceiro dos favoritos (DELETE /employees/me/fav/{pid})
-- [ ] Verificar se funcionário inativo não pode gerar códigos
+- [ ] Verificar se funcionário inativo não pode gerar códigos de
+      validação
 
 ## Testes de Perfil Administrador (Admin)
 
@@ -83,24 +85,27 @@ complementando os testes automatizados no script test_endpoints.py.
 - [ ] Verificar se o modo degradado é ativado corretamente
 - [ ] Verificar se o CORS está restrito aos domínios permitidos
 
-# Tokens JWT para Testes
+## Tokens JWT para Testes
 
 ## Token de Aluno
-```
+
+```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHVkZW50LWlkIiwicm9sZSI6InN0dWRlbnQiLCJleHAiOjE3MTY5OTIwMDAsImlhdCI6MTcxNjkwNTYwMH0.8Uj7hl5vYGnEZQGR5QeQQOdTKB4ZXEfEiqxJxlE5Pjw
 ```
 
 ## Token de Parceiro
-```
+
+```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYXJ0bmVyLWlkIiwicm9sZSI6InBhcnRuZXIiLCJleHAiOjE3MTY5OTIwMDAsImlhdCI6MTcxNjkwNTYwMH0.Hn5Fq5qSVBN5QjuoYd2KBjTIGJJoV9OQh-VzpNqJrSs
 ```
 
 ## Token de Administrador
-```
+
+```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi1pZCIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTcxNjk5MjAwMCwiaWF0IjoxNzE2OTA1NjAwfQ.jQyOq0-KnzH0vqBQwKsqzTBGzKqGLYVj9WdAZKbK5Hs
 ```
 
-# Relatório de Testes
+## Relatório de Testes
 
 Ao concluir os testes, documente:
 
