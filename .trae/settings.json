@@ -1,0 +1,47 @@
+{
+  "workbench.colorTheme": "Orange Theme",
+  "workbench.preferredDarkColorTheme": "Orange Theme",
+  "workbench.preferredLightColorTheme": "Orange Theme",
+  "editor.tokenColorCustomizations": {
+    "[Orange Theme]": {
+      "comments": "#ff8c4280",
+      "strings": "#ffb366",
+      "keywords": "#ff6b1a",
+      "variables": "#ff8c42",
+      "functions": "#ffcc99",
+      "numbers": "#ff9933",
+      "types": "#ff6b1a"
+    }
+  },
+  "workbench.colorCustomizations": {
+    "[Orange Theme]": {
+      "editor.background": "#1a0f0a",
+      "editor.foreground": "#ff8c42",
+      "activityBar.background": "#2d1810",
+      "activityBar.foreground": "#ff6b1a",
+      "sideBar.background": "#241510",
+      "sideBar.foreground": "#ff8c42",
+      "statusBar.background": "#ff6b1a",
+      "statusBar.foreground": "#ffffff",
+      "titleBar.activeBackground": "#bb6b1a",
+      "titleBar.activeForeground": "#ffffff",
+      "tab.activeBackground": "#bb6b1a",
+      "tab.activeForeground": "#ffffff",
+      "tab.inactiveBackground": "#2d1810",
+      "tab.inactiveForeground": "#ff8c42",
+      "panel.background": "#241510",
+      "terminal.background": "#1a0f0a",
+      "terminal.foreground": "#ff8c42",
+      "button.background": "#ff6b1a",
+      "button.foreground": "#ffffff",
+      "input.background": "#2d1810",
+      "input.foreground": "#ff8c42",
+      "input.border": "#ff6b1a",
+      "list.activeSelectionBackground": "#ff6b1a",
+      "list.activeSelectionForeground": "#ffffff",
+      "scrollbarSlider.background": "#ff6b1a60",
+      "badge.background": "#ff6b1a",
+      "progressBar.background": "#ff6b1a"
+    }
+  }
+}

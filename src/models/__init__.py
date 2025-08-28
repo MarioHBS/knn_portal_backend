@@ -28,9 +28,16 @@ class Student(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     tenant_id: str
     cpf_hash: str
-    name: str
-    email: str
-    course: str
+    nome_aluno: str
+    curso: str
+    ocupacao_aluno: Optional[str] = None
+    email_aluno: Optional[str] = None
+    celular_aluno: Optional[str] = None
+    cep_aluno: Optional[str] = None
+    bairro: Optional[str] = None
+    complemento_aluno: Optional[str] = None
+    nome_responsavel: Optional[str] = None
+    email_responsavel: Optional[str] = None
     active_until: date
 
     class Config:
@@ -58,6 +65,7 @@ class Partner(BaseModel):
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     tenant_id: str
+    cnpj_hash: str
     trade_name: str
     category: str
     address: str
@@ -83,6 +91,7 @@ class Promotion(BaseModel):
     )
 
     @validator("target_profile")
+    @classmethod
     def validate_target_profile(cls, v):
         if v not in ["student", "employee", "both"]:
             raise ValueError('target_profile deve ser "student", "employee" ou "both"')
@@ -130,18 +139,20 @@ class RedeemRequest(BaseModel):
     """Modelo para requisição de resgate de código."""
 
     code: str
-    cpf: str
+    cnpj: str
 
     @validator("code")
+    @classmethod
     def validate_code(cls, v):
         if not v.isdigit() or len(v) != 6:
             raise ValueError("Código deve conter 6 dígitos numéricos")
         return v
 
-    @validator("cpf")
-    def validate_cpf(cls, v):
-        if not v.isdigit() or len(v) != 11:
-            raise ValueError("CPF deve conter 11 dígitos numéricos")
+    @validator("cnpj")
+    @classmethod
+    def validate_cnpj(cls, v):
+        if not v.isdigit() or len(v) != 14:
+            raise ValueError("CNPJ deve conter 14 dígitos numéricos")
         return v
 
 
@@ -158,6 +169,7 @@ class PromotionRequest(BaseModel):
     )
 
     @validator("target_profile")
+    @classmethod
     def validate_target_profile(cls, v):
         if v not in ["student", "employee", "both"]:
             raise ValueError('target_profile deve ser "student", "employee" ou "both"')
@@ -173,12 +185,14 @@ class NotificationRequest(BaseModel):
     type: str = "both"
 
     @validator("target")
+    @classmethod
     def validate_target(cls, v):
         if v not in ["students", "partners"]:
             raise ValueError('Target deve ser "students" ou "partners"')
         return v
 
     @validator("type")
+    @classmethod
     def validate_type(cls, v):
         if v not in ["email", "push", "both"]:
             raise ValueError('Type deve ser "email", "push" ou "both"')

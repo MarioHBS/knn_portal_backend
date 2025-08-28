@@ -29,7 +29,7 @@ POSTGRES_CONNECTION_STRING = os.getenv(
 )
 
 # Configurações de segurança
-CPF_HASH_SALT = os.getenv("CPF_HASH_SALT", "knn-dev-salt")
+CNPJ_HASH_SALT = os.getenv("CNPJ_HASH_SALT", "knn-dev-salt")
 
 # Configurações de circuit breaker
 CIRCUIT_BREAKER_THRESHOLD = (

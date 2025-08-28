@@ -7,7 +7,7 @@ import re
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
-from src.config import CPF_HASH_SALT
+from src.config import CNPJ_HASH_SALT
 from src.utils import logger
 
 
@@ -87,25 +87,25 @@ class BusinessRules:
             return True
 
     @staticmethod
-    def validate_cpf(cpf: str) -> bool:
+    def validate_cnpj(cnpj: str) -> bool:
         """
-        Valida um CPF.
+        Valida um CNPJ.
 
         Args:
-            cpf: CPF a ser validado
+            cnpj: CNPJ a ser validado
 
         Returns:
-            bool: True se o CPF for válido, False caso contrário
+            bool: True se o CNPJ for válido, False caso contrário
         """
         # Remover caracteres não numéricos
-        cpf = re.sub(r"[^0-9]", "", cpf)
+        cnpj = re.sub(r"[^0-9]", "", cnpj)
 
-        # Verificar se tem 11 dígitos
-        if len(cpf) != 11:
+        # Verificar se tem 14 dígitos
+        if len(cnpj) != 14:
             return False
 
         # Verificar se todos os dígitos são iguais (caso inválido)
-        if len(set(cpf)) == 1:
+        if len(set(cnpj)) == 1:
             return False
 
         # Em uma implementação real, verificaríamos os dígitos verificadores
@@ -113,25 +113,25 @@ class BusinessRules:
         return True
 
     @staticmethod
-    def hash_cpf(cpf: str, salt: Optional[str] = None) -> str:
+    def hash_cnpj(cnpj: str, salt: Optional[str] = None) -> str:
         """
-        Gera um hash SHA-256 do CPF com salt.
+        Gera um hash SHA-256 do CNPJ com salt.
 
         Args:
-            cpf: CPF a ser hasheado
+            cnpj: CNPJ a ser hasheado
             salt: Salt para o hash (opcional)
 
         Returns:
-            str: Hash do CPF
+            str: Hash do CNPJ
         """
         if not salt:
-            salt = CPF_HASH_SALT
+            salt = CNPJ_HASH_SALT
 
         # Remover caracteres não numéricos
-        cpf = re.sub(r"[^0-9]", "", cpf)
+        cnpj = re.sub(r"[^0-9]", "", cnpj)
 
         # Gerar hash
-        return hashlib.sha256(f"{cpf}{salt}".encode()).hexdigest()
+        return hashlib.sha256(f"{cnpj}{salt}".encode()).hexdigest()
 
     @staticmethod
     def is_promotion_valid(promotion: Dict[str, Any]) -> bool:

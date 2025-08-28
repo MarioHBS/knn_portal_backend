@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
 from src.auth import JWTPayload, validate_partner_role
-from src.config import CPF_HASH_SALT, RATE_LIMIT_REDEEM
+from src.config import CNPJ_HASH_SALT, RATE_LIMIT_REDEEM
 from src.db import firestore_client, postgres_client, with_circuit_breaker
 from src.models import (
     BaseResponse,
@@ -18,7 +18,7 @@ from src.models import (
     RedeemResponse,
     ReportResponse,
 )
-from src.utils import hash_cpf, limiter, logger, validate_cpf
+from src.utils import hash_cnpj, limiter, logger, validate_cnpj
 
 # Criar router
 router = APIRouter(tags=["partner"])
@@ -36,11 +36,11 @@ async def redeem_code(
     try:
         partner_id = current_user.sub
 
-        # Validar CPF
-        if not validate_cpf(request.cpf):
+        # Validar CNPJ
+        if not validate_cnpj(request.cnpj):
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={"error": {"code": "INVALID_CPF", "msg": "CPF inválido"}},
+                detail={"error": {"code": "INVALID_CNPJ", "msg": "CNPJ inválido"}},
             )
 
         # Buscar código de validação
@@ -117,16 +117,16 @@ async def redeem_code(
                 },
             )
 
-        # Verificar se o CPF corresponde ao aluno
-        cpf_hash = hash_cpf(request.cpf, CPF_HASH_SALT)
+        # Verificar se o CNPJ corresponde ao parceiro
+        cnpj_hash = hash_cnpj(request.cnpj, CNPJ_HASH_SALT)
 
-        if student.get("cpf_hash") != cpf_hash:
+        if student.get("cnpj_hash") != cnpj_hash:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail={
                     "error": {
-                        "code": "INVALID_CPF",
-                        "msg": "CPF não corresponde ao aluno",
+                        "code": "INVALID_CNPJ",
+                        "msg": "CNPJ não corresponde ao parceiro",
                     }
                 },
             )

@@ -51,7 +51,7 @@ gcloud run deploy ${SERVICE_NAME} \
   --set-env-vars="POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}" \
   --set-env-vars="JWKS_URL=${JWKS_URL}" \
   --set-env-vars="JWKS_CACHE_TTL=600" \
-  --set-env-vars="CPF_HASH_SALT=${CPF_HASH_SALT}"
+  --set-env-vars="CNPJ_HASH_SALT=${CNPJ_HASH_SALT}"
 
 # Obter a URL do serviço
 SERVICE_URL=$(gcloud run services describe ${SERVICE_NAME} --region ${REGION} --format='value(status.url)')
