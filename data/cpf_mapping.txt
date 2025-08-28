@@ -1,0 +1,7 @@
+CPF -> Nome e Curso (para testes)
+----------------------------------
+12345678901 -> Ana Silva (ADVANCED 1)
+23456789012 -> Bruno Santos (TEENS 3)
+34567890123 -> Carla Oliveira (SEEDS 1)
+45678901234 -> Daniel Pereira (TWEENS 4)
+56789012345 -> Eduarda Costa (KINDER 6A - expirado)

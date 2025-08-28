@@ -1,0 +1,5 @@
+CNPJ -> Nome Fantasia (para testes)
+------------------------------------
+12345678000195 -> Livraria Cultura
+23456789000186 -> Restaurante Sabor & Arte
+34567890000177 -> Cinema Lumière

@@ -1,0 +1,224 @@
+{
+  "__collection__/students": {},
+  "__collection__/students/d0811aff-b710-420f-aeef-b6eed5206b17": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "cpf_hash": "3a74ca7993e0bc436448e089faf10944ec2a89d1bce08f81886ae0d42fb7d50b",
+      "nome_aluno": "Ana Silva",
+      "curso": "ADVANCED 1",
+      "ocupacao_aluno": "Estudante",
+      "email_aluno": "ana.silva@exemplo.com",
+      "celular_aluno": "(11) 99999-1234",
+      "cep_aluno": "01310-100",
+      "bairro": "Bela Vista",
+      "complemento_aluno": "Apto 101",
+      "nome_responsavel": null,
+      "email_responsavel": null,
+      "active_until": "2026-08-27"
+    }
+  },
+  "__collection__/students/84595448-fd5f-41df-84d8-d5069f3446e0": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "cpf_hash": "14809a752d7cbd7e9b26a597d80b745caaf553dfe48d0ac143ca15c86dc285d6",
+      "nome_aluno": "Bruno Santos",
+      "curso": "TEENS 3",
+      "ocupacao_aluno": "Estudante",
+      "email_aluno": "bruno.santos@exemplo.com",
+      "celular_aluno": "(11) 98888-5678",
+      "cep_aluno": "04038-001",
+      "bairro": "Vila Olímpia",
+      "complemento_aluno": "Casa 15",
+      "nome_responsavel": "Maria Santos",
+      "email_responsavel": "maria.santos@exemplo.com",
+      "active_until": "2026-02-23"
+    }
+  },
+  "__collection__/students/62d0fae2-349d-438c-b449-fdb0eb8b7601": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "cpf_hash": "8b1711db0009d91d529d84c6b391fe3ab766bd103e902b2d3427c31d3029b69a",
+      "nome_aluno": "Carla Oliveira",
+      "curso": "SEEDS 1",
+      "ocupacao_aluno": "Professora",
+      "email_aluno": "carla.oliveira@exemplo.com",
+      "celular_aluno": "(11) 97777-9012",
+      "cep_aluno": "05407-002",
+      "bairro": "Pinheiros",
+      "complemento_aluno": null,
+      "nome_responsavel": null,
+      "email_responsavel": null,
+      "active_until": "2025-11-25"
+    }
+  },
+  "__collection__/students/b16f6ac5-a6c7-4363-8f2c-e7d0ff7bf56f": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "cpf_hash": "99aaf489c540b7ed54186c966f2bfbb11accddc4d622dc669516c8db14e7a28e",
+      "nome_aluno": "Daniel Pereira",
+      "curso": "TWEENS 4",
+      "ocupacao_aluno": "Engenheiro",
+      "email_aluno": "daniel.pereira@exemplo.com",
+      "celular_aluno": "(11) 96666-3456",
+      "cep_aluno": "01452-000",
+      "bairro": "Jardins",
+      "complemento_aluno": "Bloco B, Apto 502",
+      "nome_responsavel": null,
+      "email_responsavel": null,
+      "active_until": "2026-05-24"
+    }
+  },
+  "__collection__/students/5e194bfd-5912-4f0d-840e-8fb32112bde6": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "cpf_hash": "07b94371acf6fa9a7d11c202a73f07ad086bf21e9af88d40f8af12ec014cd692",
+      "nome_aluno": "Eduarda Costa",
+      "curso": "KINDER 6A",
+      "ocupacao_aluno": "Estudante",
+      "email_aluno": null,
+      "celular_aluno": "(11) 95555-7890",
+      "cep_aluno": "02011-000",
+      "bairro": "Santana",
+      "complemento_aluno": "Casa 22",
+      "nome_responsavel": "Roberto Costa",
+      "email_responsavel": "roberto.costa@exemplo.com",
+      "active_until": "2025-07-28"
+    }
+  },
+  "__collection__/partners": {},
+  "__collection__/partners/b275d5f8-db44-4876-befa-4980a031b95b": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "cnpj_hash": "54e233ac80434697df497d54f4575c70242ec0ec22c202fc78b2fc09fedd51e7",
+      "trade_name": "Livraria Cultura",
+      "category": "Livraria",
+      "address": "Av. Paulista, 2073 - São Paulo/SP",
+      "active": true
+    }
+  },
+  "__collection__/partners/948a9e5b-7bcf-4b55-90e2-490f19e82ace": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "cnpj_hash": "098b9dbf84b9c119493a4a1e428cb2a9a93939da3fcf2f5c0a28280cc7005bf2",
+      "trade_name": "Restaurante Sabor & Arte",
+      "category": "Alimentação",
+      "address": "Rua Augusta, 1200 - São Paulo/SP",
+      "active": true
+    }
+  },
+  "__collection__/partners/f5b2e761-9f23-48a0-b069-40fe9047ab88": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "cnpj_hash": "906de17b19296dc3a9cf0ec225d112513caa44f31da6e63f4578692075bca5bf",
+      "trade_name": "Cinema Lumière",
+      "category": "Entretenimento",
+      "address": "Shopping Cidade, Loja 42 - São Paulo/SP",
+      "active": true
+    }
+  },
+  "__collection__/promotions": {},
+  "__collection__/promotions/c9979320-307e-4443-afdd-b274be2be6d4": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "partner_id": "b275d5f8-db44-4876-befa-4980a031b95b",
+      "title": "20% de desconto em livros de idiomas",
+      "type": "discount",
+      "valid_from": "2025-07-28T16:09:19.391310",
+      "valid_to": "2025-10-26T16:09:19.391310",
+      "active": true,
+      "target_profile": "both"
+    }
+  },
+  "__collection__/promotions/a0456e1e-32b1-4fa9-be3d-860284465eb9": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "partner_id": "b275d5f8-db44-4876-befa-4980a031b95b",
+      "title": "Brinde exclusivo na compra acima de R$ 100",
+      "type": "gift",
+      "valid_from": "2025-08-12T16:09:19.391310",
+      "valid_to": "2025-10-11T16:09:19.391310",
+      "active": true,
+      "target_profile": "student"
+    }
+  },
+  "__collection__/promotions/2d8afc19-6550-4d4f-b7b9-813f8b1964f7": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "partner_id": "948a9e5b-7bcf-4b55-90e2-490f19e82ace",
+      "title": "15% de desconto no almoço executivo",
+      "type": "discount",
+      "valid_from": "2025-08-17T16:09:19.391310",
+      "valid_to": "2025-11-15T16:09:19.391310",
+      "active": true,
+      "target_profile": "employee"
+    }
+  },
+  "__collection__/promotions/cd6c6459-9768-40c1-9264-9aeb42be7572": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "partner_id": "f5b2e761-9f23-48a0-b069-40fe9047ab88",
+      "title": "Ingresso com 30% de desconto nas segundas e terças",
+      "type": "discount",
+      "valid_from": "2025-08-22T16:09:19.391310",
+      "valid_to": "2025-11-25T16:09:19.391310",
+      "active": true,
+      "target_profile": "both"
+    }
+  },
+  "__collection__/validation_codes": {},
+  "__collection__/validation_codes/1a9b58d0-4541-4c3c-b6be-d80fa96f7737": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "student_id": "b16f6ac5-a6c7-4363-8f2c-e7d0ff7bf56f",
+      "partner_id": "948a9e5b-7bcf-4b55-90e2-490f19e82ace",
+      "code_hash": "3bb78535cc9555ff19fe3556aaa41c78a0a45c64d49ba2bc564507648a8e77a1",
+      "expires": "2025-08-27T16:09:19.391310",
+      "used_at": "2025-08-26T16:09:19.391310"
+    }
+  },
+  "__collection__/validation_codes/40d99fdd-a322-4270-a047-0e980cb49264": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "student_id": "b16f6ac5-a6c7-4363-8f2c-e7d0ff7bf56f",
+      "partner_id": "b275d5f8-db44-4876-befa-4980a031b95b",
+      "code_hash": "97c489b6c1231ecd9fac99df40e60cec000a70a057d5971fb520c578da8e8841",
+      "expires": "2025-08-27T16:09:19.391310",
+      "used_at": "2025-08-26T16:09:19.391310"
+    }
+  },
+  "__collection__/validation_codes/fd4ca261-dda3-4194-999d-80f89473a8a7": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "student_id": "d0811aff-b710-420f-aeef-b6eed5206b17",
+      "partner_id": "b275d5f8-db44-4876-befa-4980a031b95b",
+      "code_hash": "3fb836229505c02d85ef0286b0c93213db710766d841f00d91db5edaeade136b",
+      "expires": "2025-08-27T16:09:19.391310",
+      "used_at": null
+    }
+  },
+  "__collection__/validation_codes/4cb70297-e354-453f-8891-5bcf2e7d3f5c": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "student_id": "b16f6ac5-a6c7-4363-8f2c-e7d0ff7bf56f",
+      "partner_id": "b275d5f8-db44-4876-befa-4980a031b95b",
+      "code_hash": "24eb33c5f8f98314500b1c7f3fe403413c3b3fe0e4ae8ac5cc464dd2b686802c",
+      "expires": "2025-08-28T16:09:19.391310",
+      "used_at": null
+    }
+  },
+  "__collection__/redemptions": {},
+  "__collection__/redemptions/9a915493-1c3b-4004-8852-3fae6f4e5db9": {
+    "data": {
+      "validation_code_id": "1a9b58d0-4541-4c3c-b6be-d80fa96f7737",
+      "value": 28.0,
+      "used_at": "2025-08-26T16:09:19.391310"
+    }
+  },
+  "__collection__/redemptions/5443b021-5d19-4b0a-b497-d3c5317aae81": {
+    "data": {
+      "validation_code_id": "40d99fdd-a322-4270-a047-0e980cb49264",
+      "value": 71.0,
+      "used_at": "2025-08-26T16:09:19.391310"
+    }
+  }
+}
