@@ -2,6 +2,17 @@
 Configurações e variáveis de ambiente para o Portal de Benefícios KNN.
 """
 import os
+from pathlib import Path
+
+# Carregar variáveis do arquivo .env se existir
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent.parent / '.env'
+    if env_path.exists():
+        load_dotenv(env_path)
+except ImportError:
+    # python-dotenv não está instalado, continuar sem carregar .env
+    pass
 
 # Configurações da API
 API_VERSION = "v1"
@@ -9,6 +20,8 @@ API_TITLE = "Portal de Benefícios KNN API"
 API_DESCRIPTION = "API para o Portal de Benefícios KNN, permitindo que alunos da KNN Idiomas acessem promoções exclusivas de parceiros comerciais."
 
 # Configurações de ambiente
+KNN_USE_TEST_DATABASE = os.getenv("KNN_USE_TEST_DATABASE", "False").lower() in ("true", "1", "t")
+TESTING_MODE = os.getenv("TESTING_MODE", "False").lower() in ("true", "1", "t")
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "t")
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 PORT = int(os.getenv("PORT", "8080"))

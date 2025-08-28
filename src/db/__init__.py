@@ -4,7 +4,7 @@ Inicialização do pacote de banco de dados.
 import os
 
 # Verificar se estamos em ambiente de teste
-TEST_MODE = os.environ.get("KNN_TEST_MODE", "false").lower() == "true"
+TEST_MODE = os.environ.get("KNN_USE_TEST_DATABASE", "false").lower() == "true"
 
 if TEST_MODE:
     # Usar implementações simuladas para testes

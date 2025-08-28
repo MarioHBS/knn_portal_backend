@@ -1,0 +1,44 @@
+{
+    "python.defaultInterpreterPath": "./venv/Scripts/python.exe",
+    "flake8.enabled": false,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit"
+        },
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+    "ruff.enable": true,
+    "ruff.organizeImports": true,
+    "ruff.fixAll": true,
+    // Removed deprecated ruff.format.args setting as it's only used by ruff-lsp
+    // Removed ruff.lint.args as it's only used by deprecated ruff-lsp
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "workbench.colorTheme": "Vim Dark Hard",
+    // "workbench.preferredDarkColorTheme": "Orange Theme",
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        "*.py": "${capture}.pyc",
+        "requirements.txt": "requirements-*.txt, requirements.*.txt",
+        "pyproject.toml": "poetry.lock, setup.py, setup.cfg, MANIFEST.in",
+        "Dockerfile": "Dockerfile.*, docker-compose.yml, docker-compose.yaml, .dockerignore",
+        ".env.example": ".env, .env.*, .env.local, .env.development, .env.staging, .env.production",
+        "docs": "*.md, *.txt, *.rst",
+        "scripts": "*.py, *.sh",
+        "data": "*.json, *.sql, *.txt, *.csv",
+        "deploy": "*.sh, *.yml, *.yaml",
+        "sources": "*.json, *.csv, *.txt",
+        ".gitignore": ".gitattributes, .gitmodules",
+        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, .nvmrc, .node-version",
+        "*.test.py": "${capture}.py",
+        "test_*.py": "${capture}.py",
+        "__init__.py": "${dirname}.py"
+    },
+    "editor.minimap.enabled": true,
+    "editor.minimap.maxColumn": 80
+}

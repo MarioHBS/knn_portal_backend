@@ -1,8 +1,9 @@
 """
 Implementação dos endpoints para o perfil de administrador (admin).
 """
+
 import uuid
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
@@ -14,11 +15,113 @@ from src.models import (
     EntityResponse,
     MetricsResponse,
     NotificationRequest,
+    PartnerDetailResponse,
+    PartnerListResponse,
 )
 from src.utils import logger
 
 # Criar router
 router = APIRouter(tags=["admin"])
+
+
+@router.get("/partners", response_model=PartnerListResponse)
+async def list_partners(
+    cat: str | None = Query(None, description="Filtro por categoria"),
+    ord: str | None = Query("name", description="Ordenação (name, category)"),
+    limit: int = Query(20, ge=1, le=100, description="Limite de resultados"),
+    offset: int = Query(0, ge=0, description="Offset para paginação"),
+    current_user: JWTPayload = Depends(validate_admin_role),
+) -> PartnerListResponse:
+    """
+    Lista todos os parceiros disponíveis para administradores com filtros e paginação.
+    Administradores podem ver todos os parceiros (ativos e inativos).
+    """
+    try:
+        # Construir filtros (administradores podem ver todos os parceiros)
+        filters = {}
+        if cat:
+            filters["category"] = cat
+
+        # Buscar parceiros
+        partners_data = await with_circuit_breaker(
+            firestore_client.query_documents,
+            "partners",
+            filters=filters,
+            order_by=ord,
+            limit=limit,
+            offset=offset,
+            tenant_id=current_user.tenant_id,
+        )
+
+        # Contar total
+        total = await with_circuit_breaker(
+            firestore_client.count_documents,
+            "partners",
+            filters=filters,
+            tenant_id=current_user.tenant_id,
+        )
+
+        return PartnerListResponse(
+            data={
+                "items": partners_data,
+                "total": total,
+                "limit": limit,
+                "offset": offset,
+            }
+        )
+
+    except Exception as e:
+        logger.error(
+            f"Erro ao listar parceiros para administrador {current_user.id}: {e}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {"code": "INTERNAL_ERROR", "msg": "Erro interno do servidor"}
+            },
+        ) from e
+
+
+@router.get("/partners/{id}", response_model=PartnerDetailResponse)
+async def get_partner_details(
+    id: str = Path(..., description="ID do parceiro"),
+    current_user: JWTPayload = Depends(validate_admin_role),
+) -> PartnerDetailResponse:
+    """
+    Obtém detalhes completos de um parceiro específico.
+    Administradores podem ver detalhes de qualquer parceiro.
+    """
+    try:
+        # Buscar parceiro
+        partner_data = await with_circuit_breaker(
+            firestore_client.get_document,
+            "partners",
+            id,
+            tenant_id=current_user.tenant_id,
+        )
+
+        if not partner_data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": {"code": "NOT_FOUND", "msg": "Parceiro não encontrado"}
+                },
+            )
+
+        return PartnerDetailResponse(data=partner_data)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            f"Erro ao obter detalhes do parceiro {id} para administrador {current_user.id}: {e}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {"code": "INTERNAL_ERROR", "msg": "Erro interno do servidor"}
+            },
+        ) from e
 
 
 @router.get("/admin/{entity}", response_model=EntityListResponse)
@@ -82,13 +185,13 @@ async def list_entities(
                     "msg": f"Erro ao listar entidades {entity}",
                 }
             },
-        )
+        ) from e
 
 
 @router.post("/admin/{entity}", response_model=EntityResponse)
 async def create_entity(
     entity: str = Path(..., description="Tipo de entidade"),
-    data: Dict[str, Any] = None,
+    data: dict[str, Any] = None,
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
@@ -122,7 +225,9 @@ async def create_entity(
             data["id"] = str(uuid.uuid4())
 
         # Criar entidade
-        result = await firestore_client.create_document(entity, data, data["id"])
+        result = await firestore_client.create_document(
+            entity, data, data["id"], tenant_id=current_user.tenant_id
+        )
 
         return {"data": result, "msg": "ok"}
 
@@ -138,14 +243,14 @@ async def create_entity(
                     "msg": f"Erro ao criar entidade {entity}",
                 }
             },
-        )
+        ) from e
 
 
 @router.put("/admin/{entity}/{id}", response_model=EntityResponse)
 async def update_entity(
     entity: str = Path(..., description="Tipo de entidade"),
     id: str = Path(..., description="ID da entidade"),
-    data: Dict[str, Any] = None,
+    data: dict[str, Any] = None,
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
@@ -176,10 +281,14 @@ async def update_entity(
 
         # Verificar se a entidade existe
         async def get_firestore_entity():
-            return await firestore_client.get_document(entity, id)
+            return await firestore_client.get_document(
+                entity, id, tenant_id=current_user.tenant_id
+            )
 
         async def get_postgres_entity():
-            return await postgres_client.get_document(entity, id)
+            return await postgres_client.get_document(
+                entity, id, tenant_id=current_user.tenant_id
+            )
 
         existing_entity = await with_circuit_breaker(
             get_firestore_entity, get_postgres_entity
@@ -197,7 +306,9 @@ async def update_entity(
             )
 
         # Atualizar entidade
-        result = await firestore_client.update_document(entity, id, data)
+        result = await firestore_client.update_document(
+            entity, id, data, tenant_id=current_user.tenant_id
+        )
 
         return {"data": result, "msg": "ok"}
 
@@ -213,7 +324,7 @@ async def update_entity(
                     "msg": f"Erro ao atualizar entidade {entity}/{id}",
                 }
             },
-        )
+        ) from e
 
 
 @router.delete("/admin/{entity}/{id}", response_model=BaseResponse)
@@ -241,10 +352,14 @@ async def delete_entity(
 
         # Verificar se a entidade existe
         async def get_firestore_entity():
-            return await firestore_client.get_document(entity, id)
+            return await firestore_client.get_document(
+                entity, id, tenant_id=current_user.tenant_id
+            )
 
         async def get_postgres_entity():
-            return await postgres_client.get_document(entity, id)
+            return await postgres_client.get_document(
+                entity, id, tenant_id=current_user.tenant_id
+            )
 
         existing_entity = await with_circuit_breaker(
             get_firestore_entity, get_postgres_entity
@@ -263,10 +378,14 @@ async def delete_entity(
 
         # Para entidades que suportam soft delete, apenas inativar
         if entity in ["students", "partners", "promotions"]:
-            await firestore_client.update_document(entity, id, {"active": False})
+            await firestore_client.update_document(
+                entity, id, {"active": False}, tenant_id=current_user.tenant_id
+            )
         else:
             # Para outras entidades, remover completamente
-            await firestore_client.delete_document(entity, id)
+            await firestore_client.delete_document(
+                entity, id, tenant_id=current_user.tenant_id
+            )
 
         return {"msg": "ok"}
 
@@ -282,7 +401,7 @@ async def delete_entity(
                     "msg": f"Erro ao remover entidade {entity}/{id}",
                 }
             },
-        )
+        ) from e
 
 
 @router.get("/admin/metrics", response_model=MetricsResponse)
@@ -366,21 +485,23 @@ async def get_metrics(current_user: JWTPayload = Depends(validate_admin_role)):
 
         for partner in partners_result.get("items", []):
             # Contar resgates para este parceiro
-            async def count_firestore_partner_redemptions():
+            partner_id = partner["id"]
+
+            async def count_firestore_partner_redemptions(pid=partner_id):
                 codes_result = await firestore_client.query_documents(
                     "validation_codes",
                     filters=[
-                        ("partner_id", "==", partner["id"]),
+                        ("partner_id", "==", pid),
                         ("used_at", "!=", None),
                     ],
                 )
                 return codes_result.get("total", 0)
 
-            async def count_postgres_partner_redemptions():
+            async def count_postgres_partner_redemptions(pid=partner_id):
                 codes_result = await postgres_client.query_documents(
                     "validation_codes",
                     filters=[
-                        ("partner_id", "==", partner["id"]),
+                        ("partner_id", "==", pid),
                         ("used_at", "!=", None),
                     ],
                 )
@@ -392,7 +513,7 @@ async def get_metrics(current_user: JWTPayload = Depends(validate_admin_role)):
 
             top_partners.append(
                 {
-                    "partner_id": partner["id"],
+                    "partner_id": partner_id,
                     "trade_name": partner.get("trade_name", ""),
                     "redemptions": redemptions,
                 }
@@ -416,7 +537,7 @@ async def get_metrics(current_user: JWTPayload = Depends(validate_admin_role)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": {"code": "SERVER_ERROR", "msg": "Erro ao obter métricas"}},
-        )
+        ) from e
 
 
 @router.post("/admin/notifications", response_model=BaseResponse)
@@ -461,12 +582,12 @@ async def send_notifications(
 
         async def get_firestore_recipients():
             return await firestore_client.query_documents(
-                request.target, filters=filters
+                request.target, filters=filters, tenant_id=current_user.tenant_id
             )
 
         async def get_postgres_recipients():
             return await postgres_client.query_documents(
-                request.target, filters=filters
+                request.target, filters=filters, tenant_id=current_user.tenant_id
             )
 
         recipients_result = await with_circuit_breaker(
@@ -500,4 +621,4 @@ async def send_notifications(
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao enviar notificações"}
             },
-        )
+        ) from e

@@ -46,7 +46,9 @@ select = [
     "C4", # flake8-comprehensions
     "SIM", # flake8-simplify
 ]
-ignore = []
+ignore = [
+    "B008",  # Allow function calls in argument defaults (FastAPI Depends pattern)
+]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]

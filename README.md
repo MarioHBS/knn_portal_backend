@@ -7,7 +7,7 @@ O Portal de Benefícios KNN é uma API REST desenvolvida com FastAPI para gerenc
 ## Arquitetura
 
 - **Backend**: FastAPI + asyncpg em contêiner
-- **Banco de Dados**: 
+- **Banco de Dados**:
   - Primário: Firestore multi-região
   - Contingência: PostgreSQL (espelho diário via Pub/Sub)
 - **Autenticação**: JWT Bearer obrigatório em todas as rotas
@@ -16,7 +16,7 @@ O Portal de Benefícios KNN é uma API REST desenvolvida com FastAPI para gerenc
 
 ## Estrutura do Projeto
 
-```
+```text
 portal-knn/
 ├── src/                      # Código-fonte principal
 │   ├── api/                  # Endpoints da API
@@ -90,35 +90,67 @@ O sistema possui três perfis de usuário:
 
 1. Clone o repositório
 2. Instale as dependências:
-   ```
+
+   ```bash
    pip install -r requirements.txt
    ```
+
+3. Configure as variáveis de ambiente:
+   - Copie o arquivo `.env.example` para `.env` e ajuste as configurações conforme necessário:
+
+     ```bash
+     cp .env.example .env
+     ```
+   - As principais variáveis são:
+     - `KNN_USE_TEST_DATABASE`: Define se deve usar dados simulados (true/false)
+     - `DEBUG`: Ativa logs detalhados (true/false)
+     - `ENVIRONMENT`: Ambiente de execução (development/staging/production)
+     - `PORT`: Porta do servidor (padrão: 8080)
 
 ### Execução Local
 
 Para iniciar o servidor em modo de desenvolvimento:
 
-```
-python run_server.py
+```bash
+python scripts/run_server.py
 ```
 
 Para executar com dados simulados (sem Firestore/PostgreSQL reais):
 
+```bash
+# Opção 1: Definir variável de ambiente
+KNN_USE_TEST_DATABASE=true python scripts/run_server.py
+
+# Opção 2: Editar o arquivo .env e definir KNN_USE_TEST_DATABASE=true
+python scripts/run_server.py
 ```
-KNN_TEST_MODE=true python run_server.py
-```
+
+### Variáveis de Ambiente
+
+O projeto suporta as seguintes variáveis de ambiente (definidas no arquivo `.env`):
+
+- **KNN_USE_TEST_DATABASE**: Modo de teste com dados simulados (true/false)
+- **DEBUG**: Ativa logs detalhados (true/false)
+- **ENVIRONMENT**: Ambiente de execução (development/staging/production)
+- **PORT**: Porta do servidor (padrão: 8080)
+- **FIRESTORE_PROJECT**: ID do projeto Firestore
+- **POSTGRES_CONNECTION_STRING**: String de conexão PostgreSQL
+- **CNPJ_HASH_SALT**: Salt para hash de CNPJ
+- **CPF_HASH_SALT**: Salt para hash de CPF
+- **JWKS_URL**: URL do JWKS para validação JWT
+- **MODE**: Modo de operação (normal/degraded)
 
 ### Testes
 
 Para executar todos os testes automatizados (incluindo linting com Ruff):
 
-```
+```bash
 ./run_tests.sh
 ```
 
 Para executar apenas o linting:
 
-```
+```bash
 ruff check src/
 ruff format src/
 ```
@@ -129,7 +161,7 @@ Para testes manuais, siga as instruções em `manual_tests.md`.
 
 Para fazer deploy no Google Cloud Run:
 
-```
+```bash
 ./deploy_cloudrun.sh
 ```
 
@@ -138,17 +170,20 @@ Para fazer deploy no Google Cloud Run:
 Para facilitar os testes, você pode usar os seguintes tokens JWT:
 
 ### Token de Aluno
-```
+
+```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHVkZW50LWlkIiwicm9sZSI6InN0dWRlbnQiLCJleHAiOjE3MTY5OTIwMDAsImlhdCI6MTcxNjkwNTYwMH0.8Uj7hl5vYGnEZQGR5QeQQOdTKB4ZXEfEiqxJxlE5Pjw
 ```
 
 ### Token de Parceiro
-```
+
+```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYXJ0bmVyLWlkIiwicm9sZSI6InBhcnRuZXIiLCJleHAiOjE3MTY5OTIwMDAsImlhdCI6MTcxNjkwNTYwMH0.Hn5Fq5qSVBN5QjuoYd2KBjTIGJJoV9OQh-VzpNqJrSs
 ```
 
 ### Token de Administrador
-```
+
+```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi1pZCIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTcxNjk5MjAwMCwiaWF0IjoxNzE2OTA1NjAwfQ.jQyOq0-KnzH0vqBQwKsqzTBGzKqGLYVj9WdAZKbK5Hs
 ```
 
@@ -156,8 +191,8 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi1pZCIsInJvbGUiOiJhZG1pbiI
 
 A documentação completa da API está disponível em:
 
-- Swagger UI: http://localhost:8080/v1/docs
-- ReDoc: http://localhost:8080/v1/redoc
-- OpenAPI JSON: http://localhost:8080/v1/openapi.json
+- Swagger UI: [http://localhost:8080/v1/docs](http://localhost:8080/v1/docs)
+- ReDoc: [http://localhost:8080/v1/redoc](http://localhost:8080/v1/redoc)
+- OpenAPI JSON: [http://localhost:8080/v1/openapi.json](http://localhost:8080/v1/openapi.json)
 
 Além disso, o arquivo `openapi.yaml` contém a especificação completa da API.
