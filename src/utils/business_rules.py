@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
 from src.config import CNPJ_HASH_SALT
-from src.utils import logger
+from src.utils.logging import logger
 
 
 class BusinessRules:

@@ -61,9 +61,7 @@ def configure_logging():
             structlog.processors.JSONRenderer(),
         ],
         logger_factory=structlog.PrintLoggerFactory(),
-        wrapper_class=structlog.make_filtering_bound_logger(
-            structlog.get_logger().level
-        ),
+        wrapper_class=structlog.make_filtering_bound_logger(20),  # INFO level
         cache_logger_on_first_use=True,
     )
 
