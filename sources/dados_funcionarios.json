@@ -1,0 +1,108 @@
+{
+  "funcionarios": [
+    {
+      "NOME": "Aimeê Almeida de Oliveira",
+      "CARGO": "ADM. PEDAGÓGICO",
+      "E-MAIL": "aimee.almeida2018@gmail.com",
+      "CEP": "65110-000",
+      "TELEFONE": 98991075072,
+      "ID": "EMP_A0A0O007_AP"
+    },
+    {
+      "NOME": "Ana Carolina de Oliveira Rodrigues",
+      "CARGO": "CDA",
+      "E-MAIL": "rodriguescarol6813@gmail.com",
+      "CEP": "65053-530",
+      "TELEFONE": 98988217454,
+      "ID": "EMP_A5C3O0R_CDA"
+    },
+    {
+      "NOME": "Ana Larissa Leite Barros",
+      "CARGO": "PROFESSORA",
+      "E-MAIL": "larissaana2704@gmail.com",
+      "CEP": "65052-847",
+      "TELEFONE": 98985911317,
+      "ID": "EMP_A8L4L7B3_PR"
+    },
+    {
+      "NOME": "Carmem Patrícia Reis Borges",
+      "CARGO": "PROFESSORA",
+      "E-MAIL": "carmemprborges@gmail.com",
+      "CEP": "65130-000",
+      "TELEFONE": 98985347029,
+      "ID": "EMP_C0P0R0B0_PR"
+    },
+    {
+      "NOME": "Edilene de Araújo Barbosa",
+      "CARGO": "PROFESSORA",
+      "E-MAIL": "edillenem@outlook.com",
+      "CEP": "65065-200",
+      "TELEFONE": 98991795370,
+      "ID": "EMP_E2A0B037_PR"
+    },
+    {
+      "NOME": "Felipe Ferreira de Oliveira",
+      "CARGO": "CONSULTOR COMERCIAL",
+      "E-MAIL": "felipedefolive@gmail.com",
+      "CEP": "65138-000",
+      "TELEFONE": 98985916692,
+      "ID": "EMP_F0F0O069_CC"
+    },
+    {
+      "NOME": "Juliana Santos Oliveira",
+      "CARGO": "ADM. FINANCEIRO",
+      "E-MAIL": "julicasssantos@gmail.com",
+      "CEP": "65056-574",
+      "TELEFONE": 98988854341,
+      "ID": "EMP_J5S7O434_AF"
+    },
+    {
+      "NOME": "Luana de Abreu Silva",
+      "CARGO": "ADM. PEDAGÓGICO",
+      "E-MAIL": "luanaabreusilva09@gmail.com",
+      "CEP": "65042-626",
+      "TELEFONE": 98985594916,
+      "ID": "EMP_L6A2S691_AP"
+    },
+    {
+      "NOME": "Natália de Jesus Everton Câmara",
+      "CARGO": "CONSULTOR COMERCIAL",
+      "E-MAIL": "n4thyeverton087@gmail.com",
+      "CEP": "65035-400",
+      "TELEFONE": 98988394914,
+      "ID": "EMP_N4J0E0C9_CC"
+    },
+    {
+      "NOME": "Tadeu Moraes Rego de Oliveira",
+      "CARGO": "PROFESSOR",
+      "E-MAIL": "tadeu.mro922@gmail.com",
+      "CEP": "65051-482",
+      "TELEFONE": 98984215158,
+      "ID": "EMP_T4M8R2O1_PR"
+    },
+    {
+      "NOME": "Yago Augusto Gonçalves Costa",
+      "CARGO": "PROFESSOR",
+      "E-MAIL": "augustocosta993@gmail.com",
+      "CEP": "65066-320",
+      "TELEFONE": 98985022446,
+      "ID": "EMP_Y3A2G0C4_PR"
+    },
+    {
+      "NOME": "Yanna Biankinny Gonçalves de Jesus",
+      "CARGO": "COORD. PEDAGÓGICA",
+      "E-MAIL": "yannagoncalvesdejesus@gmail.com",
+      "CEP": "65053-730",
+      "TELEFONE": 98981031611,
+      "ID": "EMP_Y7B3G0J6_CP"
+    }
+  ],
+  "total_registros": 12,
+  "colunas": [
+    "NOME",
+    "CARGO",
+    "E-MAIL",
+    "CEP",
+    "TELEFONE"
+  ]
+}
