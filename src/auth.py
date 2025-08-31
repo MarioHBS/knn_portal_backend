@@ -3,21 +3,77 @@ Módulo de autenticação e autorização para o Portal de Benefícios KNN.
 Implementa verificação de JWT com JWKS e validação de roles.
 """
 
+import asyncio
+import json
 import time
+from typing import Dict, Optional
 
 import httpx
+import jwt
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
 from pydantic import BaseModel
 
-from src.config import JWKS_CACHE_TTL, JWKS_URL, JWT_ALGORITHM, TESTING_MODE
+# Importações Firebase
+import firebase_admin
+import firebase_admin.auth
+
+from src.config import (
+    ENVIRONMENT,
+    FIRESTORE_PROJECT,
+    JWKS_CACHE_TTL,
+    JWKS_URL,
+    JWT_ALGORITHM,
+    TESTING_MODE,
+)
 
 # Segurança para autenticação via Bearer token
 security = HTTPBearer(auto_error=not TESTING_MODE)
 
 # Cache para JWKS
 jwks_cache = {"keys": None, "last_updated": 0}
+
+# Inicialização do Firebase
+def initialize_firebase():
+    """Inicializa Firebase Admin SDK se não estiver inicializado."""
+    try:
+        if not firebase_admin._apps:
+            # Tentar carregar credenciais do arquivo padrão
+            from firebase_admin import credentials
+            import os
+            from pathlib import Path
+            
+            # Procurar arquivo de credenciais
+            possible_paths = [
+                "data/firestore_import/default-service-account-key.json",
+                "default-service-account-key.json",
+                os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
+            ]
+            
+            cred_path = None
+            for path in possible_paths:
+                if path and Path(path).exists():
+                    cred_path = path
+                    break
+            
+            if cred_path:
+                cred = credentials.Certificate(cred_path)
+                firebase_admin.initialize_app(cred, {
+                    'projectId': FIRESTORE_PROJECT
+                })
+                print(f"Firebase inicializado com credenciais: {cred_path}")
+            else:
+                # Tentar inicializar com credenciais padrão do ambiente
+                firebase_admin.initialize_app()
+                print("Firebase inicializado com credenciais padrão do ambiente")
+                
+    except Exception as e:
+        print(f"Erro ao inicializar Firebase: {e}")
+        # Não falhar se Firebase não puder ser inicializado
+        pass
+
+# Inicializar Firebase na importação do módulo
+initialize_firebase()
 
 
 class JWTPayload(BaseModel):
@@ -69,6 +125,7 @@ async def verify_token(
 ) -> JWTPayload:
     """
     Verifica o token JWT e retorna o payload.
+    Em modo de desenvolvimento, tenta primeiro Firebase Auth, depois JWKS externo.
     """
     # Se estiver em modo de teste, retornar dados mock
     if TESTING_MODE:
@@ -86,7 +143,64 @@ async def verify_token(
             detail={"error": {"code": "INVALID_TOKEN", "msg": "Token não fornecido"}},
         )
 
-    token = credentials.credentials
+    # Se credentials for uma string, usar diretamente
+    if isinstance(credentials, str):
+        token = credentials
+    else:
+        token = credentials.credentials
+
+    # Em modo de desenvolvimento, tentar Firebase Auth primeiro
+    if ENVIRONMENT == "development":
+        try:
+            # Primeiro, tentar verificar como ID token
+            try:
+                decoded_token = firebase_admin.auth.verify_id_token(token)
+                print(f"Token verificado como ID token: {decoded_token.get('uid')}")
+            except Exception as id_token_error:
+                print(f"Não é um ID token válido: {id_token_error}")
+                
+                # Se não for ID token, pode ser custom token - decodificar diretamente
+                import jwt
+                import json
+                
+                # Decodificar sem verificação (apenas para desenvolvimento)
+                decoded_token = jwt.decode(token, options={"verify_signature": False})
+                print(f"Custom token decodificado: {json.dumps(decoded_token, indent=2)}")
+                
+                # Verificar se tem as informações necessárias
+                if 'uid' in decoded_token or 'sub' in decoded_token:
+                    uid = decoded_token.get('uid') or decoded_token.get('sub')
+                    
+                    # Buscar custom claims do usuário
+                    user_record = firebase_admin.auth.get_user(uid)
+                    custom_claims = user_record.custom_claims or {}
+                    
+                    print(f"Custom claims do usuário {uid}: {custom_claims}")
+                    
+                    # Usar custom claims do usuário
+                    decoded_token.update(custom_claims)
+            
+            # Converter para JWTPayload
+            uid = decoded_token.get('uid') or decoded_token.get('sub', '')
+            payload = JWTPayload(
+                sub=uid,
+                exp=decoded_token.get('exp', 9999999999),
+                iat=decoded_token.get('iat', int(time.time())),
+                role=decoded_token.get('role', 'user'),
+                tenant=decoded_token.get('tenant', 'default-tenant'),
+                iss=decoded_token.get('iss'),
+                aud=decoded_token.get('aud')
+            )
+            
+            print(f"Token verificado com Firebase: {payload.sub} (role: {payload.role})")
+            return payload
+            
+        except Exception as firebase_error:
+            # Se Firebase falhar, tentar JWKS externo
+            print(f"Firebase Auth falhou: {firebase_error}. Tentando JWKS externo...")
+            import traceback
+            print(f"Stack trace: {traceback.format_exc()}")
+            pass
 
     try:
         # Obter JWKS

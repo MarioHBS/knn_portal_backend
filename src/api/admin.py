@@ -43,27 +43,52 @@ async def list_partners(
             filters["category"] = cat
 
         # Buscar parceiros
-        partners_data = await with_circuit_breaker(
-            firestore_client.query_documents,
-            "partners",
-            filters=filters,
-            order_by=ord,
-            limit=limit,
-            offset=offset,
-            tenant_id=current_user.tenant,
+        async def get_firestore_partners():
+            return await firestore_client.query_documents(
+                "partners",
+                filters=list(filters.items()) if filters else None,
+                order_by=[(ord, "ASCENDING")] if ord else None,
+                limit=limit,
+                offset=offset,
+                tenant_id=current_user.tenant,
+            )
+
+        async def get_postgres_partners():
+            return await postgres_client.query_documents(
+                "partners",
+                filters=list(filters.items()) if filters else None,
+                order_by=[(ord, "ASCENDING")] if ord else None,
+                limit=limit,
+                offset=offset,
+                tenant_id=current_user.tenant,
+            )
+
+        partners_result = await with_circuit_breaker(
+            get_firestore_partners, get_postgres_partners
         )
 
         # Contar total
+        async def count_firestore_partners():
+            return await firestore_client.count_documents(
+                "partners",
+                filters=list(filters.items()) if filters else None,
+                tenant_id=current_user.tenant,
+            )
+
+        async def count_postgres_partners():
+            return await postgres_client.count_documents(
+                "partners",
+                filters=list(filters.items()) if filters else None,
+                tenant_id=current_user.tenant,
+            )
+
         total = await with_circuit_breaker(
-            firestore_client.count_documents,
-            "partners",
-            filters=filters,
-            tenant_id=current_user.tenant,
+            count_firestore_partners, count_postgres_partners
         )
 
         return PartnerListResponse(
             data={
-                "items": partners_data,
+                "items": partners_result.get("items", []),
                 "total": total,
                 "limit": limit,
                 "offset": offset,
@@ -93,11 +118,18 @@ async def get_partner_details(
     """
     try:
         # Buscar parceiro
+        async def get_firestore_partner():
+            return await firestore_client.get_document(
+                "partners", id, tenant_id=current_user.tenant
+            )
+
+        async def get_postgres_partner():
+            return await postgres_client.get_document(
+                "partners", id, tenant_id=current_user.tenant
+            )
+
         partner_data = await with_circuit_breaker(
-            firestore_client.get_document,
-            "partners",
-            id,
-            tenant_id=current_user.tenant,
+            get_firestore_partner, get_postgres_partner
         )
 
         if not partner_data:

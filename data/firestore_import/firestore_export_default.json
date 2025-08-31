@@ -1,0 +1,1578 @@
+{
+  "__collection__/students": {},
+  "__collection__/students/STD_A3C1M7L7_S4": {
+    "data": {
+      "id": "STD_A3C1M7L7_S4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Alba Clarissa Maciel Lopes",
+      "livro": "SEEDS 4",
+      "ocupacao": "Psicologa",
+      "e-mail": "albaclarissa19@gmailcom",
+      "telefone": "98981194700",
+      "cep": "65055-317",
+      "bairro": "COHAPAM",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A0L0R0F8_S2": {
+    "data": {
+      "id": "STD_A0L0R0F8_S2",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Alberto Luiz Dos Reis Filho",
+      "livro": "SEEDS 2",
+      "ocupacao": "Mecânico",
+      "e-mail": "clarinhabeca.45@gmail.com",
+      "telefone": "98983285884",
+      "cep": "65110-000",
+      "bairro": "CEP não encontrado",
+      "complemento_aluno": "",
+      "nome_responsavel": "Clara Rebeca Silva do Reis",
+      "e-mail_responsavel": "clarinhabeca.45@gmail.com",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A0D0N002_K3": {
+    "data": {
+      "id": "STD_A0D0N002_K3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Alciomar Divino Nascimento",
+      "livro": "KIDS 3",
+      "ocupacao": "Estudante",
+      "e-mail": "claudianaarauj02020mt@gmailcom",
+      "telefone": "98983406021",
+      "cep": "65110-000",
+      "bairro": "CEP não encontrado",
+      "complemento_aluno": "Gran Village do Sol I",
+      "nome_responsavel": "Mayhana Caroline de Araújo",
+      "e-mail_responsavel": "profmayana@gmail.com",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A1R9C333_T1": {
+    "data": {
+      "id": "STD_A1R9C333_T1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Alessandra Rios Colins",
+      "livro": "TEENS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "cleaxp@hotmailcom",
+      "telefone": "98987449335",
+      "cep": "65056-193",
+      "bairro": "Parque Sabiá",
+      "complemento_aluno": "",
+      "nome_responsavel": "Jousicleia Rios Pereira Colins",
+      "e-mail_responsavel": "cleaxp@hotmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A1M5R5C0_S4": {
+    "data": {
+      "id": "STD_A1M5R5C0_S4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Alissa Maria Rocha Castro",
+      "livro": "SEEDS 4",
+      "ocupacao": "Estudante",
+      "e-mail": "alissarcastro@gmailcom",
+      "telefone": "98989183010",
+      "cep": "65053-155",
+      "bairro": "COHAB Anil III",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A7T3A0A3_S1": {
+    "data": {
+      "id": "STD_A7T3A0A3_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Amanda Thuane Alves Aguiar",
+      "livro": "SEEDS 1",
+      "ocupacao": "Advogada",
+      "e-mail": "amandathuane@cloundcom",
+      "telefone": "98981000302",
+      "cep": "65053-730",
+      "bairro": "Cohatrac I",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_ACNMS000_S3": {
+    "data": {
+      "id": "STD_ACNMS000_S3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Ana Clara Nogueira Martins Serra",
+      "livro": "SEEDS 3",
+      "ocupacao": "Estudante",
+      "e-mail": "",
+      "telefone": "",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Leandro Rafael Martins Serra",
+      "e-mail_responsavel": "leandrormserra@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A0G0S0O3_S1": {
+    "data": {
+      "id": "STD_A0G0S0O3_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Ana Gisele da silva Oliveira",
+      "livro": "SEEDS 1",
+      "ocupacao": "FARMACEUTICA RT",
+      "e-mail": "anagiolv@gmailcom",
+      "telefone": "98970195306",
+      "cep": "65050-000",
+      "bairro": "COHAB Anil I",
+      "complemento_aluno": "QD 05. PRAÇA 91",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A2L8M0G_TW4": {
+    "data": {
+      "id": "STD_A2L8M0G_TW4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Ana Lia Mendonça Gomes",
+      "livro": "TWEENS 4",
+      "ocupacao": "Estudante",
+      "e-mail": "lidiamendoncanutricionista@hormailcom",
+      "telefone": "98988935214",
+      "cep": "65070-280",
+      "bairro": "Vila Vicente Fialho",
+      "complemento_aluno": "",
+      "nome_responsavel": "Lidia Abidorina Silva Mendoça",
+      "e-mail_responsavel": "lidiamendoncanutricionista@hormailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A2B4R0C6_S4": {
+    "data": {
+      "id": "STD_A2B4R0C6_S4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Anna Beatriz Rabelo Carvalho",
+      "livro": "SEEDS 4",
+      "ocupacao": "Enfermeira",
+      "e-mail": "annabeatrizreabello022@gmailcom",
+      "telefone": "98984464653",
+      "cep": "65054-240",
+      "bairro": "Cohatrac II",
+      "complemento_aluno": "Casa",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A0G0O0V2_S3": {
+    "data": {
+      "id": "STD_A0G0O0V2_S3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Anne Gabriele Oliveira Viana",
+      "livro": "SEEDS 3",
+      "ocupacao": "Estudante",
+      "e-mail": "annegabrieleoliveira2009@gmailcom",
+      "telefone": "",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Carla Raquel Oliveira Silva",
+      "e-mail_responsavel": "annegabrieleoliveira2009@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A3P3N8M1_S1": {
+    "data": {
+      "id": "STD_A3P3N8M1_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Ariel Petrus Nascimento Melo",
+      "livro": "SEEDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "fernet@hotmailcom",
+      "telefone": "88999367135",
+      "cep": "65055-338",
+      "bairro": "Jardim São Cristóvão II",
+      "complemento_aluno": "Condominio",
+      "nome_responsavel": "Fernanda Elenilce Cordeiro Nascimento",
+      "e-mail_responsavel": "fernet@hotmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A8V1M28_TW2": {
+    "data": {
+      "id": "STD_A8V1M28_TW2",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Arthur Vigarani Montebeler",
+      "livro": "TWEENS 2",
+      "ocupacao": "Estudante",
+      "e-mail": "barbaravigarani@hotmailcom",
+      "telefone": "47992585817",
+      "cep": "65120-812",
+      "bairro": "Cohatrac",
+      "complemento_aluno": "",
+      "nome_responsavel": "Lucas De Souza Santaroni",
+      "e-mail_responsavel": "barbaravigarani@hotmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_A1M8C0N5_S1": {
+    "data": {
+      "id": "STD_A1M8C0N5_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Augusto Martins Campos Neto",
+      "livro": "SEEDS 1",
+      "ocupacao": "Policial Militar",
+      "e-mail": "neto1428@gmailcom",
+      "telefone": "86994971592",
+      "cep": "64027-180",
+      "bairro": "Promorar",
+      "complemento_aluno": "Cond Promorar Apt 127A",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_B0C0R0C0_S1": {
+    "data": {
+      "id": "STD_B0C0R0C0_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Beatriz Coimbra Ribeiro Costa",
+      "livro": "SEEDS 1",
+      "ocupacao": "Advogada",
+      "e-mail": "beatriz_cl5@hotmailcom",
+      "telefone": "98984321033",
+      "cep": "65110-000",
+      "bairro": "CEP não encontrado",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_B9S03261_K1": {
+    "data": {
+      "id": "STD_B9S03261_K1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Benjamin Sousa",
+      "livro": "KIDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "amandahellen@gmail.com",
+      "telefone": "98992253261",
+      "cep": "65063-903",
+      "bairro": "Angelim",
+      "complemento_aluno": "Cond Alto Angelim 2",
+      "nome_responsavel": "Amanda Hellen Sousa",
+      "e-mail_responsavel": "amandahellen@gmail.com",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_B4M8L04_TW2": {
+    "data": {
+      "id": "STD_B4M8L04_TW2",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Bryan Mourão Lima",
+      "livro": "TWEENS 2",
+      "ocupacao": "Estudante",
+      "e-mail": "juniorlnj@gmailcom",
+      "telefone": "98988296421",
+      "cep": "65056-480",
+      "bairro": "Tirirical",
+      "complemento_aluno": "",
+      "nome_responsavel": "Raimundo Luis Mourão Júnior",
+      "e-mail_responsavel": "juniorlnj@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_C0F0G0S4_S1": {
+    "data": {
+      "id": "STD_C0F0G0S4_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Carla Filomena Gomes Santos",
+      "livro": "SEEDS 1",
+      "ocupacao": "Babá",
+      "e-mail": "karlagomessantos389@gmailcom",
+      "telefone": "98985666470",
+      "cep": "65128-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_C8D4B8M9_A1": {
+    "data": {
+      "id": "STD_C8D4B8M9_A1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Carlos Daniel Barros Mouzinho",
+      "livro": "ADVANCED 1",
+      "ocupacao": "Estudante",
+      "e-mail": "ned9860@gmailcom",
+      "telefone": "",
+      "cep": "65052-848",
+      "bairro": "Residencial Primavera",
+      "complemento_aluno": "",
+      "nome_responsavel": "Maria do Monte Serra",
+      "e-mail_responsavel": "ned9860@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_C5R9C0C8_T3": {
+    "data": {
+      "id": "STD_C5R9C0C8_T3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Cassia Rafaele Cavalcante Costa",
+      "livro": "TEENS 3",
+      "ocupacao": "Estudante",
+      "e-mail": "cassiocpcosta@gmailcom",
+      "telefone": "98988455856",
+      "cep": "65053-590",
+      "bairro": "Cohatrac I",
+      "complemento_aluno": "",
+      "nome_responsavel": "Cassio Pestana Costa",
+      "e-mail_responsavel": "cassiocpcosta@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_CRSLJ776_S1": {
+    "data": {
+      "id": "STD_CRSLJ776_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Cesar Roberto Silva Lima Junior",
+      "livro": "SEEDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "crslj_86@hotmailcom",
+      "telefone": "98985528216",
+      "cep": "65068-776",
+      "bairro": "Parque Vitória",
+      "complemento_aluno": "Qd 212",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_C0R0S0R8_S2": {
+    "data": {
+      "id": "STD_C0R0S0R8_S2",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Clara Rebeca Silva do Reis",
+      "livro": "SEEDS 2",
+      "ocupacao": "Estudante",
+      "e-mail": "clarinhabeca.45@gmail.com",
+      "telefone": "98983535885",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_D0M0A563_S2": {
+    "data": {
+      "id": "STD_D0M0A563_S2",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Damião Maia Araujo",
+      "livro": "SEEDS 2",
+      "ocupacao": "Motorista",
+      "e-mail": "damiaomaiaaraujo@gmail.com",
+      "telefone": "98991237632",
+      "cep": "65054-005",
+      "bairro": "Forquilha",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_D0M0O0B8_T1": {
+    "data": {
+      "id": "STD_D0M0O0B8_T1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Daniela Maria De Oliveira Barbosa",
+      "livro": "TEENS 1",
+      "ocupacao": "",
+      "e-mail": "n@gmailcom",
+      "telefone": "98987804863",
+      "cep": "65130-000",
+      "bairro": "Não encontrado",
+      "complemento_aluno": "",
+      "nome_responsavel": "Silvania Canuto de Oliveira",
+      "e-mail_responsavel": "n@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_ECCSS00_TW4": {
+    "data": {
+      "id": "STD_ECCSS00_TW4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Emanuelle Castro Costa de Sousa Santos",
+      "livro": "TWEENS 4",
+      "ocupacao": "Estudante",
+      "e-mail": "",
+      "telefone": "",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Carmem Carolina Castro Costa",
+      "e-mail_responsavel": "bccarolcastro@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_E6R9C0S3_K1": {
+    "data": {
+      "id": "STD_E6R9C0S3_K1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Enzo Rafael Carvalho De Sousa",
+      "livro": "KIDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "vana241972@gmailcom",
+      "telefone": "98970201306",
+      "cep": "65050-690",
+      "bairro": "COHAB Anil III",
+      "complemento_aluno": "",
+      "nome_responsavel": "Silvana Da Silva Santos Ferreira",
+      "e-mail_responsavel": "vana241972@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_E2F6D221_T1": {
+    "data": {
+      "id": "STD_E2F6D221_T1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Estela Fernanda Dias",
+      "livro": "TEENS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "ferj1569@hotmailcom",
+      "telefone": "98988682218",
+      "cep": "65058-262",
+      "bairro": "Cidade Operária",
+      "complemento_aluno": "",
+      "nome_responsavel": "Francisco Eufrazio Ribeiro Junior",
+      "e-mail_responsavel": "ferj1569@hotmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_G2S7C968_S1": {
+    "data": {
+      "id": "STD_G2S7C968_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Gabrielly dos Santos Castro",
+      "livro": "SEEDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "lilymor4is@gmail.com",
+      "telefone": "98992217689",
+      "cep": "65055-279",
+      "bairro": "IPEM São Cristóvão",
+      "complemento_aluno": "",
+      "nome_responsavel": "Emanuel Machado Castro",
+      "e-mail_responsavel": "lilymor4is@gmail.com",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_G7P5B040_S1": {
+    "data": {
+      "id": "STD_G7P5B040_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Geovane Pereira Braz",
+      "livro": "SEEDS 1",
+      "ocupacao": "",
+      "e-mail": "geovaneeelizama@gmailcom",
+      "telefone": "98988483402",
+      "cep": "65053-750",
+      "bairro": "Cohatrac I",
+      "complemento_aluno": "",
+      "nome_responsavel": "Elizima Gomes Pereira",
+      "e-mail_responsavel": "geovaneeelizama@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_G0V0F00_TW3": {
+    "data": {
+      "id": "STD_G0V0F00_TW3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Guilherme Vieira Filgueiras",
+      "livro": "TWEENS 3",
+      "ocupacao": "Estudante",
+      "e-mail": "",
+      "telefone": "",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Tamires Batista Vieira",
+      "e-mail_responsavel": "thamiresvieira2203@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_HRLCS0_KD6A": {
+    "data": {
+      "id": "STD_HRLCS0_KD6A",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Hadassa Rogéria Lobato Costa Silva",
+      "livro": "KINDER 6A",
+      "ocupacao": "",
+      "e-mail": "",
+      "telefone": "98989071050",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Welson Rogério Silva Costa",
+      "e-mail_responsavel": "fransilvap273@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_H0N0R007_K1": {
+    "data": {
+      "id": "STD_H0N0R007_K1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Heitor Nunes Rocha",
+      "livro": "KIDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "laiannymarino@outlookcom",
+      "telefone": "98981102076",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "Jardim Araçagy II",
+      "nome_responsavel": "Laianny Marinho Nunes Torres",
+      "e-mail_responsavel": "laiannymarinho@outlookcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_H8M8O9M_TW4": {
+    "data": {
+      "id": "STD_H8M8O9M_TW4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Helena Maria Oliveira Monteiro",
+      "livro": "TWEENS 4",
+      "ocupacao": "Estudante",
+      "e-mail": "",
+      "telefone": "",
+      "cep": "65052-889",
+      "bairro": "Jardim das Margaridas",
+      "complemento_aluno": "",
+      "nome_responsavel": "Simone de Souza Oliveira",
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_H0C0F0B0_K2": {
+    "data": {
+      "id": "STD_H0C0F0B0_K2",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Heloísa Cristina de Freitas Brito",
+      "livro": "KIDS 2",
+      "ocupacao": "Estudante",
+      "e-mail": "kerciamlf@yahoo.com.br",
+      "telefone": "98970036069",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Kercia Maria Lopes de Freitas Brito",
+      "e-mail_responsavel": "kerciamlf@yahoo.com.br",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_I0T5S056_T1": {
+    "data": {
+      "id": "STD_I0T5S056_T1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Icaro Tapajos Santos",
+      "livro": "TEENS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "Reginaicaro934@gmailcom",
+      "telefone": "98911417561",
+      "cep": "65050-050",
+      "bairro": "COHAB Anil III",
+      "complemento_aluno": "",
+      "nome_responsavel": "Regina Barros do Amaral",
+      "e-mail_responsavel": "Reginaicaro934@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_I0R0R0J8_S1": {
+    "data": {
+      "id": "STD_I0R0R0J8_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Inaldo Rodrigues Rubim Junior",
+      "livro": "SEEDS 1",
+      "ocupacao": "NDA",
+      "e-mail": "irubimjunior@gmailcom",
+      "telefone": "98984059815",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_I0L0M0O9_S1": {
+    "data": {
+      "id": "STD_I0L0M0O9_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Ingrid Laís Martins Oliveira",
+      "livro": "SEEDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "ingridlais568@gmailcom",
+      "telefone": "98981833932",
+      "cep": "65130-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Flavio Adriano dos Santos Oliveira",
+      "e-mail_responsavel": "ingridlais568@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_I1C1L0F0_S1": {
+    "data": {
+      "id": "STD_I1C1L0F0_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Isabel Chistinne Lima Ferreira",
+      "livro": "SEEDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "docarmoferreira1975@gmailcom",
+      "telefone": "98991951051",
+      "cep": "65058-110",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Maria do Carmo Sousa de Lima Ferreira",
+      "e-mail_responsavel": "docarmoferreira1975@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_I6S8S00_TW4": {
+    "data": {
+      "id": "STD_I6S8S00_TW4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Isabelle Sousa Silva",
+      "livro": "TWEENS 4",
+      "ocupacao": "Estudante",
+      "e-mail": "josielmaj@gmailcom",
+      "telefone": "98988071094",
+      "cep": "65053-680",
+      "bairro": "Cohatrac I",
+      "complemento_aluno": "",
+      "nome_responsavel": "Josielma Leite de Oliveira Sousa Silva",
+      "e-mail_responsavel": "josielmaj@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_I0N0M013_S2": {
+    "data": {
+      "id": "STD_I0N0M013_S2",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Isack Nunes Matos",
+      "livro": "SEEDS 2",
+      "ocupacao": "Manutenção de Motores",
+      "e-mail": "nunesd250@gmailcom",
+      "telefone": "98981154136",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_I8R5S5C5_S1": {
+    "data": {
+      "id": "STD_I8R5S5C5_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Israel Resec Salazar Camelo",
+      "livro": "SEEDS 1",
+      "ocupacao": "Professor",
+      "e-mail": "israelrasec@gmailcom",
+      "telefone": "98981514547",
+      "cep": "65052-855",
+      "bairro": "Residencial Primavera",
+      "complemento_aluno": "quadra 20",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_J0D0C0C2_T1": {
+    "data": {
+      "id": "STD_J0D0C0C2_T1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "João Davi Correia Carvalho",
+      "livro": "TEENS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "hugocarvalhopandu@gmailcom",
+      "telefone": "98999728237",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "Cond Village do Sol",
+      "nome_responsavel": "Hugo Leonardo da Silva Carvalho",
+      "e-mail_responsavel": "hugocarvalhopandu@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_JLOSS680_S3": {
+    "data": {
+      "id": "STD_JLOSS680_S3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Josielma Leite de Oliveira Sousa Silva",
+      "livro": "SEEDS 3",
+      "ocupacao": "Autônoma",
+      "e-mail": "josielmaj@gmailcom",
+      "telefone": "98988071094",
+      "cep": "65053-680",
+      "bairro": "Cohatrac I",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_J6S8S00_TW4": {
+    "data": {
+      "id": "STD_J6S8S00_TW4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Julia Sousa Silva",
+      "livro": "TWEENS 4",
+      "ocupacao": "Estudante",
+      "e-mail": "josielmaj@gmailcom",
+      "telefone": "98888071094",
+      "cep": "65053-680",
+      "bairro": "Cohatrac I",
+      "complemento_aluno": "",
+      "nome_responsavel": "Josielma Leite de Oliveira Sousa Silva",
+      "e-mail_responsavel": "josielmaj@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_KAFPCL00_S4": {
+    "data": {
+      "id": "STD_KAFPCL00_S4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Kayla Anahí Freitas Pinheiro Correio Lima",
+      "livro": "SEEDS 4",
+      "ocupacao": "Estudante",
+      "e-mail": "igorleandroarquiteto@gmail.com",
+      "telefone": "98988350945",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "Cond Gran Village IV",
+      "nome_responsavel": "Igor Leandro Pinheiro Correio Lima",
+      "e-mail_responsavel": "igorleandroarquiteto@gmail.com",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_L0S0P0A8_S1": {
+    "data": {
+      "id": "STD_L0S0P0A8_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Larissa Suelen Pereira Almeida",
+      "livro": "SEEDS 1",
+      "ocupacao": "Atendente",
+      "e-mail": "larissasuelen.3103@gmail.com",
+      "telefone": "98999128880",
+      "cep": "65130-000",
+      "bairro": "Não encontrado",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_L6K5C6N8_S1": {
+    "data": {
+      "id": "STD_L6K5C6N8_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Layla Kahanna da Costa Nogueira",
+      "livro": "SEEDS 1",
+      "ocupacao": "",
+      "e-mail": "iolandra25@gmailcom",
+      "telefone": "98989180860",
+      "cep": "65056-656",
+      "bairro": "ERRO",
+      "complemento_aluno": "Condomínio Muriçi",
+      "nome_responsavel": "Iolandra Fereira da Costa",
+      "e-mail_responsavel": "Iolandra25@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_L0C0M0B_TW3": {
+    "data": {
+      "id": "STD_L0C0M0B_TW3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Letícia Cristiny Menezes Barros",
+      "livro": "TWEENS 3",
+      "ocupacao": "Estudante",
+      "e-mail": "licianne1981@gmailcom",
+      "telefone": "98988192394",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Licianne Cristine Monteiro Menezes Barros",
+      "e-mail_responsavel": "licianne1981@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_L1R0M1C6_S1": {
+    "data": {
+      "id": "STD_L1R0M1C6_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Lilian Roberta Marques Campos",
+      "livro": "SEEDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "liliancampos0993@gmailcom",
+      "telefone": "98984214615",
+      "cep": "65058-101",
+      "bairro": "Cidade Operária",
+      "complemento_aluno": "",
+      "nome_responsavel": "Robert Monteiro Campos",
+      "e-mail_responsavel": "liliancampos0993@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_LVSRC000_S3": {
+    "data": {
+      "id": "STD_LVSRC000_S3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Luana Vitorina da Silva Rocha Castro",
+      "livro": "SEEDS 3",
+      "ocupacao": "Estudante",
+      "e-mail": "luanacastro044@gmailcom",
+      "telefone": "69999233460",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_MASRS440_T1": {
+    "data": {
+      "id": "STD_MASRS440_T1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Maria Antonia de Sousa Ramos Silva",
+      "livro": "TEENS 1",
+      "ocupacao": "Esstudante",
+      "e-mail": "lucijaneemsousa@gmailcom",
+      "telefone": "98984251440",
+      "cep": "",
+      "bairro": "Não informado",
+      "complemento_aluno": "",
+      "nome_responsavel": "Lucejane Maria de Sousa",
+      "e-mail_responsavel": "Lucejaneemsousa@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_M6E3G8V_TW1": {
+    "data": {
+      "id": "STD_M6E3G8V_TW1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Maria Eliza Gomes Viana",
+      "livro": "TWEENS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "rosanagomesrsg@gmail.com",
+      "telefone": "98988876968",
+      "cep": "65113-638",
+      "bairro": "ERRO",
+      "complemento_aluno": "Escola Lêda Tajra",
+      "nome_responsavel": "Rozana Santos Gomes",
+      "e-mail_responsavel": "rozanagomesrsg@gmail.com",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_M5F9M0A2_S3": {
+    "data": {
+      "id": "STD_M5F9M0A2_S3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Maria Fernanda Melo de Araújo",
+      "livro": "SEEDS 3",
+      "ocupacao": "Estudante",
+      "e-mail": "cintiamf.melo@gmail.com",
+      "telefone": "98999064228",
+      "cep": "65053-590",
+      "bairro": "Cohatrac I",
+      "complemento_aluno": "quadra 35",
+      "nome_responsavel": "Cintia Silva Melo",
+      "e-mail_responsavel": "cintiamf.melo@gmail.com",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_M0J0S0T3_K2": {
+    "data": {
+      "id": "STD_M0J0S0T3_K2",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Maria Julia de Souza Tavares",
+      "livro": "KIDS 2",
+      "ocupacao": "Estudante",
+      "e-mail": "mcordeiro24@yahoocom.br",
+      "telefone": "98988834333",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Michelle Cordeiro de Sousa",
+      "e-mail_responsavel": "mcordeiro24@yahoocom.br",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_M0B0T00_TW4": {
+    "data": {
+      "id": "STD_M0B0T00_TW4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Mariana Barros Tavares",
+      "livro": "TWEENS 4",
+      "ocupacao": "Estudante",
+      "e-mail": "",
+      "telefone": "",
+      "cep": "",
+      "bairro": "Não informado",
+      "complemento_aluno": "",
+      "nome_responsavel": "Edna Mendes Barros",
+      "e-mail_responsavel": "Embarros2010@hotmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_M0M0D0V6_T1": {
+    "data": {
+      "id": "STD_M0M0D0V6_T1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Mariana Marques Dias Viana",
+      "livro": "TEENS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "andienemarques@hotmailcom",
+      "telefone": "98988952657",
+      "cep": "65000-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Andiene Marques Dias Viana",
+      "e-mail_responsavel": "andienemarques@hotmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_M0E0L0M_TW4": {
+    "data": {
+      "id": "STD_M0E0L0M_TW4",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Mateus Erlon Lindoso Mendonça",
+      "livro": "TWEENS 4",
+      "ocupacao": "Estudante",
+      "e-mail": "aberlon@hormailcom",
+      "telefone": "98988315900",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Aberlon Joriazio Serejo Mendonça",
+      "e-mail_responsavel": "aberlon@hormailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_M0C0M0S9_S1": {
+    "data": {
+      "id": "STD_M0C0M0S9_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Maysa da Conceição  Mendes Da Silva",
+      "livro": "SEEDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "maysasilva67890@gmailcom",
+      "telefone": "98985896946",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Raylson  Pessoa Da Silva",
+      "e-mail_responsavel": "maysasilva67890@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_N0P00000_K3": {
+    "data": {
+      "id": "STD_N0P00000_K3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Nicolas Pietro",
+      "livro": "KIDS 3",
+      "ocupacao": "Estudante",
+      "e-mail": "",
+      "telefone": "",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Elizangela Silva Moraes",
+      "e-mail_responsavel": "Elizangelamoraes21@hotmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_P6R4S0C1_S1": {
+    "data": {
+      "id": "STD_P6R4S0C1_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Patrine Raquel da Silva Cordeiro",
+      "livro": "SEEDS 1",
+      "ocupacao": "Farmaceutica",
+      "e-mail": "patrineraquel123@gmail.com",
+      "telefone": "98984950176",
+      "cep": "65044-640",
+      "bairro": "Coroadinho",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_P0F0T0G1_K3": {
+    "data": {
+      "id": "STD_P0F0T0G1_K3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Paula Ferreira Tavares Gomes",
+      "livro": "KIDS 3",
+      "ocupacao": "Estudante",
+      "e-mail": "atsg14112012@gmailcom",
+      "telefone": "",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Adriana Tavares Santos Gomes",
+      "e-mail_responsavel": "atsg14112012@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_PAFBS000_X1": {
+    "data": {
+      "id": "STD_PAFBS000_X1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Paulo Arthur Fernandes Barros Santana",
+      "livro": "JOVENES 4",
+      "ocupacao": "Estudante",
+      "e-mail": "",
+      "telefone": "",
+      "cep": "",
+      "bairro": "Não informado",
+      "complemento_aluno": "",
+      "nome_responsavel": "Nethyelly Fernandes de Sousa Leite",
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_PVDL40_KD6A": {
+    "data": {
+      "id": "STD_PVDL40_KD6A",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Pietro Valentim Dias Lopes",
+      "livro": "KINDER 6A",
+      "ocupacao": "",
+      "e-mail": "",
+      "telefone": "",
+      "cep": "65063-400",
+      "bairro": "Novo Angelim",
+      "complemento_aluno": "",
+      "nome_responsavel": "Miriam Dias Lopes",
+      "e-mail_responsavel": "lopesmiriamdias@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_R0M0D0V6_T1": {
+    "data": {
+      "id": "STD_R0M0D0V6_T1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Rafael Marques Dias Viana",
+      "livro": "TEENS 1",
+      "ocupacao": "EStudante",
+      "e-mail": "rafaelmarquesbatera1@gmailcom",
+      "telefone": "98988952657",
+      "cep": "65000-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Andiene Marques Dias Viana",
+      "e-mail_responsavel": "rafaelmarquesbatera1@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_R0R0C035_S1": {
+    "data": {
+      "id": "STD_R0R0C035_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Rayelli Rocha Conceição",
+      "livro": "SEEDS 1",
+      "ocupacao": "Valparaíso",
+      "e-mail": "rayelliconceicao@gmailcom",
+      "telefone": "98988857355",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_S0V0P029_S2": {
+    "data": {
+      "id": "STD_S0V0P029_S2",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Sarah  Vieira Pestana",
+      "livro": "SEEDS 2",
+      "ocupacao": "Estudante",
+      "e-mail": "pestanasara06@gmail.com",
+      "telefone": "98988354293",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "Próximo ao Cenaza",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_S0I0S0B_TW1": {
+    "data": {
+      "id": "STD_S0I0S0B_TW1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Sarah Izabel Sousa Bento",
+      "livro": "TWEENS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "mariza2015sa@gmailcom",
+      "telefone": "98987260606",
+      "cep": "65100-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "Itaguará 2",
+      "nome_responsavel": "Mariza de Jesus Sá Sousa",
+      "e-mail_responsavel": "mariza2015sa@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_TLSG88_KD6A": {
+    "data": {
+      "id": "STD_TLSG88_KD6A",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Thiago Luis dos Santos Gama",
+      "livro": "KINDER 6A",
+      "ocupacao": "Estudante",
+      "e-mail": "",
+      "telefone": "",
+      "cep": "65054-889",
+      "bairro": "Chácara Itapiracó",
+      "complemento_aluno": "",
+      "nome_responsavel": "Heloana Dos Santos Gama",
+      "e-mail_responsavel": "heloanagama@hotmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_V0C0C077_S1": {
+    "data": {
+      "id": "STD_V0C0C077_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Valquíria Carvalho da Conceição",
+      "livro": "SEEDS 1",
+      "ocupacao": "Valparaíso",
+      "e-mail": "valquiriacarvalh787@gmailcom",
+      "telefone": "98988956773",
+      "cep": "65130-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_V3B0N0S7_S1": {
+    "data": {
+      "id": "STD_V3B0N0S7_S1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Victor Bryan Nascimento Silva",
+      "livro": "SEEDS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "valdenicep598@gmailcom",
+      "telefone": "98988254716",
+      "cep": "65045-300",
+      "bairro": "Anil",
+      "complemento_aluno": "",
+      "nome_responsavel": "Valdenice Pereira do Nascimento",
+      "e-mail_responsavel": "valdenicep598@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_V7M6C058_X1": {
+    "data": {
+      "id": "STD_V7M6C058_X1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Vitor Melgar Cardoso",
+      "livro": "ESPANHOL 1",
+      "ocupacao": "ESTUDANTE",
+      "e-mail": "vitor1912@icloud.com",
+      "telefone": "98999663588",
+      "cep": "65117-760",
+      "bairro": "Laranjal",
+      "complemento_aluno": "QD 01",
+      "nome_responsavel": "Liliane Melgar Cuellar",
+      "e-mail_responsavel": "vitor1912@icloud.com",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_W0M0B0F2_T1": {
+    "data": {
+      "id": "STD_W0M0B0F2_T1",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Wagner Miguel Barboza Furtado",
+      "livro": "TEENS 1",
+      "ocupacao": "Estudante",
+      "e-mail": "lindavamiguel98@gmailcom",
+      "telefone": "98991508288",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "",
+      "nome_responsavel": "Lindalva Barbosa Furtado",
+      "e-mail_responsavel": "lindavamiguel98@gmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_Y0M0M04_TW3": {
+    "data": {
+      "id": "STD_Y0M0M04_TW3",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Yasmim Marques Machado",
+      "livro": "TWEENS 3",
+      "ocupacao": "estudante",
+      "e-mail": "samara14sasa@hotmailcom",
+      "telefone": "98982760451",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "AP3",
+      "nome_responsavel": "Samara Raquel Margues Bezerra",
+      "e-mail_responsavel": "samara14sasa@hotmailcom",
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/students/STD_Y0S0L0F8_S2": {
+    "data": {
+      "id": "STD_Y0S0L0F8_S2",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Yasmim Silva Lindoso Ferreira",
+      "livro": "SEEDS 2",
+      "ocupacao": "Professora",
+      "e-mail": "yasminlindoso03@gmailcom",
+      "telefone": "98984913849",
+      "cep": "65110-000",
+      "bairro": "ERRO",
+      "complemento_aluno": "Lote 4",
+      "nome_responsavel": null,
+      "e-mail_responsavel": null,
+      "active_until": "2027-08-28",
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees": {},
+  "__collection__/employees/EMP_A0A0O007_AP": {
+    "data": {
+      "id": "EMP_A0A0O007_AP",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Aimeê Almeida de Oliveira",
+      "cargo": "ADM. PEDAGÓGICO",
+      "e-mail": "aimee.almeida2018@gmail.com",
+      "telefone": "98991075072",
+      "cep": "65110-000",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_A5C3O0R_CDA": {
+    "data": {
+      "id": "EMP_A5C3O0R_CDA",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Ana Carolina de Oliveira Rodrigues",
+      "cargo": "CDA",
+      "e-mail": "rodriguescarol6813@gmail.com",
+      "telefone": "98988217454",
+      "cep": "65053-530",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_A8L4L7B3_PR": {
+    "data": {
+      "id": "EMP_A8L4L7B3_PR",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Ana Larissa Leite Barros",
+      "cargo": "PROFESSORA",
+      "e-mail": "larissaana2704@gmail.com",
+      "telefone": "98985911317",
+      "cep": "65052-847",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_C0P0R0B0_PR": {
+    "data": {
+      "id": "EMP_C0P0R0B0_PR",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Carmem Patrícia Reis Borges",
+      "cargo": "PROFESSORA",
+      "e-mail": "carmemprborges@gmail.com",
+      "telefone": "98985347029",
+      "cep": "65130-000",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_E2A0B037_PR": {
+    "data": {
+      "id": "EMP_E2A0B037_PR",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Edilene de Araújo Barbosa",
+      "cargo": "PROFESSORA",
+      "e-mail": "edillenem@outlook.com",
+      "telefone": "98991795370",
+      "cep": "65065-200",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_F0F0O069_CC": {
+    "data": {
+      "id": "EMP_F0F0O069_CC",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Felipe Ferreira de Oliveira",
+      "cargo": "CONSULTOR COMERCIAL",
+      "e-mail": "felipedefolive@gmail.com",
+      "telefone": "98985916692",
+      "cep": "65138-000",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_J5S7O434_AF": {
+    "data": {
+      "id": "EMP_J5S7O434_AF",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Juliana Santos Oliveira",
+      "cargo": "ADM. FINANCEIRO",
+      "e-mail": "julicasssantos@gmail.com",
+      "telefone": "98988854341",
+      "cep": "65056-574",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_L6A2S691_AP": {
+    "data": {
+      "id": "EMP_L6A2S691_AP",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Luana de Abreu Silva",
+      "cargo": "ADM. PEDAGÓGICO",
+      "e-mail": "luanaabreusilva09@gmail.com",
+      "telefone": "98985594916",
+      "cep": "65042-626",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_N4J0E0C9_CC": {
+    "data": {
+      "id": "EMP_N4J0E0C9_CC",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Natália de Jesus Everton Câmara",
+      "cargo": "CONSULTOR COMERCIAL",
+      "e-mail": "n4thyeverton087@gmail.com",
+      "telefone": "98988394914",
+      "cep": "65035-400",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_T4M8R2O1_PR": {
+    "data": {
+      "id": "EMP_T4M8R2O1_PR",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Tadeu Moraes Rego de Oliveira",
+      "cargo": "PROFESSOR",
+      "e-mail": "tadeu.mro922@gmail.com",
+      "telefone": "98984215158",
+      "cep": "65051-482",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_Y3A2G0C4_PR": {
+    "data": {
+      "id": "EMP_Y3A2G0C4_PR",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Yago Augusto Gonçalves Costa",
+      "cargo": "PROFESSOR",
+      "e-mail": "augustocosta993@gmail.com",
+      "telefone": "98985022446",
+      "cep": "65066-320",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  },
+  "__collection__/employees/EMP_Y7B3G0J6_CP": {
+    "data": {
+      "id": "EMP_Y7B3G0J6_CP",
+      "tenant_id": "knn-dev-tenant",
+      "nome": "Yanna Biankinny Gonçalves de Jesus",
+      "cargo": "COORD. PEDAGÓGICA",
+      "e-mail": "yannagoncalvesdejesus@gmail.com",
+      "telefone": "98981031611",
+      "cep": "65053-730",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713116",
+      "updated_at": "2025-08-28T17:45:13.713116"
+    }
+  }
+}

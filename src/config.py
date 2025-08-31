@@ -36,6 +36,7 @@ JWT_ALGORITHM = "RS256"
 
 # Configurações de banco de dados
 FIRESTORE_PROJECT = os.getenv("FIRESTORE_PROJECT", "knn-portal-dev")
+FB_PROJECT_ID = os.getenv("FB_PROJECT_ID", "knn-benefits")
 POSTGRES_CONNECTION_STRING = os.getenv(
     "POSTGRES_CONNECTION_STRING",
     "postgresql://postgres:postgres@localhost:5432/knn_portal",

@@ -122,7 +122,7 @@ async def validation_error_handler(request: Request, exc):
 
 
 # Middleware para injetar tenant_id do JWT
-from src.auth import JWTError, jwt
+# Imports removidos - não são mais necessários
 
 
 @app.middleware("http")
@@ -155,15 +155,16 @@ async def with_tenant(request: Request, call_next):
         )
     token = authorization.split(" ", 1)[1]
     try:
-        # Decodifica o JWT (ajuste conforme sua função de verificação)
-        payload = jwt.decode(token, options={"verify_signature": False})
-        tenant = payload.get("tenant")
+        # Usar a função de verificação do Firebase
+        from src.auth import verify_token
+        payload = await verify_token(token)
+        tenant = payload.tenant
         if not tenant:
             return JSONResponse(
                 status_code=400, content={"error": {"msg": "tenant missing"}}
             )
         request.state.tenant = tenant
-    except JWTError:
+    except Exception as e:
         return JSONResponse(status_code=400, content={"error": {"msg": "JWT inválido"}})
     return await call_next(request)
 

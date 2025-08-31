@@ -45,6 +45,7 @@
   - [x] Implementar role-based access control
   - [x] Configurar cache de chaves JWKS
   - [x] Validar tokens e extrair claims
+  - [x] **Decisão arquitetural:** Manter JWT atual, migração para Identity Platform condicionada a 5+ escolas
 
 ### Fase 3: Camada de Dados ⚠️ (60% Concluído)
 
@@ -131,7 +132,7 @@
   - [ ] **PENDENTE:** Vinculação com parceiros
   - [ ] **PENDENTE:** Controle de vigência
 
-### Fase 6: Segurança e Performance ⚠️ (60% Concluído)
+### Fase 6: Segurança e Performance ⚠️ (75% Concluído)
 
 - [x] **Implementações de segurança**
   - [x] Rate limiting configurável (configurado com SlowAPI)
@@ -139,6 +140,19 @@
   - [x] Validação de CORS restritiva (configurado)
   - [ ] **PENDENTE:** Sanitização de inputs
   - [ ] **PENDENTE:** Headers de segurança
+  - [x] **NOVO:** Regras de segurança Firestore para ambiente de teste
+  - [x] **NOVO:** Documentação completa das regras de segurança
+  - [ ] **PENDENTE:** Implementar regras de segurança no console Firebase
+  - [ ] **PENDENTE:** Configurar tokens personalizados para testes
+  - [ ] **PENDENTE:** Validar regras com diferentes perfis de usuário
+
+- [x] **Gerenciamento de Credenciais**
+  - [x] Estabelecer procedimento para geração de senhas temporárias seguras para alunos e funcionários
+  - [x] Aplicar o mesmo procedimento para o cadastro inicial de alunos e funcionários pelo Administrador
+  - [x] Documentar política de senhas temporárias no guia de configuração
+  - [x] Definir modelo de dados para senhas temporárias
+  - [x] Especificar endpoints para gerenciamento de senhas temporárias
+  - [x] Estabelecer medidas de segurança e auditoria
 
 - [ ] **Otimizações de performance**
   - [x] Cache de JWKS (10 minutos) - implementado
@@ -146,6 +160,12 @@
   - [ ] **PENDENTE:** Queries otimizadas
   - [ ] **PENDENTE:** Connection pooling funcional
   - [x] Async/await em toda API (estrutura implementada)
+  - [ ] **Cache de Dados Frequentes**
+    - [ ] Cache de estatísticas por parceiro
+    - [ ] Agregações pré-calculadas
+  - [ ] **Melhorias Futuras**
+    - [ ] Índices Compostos
+    - [ ] Subcoleções Híbridas (se necessário)
 
 ### Fase 7: Testes e Qualidade ❌ (15% Concluído)
 
@@ -275,6 +295,26 @@
 ## 🚨 TAREFAS PENDENTES PRIORITÁRIAS
 
 ### 🔥 ALTA PRIORIDADE (Críticas para funcionamento)
+
+#### 0. Implementação de Senhas Temporárias
+
+- [ ] **Implementar endpoints de senhas temporárias** (`src/api/auth.py`)
+  - [ ] POST /v1/auth/temporary-password - Gerar senha temporária
+  - [ ] POST /v1/auth/reset-password - Redefinir senha com token temporário
+  - [ ] GET /v1/auth/temporary-password/status - Verificar status da senha temporária
+  - [ ] DELETE /v1/auth/temporary-password - Invalidar senha temporária
+
+- [ ] **Implementar modelo de dados para senhas temporárias**
+  - [ ] Criar modelo TemporaryPassword com campos: user_id, token_hash, expires_at, used_at
+  - [ ] Implementar validação de expiração (24 horas)
+  - [ ] Adicionar logs de auditoria para geração e uso
+  - [ ] Implementar limpeza automática de tokens expirados
+
+- [ ] **Integrar com sistema de notificações**
+  - [ ] Enviar senha temporária por email seguro
+  - [ ] Implementar templates de email para senhas temporárias
+  - [ ] Adicionar notificação de redefinição de senha
+  - [ ] Implementar rate limiting para geração de senhas
 
 #### 1. Implementação dos Clientes de Banco de Dados
 
@@ -572,12 +612,224 @@
 
  **🚨 CRÍTICO: Necessário completar implementações de alta prioridade antes do deploy em produção!**
 
+---
+
+## 🚀 Novas Funcionalidades - Recomendações de Implementação
+
+### 📋 Fase 1: Adaptação Gradual (4-6 semanas)
+
+#### 🔥 ALTA PRIORIDADE - Novos Campos no Modelo de Dados
+
+- [ ] **Implementar campo `audience` nos benefícios**
+  - [ ] Atualizar modelo Pydantic para incluir `audience: List[str]`
+  - [ ] Validar valores permitidos: `["student", "employee"]`
+  - [ ] Migrar dados existentes com audience padrão
+  - [ ] Atualizar endpoints para filtrar por audience
+
+- [ ] **Implementar campo `validation` nos benefícios**
+  - [ ] Criar modelo Pydantic para `ValidationConfig`
+  - [ ] Implementar campos: `mode`, `per_user_limit`, `global_limit`, `valid_from`, `valid_to`
+  - [ ] Validar regras de negócio (datas, limites)
+  - [ ] Migrar dados existentes com validation padrão
+
+#### 🔥 ALTA PRIORIDADE - Novos Endpoints para Benefícios
+
+- [ ] **GET /v1/benefits?audience=student**
+  - [ ] Implementar filtro por público-alvo
+  - [ ] Validar permissões por role do usuário
+  - [ ] Otimizar query com índices apropriados
+  - [ ] Adicionar paginação e ordenação
+
+- [ ] **POST /v1/benefits/{id}/validate**
+  - [ ] Implementar validação de código único
+  - [ ] Implementar validação por ID
+  - [ ] Verificar limites per_user_limit e global_limit
+  - [ ] Validar período de vigência (valid_from/valid_to)
+  - [ ] Registrar redemption com auditoria
+
+- [ ] **GET /v1/benefits/{id}/usage**
+  - [ ] Implementar estatísticas de uso do benefício
+  - [ ] Mostrar contadores: total_redemptions, unique_users
+  - [ ] Calcular percentual de uso vs limites
+  - [ ] Adicionar métricas por período
+
+- [ ] **POST /v1/codes/generate**
+  - [ ] Implementar geração server-side de códigos únicos
+  - [ ] Garantir unicidade e segurança dos códigos
+  - [ ] Associar códigos a benefícios específicos
+  - [ ] Implementar expiração automática
+  - [ ] Adicionar logs de auditoria
+
+#### ⚠️ MÉDIA PRIORIDADE - Atualização das Regras de Firestore
+
+- [ ] **Regras para campo `audience`**
+  - [ ] Implementar validação de leitura por audience
+  - [ ] Permitir leitura apenas para roles apropriados
+  - [ ] Testar regras com diferentes perfis de usuário
+  - [ ] Documentar casos de uso e exceções
+
+- [ ] **Regras para campo `validation`**
+  - [ ] Validar campos obrigatórios na criação
+  - [ ] Implementar validação de tipos de dados
+  - [ ] Verificar consistência de datas e limites
+  - [ ] Testar cenários de erro e edge cases
+
+### 📋 Fase 2: Melhorias de Segurança (3-4 semanas)
+
+#### 🔥 ALTA PRIORIDADE - Custom Claims Granulares
+
+- [ ] **Implementar permissions específicas**
+  - [ ] Criar sistema de permissões granulares
+  - [ ] Implementar claims: `benefits:create`, `benefits:update`, `redemptions:validate`
+  - [ ] Atualizar middleware de autenticação
+  - [ ] Migrar roles existentes para novo sistema
+
+- [ ] **Implementar partner_ids específicos**
+  - [ ] Restringir acesso de parceiros aos seus próprios dados
+  - [ ] Validar partner_ids em todos os endpoints relevantes
+  - [ ] Implementar herança de permissões
+  - [ ] Testar isolamento entre parceiros
+
+- [ ] **Implementar rate_limit_tier**
+  - [ ] Criar tiers de rate limiting (basic, premium, enterprise)
+  - [ ] Configurar limites diferenciados por tier
+  - [ ] Implementar upgrade/downgrade automático
+  - [ ] Monitorar uso por tenant
+
+#### ⚠️ MÉDIA PRIORIDADE - Auditoria Detalhada
+
+- [ ] **Sistema de logs estruturados**
+  - [ ] Implementar logging para todas as operações CRUD
+  - [ ] Capturar: timestamp, tenant_id, user_uid, action, resource_id
+  - [ ] Adicionar contexto: IP, user_agent, success/failure
+  - [ ] Implementar rotação e retenção de logs
+
+- [ ] **Logs de auditoria para benefícios**
+  - [ ] Log de criação/edição de benefícios
+  - [ ] Log de validação de códigos/ID
+  - [ ] Log de geração de códigos únicos
+  - [ ] Log de alterações de status
+
+- [ ] **Dashboard de auditoria**
+  - [ ] Criar endpoint para consulta de logs
+  - [ ] Implementar filtros por tenant, usuário, ação
+  - [ ] Adicionar exportação de relatórios
+  - [ ] Implementar alertas para ações suspeitas
+
+#### ⚠️ MÉDIA PRIORIDADE - Otimização de Índices
+
+- [ ] **Índices para campo `audience`**
+  - [ ] Criar índice composto: tenant_id + audience + status + created_at
+  - [ ] Otimizar queries com array-contains
+  - [ ] Testar performance com dados de produção
+  - [ ] Monitorar uso e eficiência dos índices
+
+- [ ] **Índices para validação de códigos**
+  - [ ] Criar índice: tenant_id + code + status
+  - [ ] Otimizar lookup de códigos únicos
+  - [ ] Implementar TTL para códigos expirados
+  - [ ] Monitorar performance de validação
+
+#### 🔧 BAIXA PRIORIDADE - Rate Limiting por Tenant
+
+- [ ] **Rate limiting diferenciado**
+  - [ ] Implementar limites específicos por tenant premium
+  - [ ] Configurar limites por endpoint crítico
+  - [ ] Implementar burst allowance
+  - [ ] Adicionar métricas de rate limiting
+
+- [ ] **Monitoramento de uso**
+  - [ ] Dashboard de uso por tenant
+  - [ ] Alertas para tenants próximos do limite
+  - [ ] Relatórios de padrões de uso
+  - [ ] Recomendações de upgrade de tier
+
+### 📊 Métricas de Sucesso das Novas Funcionalidades
+
+#### Fase 1 - Adaptação Gradual
+- **Compatibilidade:** 100% backward compatibility
+- **Performance:** Tempo de resposta < 200ms para novos endpoints
+- **Cobertura:** Testes para todos os novos campos e endpoints
+- **Migração:** 0% de downtime na migração de dados
+
+#### Fase 2 - Melhorias de Segurança
+- **Segurança:** Auditoria completa de todas as operações
+- **Performance:** Índices otimizados reduzem tempo de query em 50%
+- **Escalabilidade:** Rate limiting suporta 10x mais tenants
+- **Compliance:** Logs de auditoria atendem requisitos regulatórios
+
+### 🎯 Cronograma de Implementação
+
+**Semanas 1-2: Modelo de Dados**
+- Implementar campos `audience` e `validation`
+- Migrar dados existentes
+- Atualizar testes unitários
+
+**Semanas 3-4: Novos Endpoints**
+- Implementar endpoints de benefícios
+- Adicionar validação de códigos/ID
+- Implementar geração server-side de códigos
+
+**Semanas 5-6: Regras e Segurança**
+- Atualizar regras de Firestore
+- Implementar custom claims granulares
+- Adicionar sistema de auditoria
+
+**Semanas 7-8: Otimização**
+- Criar índices otimizados
+- Implementar rate limiting por tenant
+- Testes de performance e carga
+
+---
+
+## 🚀 Roadmap Futuro - Estratégia de Autenticação
+
+### Implementação Atual (Mantida)
+- [x] **Arquitetura JWT + JWKS + Firebase Admin SDK**
+  - Adequada para cenário atual (1 escola)
+  - Performance otimizada e custo zero
+  - Controle total sobre autenticação
+  - Compatibilidade com base de código existente
+
+### Migração Futura (Identity Platform)
+**Condições para avaliação:**
+- [ ] **5+ escolas:** Avaliar migração para Identity Platform
+- [ ] **10+ escolas:** Migração obrigatória
+- [ ] Necessidade de recursos avançados (MFA, SSO)
+- [ ] Requisitos de compliance mais rigorosos
+
+**Estratégia de Migração em Fases:**
+- [ ] **Fase 1:** Manter JWT atual (implementação estável)
+- [ ] **Fase 2:** Implementar Identity Platform em paralelo (ambiente de teste)
+- [ ] **Fase 3:** Migração gradual por escola (rollout controlado)
+- [ ] **Fase 4:** Descomissionamento da implementação JWT
+
+**Benefícios da Migração Futura:**
+- Gerenciamento centralizado de tenants
+- Recursos avançados (MFA, SSO, provedores externos)
+- Isolamento completo por tenant
+- Escalabilidade automática
+- Redução da complexidade de manutenção
+
+---
+
  **📋 RESUMO DE TAREFAS PENDENTES:**
 
+ **Tarefas Originais:**
  - 🔥 **52 tarefas de alta prioridade**
  - ⚠️ **21 tarefas de média prioridade**
  - 🔧 **15 tarefas de baixa prioridade**
- - **TOTAL: 88 tarefas pendentes**
+
+ **Novas Funcionalidades Adicionadas:**
+ - 🔥 **18 tarefas de alta prioridade** (Fase 1 + Fase 2)
+ - ⚠️ **12 tarefas de média prioridade** (Regras Firestore + Auditoria + Índices)
+ - 🔧 **8 tarefas de baixa prioridade** (Rate Limiting + Monitoramento)
+
+ **TOTAL ATUALIZADO:**
+ - 🔥 **70 tarefas de alta prioridade**
+ - ⚠️ **33 tarefas de média prioridade**
+ - 🔧 **23 tarefas de baixa prioridade**
+ - **TOTAL: 126 tarefas pendentes** (+38 novas funcionalidades)
 
 ---
 
