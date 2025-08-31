@@ -140,12 +140,14 @@ python test_firebase_connection.py
 ### Erro: "Cliente Firestore não foi inicializado"
 
 **Possíveis causas:**
+
 - Credenciais não configuradas
 - Projeto Firebase não existe
 - Problemas de rede
 - Regras de segurança muito restritivas
 
 **Soluções:**
+
 1. Verifique se todas as variáveis de ambiente estão definidas
 2. Confirme se o projeto Firebase existe e está ativo
 3. Verifique as regras de segurança do Firestore

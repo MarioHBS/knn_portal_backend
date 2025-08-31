@@ -101,6 +101,7 @@ O sistema possui três perfis de usuário:
      ```bash
      cp .env.example .env
      ```
+
    - As principais variáveis são:
      - `KNN_USE_TEST_DATABASE`: Define se deve usar dados simulados (true/false)
      - `DEBUG`: Ativa logs detalhados (true/false)

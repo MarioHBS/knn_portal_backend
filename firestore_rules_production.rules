@@ -1,0 +1,197 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Função auxiliar para verificar tenant válido
+    function isValidTenant() {
+      return resource.data.tenant_id == "knn-benefits-tenant";
+    }
+
+    // Função auxiliar para verificar se é admin
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.role == "admin" &&
+             request.auth.token.tenant_id == "knn-benefits-tenant";
+    }
+
+    // Função auxiliar para verificar se é o próprio usuário
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Função para validar dados obrigatórios de estudantes
+    function isValidStudentData() {
+      return request.resource.data.keys().hasAll(['id', 'tenant_id', 'nome']) &&
+             request.resource.data.tenant_id == "knn-benefits-tenant" &&
+             request.resource.data.nome is string &&
+             request.resource.data.nome.size() > 0;
+    }
+
+    // Função para validar dados obrigatórios de funcionários
+    function isValidEmployeeData() {
+      return request.resource.data.keys().hasAll(['id', 'tenant_id', 'nome', 'cargo']) &&
+             request.resource.data.tenant_id == "knn-benefits-tenant" &&
+             request.resource.data.nome is string &&
+             request.resource.data.nome.size() > 0 &&
+             request.resource.data.cargo is string &&
+             request.resource.data.cargo.size() > 0;
+    }
+
+    // Função para validar email (se presente)
+    function isValidEmail(email) {
+      return email == null || email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    // Função para validar telefone brasileiro (se presente)
+    function isValidPhone(phone) {
+      return phone == null || phone.matches('^\\([0-9]{2}\\) [0-9]{4,5}-[0-9]{4}$');
+    }
+
+    // === COLEÇÃO STUDENTS ===
+    match /students/{studentId} {
+      // Leitura: próprio usuário ou admin
+      allow read: if request.auth != null &&
+                     (isOwner(studentId) || isAdmin()) &&
+                     isValidTenant();
+
+      // Criação: apenas admins com dados válidos
+      allow create: if isAdmin() && 
+                       isValidStudentData() &&
+                       isValidEmail(request.resource.data.get('email', null)) &&
+                       isValidPhone(request.resource.data.get('telefone', null));
+
+      // Atualização: próprio usuário (campos limitados) ou admin
+      allow update: if request.auth != null &&
+                       isValidTenant() &&
+                       (isOwner(studentId) || isAdmin()) &&
+                       isValidStudentData() &&
+                       isValidEmail(request.resource.data.get('email', null)) &&
+                       isValidPhone(request.resource.data.get('telefone', null));
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin() && isValidTenant();
+    }
+
+    // === COLEÇÃO EMPLOYEES ===
+    match /employees/{employeeId} {
+      // Leitura: próprio usuário ou admin
+      allow read: if request.auth != null &&
+                     (isOwner(employeeId) || isAdmin()) &&
+                     isValidTenant();
+
+      // Criação: apenas admins com dados válidos
+      allow create: if isAdmin() && 
+                       isValidEmployeeData() &&
+                       isValidEmail(request.resource.data.get('email', null)) &&
+                       isValidPhone(request.resource.data.get('telefone', null));
+
+      // Atualização: próprio usuário (campos limitados) ou admin
+      allow update: if request.auth != null &&
+                       isValidTenant() &&
+                       (isOwner(employeeId) || isAdmin()) &&
+                       isValidEmployeeData() &&
+                       isValidEmail(request.resource.data.get('email', null)) &&
+                       isValidPhone(request.resource.data.get('telefone', null));
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin() && isValidTenant();
+    }
+
+    // === COLEÇÃO PARTNERS ===
+    match /partners/{partnerId} {
+      // Leitura: usuários autenticados (para visualizar promoções)
+      allow read: if request.auth != null;
+
+      // Criação: apenas administradores
+      allow create: if isAdmin();
+
+      // Atualização: apenas administradores
+      allow update: if isAdmin();
+
+      // Exclusão: apenas administradores
+      allow delete: if isAdmin();
+    }
+
+    // === COLEÇÃO PROMOTIONS ===
+    match /promotions/{promotionId} {
+      // Leitura: usuários autenticados
+      allow read: if request.auth != null;
+
+      // Criação: apenas administradores
+      allow create: if isAdmin();
+
+      // Atualização: apenas administradores
+      allow update: if isAdmin();
+
+      // Exclusão: apenas administradores
+      allow delete: if isAdmin();
+    }
+
+    // === COLEÇÃO VALIDATION_CODES ===
+    match /validation_codes/{codeId} {
+      // Leitura: próprio usuário ou admin
+      allow read: if request.auth != null &&
+                     (isOwner(resource.data.get('student_id', '')) ||
+                      isOwner(resource.data.get('employee_id', '')) ||
+                      isAdmin());
+
+      // Criação: usuários autenticados para si mesmos ou admins
+      allow create: if request.auth != null &&
+                       (request.resource.data.get('student_id', '') == request.auth.uid ||
+                        request.resource.data.get('employee_id', '') == request.auth.uid ||
+                        isAdmin()) &&
+                       request.resource.data.tenant_id == "knn-benefits-tenant";
+
+      // Atualização: apenas para marcar como usado
+      allow update: if request.auth != null &&
+                       (isOwner(resource.data.get('student_id', '')) ||
+                        isOwner(resource.data.get('employee_id', '')) ||
+                        isAdmin()) &&
+                       // Só permite atualizar o campo 'used_at'
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used_at']);
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin();
+    }
+
+    // === COLEÇÃO REDEMPTIONS ===
+    match /redemptions/{redemptionId} {
+      // Leitura: próprio usuário ou admin
+      allow read: if request.auth != null &&
+                     (isOwner(resource.data.get('student_id', '')) ||
+                      isOwner(resource.data.get('employee_id', '')) ||
+                      isAdmin());
+
+      // Criação: usuários autenticados para si mesmos
+      allow create: if request.auth != null &&
+                       (request.resource.data.get('student_id', '') == request.auth.uid ||
+                        request.resource.data.get('employee_id', '') == request.auth.uid) &&
+                       request.resource.data.tenant_id == "knn-benefits-tenant";
+
+      // Atualização: apenas admins
+      allow update: if isAdmin();
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin();
+    }
+
+    // === COLEÇÃO AUDIT_LOGS (para auditoria) ===
+    match /audit_logs/{logId} {
+      // Leitura: apenas admins
+      allow read: if isAdmin();
+
+      // Criação: sistema pode criar logs
+      allow create: if request.auth != null;
+
+      // Atualização: negada (logs são imutáveis)
+      allow update: if false;
+
+      // Exclusão: apenas admins (para limpeza de logs antigos)
+      allow delete: if isAdmin();
+    }
+
+    // Negar acesso a qualquer outra coleção não especificada
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

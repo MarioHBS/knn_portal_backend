@@ -104,7 +104,6 @@ seed_dev.pyc
 
 # Outros arquivos sensíveis
 *.db
-knn-benefits-firebase-adminsdk-fbsvc-d5c50e314f.json
 
 # Firebase/Firestore credentials and service account keys
 *service-account-key.json

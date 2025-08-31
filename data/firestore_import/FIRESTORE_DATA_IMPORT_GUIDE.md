@@ -3,6 +3,7 @@
 ## Resumo
 
 Este guia explica como importar os dados de alunos e funcionários para os dois bancos de dados Firestore:
+
 - **default** (knn-portal-dev) - Para testes
 - **production** (knn-benefits) - Para produção
 
@@ -18,6 +19,7 @@ Este guia explica como importar os dados de alunos e funcionários para os dois 
 Todos os arquivos estão localizados em: `data/firestore_import/`
 
 ### Arquivos de Dados
+
 - `firestore_data_default.json` - Dados para o banco de testes
 - `firestore_data_production.json` - Dados para o banco de produção
 - `firestore_export_default.json` - Formato de exportação para testes
