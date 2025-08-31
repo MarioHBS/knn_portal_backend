@@ -1,9 +1,9 @@
 """
 Modelos de dados para o Portal de Benefícios KNN.
 """
+
 import uuid
 from datetime import date, datetime
-from typing import List, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -30,14 +30,14 @@ class Student(BaseModel):
     cpf_hash: str
     nome_aluno: str
     curso: str
-    ocupacao_aluno: Optional[str] = None
-    email_aluno: Optional[str] = None
-    celular_aluno: Optional[str] = None
-    cep_aluno: Optional[str] = None
-    bairro: Optional[str] = None
-    complemento_aluno: Optional[str] = None
-    nome_responsavel: Optional[str] = None
-    email_responsavel: Optional[str] = None
+    ocupacao_aluno: str | None = None
+    email_aluno: str | None = None
+    celular_aluno: str | None = None
+    cep_aluno: str | None = None
+    bairro: str | None = None
+    complemento_aluno: str | None = None
+    nome_responsavel: str | None = None
+    email_responsavel: str | None = None
     active_until: date
 
     class Config:
@@ -54,7 +54,7 @@ class Employee(BaseModel):
     email: str
     department: str
     active: bool = True
-    favorite_partners: List[str] = Field(default_factory=list)
+    favorite_partners: list[str] = Field(default_factory=list)
 
     class Config:
         orm_mode = True
@@ -86,16 +86,33 @@ class Promotion(BaseModel):
     valid_from: datetime
     valid_to: datetime
     active: bool = True
-    target_profile: str = Field(
-        default="both", description="Perfil alvo: student, employee ou both"
+    audience: list[str] = Field(
+        default=["student", "employee"],
+        description="Público-alvo: lista com 'student' e/ou 'employee'",
     )
 
-    @validator("target_profile")
+    @validator("audience")
     @classmethod
-    def validate_target_profile(cls, v):
-        if v not in ["student", "employee", "both"]:
-            raise ValueError('target_profile deve ser "student", "employee" ou "both"')
-        return v
+    def validate_audience(cls, v):
+        if not isinstance(v, list) or not v:
+            raise ValueError("audience deve ser uma lista não vazia")
+
+        valid_values = {"student", "employee"}
+        for item in v:
+            if item not in valid_values:
+                raise ValueError(
+                    'audience deve conter apenas "student" e/ou "employee"'
+                )
+
+        # Remove duplicatas mantendo a ordem
+        seen = set()
+        unique_audience = []
+        for item in v:
+            if item not in seen:
+                seen.add(item)
+                unique_audience.append(item)
+
+        return unique_audience
 
     class Config:
         orm_mode = True
@@ -110,7 +127,7 @@ class ValidationCode(BaseModel):
     partner_id: str
     code_hash: str
     expires: datetime
-    used_at: Optional[datetime] = None
+    used_at: datetime | None = None
 
     class Config:
         orm_mode = True
@@ -164,16 +181,33 @@ class PromotionRequest(BaseModel):
     valid_from: datetime
     valid_to: datetime
     active: bool = True
-    target_profile: str = Field(
-        default="both", description="Perfil alvo: student, employee ou both"
+    audience: list[str] = Field(
+        default=["student", "employee"],
+        description="Público-alvo: lista com 'student' e/ou 'employee'",
     )
 
-    @validator("target_profile")
+    @validator("audience")
     @classmethod
-    def validate_target_profile(cls, v):
-        if v not in ["student", "employee", "both"]:
-            raise ValueError('target_profile deve ser "student", "employee" ou "both"')
-        return v
+    def validate_audience(cls, v):
+        if not isinstance(v, list) or not v:
+            raise ValueError("audience deve ser uma lista não vazia")
+
+        valid_values = {"student", "employee"}
+        for item in v:
+            if item not in valid_values:
+                raise ValueError(
+                    'audience deve conter apenas "student" e/ou "employee"'
+                )
+
+        # Remove duplicatas mantendo a ordem
+        seen = set()
+        unique_audience = []
+        for item in v:
+            if item not in seen:
+                seen.add(item)
+                unique_audience.append(item)
+
+        return unique_audience
 
 
 class NotificationRequest(BaseModel):
@@ -203,7 +237,7 @@ class NotificationRequest(BaseModel):
 class PartnerDetail(Partner):
     """Modelo para detalhes de parceiro com promoções."""
 
-    promotions: List[Promotion] = []
+    promotions: list[Promotion] = []
 
 
 class PartnerListResponse(BaseResponse):
@@ -269,7 +303,7 @@ class HistoryResponse(BaseResponse):
 class FavoritesResponse(BaseResponse):
     """Modelo para resposta de favoritos."""
 
-    data: List[Partner]
+    data: list[Partner]
 
 
 class EntityResponse(BaseModel):

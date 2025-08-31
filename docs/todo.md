@@ -547,7 +547,7 @@
 - **CI/CD Pipeline:** 1 semana
 - **Documentação:** 1 semana
 
-**TEMPO TOTAL ESTIMADO: 9-13 semanas**
+### TEMPO TOTAL ESTIMADO: 9-13 semanas
 
 ---
 
@@ -556,35 +556,41 @@
 ### Semana 1-2: Fundação
 
 1. **Implementar clientes de banco de dados**
+
    - Começar com Firestore client
    - Implementar PostgreSQL client
    - Testar operações básicas CRUD
 
 2. **Configurar circuit breaker**
+
    - Implementar lógica de fallback
    - Testar cenários de falha
    - Configurar métricas básicas
 
 ### Semana 3-4: API Funcional
 
-3. **Implementar endpoints críticos**
+1. **Implementar endpoints críticos**
+
    - Endpoints de alunos (listagem e detalhes)
    - Endpoints de parceiros (resgate de códigos)
    - Validações de negócio básicas
 
-4. **Criar testes básicos**
+2. **Criar testes básicos**
+
    - Testes unitários para modelos
    - Testes de integração para endpoints
    - Configurar CI básico
 
 ### Semana 5-6: Produção Ready
 
-5. **Implementar monitoramento**
+1. **Implementar monitoramento**
+
    - Métricas de saúde
    - Logs estruturados
    - Alertas básicos
 
-6. **Finalizar segurança**
+2. **Finalizar segurança**
+
    - Headers de segurança
    - Validações de entrada
    - Audit logs
@@ -593,24 +599,25 @@
 
 ## 🎉 Status Final
 
- **⚠️ PROJETO 70% CONCLUÍDO - ANÁLISE DETALHADA REALIZADA**
+### ⚠️ PROJETO 70% CONCLUÍDO - ANÁLISE DETALHADA REALIZADA
 
- **Status Real da Implementação:**
+**Status Real da Implementação:**
 
- - ✅ Estrutura base do projeto FastAPI (100%)
- - ✅ Modelos Pydantic definidos (90%)
- - ✅ Configuração inicial de bancos (60%)
- - ✅ Sistema de autenticação JWT (80%)
- - ⚠️ Endpoints da API (30% - estrutura criada)
- - ❌ Integração completa Firestore + PostgreSQL (20%)
- - ❌ Circuit breaker funcional (10%)
- - ❌ Testes automatizados implementados (15%)
- - ✅ Documentação OpenAPI (70%)
- - ✅ Containerização básica (80%)
- - ⚠️ Segurança (60% - parcialmente implementada)
- - ❌ Monitoramento e logs funcionais (20%)
+- ✅ Estrutura base do projeto FastAPI (100%)
+- ✅ Modelos Pydantic definidos (90%)
+- ✅ Configuração inicial de bancos (60%)
+- ✅ Sistema de autenticação JWT (80%)
+- ⚠️ Endpoints da API (30% - estrutura criada)
+- ❌ Integração completa Firestore + PostgreSQL (20%)
+- ❌ Circuit breaker funcional (10%)
+- ❌ Testes automatizados implementados (15%)
+- ✅ Documentação OpenAPI (70%)
+- ✅ Containerização básica (80%)
+- ⚠️ Segurança (60% - parcialmente implementada)
+- ❌ Monitoramento e logs funcionais (20%)
 
- **🚨 CRÍTICO: Necessário completar implementações de alta prioridade antes do deploy em produção!**
+**🚨 CRÍTICO: Necessário completar implementações de alta prioridade antes do
+deploy em produção!**
 
 ---
 
@@ -620,15 +627,16 @@
 
 #### 🔥 ALTA PRIORIDADE - Novos Campos no Modelo de Dados
 
-- [ ] **Implementar campo `audience` nos benefícios**
-  - [ ] Atualizar modelo Pydantic para incluir `audience: List[str]`
-  - [ ] Validar valores permitidos: `["student", "employee"]`
-  - [ ] Migrar dados existentes com audience padrão
-  - [ ] Atualizar endpoints para filtrar por audience
+- [x] **Implementar campo `audience` nos benefícios** ✅ CONCLUÍDO
+  - [x] Atualizar modelo Pydantic para incluir `audience: List[str]`
+  - [x] Validar valores permitidos: `["student", "employee"]`
+  - [x] Migrar dados existentes com audience padrão
+  - [x] Atualizar endpoints para filtrar por audience
 
 - [ ] **Implementar campo `validation` nos benefícios**
   - [ ] Criar modelo Pydantic para `ValidationConfig`
-  - [ ] Implementar campos: `mode`, `per_user_limit`, `global_limit`, `valid_from`, `valid_to`
+  - [ ] Implementar campos: `mode`, `per_user_limit`, `global_limit`,
+        `valid_from`, `valid_to`
   - [ ] Validar regras de negócio (datas, limites)
   - [ ] Migrar dados existentes com validation padrão
 
@@ -747,12 +755,14 @@
 ### 📊 Métricas de Sucesso das Novas Funcionalidades
 
 #### Fase 1 - Adaptação Gradual
+
 - **Compatibilidade:** 100% backward compatibility
 - **Performance:** Tempo de resposta < 200ms para novos endpoints
 - **Cobertura:** Testes para todos os novos campos e endpoints
 - **Migração:** 0% de downtime na migração de dados
 
 #### Fase 2 - Melhorias de Segurança
+
 - **Segurança:** Auditoria completa de todas as operações
 - **Performance:** Índices otimizados reduzem tempo de query em 50%
 - **Escalabilidade:** Rate limiting suporta 10x mais tenants
@@ -760,22 +770,26 @@
 
 ### 🎯 Cronograma de Implementação
 
-**Semanas 1-2: Modelo de Dados**
+#### Semanas 1-2: Modelo de Dados
+
 - Implementar campos `audience` e `validation`
 - Migrar dados existentes
 - Atualizar testes unitários
 
-**Semanas 3-4: Novos Endpoints**
+#### Semanas 3-4: Novos Endpoints
+
 - Implementar endpoints de benefícios
 - Adicionar validação de códigos/ID
 - Implementar geração server-side de códigos
 
-**Semanas 5-6: Regras e Segurança**
+#### Semanas 5-6: Regras e Segurança
+
 - Atualizar regras de Firestore
 - Implementar custom claims granulares
 - Adicionar sistema de auditoria
 
-**Semanas 7-8: Otimização**
+#### Semanas 7-8: Otimização
+
 - Criar índices otimizados
 - Implementar rate limiting por tenant
 - Testes de performance e carga
@@ -785,6 +799,7 @@
 ## 🚀 Roadmap Futuro - Estratégia de Autenticação
 
 ### Implementação Atual (Mantida)
+
 - [x] **Arquitetura JWT + JWKS + Firebase Admin SDK**
   - Adequada para cenário atual (1 escola)
   - Performance otimizada e custo zero
@@ -792,19 +807,23 @@
   - Compatibilidade com base de código existente
 
 ### Migração Futura (Identity Platform)
+
 **Condições para avaliação:**
+
 - [ ] **5+ escolas:** Avaliar migração para Identity Platform
 - [ ] **10+ escolas:** Migração obrigatória
 - [ ] Necessidade de recursos avançados (MFA, SSO)
 - [ ] Requisitos de compliance mais rigorosos
 
 **Estratégia de Migração em Fases:**
+
 - [ ] **Fase 1:** Manter JWT atual (implementação estável)
 - [ ] **Fase 2:** Implementar Identity Platform em paralelo (ambiente de teste)
 - [ ] **Fase 3:** Migração gradual por escola (rollout controlado)
 - [ ] **Fase 4:** Descomissionamento da implementação JWT
 
 **Benefícios da Migração Futura:**
+
 - Gerenciamento centralizado de tenants
 - Recursos avançados (MFA, SSO, provedores externos)
 - Isolamento completo por tenant
@@ -813,23 +832,26 @@
 
 ---
 
- **📋 RESUMO DE TAREFAS PENDENTES:**
+**📋 RESUMO DE TAREFAS PENDENTES:**
 
- **Tarefas Originais:**
- - 🔥 **52 tarefas de alta prioridade**
- - ⚠️ **21 tarefas de média prioridade**
- - 🔧 **15 tarefas de baixa prioridade**
+**Tarefas Originais:**
 
- **Novas Funcionalidades Adicionadas:**
- - 🔥 **18 tarefas de alta prioridade** (Fase 1 + Fase 2)
- - ⚠️ **12 tarefas de média prioridade** (Regras Firestore + Auditoria + Índices)
- - 🔧 **8 tarefas de baixa prioridade** (Rate Limiting + Monitoramento)
+- 🔥 **52 tarefas de alta prioridade**
+- ⚠️ **21 tarefas de média prioridade**
+- 🔧 **15 tarefas de baixa prioridade**
 
- **TOTAL ATUALIZADO:**
- - 🔥 **70 tarefas de alta prioridade**
- - ⚠️ **33 tarefas de média prioridade**
- - 🔧 **23 tarefas de baixa prioridade**
- - **TOTAL: 126 tarefas pendentes** (+38 novas funcionalidades)
+**Novas Funcionalidades Adicionadas:**
+
+- 🔥 **18 tarefas de alta prioridade** (Fase 1 + Fase 2)
+- ⚠️ **12 tarefas de média prioridade** (Regras Firestore + Auditoria + Índices)
+- 🔧 **8 tarefas de baixa prioridade** (Rate Limiting + Monitoramento)
+
+**TOTAL ATUALIZADO:**
+
+- 🔥 **70 tarefas de alta prioridade**
+- ⚠️ **33 tarefas de média prioridade**
+- 🔧 **23 tarefas de baixa prioridade**
+- **TOTAL: 126 tarefas pendentes** (+38 novas funcionalidades)
 
 ---
 

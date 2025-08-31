@@ -1,6 +1,7 @@
 """
 Implementação dos endpoints para o perfil de parceiro (partner).
 """
+
 import uuid
 from datetime import datetime, timedelta
 
@@ -242,7 +243,7 @@ async def list_partner_promotions(
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao listar promoções"}
             },
-        )
+        ) from None
 
 
 @router.post("/partner/promotions", response_model=PromotionResponse)
@@ -276,6 +277,7 @@ async def create_promotion(
             "valid_from": request.valid_from.isoformat(),
             "valid_to": request.valid_to.isoformat(),
             "active": request.active,
+            "audience": request.audience,
         }
 
         result = await firestore_client.create_document(
@@ -355,6 +357,7 @@ async def update_promotion(
             "valid_from": request.valid_from.isoformat(),
             "valid_to": request.valid_to.isoformat(),
             "active": request.active,
+            "audience": request.audience,
         }
 
         result = await firestore_client.update_document(

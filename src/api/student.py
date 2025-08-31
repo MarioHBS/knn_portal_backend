@@ -1,9 +1,9 @@
 """
 Implementação dos endpoints para o perfil de aluno (student).
 """
+
 import uuid
 from datetime import datetime, timedelta
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
@@ -28,8 +28,8 @@ router = APIRouter(tags=["student"])
 
 @router.get("/partners", response_model=PartnerListResponse)
 async def list_partners(
-    cat: Optional[str] = Query(None, description="Filtro por categoria"),
-    ord: Optional[str] = Query(
+    cat: str | None = Query(None, description="Filtro por categoria"),
+    ord: str | None = Query(
         None,
         description="Ordenação dos resultados",
         enum=["name_asc", "name_desc", "category_asc", "category_desc"],
@@ -146,7 +146,7 @@ async def get_partner_details(
                     ("active", "==", True),
                     ("valid_from", "<=", now),
                     ("valid_to", ">=", now),
-                    ("target_profile", "in", ["student", "both"]),
+                    ("audience", "array_contains_any", ["student"]),
                 ],
             )
 
@@ -427,7 +427,7 @@ async def get_student_history(
 
 @router.get("/students/me/fav", response_model=FavoritesResponse)
 async def get_student_favorites(
-    current_user: JWTPayload = Depends(validate_student_role)
+    current_user: JWTPayload = Depends(validate_student_role),
 ):
     """
     Retorna a lista de parceiros favoritos do aluno.
