@@ -5,7 +5,7 @@ import hashlib
 import random
 import re
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from typing import Any
 
 from src.config import CNPJ_HASH_SALT
 from src.utils.logging import logger
@@ -113,7 +113,7 @@ class BusinessRules:
         return True
 
     @staticmethod
-    def hash_cnpj(cnpj: str, salt: Optional[str] = None) -> str:
+    def hash_cnpj(cnpj: str, salt: str | None = None) -> str:
         """
         Gera um hash SHA-256 do CNPJ com salt.
 
@@ -134,7 +134,7 @@ class BusinessRules:
         return hashlib.sha256(f"{cnpj}{salt}".encode()).hexdigest()
 
     @staticmethod
-    def is_promotion_valid(promotion: Dict[str, Any]) -> bool:
+    def is_promotion_valid(promotion: dict[str, Any]) -> bool:
         """
         Verifica se uma promoção é válida (ativa e dentro do período).
 

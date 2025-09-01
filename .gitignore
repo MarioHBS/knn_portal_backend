@@ -116,3 +116,8 @@ test_api_results.json
 test_api_comprehensive_results.json
 migration_report.json
 firestore_export.json
+
+# Scripts temporários
+scripts/temp/
+temp_*.py
+*_temp.py

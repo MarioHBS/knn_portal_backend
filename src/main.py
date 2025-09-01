@@ -130,23 +130,23 @@ async def with_tenant(request: Request, call_next):
     # Pular autenticação para rotas de documentação e health check
     excluded_paths = [
         f"/{API_VERSION}/docs",
-        f"/{API_VERSION}/redoc", 
+        f"/{API_VERSION}/redoc",
         f"/{API_VERSION}/openapi.json",
         f"/{API_VERSION}/health",
         "/docs",
         "/redoc",
         "/openapi.json"
     ]
-    
+
     if request.url.path in excluded_paths or request.url.path.startswith("/static"):
         return await call_next(request)
-    
+
     # Se estiver em modo de teste, pular autenticação
     if TESTING_MODE:
         # Adicionar tenant_id mock para modo de teste
         request.state.tenant = "test-tenant"
         return await call_next(request)
-    
+
     # Extrai o token Bearer
     authorization: str = request.headers.get("authorization")
     if not authorization or not authorization.lower().startswith("bearer "):
@@ -164,7 +164,7 @@ async def with_tenant(request: Request, call_next):
                 status_code=400, content={"error": {"msg": "tenant missing"}}
             )
         request.state.tenant = tenant
-    except Exception as e:
+    except Exception:
         return JSONResponse(status_code=400, content={"error": {"msg": "JWT inválido"}})
     return await call_next(request)
 

@@ -2,7 +2,8 @@
 Implementação do circuit breaker para fallback entre Firestore e PostgreSQL.
 """
 import time
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from src.config import CIRCUIT_BREAKER_THRESHOLD, CIRCUIT_BREAKER_TIMEOUT
 from src.utils import logger

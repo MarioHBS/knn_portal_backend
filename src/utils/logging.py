@@ -2,7 +2,7 @@
 Utilitários para logging estruturado com mascaramento de CPF.
 """
 import re
-from typing import Any, Dict, Union
+from typing import Any
 
 import structlog
 
@@ -19,8 +19,8 @@ def mask_cpf(text: str) -> str:
 
 
 def mask_cpf_in_log(
-    log_event: Union[Dict[str, Any], str]
-) -> Union[Dict[str, Any], str]:
+    log_event: dict[str, Any] | str
+) -> dict[str, Any] | str:
     """
     Mascara CPFs em eventos de log, seja dicionário ou string.
     """

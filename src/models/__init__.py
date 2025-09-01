@@ -7,7 +7,7 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, Field, validator
 
-from utils.id_generators import CURSO_CODES, IDGenerators
+from src.utils.id_generators import IDGenerators
 
 
 # Modelos base
@@ -24,41 +24,33 @@ class ErrorResponse(BaseModel):
 
 
 # Modelos de entidades
-class Course(BaseModel):
-    """Modelo para cursos disponíveis."""
+# Cursos disponíveis - Map simples baseado no IDGenerators
+# Não precisa de classe própria pois não haverá modificações administrativas
+COURSES_MAP = {
+    course_name: {
+        "code": course_code,
+        "name": course_name
+    }
+    for course_name, course_code in IDGenerators.CURSO_CODES.items()
+}
 
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str = Field(..., description="Nome do curso")
-    code: str = Field(..., description="Código do curso")
-    active: bool = Field(default=True, description="Se o curso está ativo")
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
 
-    @validator('name')
-    def validate_course_name(cls, v):
-        """Valida se o nome do curso está na lista de cursos válidos."""
-        if v not in CURSO_CODES:
-            raise ValueError(f'Curso "{v}" não está na lista de cursos válidos')
-        return v
+def get_course_by_name(course_name: str) -> dict | None:
+    """Retorna os dados do curso pelo nome."""
+    return COURSES_MAP.get(course_name)
 
-    @validator('code')
-    def validate_course_code(cls, v, values):
-        """Valida se o código corresponde ao nome do curso."""
-        if 'name' in values and values['name'] in CURSO_CODES:
-            expected_code = CURSO_CODES[values['name']]
-            if v != expected_code:
-                raise ValueError(f'Código "{v}" não corresponde ao curso "{values["name"]}"')
-        return v
 
-    class Config:
-        orm_mode = True
-        schema_extra = {
-            "example": {
-                "name": "KIDS 1",
-                "code": "K1",
-                "active": True
-            }
-        }
+def get_course_by_code(course_code: str) -> dict | None:
+    """Retorna os dados do curso pelo código."""
+    for _course_name, course_data in COURSES_MAP.items():
+        if course_data["code"] == course_code:
+            return course_data
+    return None
+
+
+def get_all_courses() -> list[dict]:
+    """Retorna todos os cursos disponíveis."""
+    return list(COURSES_MAP.values())
 
 
 class Student(BaseModel):

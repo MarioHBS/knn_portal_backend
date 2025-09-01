@@ -3,20 +3,15 @@ Módulo de autenticação e autorização para o Portal de Benefícios KNN.
 Implementa verificação de JWT com JWKS e validação de roles.
 """
 
-import asyncio
-import json
 import time
-from typing import Dict, Optional
-
-import httpx
-import jwt
-from fastapi import Depends, HTTPException, Security, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel
 
 # Importações Firebase
 import firebase_admin
 import firebase_admin.auth
+import httpx
+from fastapi import Depends, HTTPException, Security, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel
 
 from src.config import (
     ENVIRONMENT,
@@ -39,23 +34,24 @@ def initialize_firebase():
     try:
         if not firebase_admin._apps:
             # Tentar carregar credenciais do arquivo padrão
-            from firebase_admin import credentials
             import os
             from pathlib import Path
-            
+
+            from firebase_admin import credentials
+
             # Procurar arquivo de credenciais
             possible_paths = [
                 "data/firestore_import/default-service-account-key.json",
                 "default-service-account-key.json",
                 os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
             ]
-            
+
             cred_path = None
             for path in possible_paths:
                 if path and Path(path).exists():
                     cred_path = path
                     break
-            
+
             if cred_path:
                 cred = credentials.Certificate(cred_path)
                 firebase_admin.initialize_app(cred, {
@@ -66,7 +62,7 @@ def initialize_firebase():
                 # Tentar inicializar com credenciais padrão do ambiente
                 firebase_admin.initialize_app()
                 print("Firebase inicializado com credenciais padrão do ambiente")
-                
+
     except Exception as e:
         print(f"Erro ao inicializar Firebase: {e}")
         # Não falhar se Firebase não puder ser inicializado
@@ -158,28 +154,29 @@ async def verify_token(
                 print(f"Token verificado como ID token: {decoded_token.get('uid')}")
             except Exception as id_token_error:
                 print(f"Não é um ID token válido: {id_token_error}")
-                
+
                 # Se não for ID token, pode ser custom token - decodificar diretamente
-                import jwt
                 import json
-                
+
+                import jwt
+
                 # Decodificar sem verificação (apenas para desenvolvimento)
                 decoded_token = jwt.decode(token, options={"verify_signature": False})
                 print(f"Custom token decodificado: {json.dumps(decoded_token, indent=2)}")
-                
+
                 # Verificar se tem as informações necessárias
                 if 'uid' in decoded_token or 'sub' in decoded_token:
                     uid = decoded_token.get('uid') or decoded_token.get('sub')
-                    
+
                     # Buscar custom claims do usuário
                     user_record = firebase_admin.auth.get_user(uid)
                     custom_claims = user_record.custom_claims or {}
-                    
+
                     print(f"Custom claims do usuário {uid}: {custom_claims}")
-                    
+
                     # Usar custom claims do usuário
                     decoded_token.update(custom_claims)
-            
+
             # Converter para JWTPayload
             uid = decoded_token.get('uid') or decoded_token.get('sub', '')
             payload = JWTPayload(
@@ -191,10 +188,10 @@ async def verify_token(
                 iss=decoded_token.get('iss'),
                 aud=decoded_token.get('aud')
             )
-            
+
             print(f"Token verificado com Firebase: {payload.sub} (role: {payload.role})")
             return payload
-            
+
         except Exception as firebase_error:
             # Se Firebase falhar, tentar JWKS externo
             print(f"Firebase Auth falhou: {firebase_error}. Tentando JWKS externo...")

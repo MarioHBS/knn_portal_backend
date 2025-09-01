@@ -3,7 +3,6 @@ Utilitários de segurança para o Portal de Benefícios KNN.
 """
 import hashlib
 import re
-from typing import Optional
 
 from src.config import CNPJ_HASH_SALT, CPF_HASH_SALT
 
@@ -31,7 +30,7 @@ def validate_cnpj(cnpj: str) -> bool:
     return True
 
 
-def hash_cnpj(cnpj: str, salt: Optional[str] = None) -> str:
+def hash_cnpj(cnpj: str, salt: str | None = None) -> str:
     """
     Gera um hash SHA-256 do CNPJ com salt.
     """
@@ -68,7 +67,7 @@ def validate_cpf(cpf: str) -> bool:
     return True
 
 
-def hash_cpf(cpf: str, salt: Optional[str] = None) -> str:
+def hash_cpf(cpf: str, salt: str | None = None) -> str:
     """
     Gera um hash SHA-256 do CPF com salt.
     """
