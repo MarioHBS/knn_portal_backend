@@ -7,6 +7,8 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, Field, validator
 
+from utils.id_generators import CURSO_CODES, IDGenerators
+
 
 # Modelos base
 class BaseResponse(BaseModel):
@@ -22,10 +24,47 @@ class ErrorResponse(BaseModel):
 
 
 # Modelos de entidades
+class Course(BaseModel):
+    """Modelo para cursos disponíveis."""
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str = Field(..., description="Nome do curso")
+    code: str = Field(..., description="Código do curso")
+    active: bool = Field(default=True, description="Se o curso está ativo")
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+    @validator('name')
+    def validate_course_name(cls, v):
+        """Valida se o nome do curso está na lista de cursos válidos."""
+        if v not in CURSO_CODES:
+            raise ValueError(f'Curso "{v}" não está na lista de cursos válidos')
+        return v
+
+    @validator('code')
+    def validate_course_code(cls, v, values):
+        """Valida se o código corresponde ao nome do curso."""
+        if 'name' in values and values['name'] in CURSO_CODES:
+            expected_code = CURSO_CODES[values['name']]
+            if v != expected_code:
+                raise ValueError(f'Código "{v}" não corresponde ao curso "{values["name"]}"')
+        return v
+
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": {
+                "name": "KIDS 1",
+                "code": "K1",
+                "active": True
+            }
+        }
+
+
 class Student(BaseModel):
     """Modelo para alunos."""
 
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default="")
     tenant_id: str
     cpf_hash: str
     nome_aluno: str
@@ -40,6 +79,17 @@ class Student(BaseModel):
     email_responsavel: str | None = None
     active_until: date
 
+    def __init__(self, **data):
+        super().__init__(**data)
+        if not self.id:
+            self.id = IDGenerators.gerar_id_aluno(
+                nome=self.nome_aluno,
+                curso=self.curso,
+                cep=self.cep_aluno or "",
+                celular=self.celular_aluno or "",
+                email=self.email_aluno or "",
+            )
+
     class Config:
         orm_mode = True
 
@@ -47,14 +97,26 @@ class Student(BaseModel):
 class Employee(BaseModel):
     """Modelo para funcionários."""
 
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default="")
     tenant_id: str
     cpf_hash: str
     name: str
     email: str
     department: str
+    cep: str | None = None
+    telefone: str | None = None
     active: bool = True
     favorite_partners: list[str] = Field(default_factory=list)
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if not self.id:
+            self.id = IDGenerators.gerar_id_funcionario(
+                nome=self.name,
+                cargo=self.department,
+                cep=self.cep or "",
+                telefone=self.telefone or "",
+            )
 
     class Config:
         orm_mode = True
@@ -63,13 +125,29 @@ class Employee(BaseModel):
 class Partner(BaseModel):
     """Modelo para parceiros."""
 
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default="")
     tenant_id: str
     cnpj_hash: str
+    cnpj: str | None = None  # CNPJ original para geração do ID
     trade_name: str
     category: str
     address: str
     active: bool = True
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if not self.id:
+            # Para parceiros, precisamos do CNPJ original
+            cnpj_original = data.get("cnpj", "")
+            if cnpj_original:
+                self.id = IDGenerators.gerar_id_parceiro(
+                    trade_name=self.trade_name,
+                    category=self.category,
+                    cnpj=cnpj_original,
+                )
+            else:
+                # Fallback para UUID se não tiver CNPJ
+                self.id = str(uuid.uuid4())
 
     class Config:
         orm_mode = True

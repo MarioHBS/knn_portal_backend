@@ -4,6 +4,7 @@
 2. Validate MD files linting with Markdownlint
 3. Update reports in the docs/ folder
 4. Update TODO.md
+5. Do not use types Dict, List or Optional in Python scripts
 
 ## Business Rules
 

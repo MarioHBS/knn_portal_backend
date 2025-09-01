@@ -832,6 +832,60 @@ deploy em produção!**
 
 ---
 
+## 🔮 Melhorias Futuras - Sistema de Validação
+
+### QR Code para Validação de Benefícios
+
+**Objetivo:** Implementar validação por QR Code como alternativa aos códigos numéricos de 6 dígitos.
+
+#### Funcionalidades Propostas
+
+- [ ] **Geração de QR Code**
+  - [ ] Endpoint para gerar QR Code contendo dados criptografados
+  - [ ] Integração com biblioteca de geração de QR (qrcode-python)
+  - [ ] Dados inclusos: student_id, partner_id, timestamp, hash de validação
+  - [ ] TTL de 3 minutos (mesmo padrão dos códigos numéricos)
+
+- [ ] **Validação por QR Code**
+  - [ ] Endpoint para parceiros validarem QR Code via câmera/scanner
+  - [ ] Decodificação e validação dos dados criptografados
+  - [ ] Verificação de expiração e uso único
+  - [ ] Fallback para códigos numéricos (compatibilidade)
+
+- [ ] **Interface de Usuário**
+  - [ ] Exibição de QR Code no app do aluno
+  - [ ] Scanner de QR Code no sistema do parceiro
+  - [ ] Opção de alternar entre QR Code e código numérico
+
+#### Benefícios da Implementação:
+
+- **Experiência do Usuário:** Validação mais rápida e intuitiva
+- **Segurança:** Dados criptografados no QR Code
+- **Praticidade:** Eliminação de digitação manual de códigos
+- **Modernização:** Interface mais atual e tecnológica
+
+#### Considerações Técnicas:
+
+- **Criptografia:** AES-256 para dados do QR Code
+- **Formato:** JSON Web Token (JWT) embarcado no QR
+- **Compatibilidade:** Manter códigos numéricos como fallback
+- **Performance:** Cache de QR Codes gerados
+- **Mobile:** Otimização para leitura em diferentes dispositivos
+
+#### Roadmap de Implementação
+
+- [ ] **Fase 1:** Pesquisa e prototipação (1 semana)
+- [ ] **Fase 2:** Implementação backend (2 semanas)
+- [ ] **Fase 3:** Interface de geração (1 semana)
+- [ ] **Fase 4:** Interface de validação (1 semana)
+- [ ] **Fase 5:** Testes e ajustes (1 semana)
+
+**Prioridade:** Baixa (após conclusão das funcionalidades core)
+**Estimativa:** 6 semanas de desenvolvimento
+**Dependências:** Sistema de validação atual funcionando
+
+---
+
 **📋 RESUMO DE TAREFAS PENDENTES:**
 
 **Tarefas Originais:**
@@ -846,12 +900,16 @@ deploy em produção!**
 - ⚠️ **12 tarefas de média prioridade** (Regras Firestore + Auditoria + Índices)
 - 🔧 **8 tarefas de baixa prioridade** (Rate Limiting + Monitoramento)
 
+**Melhorias Futuras - QR Code:**
+
+- 🔧 **15 tarefas de baixa prioridade** (Sistema de QR Code)
+
 **TOTAL ATUALIZADO:**
 
 - 🔥 **70 tarefas de alta prioridade**
 - ⚠️ **33 tarefas de média prioridade**
-- 🔧 **23 tarefas de baixa prioridade**
-- **TOTAL: 126 tarefas pendentes** (+38 novas funcionalidades)
+- 🔧 **38 tarefas de baixa prioridade** (+15 QR Code)
+- **TOTAL: 141 tarefas pendentes** (+53 novas funcionalidades)
 
 ---
 
