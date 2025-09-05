@@ -1,3 +1,7 @@
+# ============================================================================
+# PYTHON SPECIFIC
+# ============================================================================
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -33,9 +37,20 @@ ENV/
 *.manifest
 *.spec
 
-# Installer logs
+# Package managers
 pip-log.txt
 pip-delete-this-directory.txt
+Pipfile.lock
+
+# Python version management
+.python-version
+
+# Type checkers
+.pyre/
+
+# ============================================================================
+# TESTING & COVERAGE
+# ============================================================================
 
 # Unit test / coverage reports
 htmlcov/
@@ -48,18 +63,35 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
-
-# Documentos técnicos não versionados
-relatorio_tecnico.md
-lista_tarefas_implementacao.md
 .pytest_cache/
+
+# Linting and formatting
 .ruff_cache/
 
-# Translations
-*.mo
-*.pot
+# Test data and results
+/test_data/
+test_api_results.json
+test_api_comprehensive_results.json
+seed_dev.pyc
 
-# Flask stuff:
+# ============================================================================
+# DEVELOPMENT TOOLS & IDEs
+# ============================================================================
+
+# IDEs and editors
+# .vscode/  # Uncommented to keep VS Code settings
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# ============================================================================
+# FRAMEWORKS & LIBRARIES
+# ============================================================================
+
+# Flask
 instance/
 .webassets-cache
 
@@ -69,55 +101,64 @@ docs/_build/
 # PyBuilder
 .target/
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# Translations
+*.mo
+*.pot
 
-# pyenv
-.python-version
+# ============================================================================
+# ENVIRONMENT & CONFIGURATION
+# ============================================================================
 
-# pipenv
-Pipfile.lock
-
-# Pyre type checker
-.pyre/
-
-# dotenv
+# Environment variables
 .env
-
-# IDEs and editors
-# .vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# OS files
-.DS_Store
-Thumbs.db
 
 # Docker
 *.pid
 *.pid.lock
 
-# Test/seed scripts
-seed_dev.pyc
-/test_data/
+# ============================================================================
+# SECURITY & CREDENTIALS
+# ============================================================================
 
-# Outros arquivos sensíveis
-*.db
-
-# Firebase/Firestore credentials and service account keys
+# Firebase/Firestore credentials
 *service-account-key.json
 default-service-account-key.json
 knn-benefits-service-account-key.json
 firebase-adminsdk-*.json
 
-# Test results and temporary files
-test_api_results.json
-test_api_comprehensive_results.json
+# Credentials folder (entire folder ignored except README)
+credentials/
+!credentials/README.md
+
+# Sensitive databases
+*.db
+
+# ============================================================================
+# PROJECT SPECIFIC
+# ============================================================================
+
+# Data backups
+/data/backup/*
+
+# Migration and export files
 migration_report.json
 firestore_export.json
 
-# Scripts temporários
+# Temporary scripts and files
 scripts/temp/
 temp_*.py
 *_temp.py
+
+# Technical documentation (non-versioned)
+relatorio_tecnico.md
+lista_tarefas_implementacao.md
+
+# ============================================================================
+# OPERATING SYSTEM
+# ============================================================================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
