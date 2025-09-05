@@ -1,0 +1,237 @@
+# REGRAS DE CRIAÇÃO DE ID DOS BENEFÍCIOS
+
+Baseado nos padrões estabelecidos para alunos, funcionários e parceiros, este documento
+estabelece as regras padronizadas para criação de IDs únicos dos benefícios no sistema.
+
+## ESTRUTURA DO ID
+
+O ID do benefício é uma string de exatamente 15 caracteres que segue o padrão:
+BNF_[CODIGO_INTERCALADO]_[TIPO]
+
+## COMPONENTES DO ID
+
+### 1. Prefixo Padrão
+- Formato: BNF_
+- Função: Identificação padronizada no banco de dados indicando que se trata de um registro de benefício
+- Tamanho: 4 caracteres fixos
+
+### 2. Seção Central (Código Intercalado)
+- Regra: Alternar entre iniciais do parceiro e dígitos de preenchimento
+- Iniciais do Parceiro: Extrair as primeiras letras de cada palavra do nome do parceiro
+- Exceções: Ignorar preposições e artigos como "da", "de", "do", "dos", "das", "e", "&"
+- Dígitos de Preenchimento: Na seguinte ordem de prioridade:
+  1. 4 últimos dígitos do CNPJ do parceiro
+  2. Código numérico da categoria do benefício
+  3. Sequencial numérico baseado na data de criação (MMDD)
+
+### 3. Sufixo do Tipo
+- Formato: _[CÓDIGO_TIPO]
+- Função: Identificar o tipo de benefício
+- Exemplos:
+  - Desconto → _DC
+  - Frete Grátis → _FG
+  - Cashback → _CB
+  - Produto Grátis → _PG
+  - Serviço Gratuito → _SG
+
+## ALGORITMO DE INTERCALAÇÃO
+
+1. Extrair iniciais do nome do parceiro (ignorando preposições)
+2. Obter dígitos de preenchimento (CNPJ + categoria + sequencial)
+3. Calcular espaço disponível para intercalação (15 - 4 - tamanho_sufixo)
+4. Priorizar iniciais: usar TODAS as iniciais disponíveis primeiro
+5. Intercalar: inicial → dígito → inicial → dígito → ...
+6. Se houver mais iniciais que espaços ímpares, usar todas as iniciais consecutivamente
+7. Preencher espaços restantes com dígitos conforme necessário
+
+## CÓDIGOS DE CATEGORIA
+- Education (EDU) → 1
+- Technology (TEC) → 2
+- Stationery (LIV) → 3
+- Automotive (AUT) → 4
+- Sports (ESP) → 5
+- Health (SAU) → 6
+- Food (ALI) → 7
+- Entertainment (ENT) → 8
+- Fashion (MOD) → 9
+
+## EXEMPLOS PRÁTICOS
+
+### Exemplo 1: Colégio Adventista - Desconto Educacional
+Dados:
+- Parceiro: "Colégio Adventista (Cohab)"
+- CNPJ: "83367326010494"
+- Categoria: "Education" (código 1)
+- Tipo: "Desconto" (_DC)
+- Data criação: 15/10 (sequencial 1015)
+
+Processo de criação:
+1. Prefixo: BNF_
+2. Iniciais: Colégio Adventista → C, A (ignorando parênteses)
+3. Dígitos de preenchimento:
+   - CNPJ: 83367326010494 → últimos 4 dígitos: 0494
+   - Categoria: Education → código 1
+   - Sequencial: 1015
+   - Total de dígitos: 049411015
+4. Sufixo do tipo: Desconto → _DC
+5. Estrutura base: BNF_ + intercalação + _DC
+6. Espaço para intercalação: 15 - 4 - 3 = 8 caracteres
+7. Intercalação: C + 0 + A + 4 + 9 + 4 + 1 + 1 = C0A49411
+
+ID Final: BNF_C0A49411_DC
+
+### Exemplo 2: Cadin Celulares - Desconto Tecnologia
+Dados:
+- Parceiro: "Cadin Celulares"
+- CNPJ: "57628555000108"
+- Categoria: "Technology" (código 2)
+- Tipo: "Desconto" (_DC)
+- Data criação: 20/11 (sequencial 1120)
+
+Processo de criação:
+1. Prefixo: BNF_
+2. Iniciais: Cadin Celulares → C, C
+3. Dígitos de preenchimento:
+   - CNPJ: 57628555000108 → últimos 4 dígitos: 0108
+   - Categoria: Technology → código 2
+   - Sequencial: 1120
+   - Total de dígitos: 010821120
+4. Sufixo do tipo: Desconto → _DC
+5. Estrutura base: BNF_ + intercalação + _DC
+6. Espaço para intercalação: 15 - 4 - 3 = 8 caracteres
+7. Intercalação: C + 0 + C + 1 + 0 + 8 + 2 + 1 = C0C10821
+
+ID Final: BNF_C0C10821_DC
+
+### Exemplo 3: Autoescola Escórcio - Desconto Automotivo
+Dados:
+- Parceiro: "Autoescola Escórcio"
+- CNPJ: "13018958000151"
+- Categoria: "Automotive" (código 4)
+- Tipo: "Desconto" (_DC)
+- Data criação: 05/12 (sequencial 1205)
+
+Processo de criação:
+1. Prefixo: BNF_
+2. Iniciais: Autoescola Escórcio → A, E
+3. Dígitos de preenchimento:
+   - CNPJ: 13018958000151 → últimos 4 dígitos: 0151
+   - Categoria: Automotive → código 4
+   - Sequencial: 1205
+   - Total de dígitos: 015141205
+4. Sufixo do tipo: Desconto → _DC
+5. Estrutura base: BNF_ + intercalação + _DC
+6. Espaço para intercalação: 15 - 4 - 3 = 8 caracteres
+7. Intercalação: A + 0 + E + 1 + 5 + 1 + 4 + 1 = A0E15141
+
+ID Final: BNF_A0E15141_DC
+
+## REGRAS DE INTERCALAÇÃO DETALHADAS
+
+### Padrão de Alternância
+- **PRIORIDADE 1:** Usar TODAS as iniciais do nome do parceiro (obrigatórias)
+- **PRIORIDADE 2:** Intercalar com dígitos nos espaços restantes
+- Posição ímpar: Inicial do parceiro (1ª, 3ª, 5ª, 7ª posição)
+- Posição par: Dígito de preenchimento (2ª, 4ª, 6ª, 8ª posição)
+
+### Ordem de Prioridade dos Dígitos
+1. CNPJ: Usar os 4 últimos dígitos primeiro
+2. Categoria: Usar código numérico da categoria
+3. Sequencial: Usar data de criação (MMDD) como sequencial
+
+### Tratamento de Casos Especiais
+- **Iniciais obrigatórias:** TODAS as iniciais devem ser incluídas no ID
+- Se houver mais iniciais que espaços ímpares, usar iniciais consecutivamente
+- Dígitos são usados apenas para completar os 15 caracteres
+- Se não houver dígitos suficientes, usar '0' como preenchimento
+- Nomes com símbolos especiais: extrair apenas letras para iniciais
+
+## CÓDIGOS DE TIPOS DE BENEFÍCIO
+- **Desconto:** _DC
+- **Frete Grátis:** _FG
+- **Cashback:** _CB
+- **Produto Grátis:** _PG
+- **Serviço Gratuito:** _SG
+- **Pontos/Milhas:** _PT
+- **Acesso Exclusivo:** _AE
+- **Upgrade:** _UP
+- **Combo/Pacote:** _CP
+
+## VALIDAÇÃO FINAL
+- O ID final deve ter exatamente 15 caracteres
+- Formato: BNF_XXXXXXXX_XX
+- Todos os caracteres alfabéticos devem estar em MAIÚSCULO
+- Não deve conter espaços ou caracteres especiais (exceto underscore)
+- Deve ser único no sistema (verificação obrigatória)
+
+## ALGORITMO DE IMPLEMENTAÇÃO
+
+```python
+def generate_benefit_id(partner_name: str, partner_cnpj: str, 
+                       category: str, benefit_type: str, 
+                       creation_date: str) -> str:
+    """
+    Gera ID único para benefício seguindo padrão BNF_XXXXXXXX_XX
+    
+    Args:
+        partner_name: Nome do parceiro
+        partner_cnpj: CNPJ do parceiro (apenas números)
+        category: Categoria do benefício
+        benefit_type: Tipo do benefício
+        creation_date: Data de criação (formato MMDD)
+    
+    Returns:
+        ID único do benefício
+    """
+    # Extrair iniciais do parceiro
+    initials = extract_partner_initials(partner_name)
+    
+    # Obter dígitos de preenchimento
+    cnpj_digits = partner_cnpj[-4:]  # 4 últimos dígitos
+    category_code = get_category_code(category)
+    sequential = creation_date  # MMDD
+    
+    # Combinar dígitos
+    fill_digits = cnpj_digits + category_code + sequential
+    
+    # Intercalar iniciais e dígitos
+    intercalated = intercalate_initials_digits(initials, fill_digits, 8)
+    
+    # Obter sufixo do tipo
+    type_suffix = get_benefit_type_code(benefit_type)
+    
+    # Montar ID final
+    benefit_id = f"BNF_{intercalated}_{type_suffix}"
+    
+    return benefit_id
+```
+
+## BENEFÍCIOS DO SISTEMA
+
+1. **Padronização:** Identificação consistente no banco de dados
+2. **Rastreabilidade:** Informações do parceiro e tipo codificadas no próprio ID
+3. **Unicidade:** Combinação de dados do parceiro garante IDs únicos
+4. **Legibilidade:** Estrutura clara e interpretável
+5. **Escalabilidade:** Suporte a novos tipos e categorias de benefícios
+6. **Consistência:** Alinhamento com padrões existentes de alunos, funcionários e parceiros
+
+## INTEGRAÇÃO COM SISTEMA EXISTENTE
+
+### Relacionamento com Parceiros
+- O ID do benefício deve referenciar o partner_id existente
+- Manter consistência com estrutura de dados atual
+- Validar existência do parceiro antes de criar benefício
+
+### Auditoria e Logs
+- Registrar processo de geração do ID
+- Manter histórico de IDs gerados
+- Implementar verificação de duplicatas
+
+Este sistema garante que cada benefício tenha um identificador único, padronizado e
+informativo, mantendo consistência com os padrões já estabelecidos no projeto.
+
+---
+Documento criado em: 2025-01-06
+Versão: 1.0
+Baseado em: regras_criacao_id_alunos.txt, dados_parceiros_teste.json
+Compatível com: estrutura firestore_benefits.json

@@ -6,6 +6,25 @@
 4. Update TODO.md
 5. Do not use types Dict, List or Optional in Python scripts
 
+## Organization Rules
+
+6. **Credentials Management**:
+   - All credential files must be stored in `/credentials/` folder
+   - Credential files must be added to `.gitignore`
+   - Use environment variables in production
+   - Document credential usage in `/credentials/README.md`
+
+7. **Script Organization**:
+   - Temporary scripts must be placed in `/scripts/temp/`
+   - Use prefixes `temp_` or `*_temp.py` for truly temporary files
+   - Organize scripts by category: development, maintenance, migration, testing
+   - Document script purpose in file headers
+
+8. **File Structure**:
+   - Keep project root clean - avoid scattered utility files
+   - Use appropriate folders: `/scripts/`, `/docs/`, `/src/`, `/tests/`
+   - Configuration files can remain in root if they're framework-specific
+
 ## Business Rules
 
 - For underage students, `nome_responsavel` (guardian name) must be filled

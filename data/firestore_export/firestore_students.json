@@ -18,11 +18,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_A3C1M7L7_S4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0L0R0F8_S2": {
@@ -43,11 +48,16 @@
         "name": "Clara Rebeca Silva do Reis",
         "email": "clarinhabeca.45@gmail.com"
       },
-      "id": "STD_A0L0R0F8_S2",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0D0N002_K3": {
@@ -68,11 +78,16 @@
         "name": "Mayhana Caroline de Araújo",
         "email": "profmayana@gmail.com"
       },
-      "id": "STD_A0D0N002_K3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A1R9C333_T1": {
@@ -93,11 +108,16 @@
         "name": "Jousicleia Rios Pereira Colins",
         "email": "cleaxp@hotmailcom"
       },
-      "id": "STD_A1R9C333_T1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A1M5R5C0_S4": {
@@ -118,11 +138,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_A1M5R5C0_S4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A7T3A0A3_S1": {
@@ -143,11 +168,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_A7T3A0A3_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_ACNMS000_S3": {
@@ -168,11 +198,16 @@
         "name": "Leandro Rafael Martins Serra",
         "email": "leandrormserra@gmailcom"
       },
-      "id": "STD_ACNMS000_S3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0G0S0O3_S1": {
@@ -193,11 +228,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_A0G0S0O3_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A2L8M0G_TW4": {
@@ -218,11 +258,16 @@
         "name": "Lidia Abidorina Silva Mendoça",
         "email": "lidiamendoncanutricionista@hormailcom"
       },
-      "id": "STD_A2L8M0G_TW4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A2B4R0C6_S4": {
@@ -243,11 +288,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_A2B4R0C6_S4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0G0O0V2_S3": {
@@ -268,11 +318,16 @@
         "name": "Carla Raquel Oliveira Silva",
         "email": "annegabrieleoliveira2009@gmailcom"
       },
-      "id": "STD_A0G0O0V2_S3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A3P3N8M1_S1": {
@@ -293,11 +348,16 @@
         "name": "Fernanda Elenilce Cordeiro Nascimento",
         "email": "fernet@hotmailcom"
       },
-      "id": "STD_A3P3N8M1_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A8V1M28_TW2": {
@@ -318,11 +378,16 @@
         "name": "Lucas De Souza Santaroni",
         "email": "barbaravigarani@hotmailcom"
       },
-      "id": "STD_A8V1M28_TW2",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A1M8C0N5_S1": {
@@ -343,11 +408,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_A1M8C0N5_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_B0C0R0C0_S1": {
@@ -368,11 +438,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_B0C0R0C0_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_B9S03261_K1": {
@@ -393,11 +468,16 @@
         "name": "Amanda Hellen Sousa",
         "email": "amandahellen@gmail.com"
       },
-      "id": "STD_B9S03261_K1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_B4M8L04_TW2": {
@@ -418,11 +498,16 @@
         "name": "Raimundo Luis Mourão Júnior",
         "email": "juniorlnj@gmailcom"
       },
-      "id": "STD_B4M8L04_TW2",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C0F0G0S4_S1": {
@@ -443,11 +528,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_C0F0G0S4_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C8D4B8M9_A1": {
@@ -468,11 +558,16 @@
         "name": "Maria do Monte Serra",
         "email": "ned9860@gmailcom"
       },
-      "id": "STD_C8D4B8M9_A1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C5R9C0C8_T3": {
@@ -493,11 +588,16 @@
         "name": "Cassio Pestana Costa",
         "email": "cassiocpcosta@gmailcom"
       },
-      "id": "STD_C5R9C0C8_T3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_CRSLJ776_S1": {
@@ -518,11 +618,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_CRSLJ776_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C0R0S0R8_S2": {
@@ -543,11 +648,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_C0R0S0R8_S2",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_D0M0A563_S2": {
@@ -568,11 +678,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_D0M0A563_S2",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_D0M0O0B8_T1": {
@@ -593,11 +708,16 @@
         "name": "Silvania Canuto de Oliveira",
         "email": "n@gmailcom"
       },
-      "id": "STD_D0M0O0B8_T1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_ECCSS00_TW4": {
@@ -618,11 +738,16 @@
         "name": "Carmem Carolina Castro Costa",
         "email": "bccarolcastro@gmailcom"
       },
-      "id": "STD_ECCSS00_TW4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_E6R9C0S3_K1": {
@@ -643,11 +768,16 @@
         "name": "Silvana Da Silva Santos Ferreira",
         "email": "vana241972@gmailcom"
       },
-      "id": "STD_E6R9C0S3_K1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_E2F6D221_T1": {
@@ -668,11 +798,16 @@
         "name": "Francisco Eufrazio Ribeiro Junior",
         "email": "ferj1569@hotmailcom"
       },
-      "id": "STD_E2F6D221_T1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_G2S7C968_S1": {
@@ -693,11 +828,16 @@
         "name": "Emanuel Machado Castro",
         "email": "lilymor4is@gmail.com"
       },
-      "id": "STD_G2S7C968_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_G7P5B040_S1": {
@@ -718,11 +858,16 @@
         "name": "Elizima Gomes Pereira",
         "email": "geovaneeelizama@gmailcom"
       },
-      "id": "STD_G7P5B040_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_G0V0F00_TW3": {
@@ -743,11 +888,16 @@
         "name": "Tamires Batista Vieira",
         "email": "thamiresvieira2203@gmailcom"
       },
-      "id": "STD_G0V0F00_TW3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_HRLCS0_KD6A": {
@@ -768,11 +918,16 @@
         "name": "Welson Rogério Silva Costa",
         "email": "fransilvap273@gmailcom"
       },
-      "id": "STD_HRLCS0_KD6A",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_H0N0R007_K1": {
@@ -793,11 +948,16 @@
         "name": "Laianny Marinho Nunes Torres",
         "email": "laiannymarinho@outlookcom"
       },
-      "id": "STD_H0N0R007_K1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_H8M8O9M_TW4": {
@@ -818,11 +978,16 @@
         "name": "Simone de Souza Oliveira",
         "email": ""
       },
-      "id": "STD_H8M8O9M_TW4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_H0C0F0B0_K2": {
@@ -843,11 +1008,16 @@
         "name": "Kercia Maria Lopes de Freitas Brito",
         "email": "kerciamlf@yahoo.com.br"
       },
-      "id": "STD_H0C0F0B0_K2",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0T5S056_T1": {
@@ -868,11 +1038,16 @@
         "name": "Regina Barros do Amaral",
         "email": "Reginaicaro934@gmailcom"
       },
-      "id": "STD_I0T5S056_T1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0R0R0J8_S1": {
@@ -893,11 +1068,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_I0R0R0J8_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0L0M0O9_S1": {
@@ -918,11 +1098,16 @@
         "name": "Flavio Adriano dos Santos Oliveira",
         "email": "ingridlais568@gmailcom"
       },
-      "id": "STD_I0L0M0O9_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I1C1L0F0_S1": {
@@ -943,11 +1128,16 @@
         "name": "Maria do Carmo Sousa de Lima Ferreira",
         "email": "docarmoferreira1975@gmailcom"
       },
-      "id": "STD_I1C1L0F0_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I6S8S00_TW4": {
@@ -968,11 +1158,16 @@
         "name": "Josielma Leite de Oliveira Sousa Silva",
         "email": "josielmaj@gmailcom"
       },
-      "id": "STD_I6S8S00_TW4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0N0M013_S2": {
@@ -993,11 +1188,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_I0N0M013_S2",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I8R5S5C5_S1": {
@@ -1018,11 +1218,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_I8R5S5C5_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_J0D0C0C2_T1": {
@@ -1043,11 +1248,16 @@
         "name": "Hugo Leonardo da Silva Carvalho",
         "email": "hugocarvalhopandu@gmailcom"
       },
-      "id": "STD_J0D0C0C2_T1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_JLOSS680_S3": {
@@ -1068,11 +1278,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_JLOSS680_S3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_J6S8S00_TW4": {
@@ -1093,11 +1308,16 @@
         "name": "Josielma Leite de Oliveira Sousa Silva",
         "email": "josielmaj@gmailcom"
       },
-      "id": "STD_J6S8S00_TW4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_K0A0FPCL_S4": {
@@ -1118,11 +1338,16 @@
         "name": "Igor Leandro Pinheiro Correio Lima",
         "email": "igorleandroarquiteto@gmail.com"
       },
-      "id": "STD_K0A0FPCL_S4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L0S0P0A8_S1": {
@@ -1143,11 +1368,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_L0S0P0A8_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L6K5C6N8_S1": {
@@ -1168,11 +1398,16 @@
         "name": "Iolandra Fereira da Costa",
         "email": "Iolandra25@gmailcom"
       },
-      "id": "STD_L6K5C6N8_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L0C0M0B_TW3": {
@@ -1193,11 +1428,16 @@
         "name": "Licianne Cristine Monteiro Menezes Barros",
         "email": "licianne1981@gmailcom"
       },
-      "id": "STD_L0C0M0B_TW3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L1R0M1C6_S1": {
@@ -1218,11 +1458,16 @@
         "name": "Robert Monteiro Campos",
         "email": "liliancampos0993@gmailcom"
       },
-      "id": "STD_L1R0M1C6_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_LVSRC000_S3": {
@@ -1243,11 +1488,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_LVSRC000_S3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_MASRS440_T1": {
@@ -1268,11 +1518,16 @@
         "name": "Lucejane Maria de Sousa",
         "email": "Lucejaneemsousa@gmailcom"
       },
-      "id": "STD_MASRS440_T1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M6E3G8V_TW1": {
@@ -1293,11 +1548,16 @@
         "name": "Rozana Santos Gomes",
         "email": "rozanagomesrsg@gmail.com"
       },
-      "id": "STD_M6E3G8V_TW1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M5F9M0A2_S3": {
@@ -1318,11 +1578,16 @@
         "name": "Cintia Silva Melo",
         "email": "cintiamf.melo@gmail.com"
       },
-      "id": "STD_M5F9M0A2_S3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0J0S0T3_K2": {
@@ -1343,11 +1608,16 @@
         "name": "Michelle Cordeiro de Sousa",
         "email": "mcordeiro24@yahoocom.br"
       },
-      "id": "STD_M0J0S0T3_K2",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0B0T00_TW4": {
@@ -1368,11 +1638,16 @@
         "name": "Edna Mendes Barros",
         "email": "Embarros2010@hotmailcom"
       },
-      "id": "STD_M0B0T00_TW4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0M0D0V6_T1": {
@@ -1393,11 +1668,16 @@
         "name": "Andiene Marques Dias Viana",
         "email": "andienemarques@hotmailcom"
       },
-      "id": "STD_M0M0D0V6_T1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0E0L0M_TW4": {
@@ -1418,11 +1698,16 @@
         "name": "Aberlon Joriazio Serejo Mendonça",
         "email": "aberlon@hormailcom"
       },
-      "id": "STD_M0E0L0M_TW4",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0C0M0S9_S1": {
@@ -1443,11 +1728,16 @@
         "name": "Raylson  Pessoa Da Silva",
         "email": "maysasilva67890@gmailcom"
       },
-      "id": "STD_M0C0M0S9_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_N0P00000_K3": {
@@ -1468,11 +1758,16 @@
         "name": "Elizangela Silva Moraes",
         "email": "Elizangelamoraes21@hotmailcom"
       },
-      "id": "STD_N0P00000_K3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_P6R4S0C1_S1": {
@@ -1493,11 +1788,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_P6R4S0C1_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_P0F0T0G1_K3": {
@@ -1518,11 +1818,16 @@
         "name": "Adriana Tavares Santos Gomes",
         "email": "atsg14112012@gmailcom"
       },
-      "id": "STD_P0F0T0G1_K3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_PAFBS000_X1": {
@@ -1543,11 +1848,16 @@
         "name": "Nethyelly Fernandes de Sousa Leite",
         "email": ""
       },
-      "id": "STD_PAFBS000_X1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_PVDL40_KD6A": {
@@ -1568,11 +1878,16 @@
         "name": "Miriam Dias Lopes",
         "email": "lopesmiriamdias@gmailcom"
       },
-      "id": "STD_PVDL40_KD6A",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_R0M0D0V6_T1": {
@@ -1593,11 +1908,16 @@
         "name": "Andiene Marques Dias Viana",
         "email": "rafaelmarquesbatera1@gmailcom"
       },
-      "id": "STD_R0M0D0V6_T1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_R0R0C035_S1": {
@@ -1618,11 +1938,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_R0R0C035_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_S0V0P029_S2": {
@@ -1643,11 +1968,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_S0V0P029_S2",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_S0I0S0B_TW1": {
@@ -1668,11 +1998,16 @@
         "name": "Mariza de Jesus Sá Sousa",
         "email": "mariza2015sa@gmailcom"
       },
-      "id": "STD_S0I0S0B_TW1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_TLSG88_KD6A": {
@@ -1693,11 +2028,16 @@
         "name": "Heloana Dos Santos Gama",
         "email": "heloanagama@hotmailcom"
       },
-      "id": "STD_TLSG88_KD6A",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_V0C0C077_S1": {
@@ -1718,11 +2058,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_V0C0C077_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_V3B0N0S7_S1": {
@@ -1743,11 +2088,16 @@
         "name": "Valdenice Pereira do Nascimento",
         "email": "valdenicep598@gmailcom"
       },
-      "id": "STD_V3B0N0S7_S1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_V7M6C058_X1": {
@@ -1768,11 +2118,16 @@
         "name": "Liliane Melgar Cuellar",
         "email": "vitor1912@icloud.com"
       },
-      "id": "STD_V7M6C058_X1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_W0M0B0F2_T1": {
@@ -1793,11 +2148,16 @@
         "name": "Lindalva Barbosa Furtado",
         "email": "lindavamiguel98@gmailcom"
       },
-      "id": "STD_W0M0B0F2_T1",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_Y0M0M04_TW3": {
@@ -1818,11 +2178,16 @@
         "name": "Samara Raquel Margues Bezerra",
         "email": "samara14sasa@hotmailcom"
       },
-      "id": "STD_Y0M0M04_TW3",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_Y0S0L0F8_S2": {
@@ -1843,180 +2208,16 @@
         "name": "",
         "email": ""
       },
-      "id": "STD_Y0S0L0F8_S2",
       "tenant_id": "knn-dev-tenant",
-      "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees": {},
-  "__collection__/employees/EMP_A0A0O007_AP": {
-    "data": {
-      "id": "EMP_A0A0O007_AP",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Aimeê Almeida de Oliveira",
-      "cargo": "ADM. PEDAGÓGICO",
-      "e-mail": "aimee.almeida2018@gmail.com",
-      "telefone": "98991075072",
-      "cep": "65110-000",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_A5C3O0R_CDA": {
-    "data": {
-      "id": "EMP_A5C3O0R_CDA",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Ana Carolina de Oliveira Rodrigues",
-      "cargo": "CDA",
-      "e-mail": "rodriguescarol6813@gmail.com",
-      "telefone": "98988217454",
-      "cep": "65053-530",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_A8L4L7B3_PR": {
-    "data": {
-      "id": "EMP_A8L4L7B3_PR",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Ana Larissa Leite Barros",
-      "cargo": "PROFESSORA",
-      "e-mail": "larissaana2704@gmail.com",
-      "telefone": "98985911317",
-      "cep": "65052-847",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_C0P0R0B0_PR": {
-    "data": {
-      "id": "EMP_C0P0R0B0_PR",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Carmem Patrícia Reis Borges",
-      "cargo": "PROFESSORA",
-      "e-mail": "carmemprborges@gmail.com",
-      "telefone": "98985347029",
-      "cep": "65130-000",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_E2A0B037_PR": {
-    "data": {
-      "id": "EMP_E2A0B037_PR",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Edilene de Araújo Barbosa",
-      "cargo": "PROFESSORA",
-      "e-mail": "edillenem@outlook.com",
-      "telefone": "98991795370",
-      "cep": "65065-200",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_F0F0O069_CC": {
-    "data": {
-      "id": "EMP_F0F0O069_CC",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Felipe Ferreira de Oliveira",
-      "cargo": "CONSULTOR COMERCIAL",
-      "e-mail": "felipedefolive@gmail.com",
-      "telefone": "98985916692",
-      "cep": "65138-000",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_J5S7O434_AF": {
-    "data": {
-      "id": "EMP_J5S7O434_AF",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Juliana Santos Oliveira",
-      "cargo": "ADM. FINANCEIRO",
-      "e-mail": "julicasssantos@gmail.com",
-      "telefone": "98988854341",
-      "cep": "65056-574",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_L6A2S691_AP": {
-    "data": {
-      "id": "EMP_L6A2S691_AP",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Luana de Abreu Silva",
-      "cargo": "ADM. PEDAGÓGICO",
-      "e-mail": "luanaabreusilva09@gmail.com",
-      "telefone": "98985594916",
-      "cep": "65042-626",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_N4J0E0C9_CC": {
-    "data": {
-      "id": "EMP_N4J0E0C9_CC",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Natália de Jesus Everton Câmara",
-      "cargo": "CONSULTOR COMERCIAL",
-      "e-mail": "n4thyeverton087@gmail.com",
-      "telefone": "98988394914",
-      "cep": "65035-400",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_T4M8R2O1_PR": {
-    "data": {
-      "id": "EMP_T4M8R2O1_PR",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Tadeu Moraes Rego de Oliveira",
-      "cargo": "PROFESSOR",
-      "e-mail": "tadeu.mro922@gmail.com",
-      "telefone": "98984215158",
-      "cep": "65051-482",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_Y3A2G0C4_PR": {
-    "data": {
-      "id": "EMP_Y3A2G0C4_PR",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Yago Augusto Gonçalves Costa",
-      "cargo": "PROFESSOR",
-      "e-mail": "augustocosta993@gmail.com",
-      "telefone": "98985022446",
-      "cep": "65066-320",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
-    }
-  },
-  "__collection__/employees/EMP_Y7B3G0J6_CP": {
-    "data": {
-      "id": "EMP_Y7B3G0J6_CP",
-      "tenant_id": "knn-dev-tenant",
-      "nome": "Yanna Biankinny Gonçalves de Jesus",
-      "cargo": "COORD. PEDAGÓGICA",
-      "e-mail": "yannagoncalvesdejesus@gmail.com",
-      "telefone": "98981031611",
-      "cep": "65053-730",
-      "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "active_until": "2025-12-31",
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   }
 }

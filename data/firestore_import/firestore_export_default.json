@@ -15,8 +15,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0L0R0F8_S2": {
@@ -34,8 +40,14 @@
       "nome_responsavel": "Clara Rebeca Silva do Reis",
       "e-mail_responsavel": "clarinhabeca.45@gmail.com",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0D0N002_K3": {
@@ -53,8 +65,14 @@
       "nome_responsavel": "Mayhana Caroline de Araújo",
       "e-mail_responsavel": "profmayana@gmail.com",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A1R9C333_T1": {
@@ -72,8 +90,14 @@
       "nome_responsavel": "Jousicleia Rios Pereira Colins",
       "e-mail_responsavel": "cleaxp@hotmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A1M5R5C0_S4": {
@@ -91,8 +115,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A7T3A0A3_S1": {
@@ -110,8 +140,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_ACNMS000_S3": {
@@ -129,8 +165,14 @@
       "nome_responsavel": "Leandro Rafael Martins Serra",
       "e-mail_responsavel": "leandrormserra@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0G0S0O3_S1": {
@@ -148,8 +190,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A2L8M0G_TW4": {
@@ -167,8 +215,14 @@
       "nome_responsavel": "Lidia Abidorina Silva Mendoça",
       "e-mail_responsavel": "lidiamendoncanutricionista@hormailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A2B4R0C6_S4": {
@@ -186,8 +240,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0G0O0V2_S3": {
@@ -205,8 +265,14 @@
       "nome_responsavel": "Carla Raquel Oliveira Silva",
       "e-mail_responsavel": "annegabrieleoliveira2009@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A3P3N8M1_S1": {
@@ -224,8 +290,14 @@
       "nome_responsavel": "Fernanda Elenilce Cordeiro Nascimento",
       "e-mail_responsavel": "fernet@hotmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A8V1M28_TW2": {
@@ -243,8 +315,14 @@
       "nome_responsavel": "Lucas De Souza Santaroni",
       "e-mail_responsavel": "barbaravigarani@hotmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A1M8C0N5_S1": {
@@ -262,8 +340,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_B0C0R0C0_S1": {
@@ -281,8 +365,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_B9S03261_K1": {
@@ -300,8 +390,14 @@
       "nome_responsavel": "Amanda Hellen Sousa",
       "e-mail_responsavel": "amandahellen@gmail.com",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_B4M8L04_TW2": {
@@ -319,8 +415,14 @@
       "nome_responsavel": "Raimundo Luis Mourão Júnior",
       "e-mail_responsavel": "juniorlnj@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C0F0G0S4_S1": {
@@ -338,8 +440,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C8D4B8M9_A1": {
@@ -357,8 +465,14 @@
       "nome_responsavel": "Maria do Monte Serra",
       "e-mail_responsavel": "ned9860@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C5R9C0C8_T3": {
@@ -376,8 +490,14 @@
       "nome_responsavel": "Cassio Pestana Costa",
       "e-mail_responsavel": "cassiocpcosta@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_CRSLJ776_S1": {
@@ -395,8 +515,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C0R0S0R8_S2": {
@@ -414,8 +540,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_D0M0A563_S2": {
@@ -433,8 +565,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_D0M0O0B8_T1": {
@@ -452,8 +590,14 @@
       "nome_responsavel": "Silvania Canuto de Oliveira",
       "e-mail_responsavel": "n@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_ECCSS00_TW4": {
@@ -471,8 +615,14 @@
       "nome_responsavel": "Carmem Carolina Castro Costa",
       "e-mail_responsavel": "bccarolcastro@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_E6R9C0S3_K1": {
@@ -490,8 +640,14 @@
       "nome_responsavel": "Silvana Da Silva Santos Ferreira",
       "e-mail_responsavel": "vana241972@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_E2F6D221_T1": {
@@ -509,8 +665,14 @@
       "nome_responsavel": "Francisco Eufrazio Ribeiro Junior",
       "e-mail_responsavel": "ferj1569@hotmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_G2S7C968_S1": {
@@ -528,8 +690,14 @@
       "nome_responsavel": "Emanuel Machado Castro",
       "e-mail_responsavel": "lilymor4is@gmail.com",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_G7P5B040_S1": {
@@ -547,8 +715,14 @@
       "nome_responsavel": "Elizima Gomes Pereira",
       "e-mail_responsavel": "geovaneeelizama@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_G0V0F00_TW3": {
@@ -566,8 +740,14 @@
       "nome_responsavel": "Tamires Batista Vieira",
       "e-mail_responsavel": "thamiresvieira2203@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_HRLCS0_KD6A": {
@@ -585,8 +765,14 @@
       "nome_responsavel": "Welson Rogério Silva Costa",
       "e-mail_responsavel": "fransilvap273@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_H0N0R007_K1": {
@@ -604,8 +790,14 @@
       "nome_responsavel": "Laianny Marinho Nunes Torres",
       "e-mail_responsavel": "laiannymarinho@outlookcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_H8M8O9M_TW4": {
@@ -623,8 +815,14 @@
       "nome_responsavel": "Simone de Souza Oliveira",
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_H0C0F0B0_K2": {
@@ -642,8 +840,14 @@
       "nome_responsavel": "Kercia Maria Lopes de Freitas Brito",
       "e-mail_responsavel": "kerciamlf@yahoo.com.br",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0T5S056_T1": {
@@ -661,8 +865,14 @@
       "nome_responsavel": "Regina Barros do Amaral",
       "e-mail_responsavel": "Reginaicaro934@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0R0R0J8_S1": {
@@ -680,8 +890,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0L0M0O9_S1": {
@@ -699,8 +915,14 @@
       "nome_responsavel": "Flavio Adriano dos Santos Oliveira",
       "e-mail_responsavel": "ingridlais568@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I1C1L0F0_S1": {
@@ -718,8 +940,14 @@
       "nome_responsavel": "Maria do Carmo Sousa de Lima Ferreira",
       "e-mail_responsavel": "docarmoferreira1975@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I6S8S00_TW4": {
@@ -737,8 +965,14 @@
       "nome_responsavel": "Josielma Leite de Oliveira Sousa Silva",
       "e-mail_responsavel": "josielmaj@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0N0M013_S2": {
@@ -756,8 +990,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I8R5S5C5_S1": {
@@ -775,8 +1015,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_J0D0C0C2_T1": {
@@ -794,8 +1040,14 @@
       "nome_responsavel": "Hugo Leonardo da Silva Carvalho",
       "e-mail_responsavel": "hugocarvalhopandu@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_JLOSS680_S3": {
@@ -813,8 +1065,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_J6S8S00_TW4": {
@@ -832,8 +1090,14 @@
       "nome_responsavel": "Josielma Leite de Oliveira Sousa Silva",
       "e-mail_responsavel": "josielmaj@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_KAFPCL00_S4": {
@@ -851,8 +1115,14 @@
       "nome_responsavel": "Igor Leandro Pinheiro Correio Lima",
       "e-mail_responsavel": "igorleandroarquiteto@gmail.com",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L0S0P0A8_S1": {
@@ -870,8 +1140,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L6K5C6N8_S1": {
@@ -889,8 +1165,14 @@
       "nome_responsavel": "Iolandra Fereira da Costa",
       "e-mail_responsavel": "Iolandra25@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L0C0M0B_TW3": {
@@ -908,8 +1190,14 @@
       "nome_responsavel": "Licianne Cristine Monteiro Menezes Barros",
       "e-mail_responsavel": "licianne1981@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L1R0M1C6_S1": {
@@ -927,8 +1215,14 @@
       "nome_responsavel": "Robert Monteiro Campos",
       "e-mail_responsavel": "liliancampos0993@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_LVSRC000_S3": {
@@ -946,8 +1240,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_MASRS440_T1": {
@@ -965,8 +1265,14 @@
       "nome_responsavel": "Lucejane Maria de Sousa",
       "e-mail_responsavel": "Lucejaneemsousa@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M6E3G8V_TW1": {
@@ -984,8 +1290,14 @@
       "nome_responsavel": "Rozana Santos Gomes",
       "e-mail_responsavel": "rozanagomesrsg@gmail.com",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M5F9M0A2_S3": {
@@ -1003,8 +1315,14 @@
       "nome_responsavel": "Cintia Silva Melo",
       "e-mail_responsavel": "cintiamf.melo@gmail.com",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0J0S0T3_K2": {
@@ -1022,8 +1340,14 @@
       "nome_responsavel": "Michelle Cordeiro de Sousa",
       "e-mail_responsavel": "mcordeiro24@yahoocom.br",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0B0T00_TW4": {
@@ -1041,8 +1365,14 @@
       "nome_responsavel": "Edna Mendes Barros",
       "e-mail_responsavel": "Embarros2010@hotmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0M0D0V6_T1": {
@@ -1060,8 +1390,14 @@
       "nome_responsavel": "Andiene Marques Dias Viana",
       "e-mail_responsavel": "andienemarques@hotmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0E0L0M_TW4": {
@@ -1079,8 +1415,14 @@
       "nome_responsavel": "Aberlon Joriazio Serejo Mendonça",
       "e-mail_responsavel": "aberlon@hormailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0C0M0S9_S1": {
@@ -1098,8 +1440,14 @@
       "nome_responsavel": "Raylson  Pessoa Da Silva",
       "e-mail_responsavel": "maysasilva67890@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_N0P00000_K3": {
@@ -1117,8 +1465,14 @@
       "nome_responsavel": "Elizangela Silva Moraes",
       "e-mail_responsavel": "Elizangelamoraes21@hotmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_P6R4S0C1_S1": {
@@ -1136,8 +1490,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_P0F0T0G1_K3": {
@@ -1155,8 +1515,14 @@
       "nome_responsavel": "Adriana Tavares Santos Gomes",
       "e-mail_responsavel": "atsg14112012@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_PAFBS000_X1": {
@@ -1174,8 +1540,14 @@
       "nome_responsavel": "Nethyelly Fernandes de Sousa Leite",
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_PVDL40_KD6A": {
@@ -1193,8 +1565,14 @@
       "nome_responsavel": "Miriam Dias Lopes",
       "e-mail_responsavel": "lopesmiriamdias@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_R0M0D0V6_T1": {
@@ -1212,8 +1590,14 @@
       "nome_responsavel": "Andiene Marques Dias Viana",
       "e-mail_responsavel": "rafaelmarquesbatera1@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_R0R0C035_S1": {
@@ -1231,8 +1615,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_S0V0P029_S2": {
@@ -1250,8 +1640,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_S0I0S0B_TW1": {
@@ -1269,8 +1665,14 @@
       "nome_responsavel": "Mariza de Jesus Sá Sousa",
       "e-mail_responsavel": "mariza2015sa@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_TLSG88_KD6A": {
@@ -1288,8 +1690,14 @@
       "nome_responsavel": "Heloana Dos Santos Gama",
       "e-mail_responsavel": "heloanagama@hotmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_V0C0C077_S1": {
@@ -1307,8 +1715,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_V3B0N0S7_S1": {
@@ -1326,8 +1740,14 @@
       "nome_responsavel": "Valdenice Pereira do Nascimento",
       "e-mail_responsavel": "valdenicep598@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_V7M6C058_X1": {
@@ -1345,8 +1765,14 @@
       "nome_responsavel": "Liliane Melgar Cuellar",
       "e-mail_responsavel": "vitor1912@icloud.com",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_W0M0B0F2_T1": {
@@ -1364,8 +1790,14 @@
       "nome_responsavel": "Lindalva Barbosa Furtado",
       "e-mail_responsavel": "lindavamiguel98@gmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_Y0M0M04_TW3": {
@@ -1383,8 +1815,14 @@
       "nome_responsavel": "Samara Raquel Margues Bezerra",
       "e-mail_responsavel": "samara14sasa@hotmailcom",
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_Y0S0L0F8_S2": {
@@ -1402,8 +1840,14 @@
       "nome_responsavel": null,
       "e-mail_responsavel": null,
       "active_until": "2027-08-28",
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees": {},
@@ -1417,8 +1861,14 @@
       "telefone": "98991075072",
       "cep": "65110-000",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_A5C3O0R_CDA": {
@@ -1431,8 +1881,14 @@
       "telefone": "98988217454",
       "cep": "65053-530",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_A8L4L7B3_PR": {
@@ -1445,8 +1901,14 @@
       "telefone": "98985911317",
       "cep": "65052-847",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_C0P0R0B0_PR": {
@@ -1459,8 +1921,14 @@
       "telefone": "98985347029",
       "cep": "65130-000",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_E2A0B037_PR": {
@@ -1473,8 +1941,14 @@
       "telefone": "98991795370",
       "cep": "65065-200",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_F0F0O069_CC": {
@@ -1487,8 +1961,14 @@
       "telefone": "98985916692",
       "cep": "65138-000",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_J5S7O434_AF": {
@@ -1501,8 +1981,14 @@
       "telefone": "98988854341",
       "cep": "65056-574",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_L6A2S691_AP": {
@@ -1515,8 +2001,14 @@
       "telefone": "98985594916",
       "cep": "65042-626",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_N4J0E0C9_CC": {
@@ -1529,8 +2021,14 @@
       "telefone": "98988394914",
       "cep": "65035-400",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_T4M8R2O1_PR": {
@@ -1543,8 +2041,14 @@
       "telefone": "98984215158",
       "cep": "65051-482",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_Y3A2G0C4_PR": {
@@ -1557,8 +2061,14 @@
       "telefone": "98985022446",
       "cep": "65066-320",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/employees/EMP_Y7B3G0J6_CP": {
@@ -1571,8 +2081,14 @@
       "telefone": "98981031611",
       "cep": "65053-730",
       "active": true,
-      "created_at": "2025-08-28T17:45:13.713116",
-      "updated_at": "2025-08-28T17:45:13.713116"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   }
 }
