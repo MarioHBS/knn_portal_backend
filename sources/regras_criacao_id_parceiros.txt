@@ -69,6 +69,7 @@ O ID do parceiro segue o padrão: **PTN_[INICIAIS_INTERCALADAS_COM_DÍGITOS_CNPJ
 - **FIN**: Financeiro
 - **SER**: Serviços Gerais
 - **VAR**: Varejo
+- **REL**: Religião
 - **OUT**: Outros
 
 ### MAPEAMENTO DE CATEGORIAS

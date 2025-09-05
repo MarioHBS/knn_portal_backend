@@ -52,7 +52,7 @@
 - [x] **Integração com Firestore**
   - [x] Configurar cliente Firestore
   - [ ] **PENDENTE:** Implementar operações CRUD básicas
-  - [ ] **PENDENTE:** Adicionar suporte multi-tenant
+  - [x] Adicionar suporte multi-tenant (implementado com coleção 'tenants' para metadados)
   - [ ] **PENDENTE:** Implementar queries com filtros e paginação
   - [ ] **PENDENTE:** Configurar tratamento de erros
 
@@ -116,7 +116,7 @@
   - [x] Verificar matrícula ativa (active_until) - estrutura definida
   - [x] Validar formato de CPF (implementado em utils/security.py)
   - [x] Hash seguro de CPF com salt (implementado)
-  - [ ] **PENDENTE:** Controle de acesso por tenant funcional
+  - [x] Controle de acesso por tenant funcional (implementado com coleção 'tenants')
 
 - [ ] **Códigos de validação**
   - [x] Geração de códigos de 6 dígitos (estrutura definida)

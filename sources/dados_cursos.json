@@ -1,0 +1,102 @@
+{
+  "metadata": {
+    "count": 22,
+    "generation_date": "2025-09-04",
+    "description": "Dados de cursos formatados para alimentação de banco de dados",
+    "version": 1
+  },
+  "courses": {
+    "course_001": {
+      "code": "K1",
+      "name": "KIDS 1"
+    },
+    "course_002": {
+      "code": "K2",
+      "name": "KIDS 2"
+    },
+    "course_003": {
+      "code": "K3",
+      "name": "KIDS 3"
+    },
+    "course_004": {
+      "code": "S1",
+      "name": "SEEDS 1"
+    },
+    "course_005": {
+      "code": "S2",
+      "name": "SEEDS 2"
+    },
+    "course_006": {
+      "code": "S3",
+      "name": "SEEDS 3"
+    },
+    "course_007": {
+      "code": "S4",
+      "name": "SEEDS 4"
+    },
+    "course_008": {
+      "code": "T1",
+      "name": "TEENS 1"
+    },
+    "course_009": {
+      "code": "T2",
+      "name": "TEENS 2"
+    },
+    "course_010": {
+      "code": "T3",
+      "name": "TEENS 3"
+    },
+    "course_011": {
+      "code": "TW1",
+      "name": "TWEENS 1"
+    },
+    "course_012": {
+      "code": "TW2",
+      "name": "TWEENS 2"
+    },
+    "course_013": {
+      "code": "TW3",
+      "name": "TWEENS 3"
+    },
+    "course_014": {
+      "code": "TW4",
+      "name": "TWEENS 4"
+    },
+    "course_015": {
+      "code": "KT1",
+      "name": "KEEP_TALKING 1"
+    },
+    "course_016": {
+      "code": "KT2",
+      "name": "KEEP_TALKING 2"
+    },
+    "course_017": {
+      "code": "KT3",
+      "name": "KEEP_TALKING 3"
+    },
+    "course_018": {
+      "code": "A1",
+      "name": "ADVANCED 1"
+    },
+    "course_019": {
+      "code": "A2",
+      "name": "ADVANCED 2"
+    },
+    "course_020": {
+      "code": "KD",
+      "name": "KINDER"
+    },
+    "course_021": {
+      "code": "KD6A",
+      "name": "KINDER 6A"
+    },
+    "course_022": {
+      "code": "X1",
+      "name": "ESPANHOL 1"
+    }
+  },
+  "columns": [
+    "code",
+    "name"
+  ]
+}

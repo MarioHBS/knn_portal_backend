@@ -1,0 +1,214 @@
+{
+  "metadata": {
+    "count": 74,
+    "generation_date": "2025-08-20",
+    "description": "Dados de alunos ativos formatados para alimentação de banco de dados",
+    "version": 1
+  },
+  "students": {
+    "STD_A3C1M7L7_S4": {
+      "name": "Alba Clarissa Maciel Lopes",
+      "book": "SEEDS 4",
+      "occupation": "Psicologa",
+      "contact": {
+        "email": "albaclarissa19@gmailcom",
+        "phone": "98981194700"
+      },
+      "address": {
+        "zip": "65055-317",
+        "neighborhood": "COHAPAM",
+        "complement": ""
+      },
+      "guardian": {
+        "name": "",
+        "email": ""
+      }
+    },
+    "STD_A0L0R0F8_S2": {
+      "name": "Alberto Luiz Dos Reis Filho",
+      "book": "SEEDS 2",
+      "occupation": "Mecânico",
+      "contact": {
+        "email": "clarinhabeca.45@gmail.com",
+        "phone": "98983285884"
+      },
+      "address": {
+        "zip": "65110-000",
+        "neighborhood": "CEP não encontrado",
+        "complement": ""
+      },
+      "guardian": {
+        "name": "Clara Rebeca Silva do Reis",
+        "email": "clarinhabeca.45@gmail.com"
+      }
+    },
+    "STD_A0D0N002_K3": {
+      "name": "Alciomar Divino Nascimento",
+      "book": "KIDS 3",
+      "occupation": "Estudante",
+      "contact": {
+        "email": "claudianaarauj02020mt@gmailcom",
+        "phone": "98983406021"
+      },
+      "address": {
+        "zip": "65110-000",
+        "neighborhood": "CEP não encontrado",
+        "complement": "Gran Village do Sol I"
+      },
+      "guardian": {
+        "name": "Mayhana Caroline de Araújo",
+        "email": "profmayana@gmail.com"
+      }
+    },
+    "STD_A1R9C333_T1": {
+      "name": "Alessandra Rios Colins",
+      "book": "TEENS 1",
+      "occupation": "Estudante",
+      "contact": {
+        "email": "cleaxp@hotmailcom",
+        "phone": "98987449335"
+      },
+      "address": {
+        "zip": "65056-193",
+        "neighborhood": "Parque Sabiá",
+        "complement": ""
+      },
+      "guardian": {
+        "name": "Jousicleia Rios Pereira Colins",
+        "email": "cleaxp@hotmailcom"
+      }
+    },
+    "STD_A1M5R5C0_S4": {
+      "name": "Alissa Maria Rocha Castro",
+      "book": "SEEDS 4",
+      "occupation": "Estudante",
+      "contact": {
+        "email": "alissarcastro@gmailcom",
+        "phone": "98989183010"
+      },
+      "address": {
+        "zip": "65053-155",
+        "neighborhood": "COHAB Anil III",
+        "complement": ""
+      },
+      "guardian": {
+        "name": "",
+        "email": ""
+      }
+    },
+    "STD_A7T3A0A3_S1": {
+      "name": "Amanda Thuane Alves Aguiar",
+      "book": "SEEDS 1",
+      "occupation": "Advogada",
+      "contact": {
+        "email": "amandathuane@cloundcom",
+        "phone": "98981000302"
+      },
+      "address": {
+        "zip": "65053-730",
+        "neighborhood": "Cohatrac I",
+        "complement": ""
+      },
+      "guardian": {
+        "name": "",
+        "email": ""
+      }
+    },
+    "STD_ACNMS000_S3": {
+      "name": "Ana Clara Nogueira Martins Serra",
+      "book": "SEEDS 3",
+      "occupation": "Estudante",
+      "contact": {
+        "email": "",
+        "phone": ""
+      },
+      "address": {
+        "zip": "65110-000",
+        "neighborhood": "ERRO",
+        "complement": ""
+      },
+      "guardian": {
+        "name": "Leandro Rafael Martins Serra",
+        "email": "leandrormserra@gmailcom"
+      }
+    },
+    "STD_A0G0S0O3_S1": {
+      "name": "Ana Gisele da silva Oliveira",
+      "book": "SEEDS 1",
+      "occupation": "FARMACEUTICA RT",
+      "contact": {
+        "email": "anagiolv@gmailcom",
+        "phone": "98970195306"
+      },
+      "address": {
+        "zip": "65050-000",
+        "neighborhood": "COHAB Anil I",
+        "complement": "QD 05. PRAÇA 91"
+      },
+      "guardian": {
+        "name": "",
+        "email": ""
+      }
+    },
+    "STD_A2L8M0G_TW4": {
+      "name": "Ana Lia Mendonça Gomes",
+      "book": "TWEENS 4",
+      "occupation": "Estudante",
+      "contact": {
+        "email": "lidiamendoncanutricionista@hormailcom",
+        "phone": "98988935214"
+      },
+      "address": {
+        "zip": "65070-280",
+        "neighborhood": "Vila Vicente Fialho",
+        "complement": ""
+      },
+      "guardian": {
+        "name": "Lidia Abidorina Silva Mendoça",
+        "email": "lidiamendoncanutricionista@hormailcom"
+      }
+    },
+    "STD_A2B4R0C6_S4": {
+      "name": "Anna Beatriz Rabelo Carvalho",
+      "book": "SEEDS 4",
+      "occupation": "Enfermeira",
+      "contact": {
+        "email": "annabeatrizreabello022@gmailcom",
+        "phone": "98984464653"
+      },
+      "address": {
+        "zip": "65054-240",
+        "neighborhood": "Cohatrac II",
+        "complement": "Casa"
+      },
+      "guardian": {
+        "name": "",
+        "email": ""
+      }
+    }
+  },
+  "columns": [
+    "name",
+    "book",
+    "occupation",
+    {
+      "contact": [
+        "email",
+        "phone"
+      ]
+    },
+    {
+      "address": [
+        "zip",
+        "neighborhood",
+        "complement"
+      ]
+    },
+    {
+      "guardian": [
+        "name",
+        "email"
+      ]
+    }
+  ]
+}

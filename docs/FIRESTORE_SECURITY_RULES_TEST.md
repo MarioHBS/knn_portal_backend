@@ -12,6 +12,8 @@ Este documento define as regras de segurança recomendadas para o banco de dados
 - **Tenant ID**: `knn-dev-tenant`
 
 ### Coleções Principais
+- `tenants` - Metadados das escolas/unidades
+- `metadata` - Metadados das coleções
 - `students` - Dados dos alunos (74 registros)
 - `employees` - Dados dos funcionários (12 registros)
 - `partners` - Parceiros comerciais

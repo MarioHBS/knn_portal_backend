@@ -12,6 +12,8 @@ Este documento define as regras de segurança para o banco de dados Firestore de
 - **Tenant ID**: `knn-benefits-tenant`
 
 ### Coleções Principais
+- `tenants` - Metadados das escolas/unidades
+- `metadata` - Metadados das coleções
 - `students` - Dados dos alunos (74 registros)
 - `employees` - Dados dos funcionários (12 registros)
 - `partners` - Parceiros comerciais
@@ -34,7 +36,7 @@ service cloud.firestore {
 
     // Função auxiliar para verificar se é admin
     function isAdmin() {
-      return request.auth != null && 
+      return request.auth != null &&
              request.auth.token.role == "admin" &&
              request.auth.token.tenant_id == "knn-benefits-tenant";
     }
@@ -258,7 +260,7 @@ function isValidCPFHash(cpf_hash) {
 ### Logs de Auditoria
 ```javascript
 // Adicionar logs para operações sensíveis
-allow delete: if isAdmin() && 
+allow delete: if isAdmin() &&
                  debug('AUDIT: Admin ' + request.auth.uid + ' deleting document ' + resource.id);
 ```
 

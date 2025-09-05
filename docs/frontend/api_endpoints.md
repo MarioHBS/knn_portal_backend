@@ -6,7 +6,7 @@ Esta documentação descreve os endpoints da API que o Frontend deve consumir. O
 
 ## Base URL
 
-```
+```text
 Desenvolvimento: http://localhost:8000/api/v1
 Homologação: https://knn-portal-hml.cloudrun.app/api/v1
 Produção: https://knn-portal.cloudrun.app/api/v1
@@ -25,11 +25,13 @@ X-Tenant-ID: <school_id>
 ### 1. Estudantes
 
 #### Criar Estudante
+
 ```http
 POST /students
 ```
 
 **Request Body:**
+
 ```json
 {
   "nome": "João Silva Santos",
@@ -43,6 +45,7 @@ POST /students
 ```
 
 **Response (201):**
+
 ```json
 {
   "id": "STD_J6S7S899_K1",
@@ -59,11 +62,13 @@ POST /students
 ```
 
 #### Listar Estudantes
+
 ```http
 GET /students?page=1&limit=20
 ```
 
 **Response (200):**
+
 ```json
 {
   "data": [
@@ -84,11 +89,13 @@ GET /students?page=1&limit=20
 ```
 
 #### Buscar Estudante por ID
+
 ```http
 GET /students/{id}
 ```
 
 **Response (200):**
+
 ```json
 {
   "id": "STD_J6S7S899_K1",
@@ -107,11 +114,13 @@ GET /students/{id}
 ### 2. Funcionários
 
 #### Criar Funcionário
+
 ```http
 POST /employees
 ```
 
 **Request Body:**
+
 ```json
 {
   "nome": "Carlos Eduardo Silva",
@@ -124,6 +133,7 @@ POST /employees
 ```
 
 **Response (201):**
+
 ```json
 {
   "id": "EMP_C2E22555_PR",
@@ -139,6 +149,7 @@ POST /employees
 ```
 
 #### Listar Funcionários
+
 ```http
 GET /employees?page=1&limit=20
 ```
@@ -146,11 +157,13 @@ GET /employees?page=1&limit=20
 ### 3. Parceiros
 
 #### Criar Parceiro
+
 ```http
 POST /partners
 ```
 
 **Request Body:**
+
 ```json
 {
   "nome_comercial": "Tech Solutions LTDA",
@@ -162,6 +175,7 @@ POST /partners
 ```
 
 **Response (201):**
+
 ```json
 {
   "id": "PTN_T4S5678_TEC",
@@ -176,6 +190,7 @@ POST /partners
 ```
 
 #### Listar Parceiros
+
 ```http
 GET /partners?page=1&limit=20
 ```
@@ -197,6 +212,7 @@ GET /partners?page=1&limit=20
 ## Exemplos de Respostas de Erro
 
 ### Erro de Validação (400)
+
 ```json
 {
   "error": "Validation Error",
@@ -215,6 +231,7 @@ GET /partners?page=1&limit=20
 ```
 
 ### Erro de Autorização (401)
+
 ```json
 {
   "error": "Unauthorized",
@@ -223,6 +240,7 @@ GET /partners?page=1&limit=20
 ```
 
 ### Rate Limit (429)
+
 ```json
 {
   "error": "Rate Limit Exceeded",
@@ -236,23 +254,27 @@ GET /partners?page=1&limit=20
 ### Campos Obrigatórios
 
 **Estudantes:**
+
 - `nome` (string, min: 2, max: 100)
 - `cep` (string, formato: XXXXX-XXX)
 - `curso` (string, deve existir na lista de cursos)
 - `data_nascimento` (date, formato: YYYY-MM-DD)
 
 **Funcionários:**
+
 - `nome` (string, min: 2, max: 100)
 - `cep` (string, formato: XXXXX-XXX)
 - `cargo` (string, deve existir na lista de cargos)
 - `data_nascimento` (date, formato: YYYY-MM-DD)
 
 **Parceiros:**
+
 - `nome_comercial` (string, min: 2, max: 100)
 - `cnpj` (string, formato: XX.XXX.XXX/XXXX-XX)
 - `categoria` (string, deve existir na lista de categorias)
 
 ### Campos Opcionais
+
 - `email` (string, formato válido quando preenchido)
 - `telefone` (string, formato brasileiro quando preenchido)
 - `nome_responsavel` (obrigatório para menores de idade)
@@ -260,6 +282,7 @@ GET /partners?page=1&limit=20
 ## Endpoints Utilitários
 
 ### GET /utils/courses
+
 Busca a lista de cursos disponíveis.
 
 **URL**: `{BASE_URL}/utils/courses`
@@ -267,12 +290,14 @@ Busca a lista de cursos disponíveis.
 **Método**: GET
 
 **Headers obrigatórios**:
-```
+
+```text
 Content-Type: application/json
 Authorization: Bearer {token}
 ```
 
 **Resposta de sucesso (200)**:
+
 ```json
 [
   "KIDS 1",
@@ -297,6 +322,7 @@ Authorization: Bearer {token}
 ```
 
 ### GET /utils/course-codes
+
 Busca o mapeamento completo de cursos para códigos.
 
 **URL**: `{BASE_URL}/utils/course-codes`
@@ -304,12 +330,14 @@ Busca o mapeamento completo de cursos para códigos.
 **Método**: GET
 
 **Headers obrigatórios**:
-```
+
+```text
 Content-Type: application/json
 Authorization: Bearer {token}
 ```
 
 **Resposta de sucesso (200)**:
+
 ```json
 {
   "KIDS 1": "K1",
@@ -344,10 +372,12 @@ Authorization: Bearer {token}
 ## Paginação
 
 **Parâmetros de query:**
+
 - `page`: Número da página (padrão: 1)
 - `limit`: Itens por página (padrão: 20, máximo: 100)
 
 **Resposta:**
+
 ```json
 {
   "data": [...],
@@ -363,6 +393,7 @@ Authorization: Bearer {token}
 ## Filtros e Busca
 
 ### Busca por texto
+
 ```http
 GET /students?search=joão
 GET /employees?search=carlos
@@ -370,6 +401,7 @@ GET /partners?search=tech
 ```
 
 ### Filtros específicos
+
 ```http
 GET /students?curso=Engenharia
 GET /employees?cargo=Professor

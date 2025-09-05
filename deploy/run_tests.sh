@@ -2,7 +2,7 @@
 # Script para executar testes locais do Portal de Benefícios KNN
 
 # Configurar ambiente de teste
-export KNN_TEST_MODE=true
+export KNN_USE_TEST_DATABASE=true
 
 # Executar linting com Ruff
 echo "Executando linting com Ruff..."
@@ -20,7 +20,7 @@ python3 test_endpoints.py
 # Instruções para testes manuais
 echo -e "\n=== Instruções para testes manuais ==="
 echo "1. Execute o servidor FastAPI em um terminal separado:"
-echo "   KNN_TEST_MODE=true python3 run_server.py"
+echo "   KNN_USE_TEST_DATABASE=true python3 run_server.py"
 echo ""
 echo "2. Acesse a documentação Swagger:"
 echo "   http://localhost:8080/v1/docs"

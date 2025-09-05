@@ -1,6 +1,35 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // === COLEÇÃO TENANTS ===
+    match /tenants/{tenantId} {
+      // Leitura: apenas admins
+      allow read: if isAdmin();
+
+      // Criação: apenas admins
+      allow create: if isAdmin();
+
+      // Atualização: apenas admins
+      allow update: if isAdmin();
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin();
+    }
+
+    // === COLEÇÃO METADATA ===
+    match /metadata/{metadataId} {
+      // Leitura: usuários autenticados
+      allow read: if request.auth != null;
+
+      // Criação: apenas admins
+      allow create: if isAdmin();
+
+      // Atualização: apenas admins
+      allow update: if isAdmin();
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin();
+    }
     // Função auxiliar para verificar tenant válido
     function isValidTenant() {
       return resource.data.tenant_id == "knn-benefits-tenant";
@@ -8,7 +37,7 @@ service cloud.firestore {
 
     // Função auxiliar para verificar se é admin
     function isAdmin() {
-      return request.auth != null && 
+      return request.auth != null &&
              request.auth.token.role == "admin" &&
              request.auth.token.tenant_id == "knn-benefits-tenant";
     }
@@ -54,7 +83,7 @@ service cloud.firestore {
                      isValidTenant();
 
       // Criação: apenas admins com dados válidos
-      allow create: if isAdmin() && 
+      allow create: if isAdmin() &&
                        isValidStudentData() &&
                        isValidEmail(request.resource.data.get('email', null)) &&
                        isValidPhone(request.resource.data.get('telefone', null));
@@ -79,7 +108,7 @@ service cloud.firestore {
                      isValidTenant();
 
       // Criação: apenas admins com dados válidos
-      allow create: if isAdmin() && 
+      allow create: if isAdmin() &&
                        isValidEmployeeData() &&
                        isValidEmail(request.resource.data.get('email', null)) &&
                        isValidPhone(request.resource.data.get('telefone', null));

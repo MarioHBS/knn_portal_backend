@@ -1,6 +1,35 @@
 rules_version = '3';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // === COLEÇÃO TENANTS ===
+    match /tenants/{tenantId} {
+      // Leitura: usuários autenticados
+      allow read: if request.auth != null;
+
+      // Criação: apenas admins
+      allow create: if isAdmin();
+
+      // Atualização: apenas admins
+      allow update: if isAdmin();
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin();
+    }
+
+    // === COLEÇÃO METADATA ===
+    match /metadata/{metadataId} {
+      // Leitura: usuários autenticados
+      allow read: if request.auth != null;
+
+      // Criação: apenas admins
+      allow create: if isAdmin();
+
+      // Atualização: apenas admins
+      allow update: if isAdmin();
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin();
+    }
     // Função auxiliar para verificar tenant válido
     function isValidTenant() {
       return resource.data.tenant_id == "knn-dev-tenant";

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-Script para migrar dados de alunos e funcionários dos arquivos JSON para os bancos Firestore.
+Script para migrar dados de alunos, funcionários e parceiros dos arquivos JSON para os bancos Firestore.
 
 Este script:
 1. Conecta aos bancos Firestore (default e knn-benefits)
 2. Migra dados de alunos do arquivo dados_alunos.json
 3. Migra dados de funcionários do arquivo dados_funcionarios.json
-4. Mantém a estrutura multi-tenant do projeto
-5. Aplica transformações necessárias nos dados
+4. Migra dados de parceiros do arquivo dados_parceiros_teste.json
+5. Mantém a estrutura multi-tenant do projeto
+6. Aplica transformações necessárias nos dados
 """
 
 import hashlib
@@ -19,7 +20,8 @@ from datetime import datetime, timedelta
 from typing import Any
 
 # Adicionar o diretório raiz ao path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(root_dir)
 
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -38,10 +40,41 @@ class FirestoreMigrator:
     def initialize_databases(self):
         """Inicializa conexões com os bancos Firestore."""
         try:
+            # Limpar apps existentes para evitar conflitos
+            apps_to_delete = list(firebase_admin._apps.values())
+            for app in apps_to_delete:
+                firebase_admin.delete_app(app)
+
+            # Procurar arquivo de credenciais
+            possible_paths = [
+                os.path.join(
+                    root_dir, "data/firestore_import/default-service-account-key.json"
+                ),
+                os.path.join(root_dir, "default-service-account-key.json"),
+                os.getenv("GOOGLE_APPLICATION_CREDENTIALS", ""),
+            ]
+
+            cred_path = None
+            for path in possible_paths:
+                if path and os.path.exists(path):
+                    cred_path = path
+                    break
+
             # Banco padrão (default)
-            if not firebase_admin._apps:
+            if cred_path:
+                logger.info(f"Usando chave de conta de serviço: {cred_path}")
+                cred = credentials.Certificate(cred_path)
+                default_app = firebase_admin.initialize_app(
+                    cred,
+                    {
+                        "projectId": FIRESTORE_PROJECT,
+                    },
+                    name="default",
+                )
+            else:
                 try:
                     # Tentar credenciais padrão primeiro
+                    logger.info("Tentando usar credenciais padrão da aplicação...")
                     cred = credentials.ApplicationDefault()
                     default_app = firebase_admin.initialize_app(
                         cred,
@@ -62,35 +95,42 @@ class FirestoreMigrator:
                         },
                         name="default",
                     )
-            else:
-                default_app = firebase_admin.get_app("default")
 
             self.databases["default"] = firestore.client(app=default_app)
             logger.info(f"Conectado ao banco default: {FIRESTORE_PROJECT}")
 
             # Banco de produção (knn-benefits)
             if FB_PROJECT_ID != FIRESTORE_PROJECT:
-                try:
+                if cred_path:
                     prod_app = firebase_admin.initialize_app(
-                        credentials.ApplicationDefault(),
+                        credentials.Certificate(cred_path),
                         {
                             "projectId": FB_PROJECT_ID,
                         },
                         name="production",
                     )
-                except Exception as cred_error:
-                    logger.warning(
-                        f"Credenciais para produção não encontradas: {str(cred_error)}"
-                    )
-                    logger.info(
-                        "Tentando inicializar produção sem credenciais (modo emulador)"
-                    )
-                    prod_app = firebase_admin.initialize_app(
-                        options={
-                            "projectId": FB_PROJECT_ID,
-                        },
-                        name="production",
-                    )
+                else:
+                    try:
+                        prod_app = firebase_admin.initialize_app(
+                            credentials.ApplicationDefault(),
+                            {
+                                "projectId": FB_PROJECT_ID,
+                            },
+                            name="production",
+                        )
+                    except Exception as cred_error:
+                        logger.warning(
+                            f"Credenciais para produção não encontradas: {str(cred_error)}"
+                        )
+                        logger.info(
+                            "Tentando inicializar produção sem credenciais (modo emulador)"
+                        )
+                        prod_app = firebase_admin.initialize_app(
+                            options={
+                                "projectId": FB_PROJECT_ID,
+                            },
+                            name="production",
+                        )
 
                 self.databases["production"] = firestore.client(app=prod_app)
                 logger.info(f"Conectado ao banco production: {FB_PROJECT_ID}")
@@ -100,6 +140,14 @@ class FirestoreMigrator:
 
         except Exception as e:
             logger.error(f"Erro ao inicializar bancos Firestore: {str(e)}")
+            logger.error("\nSoluções possíveis:")
+            logger.error("  1. Configure a variável GOOGLE_APPLICATION_CREDENTIALS")
+            logger.error(
+                "  2. Coloque o arquivo de credenciais em um dos caminhos padrão"
+            )
+            logger.error(
+                "  3. Inicie o emulador do Firestore se estiver em ambiente de desenvolvimento"
+            )
             raise
 
     def hash_cpf(self, cpf: str) -> str:
@@ -286,19 +334,22 @@ class FirestoreMigrator:
         self.initialize_databases()
 
         # Carregar dados dos arquivos JSON
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        base_dir = root_dir
         students_file = os.path.join(base_dir, "sources", "dados_alunos.json")
         employees_file = os.path.join(base_dir, "sources", "dados_funcionarios.json")
+        partners_file = os.path.join(base_dir, "sources", "dados_parceiros_teste.json")
 
         logger.info("Carregando dados dos arquivos JSON...")
         students_data = self.load_json_data(students_file)
         employees_data = self.load_json_data(employees_file)
+        partners_data = self.load_json_data(partners_file)
 
         students_list = students_data.get("alunos", [])
         employees_list = employees_data.get("funcionarios", [])
+        partners_count = len(partners_data.get("partners", {}))
 
         logger.info(
-            f"Dados carregados: {len(students_list)} alunos, {len(employees_list)} funcionários"
+            f"Dados carregados: {len(students_list)} alunos, {len(employees_list)} funcionários, {partners_count} parceiros"
         )
 
         # Migrar para cada banco
@@ -315,9 +366,72 @@ class FirestoreMigrator:
             # Migrar funcionários
             employees_migrated = self.migrate_employees(db_name, employees_list)
 
+            # Migrar parceiros
+            partners_migrated = self.migrate_partners(db_name, partners_data)
+
             logger.info(
-                f"Migração para {db_name} concluída: {students_migrated} alunos, {employees_migrated} funcionários"
+                f"Migração para {db_name} concluída: {students_migrated} alunos, {employees_migrated} funcionários, {partners_migrated} parceiros"
             )
+
+    def migrate_partners(
+        self, database_name: str, partners_data: dict[str, Any]
+    ) -> int:
+        """Migra dados de parceiros para o Firestore."""
+        db = self.databases[database_name]
+        migrated_count = 0
+
+        # Obter o dicionário de parceiros e metadados
+        partners = partners_data.get("partners", {})
+        metadata = partners_data.get("metadata", {})
+
+        if not partners:
+            logger.warning("Nenhum parceiro encontrado nos dados")
+            return 0
+
+        logger.info(
+            f"Iniciando migração de {len(partners)} parceiros para {database_name}"
+        )
+
+        batch = db.batch()
+        batch_count = 0
+
+        # Adicionar metadados à coleção partners_metadata
+        if metadata:
+            metadata_ref = db.collection("partners_metadata").document("info")
+            batch.set(metadata_ref, metadata)
+            logger.info("Adicionando metadados dos parceiros")
+
+        # Adicionar cada parceiro ao batch usando o ID como chave do documento
+        for partner_id, partner_data in partners.items():
+            try:
+                # Adicionar ao batch
+                doc_ref = db.collection("partners").document(partner_id)
+                batch.set(doc_ref, partner_data)
+
+                batch_count += 1
+                migrated_count += 1
+
+                # Executar batch a cada 500 documentos (limite do Firestore)
+                if batch_count >= 500:
+                    batch.commit()
+                    batch = db.batch()
+                    batch_count = 0
+                    logger.info(f"Migrados {migrated_count} parceiros...")
+
+            except Exception as e:
+                logger.error(
+                    f"Erro ao migrar parceiro {partner_data.get('name', 'N/A')}: {str(e)}"
+                )
+                continue
+
+        # Executar batch final
+        if batch_count > 0:
+            batch.commit()
+
+        logger.info(
+            f"Migração de parceiros concluída: {migrated_count} registros em {database_name}"
+        )
+        return migrated_count
 
     def validate_migration(self, database_name: str) -> dict[str, int]:
         """Valida se a migração foi bem-sucedida."""
@@ -327,15 +441,20 @@ class FirestoreMigrator:
             # Contar documentos nas coleções
             students_count = len(list(db.collection("students").limit(1000).stream()))
             employees_count = len(list(db.collection("employees").limit(1000).stream()))
+            partners_count = len(list(db.collection("partners").limit(1000).stream()))
 
             logger.info(
-                f"Validação {database_name}: {students_count} alunos, {employees_count} funcionários"
+                f"Validação {database_name}: {students_count} alunos, {employees_count} funcionários, {partners_count} parceiros"
             )
 
-            return {"students": students_count, "employees": employees_count}
+            return {
+                "students": students_count,
+                "employees": employees_count,
+                "partners": partners_count,
+            }
         except Exception as e:
             logger.error(f"Erro na validação do banco {database_name}: {str(e)}")
-            return {"students": 0, "employees": 0}
+            return {"students": 0, "employees": 0, "partners": 0}
 
 
 def main():
