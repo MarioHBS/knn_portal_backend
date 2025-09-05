@@ -1,7 +1,8 @@
 """Endpoints utilitários da API."""
+
 from fastapi import APIRouter
 
-from src.db.firestore import FirestoreDB
+from src.db.firestore import db
 from src.utils.id_generators import CURSO_CODES
 from src.utils.logging import logger
 from src.utils.rate_limit import limiter
@@ -20,13 +21,16 @@ async def get_courses(request):
         list[str]: Lista com os nomes dos cursos disponíveis
     """
     try:
-        db = FirestoreDB()
-
         # Tentar buscar cursos da base de dados
-        courses_data = await db.get_collection_data(
-            collection="courses",
-            filters={"active": True}
-        )
+        courses_ref = db.collection("courses")
+        courses_query = courses_ref.where("active", "==", True)
+        courses_docs = courses_query.stream()
+
+        courses_data = []
+        for doc in courses_docs:
+            course_dict = doc.to_dict()
+            course_dict["id"] = doc.id
+            courses_data.append(course_dict)
 
         if courses_data:
             courses = [course["name"] for course in courses_data]
@@ -63,13 +67,16 @@ async def get_course_codes(request):
         dict[str, str]: Dicionário com curso como chave e código como valor
     """
     try:
-        db = FirestoreDB()
-
         # Tentar buscar cursos da base de dados
-        courses_data = await db.get_collection_data(
-            collection="courses",
-            filters={"active": True}
-        )
+        courses_ref = db.collection("courses")
+        courses_query = courses_ref.where("active", "==", True)
+        courses_docs = courses_query.stream()
+
+        courses_data = []
+        for doc in courses_docs:
+            course_dict = doc.to_dict()
+            course_dict["id"] = doc.id
+            courses_data.append(course_dict)
 
         if courses_data:
             course_codes = {course["name"]: course["code"] for course in courses_data}

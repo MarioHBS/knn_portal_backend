@@ -44,42 +44,48 @@ async def redeem_code(
                 detail={"error": {"code": "INVALID_CNPJ", "msg": "CNPJ inválido"}},
             )
 
-        # Buscar código de validação
-        async def get_firestore_codes():
-            return await firestore_client.query_documents(
-                "validation_codes",
-                filters=[
-                    ("code_hash", "==", request.code),
-                    ("partner_id", "==", partner_id),
-                    ("used_at", "==", None),
-                ],
-                limit=1,
+        # Buscar código de validação no Firestore e PostgreSQL
+        async def get_firestore_code():
+            return await firestore_client.get_document(
+                "validation_codes", request.code, tenant_id=current_user.tenant
             )
 
-        async def get_postgres_codes():
-            return await postgres_client.query_documents(
-                "validation_codes",
-                filters=[
-                    ("code_hash", "==", request.code),
-                    ("partner_id", "==", partner_id),
-                    ("used_at", "==", None),
-                ],
-                limit=1,
+        async def get_postgres_code():
+            return await postgres_client.get_document(
+                "validation_codes", request.code, tenant_id=current_user.tenant
             )
 
-        codes_result = await with_circuit_breaker(
-            get_firestore_codes, get_postgres_codes
-        )
+        code_result = await with_circuit_breaker(get_firestore_code, get_postgres_code)
+        code_data = code_result.get("data")
 
-        if not codes_result.get("items"):
+        if not code_data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
+                detail={"error": {"code": "NOT_FOUND", "msg": "Código não encontrado"}},
+            )
+
+        # Verificar se o código já foi usado
+        if code_data.get("used_at"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail={
-                    "error": {"code": "INVALID_CODE", "msg": "Código não encontrado"}
+                    "error": {"code": "CODE_USED", "msg": "Código já foi utilizado"}
                 },
             )
 
-        code = codes_result["items"][0]
+        # Verificar se o código pertence ao parceiro correto
+        if code_data.get("partner_id") != partner_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={
+                    "error": {
+                        "code": "INVALID_PARTNER",
+                        "msg": "Código não pertence a este parceiro",
+                    }
+                },
+            )
+
+        code = code_data
 
         # Verificar se o código expirou
         expires = code.get("expires")
@@ -94,26 +100,47 @@ async def redeem_code(
                     detail={"error": {"code": "EXPIRED", "msg": "Código expirado"}},
                 )
 
-        # Obter aluno
-        student_id = code.get("student_id")
-
-        async def get_firestore_student():
-            return await firestore_client.get_document("students", student_id)
-
-        async def get_postgres_student():
-            return await postgres_client.get_document("students", student_id)
-
-        student = await with_circuit_breaker(
-            get_firestore_student, get_postgres_student
+        # Determinar tipo de usuário e buscar dados
+        user_type = code.get("user_type", "student")  # Default para compatibilidade
+        user_id = (
+            code.get("student_id")
+            if user_type == "student"
+            else code.get("employee_id")
         )
+        collection_name = "students" if user_type == "student" else "employees"
 
-        if not student:
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "error": {
+                        "code": "INVALID_CODE",
+                        "msg": "Código inválido - usuário não identificado",
+                    }
+                },
+            )
+
+        async def get_firestore_user():
+            return await firestore_client.get_document(
+                collection_name, user_id, tenant_id=current_user.tenant
+            )
+
+        async def get_postgres_user():
+            return await postgres_client.get_document(
+                collection_name, user_id, tenant_id=current_user.tenant
+            )
+
+        user_result = await with_circuit_breaker(get_firestore_user, get_postgres_user)
+        user = user_result.get("data")
+
+        if not user:
+            user_label = "Aluno" if user_type == "student" else "Funcionário"
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={
                     "error": {
-                        "code": "STUDENT_NOT_FOUND",
-                        "msg": "Aluno não encontrado",
+                        "code": "USER_NOT_FOUND",
+                        "msg": f"{user_label} não encontrado",
                     }
                 },
             )
@@ -121,7 +148,7 @@ async def redeem_code(
         # Verificar se o CNPJ corresponde ao parceiro
         cnpj_hash = hash_cnpj(request.cnpj, CNPJ_HASH_SALT)
 
-        if student.get("cnpj_hash") != cnpj_hash:
+        if user.get("cnpj_hash") != cnpj_hash:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail={
@@ -132,8 +159,8 @@ async def redeem_code(
                 },
             )
 
-        # Verificar se o aluno está com matrícula ativa
-        active_until = student.get("active_until")
+        # Verificar se o usuário está com cadastro ativo
+        active_until = user.get("active_until")
         if active_until:
             # Converter para datetime se for string
             if isinstance(active_until, str):
@@ -142,12 +169,18 @@ async def redeem_code(
                 )
 
             if active_until < datetime.now().date():
+                user_label = "Aluno" if user_type == "student" else "Funcionário"
+                error_code = (
+                    "INACTIVE_STUDENT"
+                    if user_type == "student"
+                    else "INACTIVE_EMPLOYEE"
+                )
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail={
                         "error": {
-                            "code": "INACTIVE_STUDENT",
-                            "msg": "Aluno com matrícula inativa",
+                            "code": error_code,
+                            "msg": f"{user_label} com cadastro inativo",
                         }
                     },
                 )
@@ -162,22 +195,39 @@ async def redeem_code(
         # Registrar resgate
         redemption = {
             "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "user_type": user_type,
+            "partner_id": partner_id,
             "validation_code_id": code["id"],
-            "value": 0.0,  # Valor simbólico, pode ser atualizado depois
-            "used_at": now.isoformat(),
+            "code": request.code,
+            "redeemed_at": now.isoformat(),
+            "tenant_id": current_user.tenant,
         }
+
+        # Manter compatibilidade com campo student_id para códigos antigos
+        if user_type == "student":
+            redemption["student_id"] = user_id
 
         await firestore_client.create_document(
             "redemptions", redemption, redemption["id"]
         )
 
-        # Retornar informações do aluno e promoção
+        # Retornar informações do usuário e promoção
+        user_data = {
+            "name": user.get("name", ""),
+        }
+
+        # Adicionar campos específicos por tipo de usuário
+        if user_type == "student":
+            user_data["course"] = user.get("course", "")
+        else:  # employee
+            user_data["department"] = user.get("department", "")
+            user_data["position"] = user.get("position", "")
+
         return {
             "data": {
-                "student": {
-                    "name": student.get("name", ""),
-                    "course": student.get("course", ""),
-                },
+                "user": user_data,
+                "user_type": user_type,
                 "promotion": {
                     "title": "Promoção"  # Simplificado, poderia buscar a promoção específica
                 },
@@ -194,7 +244,7 @@ async def redeem_code(
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao resgatar código"}
             },
-        )
+        ) from e
 
 
 @router.get("/partner/promotions", response_model=PromotionListResponse)
@@ -293,7 +343,7 @@ async def create_promotion(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": {"code": "SERVER_ERROR", "msg": "Erro ao criar promoção"}},
-        )
+        ) from e
 
 
 @router.put("/partner/promotions/{id}", response_model=PromotionResponse)
@@ -375,7 +425,7 @@ async def update_promotion(
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao atualizar promoção"}
             },
-        )
+        ) from e
 
 
 @router.delete("/partner/promotions/{id}", response_model=BaseResponse)
@@ -433,7 +483,7 @@ async def delete_promotion(
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao desativar promoção"}
             },
-        )
+        ) from e
 
 
 @router.get("/partner/reports", response_model=ReportResponse)
@@ -470,10 +520,7 @@ async def get_partner_reports(
         start_date = date(year, month, 1).isoformat()
 
         # Calcular último dia do mês
-        if month == 12:
-            end_date = date(year + 1, 1, 1)
-        else:
-            end_date = date(year, month + 1, 1)
+        end_date = date(year + 1, 1, 1) if month == 12 else date(year, month + 1, 1)
         end_date = (end_date - timedelta(days=1)).isoformat()
 
         # Obter códigos gerados no período
@@ -559,4 +606,4 @@ async def get_partner_reports(
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao gerar relatório"}
             },
-        )
+        ) from e

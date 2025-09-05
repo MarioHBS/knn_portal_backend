@@ -942,11 +942,15 @@ paths:
                           code:
                             type: string
                             example: "123456"
+                            description: "Código de validação de 6 dígitos"
                           expires:
                             type: string
                             format: date-time
-                          partner_id:
-                            type: string
+                            description: "Data e hora de expiração do código"
+                          ttl_seconds:
+                            type: integer
+                            example: 180
+                            description: "Tempo de vida em segundos (3 minutos)"
         '401':
           description: Token inválido
           content:
@@ -969,15 +973,59 @@ paths:
   /employees/me/history:
     get:
       summary: Histórico de resgates (funcionários)
-      description: Retorna o histórico de códigos de validação gerados pelo funcionário
+      description: Retorna o histórico de códigos de validação usados pelo funcionário
       tags:
         - employee
-      parameters:
-        - $ref: '#/components/parameters/PaginationLimit'
-        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
-          description: Histórico de resgates
+          description: Histórico de códigos de validação usados
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          history:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                code:
+                                  type: string
+                                  example: "***"
+                                  description: "Código mascarado por segurança"
+                                used_at:
+                                  type: string
+                                  format: date-time
+                                  description: "Data e hora do uso do código"
+                                partner:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: "ID do parceiro"
+                                    name:
+                                      type: string
+                                      description: "Nome do parceiro"
+                          total:
+                            type: integer
+                            description: "Total de códigos no histórico"
+        '401':
+          description: Token inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Acesso negado (role inválida)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
           content:
             application/json:
               schema:
@@ -1140,7 +1188,7 @@ paths:
   /partner/redeem:
     post:
       summary: Resgata código de validação
-      description: Resgata um código de validação gerado por um aluno
+      description: Resgata um código de validação gerado por um aluno ou funcionário
       tags:
         - partner
       requestBody:
@@ -1162,14 +1210,32 @@ paths:
                       data:
                         type: object
                         properties:
-                          student:
+                          user:
                             type: object
                             properties:
                               name:
                                 type: string
+                                description: "Nome do usuário"
                               course:
                                 type: string
-                            required:
+                                description: "Curso (apenas para alunos)"
+                              cnpj:
+                                type: string
+                                description: "CNPJ (apenas para funcionários)"
+                              status:
+                                type: string
+                                description: "Status (apenas para funcionários)"
+                          user_type:
+                            type: string
+                            enum: ["student", "employee"]
+                            description: "Tipo do usuário que gerou o código"
+                          code:
+                            type: string
+                            description: "Código de validação usado"
+                          redeemed_at:
+                            type: string
+                            format: date-time
+                            description: "Data e hora do resgate"
                               - name
                               - course
                           promotion:
