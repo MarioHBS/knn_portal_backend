@@ -20,8 +20,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0L0R0F8_S2": {
@@ -44,8 +50,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0D0N002_K3": {
@@ -68,8 +80,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A1R9C333_T1": {
@@ -92,8 +110,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A1M5R5C0_S4": {
@@ -116,8 +140,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A7T3A0A3_S1": {
@@ -140,8 +170,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_ACNMS000_S3": {
@@ -164,8 +200,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0G0S0O3_S1": {
@@ -188,8 +230,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A2L8M0G_TW4": {
@@ -212,8 +260,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A2B4R0C6_S4": {
@@ -236,8 +290,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A0G0O0V2_S3": {
@@ -260,8 +320,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A3P3N8M1_S1": {
@@ -284,8 +350,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A8V1M28_TW2": {
@@ -308,8 +380,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_A1M8C0N5_S1": {
@@ -332,8 +410,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_B0C0R0C0_S1": {
@@ -356,8 +440,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_B9S03261_K1": {
@@ -380,8 +470,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_B4M8L04_TW2": {
@@ -404,8 +500,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C0F0G0S4_S1": {
@@ -428,8 +530,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C8D4B8M9_A1": {
@@ -452,8 +560,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C5R9C0C8_T3": {
@@ -476,8 +590,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_CRSLJ776_S1": {
@@ -500,8 +620,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_C0R0S0R8_S2": {
@@ -524,8 +650,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_D0M0A563_S2": {
@@ -548,8 +680,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_D0M0O0B8_T1": {
@@ -572,8 +710,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_ECCSS00_TW4": {
@@ -596,8 +740,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_E6R9C0S3_K1": {
@@ -620,8 +770,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_E2F6D221_T1": {
@@ -644,8 +800,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_G2S7C968_S1": {
@@ -668,8 +830,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_G7P5B040_S1": {
@@ -692,8 +860,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_G0V0F00_TW3": {
@@ -716,8 +890,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_HRLCS0_KD6A": {
@@ -740,8 +920,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_H0N0R007_K1": {
@@ -764,8 +950,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_H8M8O9M_TW4": {
@@ -788,8 +980,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_H0C0F0B0_K2": {
@@ -812,8 +1010,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0T5S056_T1": {
@@ -836,8 +1040,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0R0R0J8_S1": {
@@ -860,8 +1070,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0L0M0O9_S1": {
@@ -884,8 +1100,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I1C1L0F0_S1": {
@@ -908,8 +1130,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I6S8S00_TW4": {
@@ -932,8 +1160,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I0N0M013_S2": {
@@ -956,8 +1190,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_I8R5S5C5_S1": {
@@ -980,8 +1220,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_J0D0C0C2_T1": {
@@ -1004,8 +1250,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_JLOSS680_S3": {
@@ -1028,8 +1280,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_J6S8S00_TW4": {
@@ -1052,8 +1310,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_K0A0FPCL_S4": {
@@ -1076,8 +1340,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L0S0P0A8_S1": {
@@ -1100,8 +1370,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L6K5C6N8_S1": {
@@ -1124,8 +1400,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L0C0M0B_TW3": {
@@ -1148,8 +1430,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_L1R0M1C6_S1": {
@@ -1172,8 +1460,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_LVSRC000_S3": {
@@ -1196,8 +1490,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_MASRS440_T1": {
@@ -1220,8 +1520,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M6E3G8V_TW1": {
@@ -1244,8 +1550,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M5F9M0A2_S3": {
@@ -1268,8 +1580,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0J0S0T3_K2": {
@@ -1292,8 +1610,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0B0T00_TW4": {
@@ -1316,8 +1640,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0M0D0V6_T1": {
@@ -1340,8 +1670,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0E0L0M_TW4": {
@@ -1364,8 +1700,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_M0C0M0S9_S1": {
@@ -1388,8 +1730,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_N0P00000_K3": {
@@ -1412,8 +1760,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_P6R4S0C1_S1": {
@@ -1436,8 +1790,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_P0F0T0G1_K3": {
@@ -1460,8 +1820,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_PAFBS000_X1": {
@@ -1484,8 +1850,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_PVDL40_KD6A": {
@@ -1508,8 +1880,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_R0M0D0V6_T1": {
@@ -1532,8 +1910,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_R0R0C035_S1": {
@@ -1556,8 +1940,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_S0V0P029_S2": {
@@ -1580,8 +1970,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_S0I0S0B_TW1": {
@@ -1604,8 +2000,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_TLSG88_KD6A": {
@@ -1628,8 +2030,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_V0C0C077_S1": {
@@ -1652,8 +2060,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_V3B0N0S7_S1": {
@@ -1676,8 +2090,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_V7M6C058_X1": {
@@ -1700,8 +2120,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_W0M0B0F2_T1": {
@@ -1724,8 +2150,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_Y0M0M04_TW3": {
@@ -1748,8 +2180,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   },
   "__collection__/students/STD_Y0S0L0F8_S2": {
@@ -1772,8 +2210,14 @@
       },
       "tenant_id": "knn-dev-tenant",
       "active_until": "2025-12-31",
-      "created_at": "2025-08-28T17:45:13.713115",
-      "updated_at": "2025-08-28T17:45:13.713115"
+      "created_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      },
+      "updated_at": {
+        "_seconds": 1756413913,
+        "_nanoseconds": 713115930
+      }
     }
   }
 }

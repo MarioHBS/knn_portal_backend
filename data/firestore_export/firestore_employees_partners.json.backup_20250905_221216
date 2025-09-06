@@ -163,7 +163,7 @@
       "name": "Colégio Adventista (Cohab)",
       "benefit": "Foi acordado que, todos alunos knn têm 15% de descontos na para estudar na escola.",
       "cnpj": "83367326010494",
-      "category": "Educação",
+      "category": "Education",
       "address": {
         "zip": "65053240",
         "street": "Av. 8, III Conjunto Cohab Anil, 12",
@@ -202,7 +202,7 @@
       "name": "Tudo Fácil Cursos",
       "benefit": "Foi acordado que, todo aluno tem 5% de desconto em qualquer curso da instituição.",
       "cnpj": "24650966000132",
-      "category": "Educação",
+      "category": "Education",
       "address": {
         "zip": "65050175",
         "street": "Av. Jerônimo de Albuquerque, 123",
@@ -241,7 +241,7 @@
       "name": "Cadin Celulares",
       "benefit": "Todos alunos e colaboradores têm 5% de descontos nas compras até R$3,000,00 e ganha um acessorio na loja.",
       "cnpj": "57628555000108",
-      "category": "Tecnologia",
+      "category": "Technology",
       "address": {
         "zip": "65110000",
         "street": "Av. América do Sul, 2",
@@ -280,7 +280,7 @@
       "name": "Microlins",
       "benefit": "Todos os alunos knn terão 26% de descontos em todos os cursos da instituição.",
       "cnpj": "36561122000102",
-      "category": "Educação",
+      "category": "Education",
       "address": {
         "zip": "65058181",
         "street": "Av. 203, 98",
@@ -319,7 +319,7 @@
       "name": "Clube do papel",
       "benefit": "Todos os nossos alunos tem desconto de 5% nas compras.",
       "cnpj": "04799927000194",
-      "category": "Papelaria",
+      "category": "Stationery",
       "address": {
         "zip": "65050000",
         "street": "Av. Principal, 12",
@@ -358,7 +358,7 @@
       "name": "Autoescola Escórcio",
       "benefit": "Foi acordado que todo aluno knn terá 10% de desconto em cima do valor final.",
       "cnpj": "13018958000151",
-      "category": "Automotivo",
+      "category": "Automotive",
       "address": {
         "zip": "65040003",
         "street": "Av. João Pessoa, 20",
@@ -397,7 +397,7 @@
       "name": "Edufor",
       "benefit": "Foi acordado que, todos os alunos têm 70% de descontos nos cursos, exeto medicina.",
       "cnpj": "21103399000106",
-      "category": "Educação",
+      "category": "Education",
       "address": {
         "zip": "65065470",
         "street": "Av. São Luís Rei de França, 19",

@@ -1,6 +1,6 @@
 # Lista de Tarefas - Portal de Benefícios KNN
 
-**Data:** Janeiro 2025
+**Data:** Agosto 2025
 **Versão:** 1.0
 **Objetivo:** Implementação completa do Portal de Benefícios KNN
 
