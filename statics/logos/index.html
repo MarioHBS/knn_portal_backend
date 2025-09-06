@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logos dos Parceiros - KNN Portal</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .logo-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            background: #fafafa;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .logo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .logo-image {
+            max-width: 100%;
+            max-height: 120px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .logo-info {
+            font-size: 14px;
+            color: #666;
+        }
+        .logo-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .partner-id {
+            color: #007bff;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .stats {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .error {
+            color: #dc3545;
+            text-align: center;
+            padding: 20px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 Logos dos Parceiros</h1>
+        
+        <div class="stats" id="stats">
+            <div class="loading">Carregando informações...</div>
+        </div>
+        
+        <div class="logo-grid" id="logoGrid">
+            <div class="loading">Carregando logos...</div>
+        </div>
+    </div>
+
+    <script>
+        // Lista de logos conhecidos (será atualizada dinamicamente)
+        const knownLogos = [
+            'PTN_A1E3018_AUT.png',
+            'PTN_C0P4799_LIV.png',
+            'PTN_C5C7628_TEC.png',
+            'PTN_C8A3367_EDU.png',
+            'PTN_E211033_EDU.png',
+            'PTN_M365611_EDU.png'
+        ];
+
+        function extractPartnerInfo(filename) {
+            const parts = filename.split('_');
+            if (parts.length >= 3) {
+                return {
+                    id: `${parts[0]}_${parts[1]}_${parts[2]}`,
+                    category: parts[2],
+                    type: parts[3] ? parts[3].split('.')[0] : 'logo'
+                };
+            }
+            return { id: filename, category: 'unknown', type: 'logo' };
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'AUT': 'Automotivo',
+                'EDU': 'Educação',
+                'TEC': 'Tecnologia',
+                'LIV': 'Livraria/Papelaria'
+            };
+            return categories[category] || category;
+        }
+
+        function createLogoCard(filename) {
+            const info = extractPartnerInfo(filename);
+            
+            return `
+                <div class="logo-card">
+                    <img src="${filename}" alt="Logo ${info.id}" class="logo-image" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                    <div style="display:none; padding: 40px; color: #999;">❌ Erro ao carregar</div>
+                    <div class="logo-info">
+                        <div class="logo-name">${getCategoryName(info.category)}</div>
+                        <div class="partner-id">${info.id}</div>
+                        <div style="font-size: 12px; margin-top: 5px;">${filename}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadLogos() {
+            const logoGrid = document.getElementById('logoGrid');
+            const stats = document.getElementById('stats');
+            
+            if (knownLogos.length === 0) {
+                logoGrid.innerHTML = '<div class="error">Nenhum logo encontrado</div>';
+                stats.innerHTML = '<div class="error">Nenhuma imagem disponível</div>';
+                return;
+            }
+
+            // Atualiza estatísticas
+            const categories = {};
+            knownLogos.forEach(logo => {
+                const info = extractPartnerInfo(logo);
+                categories[info.category] = (categories[info.category] || 0) + 1;
+            });
+
+            const categoryStats = Object.entries(categories)
+                .map(([cat, count]) => `${getCategoryName(cat)}: ${count}`)
+                .join(' • ');
+
+            stats.innerHTML = `
+                <strong>${knownLogos.length} logos disponíveis</strong><br>
+                <small>${categoryStats}</small>
+            `;
+
+            // Carrega logos
+            logoGrid.innerHTML = knownLogos.map(createLogoCard).join('');
+        }
+
+        // Carrega logos quando a página estiver pronta
+        document.addEventListener('DOMContentLoaded', loadLogos);
+    </script>
+</body>
+</html>

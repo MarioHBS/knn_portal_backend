@@ -1,0 +1,50 @@
+{
+  "upload_date": "2025-09-06T09:39:18.150720",
+  "total_images": 6,
+  "uploads": [
+    {
+      "success": false,
+      "error": "404 POST https://storage.googleapis.com/upload/storage/v1/b/knn-benefits.appspot.com/o?uploadType=resumable: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"The specified bucket does not exist.\",\n    \"errors\": [\n      {\n        \"message\": \"The specified bucket does not exist.\",\n        \"domain\": \"global\",\n        \"reason\": \"notFound\"\n      }\n    ]\n  }\n}\n: ('Request failed with status code', 404, 'Expected one of', <HTTPStatus.OK: 200>, <HTTPStatus.CREATED: 201>)",
+      "filename": "PTN_A1E3018_AUT.png",
+      "partner_id": "PTN_A1E3018_AUT"
+    },
+    {
+      "success": false,
+      "error": "404 POST https://storage.googleapis.com/upload/storage/v1/b/knn-benefits.appspot.com/o?uploadType=resumable: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"The specified bucket does not exist.\",\n    \"errors\": [\n      {\n        \"message\": \"The specified bucket does not exist.\",\n        \"domain\": \"global\",\n        \"reason\": \"notFound\"\n      }\n    ]\n  }\n}\n: ('Request failed with status code', 404, 'Expected one of', <HTTPStatus.OK: 200>, <HTTPStatus.CREATED: 201>)",
+      "filename": "PTN_C0P4799_LIV.png",
+      "partner_id": "PTN_C0P4799_LIV"
+    },
+    {
+      "success": false,
+      "error": "404 POST https://storage.googleapis.com/upload/storage/v1/b/knn-benefits.appspot.com/o?uploadType=resumable: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"The specified bucket does not exist.\",\n    \"errors\": [\n      {\n        \"message\": \"The specified bucket does not exist.\",\n        \"domain\": \"global\",\n        \"reason\": \"notFound\"\n      }\n    ]\n  }\n}\n: ('Request failed with status code', 404, 'Expected one of', <HTTPStatus.OK: 200>, <HTTPStatus.CREATED: 201>)",
+      "filename": "PTN_C5C7628_TEC.png",
+      "partner_id": "PTN_C5C7628_TEC"
+    },
+    {
+      "success": false,
+      "error": "404 POST https://storage.googleapis.com/upload/storage/v1/b/knn-benefits.appspot.com/o?uploadType=resumable: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"The specified bucket does not exist.\",\n    \"errors\": [\n      {\n        \"message\": \"The specified bucket does not exist.\",\n        \"domain\": \"global\",\n        \"reason\": \"notFound\"\n      }\n    ]\n  }\n}\n: ('Request failed with status code', 404, 'Expected one of', <HTTPStatus.OK: 200>, <HTTPStatus.CREATED: 201>)",
+      "filename": "PTN_C8A3367_EDU.png",
+      "partner_id": "PTN_C8A3367_EDU"
+    },
+    {
+      "success": false,
+      "error": "404 POST https://storage.googleapis.com/upload/storage/v1/b/knn-benefits.appspot.com/o?uploadType=resumable: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"The specified bucket does not exist.\",\n    \"errors\": [\n      {\n        \"message\": \"The specified bucket does not exist.\",\n        \"domain\": \"global\",\n        \"reason\": \"notFound\"\n      }\n    ]\n  }\n}\n: ('Request failed with status code', 404, 'Expected one of', <HTTPStatus.OK: 200>, <HTTPStatus.CREATED: 201>)",
+      "filename": "PTN_E211033_EDU.png",
+      "partner_id": "PTN_E211033_EDU"
+    },
+    {
+      "success": false,
+      "error": "404 POST https://storage.googleapis.com/upload/storage/v1/b/knn-benefits.appspot.com/o?uploadType=resumable: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"The specified bucket does not exist.\",\n    \"errors\": [\n      {\n        \"message\": \"The specified bucket does not exist.\",\n        \"domain\": \"global\",\n        \"reason\": \"notFound\"\n      }\n    ]\n  }\n}\n: ('Request failed with status code', 404, 'Expected one of', <HTTPStatus.OK: 200>, <HTTPStatus.CREATED: 201>)",
+      "filename": "PTN_M365611_EDU.png",
+      "partner_id": "PTN_M365611_EDU"
+    }
+  ],
+  "firestore_updates": [],
+  "summary": {
+    "successful_uploads": 0,
+    "failed_uploads": 6,
+    "successful_updates": 0,
+    "failed_updates": 0,
+    "total_size_uploaded": 0
+  }
+}

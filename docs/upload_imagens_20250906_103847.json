@@ -1,0 +1,93 @@
+{
+  "upload_date": "2025-09-06T10:38:25.566725",
+  "total_images": 6,
+  "uploads": [
+    {
+      "success": true,
+      "storage_path": "partners/logos/PTN_A1E3018_AUT.png",
+      "public_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_A1E3018_AUT.png",
+      "file_size": 30148,
+      "filename": "PTN_A1E3018_AUT.png",
+      "partner_id": "PTN_A1E3018_AUT"
+    },
+    {
+      "success": true,
+      "storage_path": "partners/logos/PTN_C0P4799_LIV.png",
+      "public_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C0P4799_LIV.png",
+      "file_size": 32798,
+      "filename": "PTN_C0P4799_LIV.png",
+      "partner_id": "PTN_C0P4799_LIV"
+    },
+    {
+      "success": true,
+      "storage_path": "partners/logos/PTN_C5C7628_TEC.png",
+      "public_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C5C7628_TEC.png",
+      "file_size": 45214,
+      "filename": "PTN_C5C7628_TEC.png",
+      "partner_id": "PTN_C5C7628_TEC"
+    },
+    {
+      "success": true,
+      "storage_path": "partners/logos/PTN_C8A3367_EDU.png",
+      "public_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C8A3367_EDU.png",
+      "file_size": 3526,
+      "filename": "PTN_C8A3367_EDU.png",
+      "partner_id": "PTN_C8A3367_EDU"
+    },
+    {
+      "success": true,
+      "storage_path": "partners/logos/PTN_E211033_EDU.png",
+      "public_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_E211033_EDU.png",
+      "file_size": 7716,
+      "filename": "PTN_E211033_EDU.png",
+      "partner_id": "PTN_E211033_EDU"
+    },
+    {
+      "success": true,
+      "storage_path": "partners/logos/PTN_M365611_EDU.png",
+      "public_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_M365611_EDU.png",
+      "file_size": 19809,
+      "filename": "PTN_M365611_EDU.png",
+      "partner_id": "PTN_M365611_EDU"
+    }
+  ],
+  "firestore_updates": [
+    {
+      "success": true,
+      "partner_id": "PTN_A1E3018_AUT",
+      "updated_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_A1E3018_AUT.png"
+    },
+    {
+      "success": true,
+      "partner_id": "PTN_C0P4799_LIV",
+      "updated_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C0P4799_LIV.png"
+    },
+    {
+      "success": true,
+      "partner_id": "PTN_C5C7628_TEC",
+      "updated_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C5C7628_TEC.png"
+    },
+    {
+      "success": true,
+      "partner_id": "PTN_C8A3367_EDU",
+      "updated_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C8A3367_EDU.png"
+    },
+    {
+      "success": true,
+      "partner_id": "PTN_E211033_EDU",
+      "updated_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_E211033_EDU.png"
+    },
+    {
+      "success": true,
+      "partner_id": "PTN_M365611_EDU",
+      "updated_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_M365611_EDU.png"
+    }
+  ],
+  "summary": {
+    "successful_uploads": 6,
+    "failed_uploads": 0,
+    "successful_updates": 6,
+    "failed_updates": 0,
+    "total_size_uploaded": 139211
+  }
+}
