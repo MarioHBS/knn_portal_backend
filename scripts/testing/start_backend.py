@@ -49,7 +49,7 @@ class BackendManager:
         self.health_check_interval = health_check_interval
 
         self.base_url = f"http://{self.host}:{self.port}"
-        self.health_url = f"{self.base_url}/health"
+        self.health_url = f"{self.base_url}/v1/health"
 
         self.process: subprocess.Popen | None = None
         self.is_running = False
@@ -67,14 +67,18 @@ class BackendManager:
         current_dir = Path(__file__).parent.absolute()
 
         # Procurar por arquivos indicadores do projeto
-        indicators = ["main.py", "requirements.txt", "pyproject.toml", "src"]
+        indicators = ["requirements.txt", "pyproject.toml"]
+        src_indicators = ["src/main.py", "main.py"]
 
         # Subir até 3 níveis para encontrar a raiz
         for _ in range(3):
-            for indicator in indicators:
-                if (current_dir / indicator).exists():
-                    logger.info(f"Diretório do projeto encontrado: {current_dir}")
-                    return current_dir
+            # Verificar se tem os arquivos de configuração E o main.py
+            has_config = any((current_dir / indicator).exists() for indicator in indicators)
+            has_main = any((current_dir / indicator).exists() for indicator in src_indicators)
+            
+            if has_config and has_main:
+                logger.info(f"Diretório do projeto encontrado: {current_dir}")
+                return current_dir
 
             parent = current_dir.parent
             if parent == current_dir:  # Chegou na raiz do sistema
@@ -160,11 +164,17 @@ class BackendManager:
         logger.info(f"Iniciando servidor backend na porta {self.port}")
 
         # Comando para iniciar o servidor
+        # Determinar o módulo correto baseado na localização do main.py
+        if "src" in str(main_file):
+            app_module = "src.main:app"
+        else:
+            app_module = "main:app"
+            
         cmd = [
             sys.executable,
             "-m",
             "uvicorn",
-            "main:app",
+            app_module,
             "--host",
             self.host,
             "--port",

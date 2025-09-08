@@ -1,6 +1,7 @@
 """
 Inicialização do pacote de banco de dados.
 """
+
 import os
 
 # Verificar se estamos em ambiente de teste

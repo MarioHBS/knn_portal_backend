@@ -1,6 +1,7 @@
 """
 Implementação da camada de acesso ao Firestore.
 """
+
 import uuid
 from typing import Any
 
@@ -11,31 +12,41 @@ from src.config import FIRESTORE_PROJECT
 from src.utils import logger
 
 # Inicializar o Firestore
+db = None
 try:
-    # Em ambiente de produção, usamos credenciais padrão
-    cred = credentials.ApplicationDefault()
-    firebase_admin.initialize_app(
-        cred,
-        {
-            "projectId": FIRESTORE_PROJECT,
-        },
-    )
-    db = firestore.client()
-    logger.info("Firestore inicializado com sucesso")
-except Exception as e:
-    # Em ambiente de desenvolvimento/teste, podemos usar um emulador
-    logger.warning(f"Erro ao inicializar Firestore com credenciais padrão: {str(e)}")
-    try:
-        firebase_admin.initialize_app(
-            options={
-                "projectId": FIRESTORE_PROJECT,
-            }
-        )
+    # Verificar se Firebase já foi inicializado
+    if firebase_admin._apps:
+        logger.info("Firebase já inicializado, reutilizando conexão")
         db = firestore.client()
-        logger.info("Firestore inicializado com emulador")
-    except Exception as e:
-        logger.error(f"Erro ao inicializar Firestore com emulador: {str(e)}")
-        db = None
+    else:
+        # Em ambiente de produção, usamos credenciais padrão
+        try:
+            cred = credentials.ApplicationDefault()
+            firebase_admin.initialize_app(
+                cred,
+                {
+                    "projectId": FIRESTORE_PROJECT,
+                },
+            )
+            db = firestore.client()
+            logger.info("Firestore inicializado com credenciais padrão")
+        except Exception as e:
+            # Em ambiente de desenvolvimento/teste, podemos usar um emulador
+            logger.warning(f"Erro ao inicializar Firestore com credenciais padrão: {str(e)}")
+            try:
+                firebase_admin.initialize_app(
+                    options={
+                        "projectId": FIRESTORE_PROJECT,
+                    }
+                )
+                db = firestore.client()
+                logger.info("Firestore inicializado com emulador")
+            except Exception as e:
+                logger.error(f"Erro ao inicializar Firestore com emulador: {str(e)}")
+                db = None
+except Exception as e:
+    logger.error(f"Erro geral ao inicializar Firestore: {str(e)}")
+    db = None
 
 # Helpers multi-tenant
 

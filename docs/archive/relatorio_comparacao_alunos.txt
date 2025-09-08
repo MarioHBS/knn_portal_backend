@@ -1,0 +1,89 @@
+RELATÓRIO DE COMPARAÇÃO DE ALUNOS
+==================================================
+
+Data da análise: P:\ProjectsWEB\PRODUCAO\KNN PROJECT\knn_portal_journey_club_backend
+Total de alunos em dados_alunos.json: 74
+Total de alunos em firestore_export.json: 74
+
+ALUNOS APENAS EM dados_alunos.json (0):
+----------------------------------------
+
+ALUNOS APENAS EM firestore_export.json (0):
+----------------------------------------
+
+ALUNOS EM AMBOS OS ARQUIVOS (74):
+----------------------------------------
+STD_A0D0N002_K3 - Alciomar Divino Nascimento
+STD_A0G0O0V2_S3 - Anne Gabriele Oliveira Viana
+STD_A0G0S0O3_S1 - Ana Gisele da silva Oliveira
+STD_A0L0R0F8_S2 - Alberto Luiz Dos Reis Filho
+STD_A1M5R5C0_S4 - Alissa Maria Rocha Castro
+STD_A1M8C0N5_S1 - Augusto Martins Campos Neto
+STD_A1R9C333_T1 - Alessandra Rios Colins
+STD_A2B4R0C6_S4 - Anna Beatriz Rabelo Carvalho
+STD_A2L8M0G_TW4 - Ana Lia Mendonça Gomes
+STD_A3C1M7L7_S4 - Alba Clarissa Maciel Lopes
+STD_A3P3N8M1_S1 - Ariel Petrus Nascimento Melo
+STD_A7T3A0A3_S1 - Amanda Thuane Alves Aguiar
+STD_A8V1M28_TW2 - Arthur Vigarani Montebeler
+STD_ACNMS000_S3 - Ana Clara Nogueira Martins Serra
+STD_B0C0R0C0_S1 - Beatriz Coimbra Ribeiro Costa
+STD_B4M8L04_TW2 - Bryan Mourão Lima
+STD_B9S03261_K1 - Benjamin Sousa
+STD_C0F0G0S4_S1 - Carla Filomena Gomes Santos
+STD_C0R0S0R8_S2 - Clara Rebeca Silva do Reis
+STD_C5R9C0C8_T3 - Cassia Rafaele Cavalcante Costa
+STD_C8D4B8M9_A1 - Carlos Daniel Barros Mouzinho
+STD_CRSLJ776_S1 - Cesar Roberto Silva Lima Junior
+STD_D0M0A563_S2 - Damião Maia Araujo
+STD_D0M0O0B8_T1 - Daniela Maria De Oliveira Barbosa
+STD_E2F6D221_T1 - Estela Fernanda Dias
+STD_E6R9C0S3_K1 - Enzo Rafael Carvalho De Sousa
+STD_ECCSS00_TW4 - Emanuelle Castro Costa de Sousa Santos
+STD_G0V0F00_TW3 - Guilherme Vieira Filgueiras
+STD_G2S7C968_S1 - Gabrielly dos Santos Castro
+STD_G7P5B040_S1 - Geovane Pereira Braz
+STD_H0C0F0B0_K2 - Heloísa Cristina de Freitas Brito
+STD_H0N0R007_K1 - Heitor Nunes Rocha
+STD_H8M8O9M_TW4 - Helena Maria Oliveira Monteiro
+STD_HRLCS0_KD6A - Hadassa Rogéria Lobato Costa Silva
+STD_I0L0M0O9_S1 - Ingrid Laís Martins Oliveira
+STD_I0N0M013_S2 - Isack Nunes Matos
+STD_I0R0R0J8_S1 - Inaldo Rodrigues Rubim Junior
+STD_I0T5S056_T1 - Icaro Tapajos Santos
+STD_I1C1L0F0_S1 - Isabel Chistinne Lima Ferreira
+STD_I6S8S00_TW4 - Isabelle Sousa Silva
+STD_I8R5S5C5_S1 - Israel Resec Salazar Camelo
+STD_J0D0C0C2_T1 - João Davi Correia Carvalho
+STD_J6S8S00_TW4 - Julia Sousa Silva
+STD_JLOSS680_S3 - Josielma Leite de Oliveira Sousa Silva
+STD_K0A0FPCL_S4 - Kayla Anahí Freitas Pinheiro Correio Lima
+STD_L0C0M0B_TW3 - Letícia Cristiny Menezes Barros
+STD_L0S0P0A8_S1 - Larissa Suelen Pereira Almeida
+STD_L1R0M1C6_S1 - Lilian Roberta Marques Campos
+STD_L6K5C6N8_S1 - Layla Kahanna da Costa Nogueira
+STD_LVSRC000_S3 - Luana Vitorina da Silva Rocha Castro
+STD_M0B0T00_TW4 - Mariana Barros Tavares
+STD_M0C0M0S9_S1 - Maysa da Conceição  Mendes Da Silva
+STD_M0E0L0M_TW4 - Mateus Erlon Lindoso Mendonça
+STD_M0J0S0T3_K2 - Maria Julia de Souza Tavares
+STD_M0M0D0V6_T1 - Mariana Marques Dias Viana
+STD_M5F9M0A2_S3 - Maria Fernanda Melo de Araújo
+STD_M6E3G8V_TW1 - Maria Eliza Gomes Viana
+STD_MASRS440_T1 - Maria Antonia de Sousa Ramos Silva
+STD_N0P00000_K3 - Nicolas Pietro
+STD_P0F0T0G1_K3 - Paula Ferreira Tavares Gomes
+STD_P6R4S0C1_S1 - Patrine Raquel da Silva Cordeiro
+STD_PAFBS000_X1 - Paulo Arthur Fernandes Barros Santana
+STD_PVDL40_KD6A - Pietro Valentim Dias Lopes
+STD_R0M0D0V6_T1 - Rafael Marques Dias Viana
+STD_R0R0C035_S1 - Rayelli Rocha Conceição
+STD_S0I0S0B_TW1 - Sarah Izabel Sousa Bento
+STD_S0V0P029_S2 - Sarah  Vieira Pestana
+STD_TLSG88_KD6A - Thiago Luis dos Santos Gama
+STD_V0C0C077_S1 - Valquíria Carvalho da Conceição
+STD_V3B0N0S7_S1 - Victor Bryan Nascimento Silva
+STD_V7M6C058_X1 - Vitor Melgar Cardoso
+STD_W0M0B0F2_T1 - Wagner Miguel Barboza Furtado
+STD_Y0M0M04_TW3 - Yasmim Marques Machado
+STD_Y0S0L0F8_S2 - Yasmim Silva Lindoso Ferreira

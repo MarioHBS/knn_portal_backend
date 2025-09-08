@@ -1,6 +1,7 @@
 """
 Implementação da camada de acesso ao PostgreSQL.
 """
+
 from datetime import datetime
 from typing import Any
 

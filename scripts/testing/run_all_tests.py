@@ -21,7 +21,7 @@ sys.path.append(str(Path(__file__).parent))
 from report_generator import ReportGenerator
 from start_backend import BackendManager
 from test_admin_endpoints import AdminEndpointTester
-from test_config import TestConfig, validate_config
+from test_config import validate_config
 from test_employee_endpoints import EmployeeEndpointTester
 from test_partner_endpoints import PartnerEndpointTester
 from test_runner import TestRunner
@@ -34,7 +34,6 @@ class TestSuiteRunner:
     """Executor principal da suíte de testes."""
 
     def __init__(self, config_path: str | None = None):
-        self.config = TestConfig()
         self.backend_manager = BackendManager()
         self.test_runner = TestRunner()
         self.report_generator = ReportGenerator()
@@ -62,7 +61,7 @@ class TestSuiteRunner:
 
             # Inicializar backend
             logger.info("🚀 Iniciando backend...")
-            if not await self.backend_manager.start():
+            if not self.backend_manager.start_backend():
                 logger.error("❌ Falha ao iniciar backend")
                 return False
 
@@ -70,7 +69,7 @@ class TestSuiteRunner:
 
             # Aguardar backend estar pronto
             logger.info("⏳ Aguardando backend estar pronto...")
-            if not await self.backend_manager.wait_for_health(timeout=30):
+            if not self.backend_manager.wait_for_backend(timeout=30):
                 logger.error("❌ Backend não respondeu no tempo esperado")
                 return False
 
@@ -163,7 +162,7 @@ class TestSuiteRunner:
 
             # Parar backend se foi iniciado
             if self.backend_started:
-                await self.backend_manager.stop()
+                self.backend_manager.stop_backend()
 
             # Limpar testers
             for tester in self.testers.values():

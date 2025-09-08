@@ -3,7 +3,7 @@
 from fastapi import APIRouter
 
 from src.db.firestore import db
-from src.utils.id_generators import CURSO_CODES
+from src.utils.id_generators import IDGenerators
 from src.utils.logging import logger
 from src.utils.rate_limit import limiter
 
@@ -39,7 +39,7 @@ async def get_courses(request):
             )
         else:
             # Fallback para mapeamento hardcoded
-            courses = list(CURSO_CODES.keys())
+            courses = list(IDGenerators.CURSO_CODES.keys())
             logger.warning(
                 "Nenhum curso encontrado na base de dados, usando mapeamento hardcoded"
             )
@@ -83,7 +83,7 @@ async def get_course_codes(request):
             logger.info("Mapeamento de códigos de cursos retornado da base de dados")
         else:
             # Fallback para mapeamento hardcoded
-            course_codes = CURSO_CODES
+            course_codes = IDGenerators.CURSO_CODES
             logger.warning(
                 "Nenhum curso encontrado na base de dados, usando mapeamento hardcoded"
             )
@@ -96,4 +96,4 @@ async def get_course_codes(request):
         logger.info(
             "Retornando códigos do mapeamento hardcoded devido a erro na base de dados"
         )
-        return CURSO_CODES
+        return IDGenerators.CURSO_CODES

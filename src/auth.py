@@ -11,6 +11,7 @@ import firebase_admin.auth
 import httpx
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jwt import PyJWTError as JWTError
 from pydantic import BaseModel
 
 from src.config import (
@@ -32,36 +33,52 @@ jwks_cache = {"keys": None, "last_updated": 0}
 def initialize_firebase():
     """Inicializa Firebase Admin SDK se não estiver inicializado."""
     try:
-        if not firebase_admin._apps:
-            # Tentar carregar credenciais do arquivo padrão
-            import os
-            from pathlib import Path
+        # Verificar se Firebase já foi inicializado
+        if firebase_admin._apps:
+            print("Firebase já inicializado, reutilizando conexão")
+            return
 
-            from firebase_admin import credentials
+        # Tentar carregar credenciais do arquivo padrão
+        import os
+        from pathlib import Path
 
-            # Procurar arquivo de credenciais
-            possible_paths = [
-                "data/firestore_import/default-service-account-key.json",
-                "default-service-account-key.json",
-                os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
-            ]
+        from firebase_admin import credentials
 
-            cred_path = None
-            for path in possible_paths:
-                if path and Path(path).exists():
-                    cred_path = path
-                    break
+        # Procurar arquivo de credenciais
+        possible_paths = [
+            "credentials/default-service-account-key.json",
+            "data/firestore_import/default-service-account-key.json",
+            "default-service-account-key.json",
+            os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
+        ]
 
-            if cred_path:
-                cred = credentials.Certificate(cred_path)
+        cred_path = None
+        for path in possible_paths:
+            if path and Path(path).exists():
+                cred_path = path
+                break
+
+        if cred_path:
+            cred = credentials.Certificate(cred_path)
+            firebase_admin.initialize_app(cred, {
+                'projectId': FIRESTORE_PROJECT
+            })
+            print(f"Firebase inicializado com credenciais: {cred_path}")
+        else:
+            # Tentar inicializar com credenciais padrão do ambiente
+            try:
+                cred = credentials.ApplicationDefault()
                 firebase_admin.initialize_app(cred, {
                     'projectId': FIRESTORE_PROJECT
                 })
-                print(f"Firebase inicializado com credenciais: {cred_path}")
-            else:
-                # Tentar inicializar com credenciais padrão do ambiente
-                firebase_admin.initialize_app()
                 print("Firebase inicializado com credenciais padrão do ambiente")
+            except Exception as e:
+                print(f"Aviso: Não foi possível usar credenciais padrão: {e}")
+                # Fallback para modo emulador/teste
+                firebase_admin.initialize_app(options={
+                    'projectId': FIRESTORE_PROJECT
+                })
+                print("Firebase inicializado em modo emulador/teste")
 
     except Exception as e:
         print(f"Erro ao inicializar Firebase: {e}")
@@ -140,10 +157,7 @@ async def verify_token(
         )
 
     # Se credentials for uma string, usar diretamente
-    if isinstance(credentials, str):
-        token = credentials
-    else:
-        token = credentials.credentials
+    token = credentials if isinstance(credentials, str) else credentials.credentials
 
     # Em modo de desenvolvimento, tentar Firebase Auth primeiro
     if ENVIRONMENT == "development":

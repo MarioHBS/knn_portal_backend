@@ -144,6 +144,15 @@ credentials/
 migration_report.json
 firestore_export.json
 
+# Reports directory (temporary reports)
+/reports/*.json
+/reports/*.txt
+/reports/*.html
+/reports/test_report_*
+/reports/migration_report_*
+/reports/upload_report_*
+# Keep archived reports in docs/archive/ under version control
+
 # Temporary scripts and files
 scripts/temp/
 temp_*.py

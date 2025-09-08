@@ -213,7 +213,7 @@ def main():
             print("  URL_BASE: URL do servidor (padrão: http://localhost:8000)")
             print("\nExemplos:")
             print("  python test_suite.py")
-            print("  python test_suite.py http://localhost:8080")
+            print("  python test_suite.py http://localhost:8000")
             return
 
     test_suite = TestSuite(base_url)

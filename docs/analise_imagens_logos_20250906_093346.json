@@ -1,0 +1,92 @@
+{
+  "analysis_date": "2025-09-06T09:33:46.041856",
+  "total_logo_images": 6,
+  "images": [
+    {
+      "filename": "PTN_A1E3018_AUT_logo.png",
+      "width": 960,
+      "height": 622,
+      "format": "PNG",
+      "mode": "RGB",
+      "has_transparency": false,
+      "file_size_bytes": 408903,
+      "file_size_kb": 399.32,
+      "aspect_ratio": 1.54
+    },
+    {
+      "filename": "PTN_C0P4799_LIV_logo.png",
+      "width": 150,
+      "height": 150,
+      "format": "PNG",
+      "mode": "RGB",
+      "has_transparency": false,
+      "file_size_bytes": 33737,
+      "file_size_kb": 32.95,
+      "aspect_ratio": 1.0
+    },
+    {
+      "filename": "PTN_C5C7628_TEC_logo.png",
+      "width": 316,
+      "height": 354,
+      "format": "PNG",
+      "mode": "RGB",
+      "has_transparency": false,
+      "file_size_bytes": 159105,
+      "file_size_kb": 155.38,
+      "aspect_ratio": 0.89
+    },
+    {
+      "filename": "PTN_C8A3367_EDU_logo.png",
+      "width": 67,
+      "height": 61,
+      "format": "PNG",
+      "mode": "RGBA",
+      "has_transparency": true,
+      "file_size_bytes": 3679,
+      "file_size_kb": 3.59,
+      "aspect_ratio": 1.1
+    },
+    {
+      "filename": "PTN_E211033_EDU_logo.png",
+      "width": 200,
+      "height": 43,
+      "format": "PNG",
+      "mode": "RGBA",
+      "has_transparency": true,
+      "file_size_bytes": 6881,
+      "file_size_kb": 6.72,
+      "aspect_ratio": 4.65
+    },
+    {
+      "filename": "PTN_M365611_EDU_logo.png",
+      "width": 835,
+      "height": 836,
+      "format": "PNG",
+      "mode": "RGB",
+      "has_transparency": false,
+      "file_size_bytes": 152396,
+      "file_size_kb": 148.82,
+      "aspect_ratio": 1.0
+    }
+  ],
+  "summary": {
+    "png_format": 6,
+    "has_transparency": 2,
+    "dimensions": {
+      "960x622": 1,
+      "150x150": 1,
+      "316x354": 1,
+      "67x61": 1,
+      "200x43": 1,
+      "835x836": 1
+    },
+    "file_sizes": [
+      399.32,
+      32.95,
+      155.38,
+      3.59,
+      6.72,
+      148.82
+    ]
+  }
+}

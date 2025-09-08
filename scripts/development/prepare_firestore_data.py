@@ -295,7 +295,12 @@ if __name__ == "__main__":
             ],
         }
 
-        report_file = os.path.join(output_dir, "migration_report.json")
+        # Salvar relatório no diretório de relatórios
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        reports_dir = os.path.join(project_root, "reports")
+        os.makedirs(reports_dir, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_file = os.path.join(reports_dir, f"migration_report_{timestamp}.json")
         self.save_json_data(report, report_file)
 
         logger.info("\n=== Preparação Concluída ===")

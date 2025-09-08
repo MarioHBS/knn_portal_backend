@@ -51,7 +51,12 @@ class ProfileSummary:
 class ReportGenerator:
     """Gerador de relatórios de testes."""
 
-    def __init__(self, output_dir: str = "reports"):
+    def __init__(self, output_dir: str = None):
+        if output_dir is None:
+            # Caminho relativo para o diretório reports na raiz do projeto
+            import os
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+            output_dir = os.path.join(project_root, "reports")
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
 

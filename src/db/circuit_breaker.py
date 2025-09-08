@@ -1,6 +1,7 @@
 """
 Implementação do circuit breaker para fallback entre Firestore e PostgreSQL.
 """
+
 import time
 from collections.abc import Callable
 from typing import Any

@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 
 # URLs base para diferentes ambientes
 BASE_URLS = {
-    "development": "http://localhost:8080/v1",
+    "development": "http://localhost:8000/v1",
     "staging": "https://knn-portal-hml.cloudrun.app/v1",
     "production": "https://knn-portal.cloudrun.app/v1",
 }
@@ -293,7 +293,7 @@ TEST_DATA = {
 # =============================================================================
 
 # Diretório para salvar relatórios
-REPORTS_DIR = "reports"
+REPORTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "reports")
 
 # Formatos de relatório disponíveis
 REPORT_FORMATS = ["json", "html", "txt"]
