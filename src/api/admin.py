@@ -5,7 +5,7 @@ Implementação dos endpoints para o perfil de administrador (admin).
 import uuid
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
 from src.auth import JWTPayload, validate_admin_role
 from src.db import firestore_client, postgres_client, with_circuit_breaker
@@ -97,7 +97,7 @@ async def list_partners(
 
     except Exception as e:
         logger.error(
-            f"Erro ao listar parceiros para administrador {current_user.id}: {e}"
+            f"Erro ao listar parceiros para administrador {current_user.sub}: {e}"
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -146,7 +146,7 @@ async def get_partner_details(
         raise
     except Exception as e:
         logger.error(
-            f"Erro ao obter detalhes do parceiro {id} para administrador {current_user.id}: {e}"
+            f"Erro ao obter detalhes do parceiro {id} para administrador {current_user.sub}: {e}"
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -246,7 +246,7 @@ async def list_entities(
 @router.post("/{entity}", response_model=EntityResponse)
 async def create_entity(
     entity: str = Path(..., description="Tipo de entidade"),
-    data: dict[str, Any] = None,
+    data: dict[str, Any] = Body(..., description="Dados da entidade"),
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
@@ -301,11 +301,75 @@ async def create_entity(
         ) from e
 
 
+@router.get("/{entity}/{id}", response_model=EntityResponse)
+async def get_entity(
+    entity: str = Path(..., description="Tipo de entidade"),
+    id: str = Path(..., description="ID da entidade"),
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Busca uma entidade específica por ID (student, partner, promotion, etc.).
+    """
+    try:
+        # Validar tipo de entidade
+        valid_entities = ["students", "employees", "partners", "promotions"]
+        if entity not in valid_entities:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": {
+                        "code": "INVALID_ENTITY",
+                        "msg": f"Entidade inválida. Use: {', '.join(valid_entities)}",
+                    }
+                },
+            )
+
+        # Buscar entidade
+        async def get_firestore_entity():
+            return await firestore_client.get_document(
+                entity, id, tenant_id=current_user.tenant
+            )
+
+        async def get_postgres_entity():
+            return await postgres_client.get_document(
+                entity, id, tenant_id=current_user.tenant
+            )
+
+        result = await with_circuit_breaker(get_firestore_entity, get_postgres_entity)
+
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "msg": f"Entidade {entity} com ID {id} não encontrada",
+                    }
+                },
+            )
+
+        return {"data": result, "msg": "ok"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao buscar entidade {entity}/{id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": f"Erro ao buscar entidade {entity}/{id}",
+                }
+            },
+        ) from e
+
+
 @router.put("/{entity}/{id}", response_model=EntityResponse)
 async def update_entity(
     entity: str = Path(..., description="Tipo de entidade"),
     id: str = Path(..., description="ID da entidade"),
-    data: dict[str, Any] = None,
+    data: dict[str, Any] = Body(..., description="Dados da entidade"),
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """

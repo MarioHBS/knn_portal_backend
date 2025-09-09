@@ -51,7 +51,7 @@
 
 - [x] **Integração com Firestore**
   - [x] Configurar cliente Firestore
-  - [ ] **PENDENTE:** Implementar operações CRUD básicas
+  - [x] **CONCLUÍDO:** Implementar operações CRUD básicas
   - [x] Adicionar suporte multi-tenant (implementado com coleção 'tenants' para metadados)
   - [ ] **PENDENTE:** Implementar queries com filtros e paginação
   - [ ] **PENDENTE:** Configurar tratamento de erros

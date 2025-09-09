@@ -1,7 +1,7 @@
 [
   {
     "id": "student_001",
-    "nome": "João Silva",
+    "nome": "Jo\u00c3\u00a3o Silva",
     "email": "joao.silva@email.com",
     "telefone": "(11) 99999-1111",
     "cep": "01234-567",
@@ -63,5 +63,14 @@
     "tenant_id": "test-tenant",
     "created_at": "2024-01-19T13:10:00",
     "updated_at": "2024-01-19T13:10:00"
+  },
+  {
+    "nome_aluno": "Jo\u00e3o Silva Santos",
+    "curso": "Engenharia de Software",
+    "tenant_id": "test-tenant",
+    "id": "20870a35-cf10-43e0-9b65-386fdd9937da",
+    "created_at": "2025-09-09T10:48:29.176744",
+    "updated_at": "2025-09-09T10:49:54.830709",
+    "active": false
   }
 ]

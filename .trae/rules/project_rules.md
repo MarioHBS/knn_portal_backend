@@ -25,6 +25,15 @@
    - Use appropriate folders: `/scripts/`, `/docs/`, `/src/`, `/tests/`
    - Configuration files can remain in root if they're framework-specific
 
+## Operations Rules
+
+9. **Bulk Operations**:
+   - Bulk operations (operações em massa) must NOT be executed automatically
+   - Bulk operations require explicit and specific user request
+   - Always confirm the scope and impact before executing bulk operations
+   - Document all bulk operations in execution logs
+   - Implement safeguards to prevent accidental bulk operations
+
 ## Business Rules
 
 - For underage students, `nome_responsavel` (guardian name) must be filled

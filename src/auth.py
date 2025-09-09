@@ -90,7 +90,17 @@ initialize_firebase()
 
 
 class JWTPayload(BaseModel):
-    """Modelo para o payload do JWT."""
+    """Modelo para o payload do JWT.
+
+    Attributes:
+        sub: Subject - Identificador único do usuário (user ID)
+        role: Papel/função do usuário no sistema (admin, employee, student, partner)
+        tenant: Identificador do tenant/organização do usuário
+        exp: Expiration time - Timestamp Unix de quando o token expira
+        iat: Issued at - Timestamp Unix de quando o token foi emitido
+        iss: Issuer - Identificador do emissor do token (opcional)
+        aud: Audience - Audiência pretendida do token, pode ser string ou lista (opcional)
+    """
 
     sub: str
     role: str
