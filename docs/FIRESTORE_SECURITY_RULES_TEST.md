@@ -7,11 +7,35 @@ Este documento define as regras de segurança recomendadas para o banco de dados
 ## Configuração Atual
 
 ### Projeto Firebase
+
 - **ID do Projeto**: `knn-portal-dev`
 - **Ambiente**: Desenvolvimento/Teste
 - **Tenant ID**: `knn-dev-tenant`
 
+### Usuários Registrados no Firebase Authentication
+
+- **Admin (Superuser)**: `developer.mario.santos@gmail.com` (UID: `ZkOxi2kaZvZyl2Fv8FcWJdZ2rcN2`)
+  - Role: `superuser`
+  - Tenant: `knn-dev-tenant`
+
+- **Admin (Tenant)**: `felipedefolive@gmail.com` (UID: `zRC8AsHsjlTDTHVf71AxyFmkEpx1`)
+  - Role: `admin`
+  - Tenant: `knn-dev-tenant`
+
+- **Student**: `4IFJpVB7dLRvijxW1TQaqjzFGM33@example.com` (UID: `4IFJpVB7dLRvijxW1TQaqjzFGM33`)
+  - Role: `student`
+  - Tenant: `knn-dev-tenant`
+
+- **Employee**: `6m9KyWtNPGejUqK8xKVZ2f0HLwA2@example.com` (UID: `6m9KyWtNPGejUqK8xKVZ2f0HLwA2`)
+  - Role: `employee`
+  - Tenant: `knn-dev-tenant`
+
+- **Partner**: `WaPnrhF1nZXmvwJFawqnfJqB96a2@example.com` (UID: `WaPnrhF1nZXmvwJFawqnfJqB96a2`)
+  - Role: `partner`
+  - Tenant: `knn-dev-tenant`
+
 ### Coleções Principais
+
 - `tenants` - Metadados das escolas/unidades
 - `metadata` - Metadados das coleções
 - `students` - Dados dos alunos (74 registros)

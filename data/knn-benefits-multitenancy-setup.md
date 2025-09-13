@@ -508,6 +508,28 @@ export function canSeeBenefit(userRoles: string[], audience: string[]): boolean 
 
 ### 9.1 Usuários de teste por tenant
 
+**Usuários de teste registrados no Firebase Authentication:**
+
+- **Student**: `4IFJpVB7dLRvijxW1TQaqjzFGM33@example.com`
+  - UID: `4IFJpVB7dLRvijxW1TQaqjzFGM33`
+  - Role: `student`
+  - Tenant: `knn-dev-tenant`
+  - Email: `4IFJpVB7dLRvijxW1TQaqjzFGM33@example.com`
+
+- **Employee**: `6m9KyWtNPGejUqK8xKVZ2f0HLwA2@example.com`
+  - UID: `6m9KyWtNPGejUqK8xKVZ2f0HLwA2`
+  - Role: `employee`
+  - Tenant: `knn-dev-tenant`
+  - Email: `6m9KyWtNPGejUqK8xKVZ2f0HLwA2@example.com`
+
+- **Partner**: `WaPnrhF1nZXmvwJFawqnfJqB96a2@example.com`
+  - UID: `WaPnrhF1nZXmvwJFawqnfJqB96a2`
+  - Role: `partner`
+  - Tenant: `knn-dev-tenant`
+  - Email: `WaPnrhF1nZXmvwJFawqnfJqB96a2@example.com`
+
+**Padrão de usuários teste por tenant (para criação futura):**
+
 - `admin@{tenant}.local` → roles `["admin"]`
 - `parceiro@{tenant}.local` → roles `["partner"]`, `partner_ids: ["partnerDocId"]`
 - `aluno@{tenant}.local` → roles `["student"]`

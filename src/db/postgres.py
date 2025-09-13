@@ -13,6 +13,26 @@ from src.utils import logger
 
 class PostgresClient:
     """Cliente para acesso ao PostgreSQL."""
+    
+    _pool = None
+
+    @classmethod
+    async def get_pool(cls):
+        """Obtém o pool de conexões PostgreSQL."""
+        if cls._pool is None:
+            try:
+                logger.info(f"Criando pool de conexões PostgreSQL: {POSTGRES_CONNECTION_STRING}")
+                cls._pool = await asyncpg.create_pool(
+                    POSTGRES_CONNECTION_STRING,
+                    min_size=1,
+                    max_size=10,
+                    command_timeout=30
+                )
+                logger.info("Pool de conexões PostgreSQL criado com sucesso")
+            except Exception as e:
+                logger.error(f"Erro ao criar pool PostgreSQL: {str(e)}", exc_info=True)
+                raise
+        return cls._pool
 
     @staticmethod
     async def get_connection():
@@ -20,11 +40,21 @@ class PostgresClient:
         Obtém uma conexão com o PostgreSQL.
         """
         try:
-            conn = await asyncpg.connect(POSTGRES_CONNECTION_STRING)
+            pool = await PostgresClient.get_pool()
+            conn = await pool.acquire()
             return conn
         except Exception as e:
-            logger.error(f"Erro ao conectar ao PostgreSQL: {str(e)}")
+            logger.error(f"Erro ao conectar ao PostgreSQL: {str(e)}", exc_info=True)
             raise
+    
+    @staticmethod
+    async def release_connection(conn):
+        """Libera uma conexão de volta ao pool."""
+        try:
+            pool = await PostgresClient.get_pool()
+            await pool.release(conn)
+        except Exception as e:
+            logger.error(f"Erro ao liberar conexão PostgreSQL: {str(e)}")
 
     @staticmethod
     async def get_document(
@@ -60,28 +90,48 @@ class PostgresClient:
         """
         Consulta documentos no PostgreSQL filtrando por tenant_id.
         """
+        conn = None
         try:
             conn = await PostgresClient.get_connection()
-            try:
-                query = f"SELECT * FROM {table} WHERE tenant_id = $1"
-                params = [tenant_id]
-                param_idx = 2
-                if filters:
-                    for f in filters:
-                        query += f" AND {f[0]} {f[1]} ${param_idx}"
-                        params.append(f[2])
-                        param_idx += 1
-                if order_by:
-                    order_str = ", ".join([f"{o[0]} {o[1]}" for o in order_by])
-                    query += f" ORDER BY {order_str}"
-                query += f" LIMIT {limit} OFFSET {offset}"
-                rows = await conn.fetch(query, *params)
-                return {"data": [dict(r) for r in rows]}
-            finally:
-                await conn.close()
+            
+            query = f"SELECT * FROM {table} WHERE tenant_id = $1"
+            params = [tenant_id]
+            param_idx = 2
+            
+            if filters:
+                for f in filters:
+                    query += f" AND {f[0]} {f[1]} ${param_idx}"
+                    params.append(f[2])
+                    param_idx += 1
+                    
+            if order_by:
+                order_str = ", ".join([f"{o[0]} {o[1]}" for o in order_by])
+                query += f" ORDER BY {order_str}"
+            
+            # Aplicar limit e offset na query principal
+            query += f" LIMIT {limit} OFFSET {offset}"
+            
+            logger.info(f"Executando query PostgreSQL: {query} com params: {params}")
+            rows = await conn.fetch(query, *params)
+            logger.info(f"Query executada com sucesso, {len(rows)} registros retornados")
+            
+            return {
+                "items": [dict(r) for r in rows],
+                "total": len(rows),  # Temporário: usar len dos resultados
+                "limit": limit,
+                "offset": offset
+            }
+            
         except Exception as e:
-            logger.error(f"Erro ao consultar documentos {table}: {str(e)}")
+            logger.error(f"Erro ao consultar documentos {table}: {str(e)}", exc_info=True)
             raise
+        finally:
+            if conn:
+                try:
+                    await PostgresClient.release_connection(conn)
+                    logger.info("Conexão PostgreSQL liberada com sucesso")
+                except Exception as e:
+                    logger.error(f"Erro ao liberar conexão PostgreSQL: {str(e)}")
 
     @staticmethod
     async def create_document(table: str, data: dict[str, Any]) -> dict[str, Any]:

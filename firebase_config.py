@@ -24,7 +24,7 @@ except ImportError:
 FIREBASE_CONFIG = {
     "apiKey": os.getenv("FB_API_KEY", "your-api-key-here"),
     "authDomain": os.getenv("FB_AUTH_DOMAIN", "your-project.firebaseapp.com"),
-    "projectId": os.getenv("FB_PROJECT_ID", "your-project-id"),
+    "projectId": os.getenv("FIRESTORE_PROJECT", "knn-benefits"),
     "storageBucket": os.getenv("FB_STORAGE_BUCKET", "your-project.appspot.com"),
     "messagingSenderId": os.getenv("FB_MESSAGING_SENDER_ID", "123456789"),
     "appId": os.getenv("FB_APP_ID", "your-app-id"),

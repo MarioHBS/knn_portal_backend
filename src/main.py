@@ -1,6 +1,7 @@
 """
 Atualização do arquivo principal para integrar todos os componentes.
 """
+
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -127,15 +128,22 @@ async def validation_error_handler(request: Request, exc):
 
 @app.middleware("http")
 async def with_tenant(request: Request, call_next):
-    # Pular autenticação para rotas de documentação e health check
+    # Pular autenticação para requisições OPTIONS (preflight CORS)
+    if request.method == "OPTIONS":
+        return await call_next(request)
+
+    # Pular autenticação para rotas de documentação, health check e authenticate
     excluded_paths = [
         f"/{API_VERSION}/docs",
         f"/{API_VERSION}/redoc",
         f"/{API_VERSION}/openapi.json",
         f"/{API_VERSION}/health",
+        f"/{API_VERSION}/utils/authenticate",
+        f"/{API_VERSION}/users/login",
+        f"/{API_VERSION}/users/register",
         "/docs",
         "/redoc",
-        "/openapi.json"
+        "/openapi.json",
     ]
 
     if request.url.path in excluded_paths or request.url.path.startswith("/static"):
@@ -151,21 +159,22 @@ async def with_tenant(request: Request, call_next):
     authorization: str = request.headers.get("authorization")
     if not authorization or not authorization.lower().startswith("bearer "):
         return JSONResponse(
-            status_code=400, content={"error": {"msg": "Token JWT ausente"}}
+            status_code=401, content={"error": {"msg": "Token JWT ausente"}}
         )
     token = authorization.split(" ", 1)[1]
     try:
-        # Usar a função de verificação do Firebase
-        from src.auth import verify_token
-        payload = await verify_token(token)
+        # Usar a função de verificação local do JWT
+        from src.auth import verify_local_jwt
+
+        payload = await verify_local_jwt(token)
         tenant = payload.tenant
         if not tenant:
             return JSONResponse(
-                status_code=400, content={"error": {"msg": "tenant missing"}}
+                status_code=401, content={"error": {"msg": "tenant missing"}}
             )
         request.state.tenant = tenant
     except Exception:
-        return JSONResponse(status_code=400, content={"error": {"msg": "JWT inválido"}})
+        return JSONResponse(status_code=401, content={"error": {"msg": "JWT inválido"}})
     return await call_next(request)
 
 

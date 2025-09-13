@@ -19,15 +19,16 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Any
 
+import firebase_admin
+from firebase_admin import credentials, firestore
+
 # Adicionar o diretório raiz ao path
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(root_dir)
 
-import firebase_admin
-from firebase_admin import credentials, firestore
-
-from src.config import FB_PROJECT_ID, FIRESTORE_PROJECT
-from src.utils import logger
+# Imports locais após modificação do path
+from src.config import FIRESTORE_PROJECT  # noqa: E402
+from src.utils import logger  # noqa: E402
 
 
 class FirestoreMigrator:
@@ -99,44 +100,9 @@ class FirestoreMigrator:
             self.databases["default"] = firestore.client(app=default_app)
             logger.info(f"Conectado ao banco default: {FIRESTORE_PROJECT}")
 
-            # Banco de produção (knn-benefits)
-            if FB_PROJECT_ID != FIRESTORE_PROJECT:
-                if cred_path:
-                    prod_app = firebase_admin.initialize_app(
-                        credentials.Certificate(cred_path),
-                        {
-                            "projectId": FB_PROJECT_ID,
-                        },
-                        name="production",
-                    )
-                else:
-                    try:
-                        prod_app = firebase_admin.initialize_app(
-                            credentials.ApplicationDefault(),
-                            {
-                                "projectId": FB_PROJECT_ID,
-                            },
-                            name="production",
-                        )
-                    except Exception as cred_error:
-                        logger.warning(
-                            f"Credenciais para produção não encontradas: {str(cred_error)}"
-                        )
-                        logger.info(
-                            "Tentando inicializar produção sem credenciais (modo emulador)"
-                        )
-                        prod_app = firebase_admin.initialize_app(
-                            options={
-                                "projectId": FB_PROJECT_ID,
-                            },
-                            name="production",
-                        )
-
-                self.databases["production"] = firestore.client(app=prod_app)
-                logger.info(f"Conectado ao banco production: {FB_PROJECT_ID}")
-            else:
-                logger.info("Usando o mesmo projeto para ambos os bancos")
-                self.databases["production"] = self.databases["default"]
+            # Banco de produção (usando o mesmo projeto)
+            logger.info("Usando o mesmo projeto para ambos os bancos")
+            self.databases["production"] = self.databases["default"]
 
         except Exception as e:
             logger.error(f"Erro ao inicializar bancos Firestore: {str(e)}")
@@ -469,7 +435,7 @@ def main():
 
         # Validar migração
         logger.info("\n=== Validando Migração ===")
-        for db_name in migrator.databases.keys():
+        for db_name in migrator.databases:
             migrator.validate_migration(db_name)
 
         logger.info("\n=== Migração Concluída com Sucesso ===")

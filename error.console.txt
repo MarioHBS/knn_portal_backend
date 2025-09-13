@@ -1,0 +1,53 @@
+Access to fetch at 'http://localhost:8080/v1/users/me' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+api.client.ts:39  GET http://localhost:8080/v1/users/me net::ERR_FAILED 400 (Bad Request)
+request @ api.client.ts:39
+await in request
+get @ api.client.ts:148
+getMyProfile @ user.service.ts:7
+fetchUserProfile @ auth.service.ts:54
+(anonymous) @ auth.service.ts:31
+(anonymous) @ firebase.auth.ts:89
+notifyListeners @ firebase.auth.ts:89
+(anonymous) @ firebase.auth.ts:22
+(anonymous) @ firebase_auth.js?v=57a0f456:2747
+user.service.ts:10 Erro ao buscar o perfil do usuário: Error: Erro de conexão: Verifique se o backend está rodando e sua conexão com a internet.
+    at ApiClient.request (api.client.ts:75:17)
+    at async UserService.getMyProfile (user.service.ts:7:20)
+    at async AuthService.fetchUserProfile (auth.service.ts:54:26)
+    at async auth.service.ts:31:11
+overrideMethod @ hook.js:608
+getMyProfile @ user.service.ts:10
+await in getMyProfile
+fetchUserProfile @ auth.service.ts:54
+(anonymous) @ auth.service.ts:31
+(anonymous) @ firebase.auth.ts:89
+notifyListeners @ firebase.auth.ts:89
+(anonymous) @ firebase.auth.ts:22
+(anonymous) @ firebase_auth.js?v=57a0f456:2747
+auth.service.ts:56 Falha ao buscar perfil do usuário: Error: Não foi possível carregar o perfil do usuário.
+    at UserService.getMyProfile (user.service.ts:11:13)
+    at async AuthService.fetchUserProfile (auth.service.ts:54:26)
+    at async auth.service.ts:31:11
+overrideMethod @ hook.js:608
+fetchUserProfile @ auth.service.ts:56
+await in fetchUserProfile
+(anonymous) @ auth.service.ts:31
+(anonymous) @ firebase.auth.ts:89
+notifyListeners @ firebase.auth.ts:89
+(anonymous) @ firebase.auth.ts:22
+(anonymous) @ firebase_auth.js?v=57a0f456:2747
+auth.service.ts:38 Erro ao buscar perfil do usuário: Error: Não foi possível carregar o perfil do usuário.
+    at UserService.getMyProfile (user.service.ts:11:13)
+    at async AuthService.fetchUserProfile (auth.service.ts:54:26)
+    at async auth.service.ts:31:11
+overrideMethod @ hook.js:608
+(anonymous) @ auth.service.ts:38
+await in (anonymous)
+(anonymous) @ firebase.auth.ts:89
+notifyListeners @ firebase.auth.ts:89
+(anonymous) @ firebase.auth.ts:22
+(anonymous) @ firebase_auth.js?v=57a0f456:2747
+auth.service.ts:113 Erro de autenticação: Error: Não foi possível carregar o perfil do usuário.
+    at UserService.getMyProfile (user.service.ts:11:13)
+    at async AuthService.fetchUserProfile (auth.service.ts:54:26)
+    at async auth.service.ts:31:11

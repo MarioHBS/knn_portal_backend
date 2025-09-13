@@ -1,6 +1,6 @@
 {
     "python.defaultInterpreterPath": "./venv/Scripts/python.exe",
-    "flake8.enabled": false,
+    "flake8.args": ["--enabled=false"],
     "editor.defaultFormatter": "charliermarsh.ruff",
     "[python]": {
         "editor.formatOnSave": true,

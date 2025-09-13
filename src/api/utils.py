@@ -1,13 +1,19 @@
 """Endpoints utilitários da API."""
 
-from fastapi import APIRouter
 
+from fastapi import APIRouter, HTTPException, Request, status
+from pydantic import BaseModel
+
+from src.auth import get_current_user
 from src.db.firestore import db
 from src.utils.id_generators import IDGenerators
 from src.utils.logging import logger
 from src.utils.rate_limit import limiter
 
 router = APIRouter()
+
+
+
 
 
 @router.get("/courses", response_model=list[str])
@@ -49,7 +55,7 @@ async def get_courses(request):
     except Exception as e:
         logger.error(f"Erro ao buscar cursos: {str(e)}")
         # Fallback para mapeamento hardcoded em caso de erro
-        courses = list(CURSO_CODES.keys())
+        courses = list(IDGenerators.CURSO_CODES.keys())
         logger.info(
             "Retornando cursos do mapeamento hardcoded devido a erro na base de dados"
         )

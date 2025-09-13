@@ -127,7 +127,7 @@ knn-benefits-service-account-key.json
 firebase-adminsdk-*.json
 
 # Credentials folder (entire folder ignored except README)
-credentials/
+/credentials/
 !credentials/README.md
 
 # Sensitive databases

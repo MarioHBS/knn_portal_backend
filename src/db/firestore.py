@@ -5,48 +5,143 @@ Implementação da camada de acesso ao Firestore.
 import uuid
 from typing import Any
 
-import firebase_admin
-from firebase_admin import credentials, firestore
+import json
+from google.cloud import firestore
+from google.cloud.firestore import Client, Query
+from google.auth import default
+from google.oauth2 import service_account
 
-from src.config import FIRESTORE_PROJECT
+from src.config import (
+    CURRENT_FIRESTORE_DATABASE,
+    FIRESTORE_DATABASE,
+    FIRESTORE_DATABASES_LIST,
+    FIRESTORE_PROJECT,
+    GOOGLE_APPLICATION_CREDENTIALS,
+    FIRESTORE_SERVICE_ACCOUNT_KEY,
+)
 from src.utils import logger
 
-# Inicializar o Firestore
+# Inicializar múltiplos bancos Firestore
 db = None
-try:
-    # Verificar se Firebase já foi inicializado
-    if firebase_admin._apps:
-        logger.info("Firebase já inicializado, reutilizando conexão")
-        db = firestore.client()
-    else:
-        # Em ambiente de produção, usamos credenciais padrão
-        try:
-            cred = credentials.ApplicationDefault()
-            firebase_admin.initialize_app(
-                cred,
-                {
-                    "projectId": FIRESTORE_PROJECT,
-                },
-            )
-            db = firestore.client()
-            logger.info("Firestore inicializado com credenciais padrão")
-        except Exception as e:
-            # Em ambiente de desenvolvimento/teste, podemos usar um emulador
-            logger.warning(f"Erro ao inicializar Firestore com credenciais padrão: {str(e)}")
+databases = {}  # Dicionário para armazenar conexões com múltiplos bancos
+
+
+def initialize_firestore_databases():
+    """Inicializa conexões com múltiplos bancos Firestore."""
+    global db, databases
+
+    try:
+        # Configurar credenciais baseado nas variáveis de ambiente
+        credentials = None
+        project_id = FIRESTORE_PROJECT
+        
+        if FIRESTORE_SERVICE_ACCOUNT_KEY:
+            # Usar service account key como JSON string
             try:
-                firebase_admin.initialize_app(
-                    options={
-                        "projectId": FIRESTORE_PROJECT,
-                    }
-                )
-                db = firestore.client()
-                logger.info("Firestore inicializado com emulador")
+                service_account_info = json.loads(FIRESTORE_SERVICE_ACCOUNT_KEY)
+                credentials = service_account.Credentials.from_service_account_info(service_account_info)
+                if not project_id:
+                    project_id = service_account_info.get('project_id')
+                logger.info("Usando service account key do ambiente")
+            except json.JSONDecodeError as e:
+                logger.error(f"Erro ao decodificar FIRESTORE_SERVICE_ACCOUNT_KEY: {e}")
+                credentials, project_id = default()
+        elif GOOGLE_APPLICATION_CREDENTIALS:
+            # Usar arquivo de service account key
+            try:
+                credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
+                with open(GOOGLE_APPLICATION_CREDENTIALS, 'r') as f:
+                    service_account_info = json.load(f)
+                    if not project_id:
+                        project_id = service_account_info.get('project_id')
+                logger.info(f"Usando service account key do arquivo: {GOOGLE_APPLICATION_CREDENTIALS}")
             except Exception as e:
-                logger.error(f"Erro ao inicializar Firestore com emulador: {str(e)}")
-                db = None
-except Exception as e:
-    logger.error(f"Erro geral ao inicializar Firestore: {str(e)}")
-    db = None
+                logger.error(f"Erro ao carregar service account key: {e}")
+                credentials, project_id = default()
+        else:
+            # Usar credenciais padrão (ADC)
+            credentials, detected_project = default()
+            if not project_id:
+                project_id = detected_project
+            logger.info("Usando credenciais padrão (ADC)")
+            
+        logger.info(f"Inicializando Firestore para projeto: {project_id}")
+
+        # Inicializar conexões com todos os bancos configurados
+        for i, database_name in enumerate(FIRESTORE_DATABASES_LIST):
+            try:
+                if database_name == "(default)":
+                    # Cliente para banco padrão
+                    client = Client(project=project_id, credentials=credentials)
+                else:
+                    # Cliente para banco específico com suporte nativo
+                    client = Client(
+                        project=project_id, 
+                        credentials=credentials,
+                        database=database_name
+                    )
+
+                databases[database_name] = client
+                logger.info(f"Conexão estabelecida com banco: {database_name}")
+
+                # Definir o banco principal baseado na configuração
+                if i == FIRESTORE_DATABASE:
+                    db = client
+                    logger.info(f"Banco principal definido: {database_name}")
+
+            except Exception as e:
+                logger.error(f"Erro ao conectar com banco {database_name}: {str(e)}")
+
+        # Se não conseguiu definir o banco principal, usar o primeiro disponível
+        if db is None and databases:
+            db = list(databases.values())[0]
+            logger.warning("Usando primeiro banco disponível como principal")
+
+    except Exception as e:
+        logger.error(f"Erro geral ao inicializar Firestore: {str(e)}")
+        db = None
+
+
+# Inicializar os bancos
+initialize_firestore_databases()
+
+
+def get_database(database_name: str = None):
+    """Obtém conexão com um banco específico.
+
+    Args:
+        database_name: Nome do banco. Se None, usa o banco principal.
+
+    Returns:
+        Cliente Firestore para o banco especificado.
+    """
+    if database_name is None:
+        return db
+
+    if database_name in databases:
+        return databases[database_name]
+
+    logger.warning(f"Banco {database_name} não encontrado, usando banco principal")
+    return db
+
+
+def list_available_databases():
+    """Lista todos os bancos disponíveis.
+
+    Returns:
+        Lista com nomes dos bancos configurados.
+    """
+    return list(databases.keys())
+
+
+def get_current_database_name():
+    """Obtém o nome do banco atual.
+
+    Returns:
+        Nome do banco principal configurado.
+    """
+    return CURRENT_FIRESTORE_DATABASE
+
 
 # Helpers multi-tenant
 
@@ -85,6 +180,7 @@ class FirestoreClient:
     @staticmethod
     async def query_documents(
         collection: str,
+        tenant_id: str,
         filters: list[tuple] | None = None,
         order_by: list[tuple] | None = None,
         limit: int = 20,
@@ -95,6 +191,7 @@ class FirestoreClient:
 
         Args:
             collection: Nome da coleção
+            tenant_id: ID do tenant para filtrar os documentos
             filters: Lista de tuplas (campo, operador, valor)
             order_by: Lista de tuplas (campo, direção)
             limit: Limite de documentos
@@ -108,10 +205,10 @@ class FirestoreClient:
             return {"items": [], "total": 0, "limit": limit, "offset": offset}
 
         try:
-            # Iniciar query
-            query = db.collection(collection)
+            # Iniciar query com filtro de tenant_id obrigatório
+            query = db.collection(collection).where("tenant_id", "==", tenant_id)
 
-            # Aplicar filtros
+            # Aplicar filtros adicionais
             if filters:
                 for field, op, value in filters:
                     query = query.where(field, op, value)

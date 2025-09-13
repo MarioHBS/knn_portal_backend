@@ -44,59 +44,46 @@ async def list_partners(
     Lista parceiros com filtros e paginação.
     """
     try:
-        # Preparar filtros
-        filters = []
+        # Buscar parceiros ativos no Firestore
+        filters = [("active", "==", True)]
         if cat:
             filters.append(("category", "==", cat))
 
-        # Adicionar filtro de parceiros ativos
-        filters.append(("active", "==", True))
+        partners_response = await firestore_client.query_documents(
+            "partners",
+            filters=filters,
+            order_by=None,  # Removendo ordenação para evitar necessidade de índice
+            limit=limit,
+            offset=offset,
+            tenant_id=current_user.tenant,
+        )
 
-        # Preparar ordenação
-        order_by = []
-        if ord == "name_asc":
-            order_by.append(("trade_name", "ASCENDING"))
-        elif ord == "name_desc":
-            order_by.append(("trade_name", "DESCENDING"))
-        elif ord == "category_asc":
-            order_by.append(("category", "ASCENDING"))
-        elif ord == "category_desc":
-            order_by.append(("category", "DESCENDING"))
-        else:
-            # Ordenação padrão
-            order_by.append(("trade_name", "ASCENDING"))
+        partners_data = partners_response.get("items", [])
+        total = partners_response.get("total", 0)
 
-        # Consultar parceiros com circuit breaker
-        async def firestore_query():
-            return await firestore_client.query_documents(
-                "partners",
-                filters=filters,
-                order_by=order_by,
-                limit=limit,
-                offset=offset,
-            )
-
-        async def postgres_query():
-            return await postgres_client.query_documents(
-                "partners",
-                filters=filters,
-                order_by=order_by,
-                limit=limit,
-                offset=offset,
-            )
-
-        result = await with_circuit_breaker(firestore_query, postgres_query)
-
-        return {"data": result, "msg": "ok"}
+        logger.info(f"Retornando {len(partners_data)} parceiros para o usuário")
+        return PartnerListResponse(
+            data={
+                "items": partners_data,
+                "total": total,
+                "limit": limit,
+                "offset": offset,
+            }
+        )
 
     except Exception as e:
-        logger.error(f"Erro ao listar parceiros: {str(e)}")
+        logger.error(f"Erro detalhado ao listar parceiros: {str(e)}", exc_info=True)
+        logger.error(f"Tipo do erro: {type(e).__name__}")
+        logger.error(f"Args do erro: {e.args}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao listar parceiros"}
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": f"Erro ao listar parceiros: {str(e)}",
+                }
             },
-        )
+        ) from e
 
 
 @router.get("/partners/{id}", response_model=PartnerDetailResponse)
@@ -115,9 +102,7 @@ async def get_partner_details(
         async def get_postgres_partner():
             return await postgres_client.get_document("partners", id)
 
-        partner = await with_circuit_breaker(
-            get_firestore_partner, get_postgres_partner
-        )
+        partner = await get_firestore_partner()
 
         if not partner:
             raise HTTPException(
@@ -148,6 +133,7 @@ async def get_partner_details(
                     ("valid_to", ">=", now),
                     ("audience", "array_contains_any", ["student"]),
                 ],
+                tenant_id=current_user.tenant,
             )
 
         async def get_postgres_promotions():
@@ -159,11 +145,10 @@ async def get_partner_details(
                     ("valid_from", "<=", now),
                     ("valid_to", ">=", now),
                 ],
+                tenant_id=current_user.tenant,
             )
 
-        promotions_result = await with_circuit_breaker(
-            get_firestore_promotions, get_postgres_promotions
-        )
+        promotions_result = await get_firestore_promotions()
 
         # Construir resposta
         partner_detail = PartnerDetail(
@@ -184,7 +169,7 @@ async def get_partner_details(
                     "msg": "Erro ao obter detalhes do parceiro",
                 }
             },
-        )
+        ) from e
 
 
 @router.post("/validation-codes", response_model=ValidationCodeResponse)
@@ -203,9 +188,7 @@ async def create_validation_code(
         async def get_postgres_partner():
             return await postgres_client.get_document("partners", request.partner_id)
 
-        partner = await with_circuit_breaker(
-            get_firestore_partner, get_postgres_partner
-        )
+        partner = await get_firestore_partner()
 
         if not partner or not partner.get("active", False):
             raise HTTPException(
@@ -224,9 +207,7 @@ async def create_validation_code(
         async def get_postgres_student():
             return await postgres_client.get_document("students", student_id)
 
-        student = await with_circuit_breaker(
-            get_firestore_student, get_postgres_student
-        )
+        student = await get_firestore_student()
 
         if not student:
             raise HTTPException(
@@ -291,7 +272,7 @@ async def create_validation_code(
                     "msg": "Erro ao gerar código de validação",
                 }
             },
-        )
+        ) from e
 
 
 @router.get("/students/me/history", response_model=HistoryResponse)
@@ -316,6 +297,7 @@ async def get_student_history(
                 order_by=[("used_at", "DESCENDING")],
                 limit=limit,
                 offset=offset,
+                tenant_id=current_user.tenant,
             )
 
         async def get_postgres_codes():
@@ -325,39 +307,36 @@ async def get_student_history(
                 order_by=[("used_at", "DESCENDING")],
                 limit=limit,
                 offset=offset,
+                tenant_id=current_user.tenant,
             )
 
-        codes_result = await with_circuit_breaker(
-            get_firestore_codes, get_postgres_codes
-        )
+        codes_result = await get_firestore_codes()
 
         # Construir histórico com detalhes de parceiros e resgates
         history_items = []
 
         for code in codes_result.get("items", []):
             # Obter parceiro
-            async def get_firestore_partner():
+            async def get_firestore_partner(current_code=code):
                 return await firestore_client.get_document(
-                    "partners", code["partner_id"]
+                    "partners", current_code["partner_id"]
                 )
 
-            async def get_postgres_partner():
+            async def get_postgres_partner(current_code=code):
                 return await postgres_client.get_document(
-                    "partners", code["partner_id"]
+                    "partners", current_code["partner_id"]
                 )
 
-            partner = await with_circuit_breaker(
-                get_firestore_partner, get_postgres_partner
-            )
+            partner = await get_firestore_partner()
 
             if not partner:
                 continue
 
             # Obter resgate
-            async def get_firestore_redemption():
+            async def get_firestore_redemption(current_code=code):
                 redemptions = await firestore_client.query_documents(
                     "redemptions",
-                    filters=[("validation_code_id", "==", code["id"])],
+                    filters=[("validation_code_id", "==", current_code["id"])],
                     limit=1,
                 )
                 return (
@@ -366,10 +345,10 @@ async def get_student_history(
                     else None
                 )
 
-            async def get_postgres_redemption():
+            async def get_postgres_redemption(current_code=code):
                 redemptions = await postgres_client.query_documents(
                     "redemptions",
-                    filters=[("validation_code_id", "==", code["id"])],
+                    filters=[("validation_code_id", "==", current_code["id"])],
                     limit=1,
                 )
                 return (
@@ -378,9 +357,7 @@ async def get_student_history(
                     else None
                 )
 
-            redemption = await with_circuit_breaker(
-                get_firestore_redemption, get_postgres_redemption
-            )
+            redemption = await get_firestore_redemption()
 
             if not redemption:
                 continue
@@ -422,7 +399,7 @@ async def get_student_history(
                     "msg": "Erro ao obter histórico do aluno",
                 }
             },
-        )
+        ) from e
 
 
 @router.get("/students/me/fav", response_model=FavoritesResponse)
@@ -438,17 +415,19 @@ async def get_student_favorites(
         # Obter favoritos do aluno
         async def get_firestore_favorites():
             return await firestore_client.query_documents(
-                "favorites", filters=[("student_id", "==", student_id)]
+                "favorites",
+                filters=[("student_id", "==", student_id)],
+                tenant_id=current_user.tenant,
             )
 
         async def get_postgres_favorites():
             return await postgres_client.query_documents(
-                "favorites", filters=[("student_id", "==", student_id)]
+                "favorites",
+                filters=[("student_id", "==", student_id)],
+                tenant_id=current_user.tenant,
             )
 
-        favorites_result = await with_circuit_breaker(
-            get_firestore_favorites, get_postgres_favorites
-        )
+        favorites_result = await get_firestore_favorites()
 
         # Obter detalhes dos parceiros favoritos
         favorite_partners = []
@@ -460,11 +439,11 @@ async def get_student_favorites(
                 continue
 
             # Obter parceiro
-            async def get_firestore_partner():
-                return await firestore_client.get_document("partners", partner_id)
+            async def get_firestore_partner(pid=partner_id):
+                return await firestore_client.get_document("partners", pid)
 
-            async def get_postgres_partner():
-                return await postgres_client.get_document("partners", partner_id)
+            async def get_postgres_partner(pid=partner_id):
+                return await postgres_client.get_document("partners", pid)
 
             partner = await with_circuit_breaker(
                 get_firestore_partner, get_postgres_partner
@@ -485,7 +464,7 @@ async def get_student_favorites(
                     "msg": "Erro ao obter favoritos do aluno",
                 }
             },
-        )
+        ) from e
 
 
 @router.post("/students/me/fav", response_model=BaseResponse)
@@ -517,9 +496,7 @@ async def add_student_favorite(
         async def get_postgres_partner():
             return await postgres_client.get_document("partners", partner_id_value)
 
-        partner = await with_circuit_breaker(
-            get_firestore_partner, get_postgres_partner
-        )
+        partner = await get_firestore_partner()
 
         if not partner or not partner.get("active", False):
             raise HTTPException(
@@ -552,9 +529,7 @@ async def add_student_favorite(
             )
             return favorites.get("items", [])[0] if favorites.get("items") else None
 
-        existing_favorite = await with_circuit_breaker(
-            get_firestore_favorite, get_postgres_favorite
-        )
+        existing_favorite = await get_firestore_favorite()
 
         if existing_favorite:
             return {"msg": "ok"}
@@ -580,7 +555,7 @@ async def add_student_favorite(
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao adicionar favorito"}
             },
-        )
+        ) from e
 
 
 @router.delete("/students/me/fav/{pid}", response_model=BaseResponse)
@@ -611,9 +586,7 @@ async def remove_student_favorite(
             )
             return favorites.get("items", [])[0] if favorites.get("items") else None
 
-        favorite = await with_circuit_breaker(
-            get_firestore_favorite, get_postgres_favorite
-        )
+        favorite = await get_firestore_favorite()
 
         if not favorite:
             raise HTTPException(
@@ -640,4 +613,4 @@ async def remove_student_favorite(
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao remover favorito"}
             },
-        )
+        ) from e

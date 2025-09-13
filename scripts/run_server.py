@@ -25,6 +25,10 @@ if __name__ == "__main__":
             load_dotenv(env_path)
             print(f"Carregadas variáveis de ambiente de: {env_path}")
     except ImportError:
+
+        def load_dotenv(*args, **kwargs):
+            pass
+
         print("python-dotenv não encontrado, usando variáveis de ambiente do sistema")
 
     # Obter porta das variáveis de ambiente
