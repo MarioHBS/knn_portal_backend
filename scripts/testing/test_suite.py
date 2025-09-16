@@ -115,8 +115,11 @@ class TestSuite:
                         data = response.json()
                         if isinstance(data, list):
                             message += f", Items: {len(data)}"
-                        elif isinstance(data, dict) and "items" in data:
-                            message += f", Items: {len(data['items'])}"
+                        elif isinstance(data, dict):
+                            if "data" in data and isinstance(data["data"], list):
+                                message += f", Items: {len(data['data'])}"
+                            elif "items" in data:
+                                message += f", Items: {len(data['items'])}"
                     except:
                         pass
 

@@ -43,7 +43,7 @@ async def list_partners(
 ):
     """
     Lista parceiros com filtros e paginação.
-    
+
     Endpoint específico para estudantes com as seguintes características:
     - Utiliza circuit breaker para alta disponibilidade
     - Ordenação desabilitada por padrão (para evitar necessidade de índices)
@@ -264,7 +264,7 @@ async def create_validation_code(
         ) from e
 
 
-@router.get("/students/me/history", response_model=HistoryResponse)
+@router.get("/me/history", response_model=HistoryResponse)
 async def get_student_history(
     limit: int = Query(
         20, ge=1, le=100, description="Número máximo de itens por página"
@@ -391,7 +391,7 @@ async def get_student_history(
         ) from e
 
 
-@router.get("/students/me/fav", response_model=FavoritesResponse)
+@router.get("/me/fav", response_model=FavoritesResponse)
 async def get_student_favorites(
     current_user: JWTPayload = Depends(validate_student_role),
 ):
@@ -456,7 +456,7 @@ async def get_student_favorites(
         ) from e
 
 
-@router.post("/students/me/fav", response_model=BaseResponse)
+@router.post("/me/fav", response_model=BaseResponse)
 async def add_student_favorite(
     partner_id: dict, current_user: JWTPayload = Depends(validate_student_role)
 ):
@@ -547,7 +547,7 @@ async def add_student_favorite(
         ) from e
 
 
-@router.delete("/students/me/fav/{pid}", response_model=BaseResponse)
+@router.delete("/me/fav/{pid}", response_model=BaseResponse)
 async def remove_student_favorite(
     pid: str = Path(..., description="ID do parceiro"),
     current_user: JWTPayload = Depends(validate_student_role),

@@ -25,7 +25,7 @@ from src.utils import hash_cnpj, limiter, logger, validate_cnpj
 router = APIRouter(tags=["partner"])
 
 
-@router.post("/partner/redeem", response_model=RedeemResponse)
+@router.post("/redeem", response_model=RedeemResponse)
 @limiter.limit(RATE_LIMIT_REDEEM)
 async def redeem_code(
     request: RedeemRequest, current_user: JWTPayload = Depends(validate_partner_role)
@@ -247,7 +247,7 @@ async def redeem_code(
         ) from e
 
 
-@router.get("/partner/promotions", response_model=PromotionListResponse)
+@router.get("/promotions", response_model=PromotionListResponse)
 async def list_partner_promotions(
     limit: int = Query(
         20, ge=1, le=100, description="Número máximo de itens por página"
@@ -296,7 +296,7 @@ async def list_partner_promotions(
         ) from None
 
 
-@router.post("/partner/promotions", response_model=PromotionResponse)
+@router.post("/promotions", response_model=PromotionResponse)
 async def create_promotion(
     request: PromotionRequest, current_user: JWTPayload = Depends(validate_partner_role)
 ):
@@ -346,7 +346,7 @@ async def create_promotion(
         ) from e
 
 
-@router.put("/partner/promotions/{id}", response_model=PromotionResponse)
+@router.put("/promotions/{id}", response_model=PromotionResponse)
 async def update_promotion(
     id: str = Path(..., description="ID da promoção"),
     request: PromotionRequest = None,
@@ -428,7 +428,7 @@ async def update_promotion(
         ) from e
 
 
-@router.delete("/partner/promotions/{id}", response_model=BaseResponse)
+@router.delete("/promotions/{id}", response_model=BaseResponse)
 async def delete_promotion(
     id: str = Path(..., description="ID da promoção"),
     current_user: JWTPayload = Depends(validate_partner_role),
@@ -486,7 +486,7 @@ async def delete_promotion(
         ) from e
 
 
-@router.get("/partner/reports", response_model=ReportResponse)
+@router.get("/reports", response_model=ReportResponse)
 async def get_partner_reports(
     range: str = Query(..., description="Período para relatório (formato YYYY-MM)"),
     current_user: JWTPayload = Depends(validate_partner_role),

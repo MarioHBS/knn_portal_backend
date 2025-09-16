@@ -670,7 +670,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /students/me/history:
+  /student/me/history:
     get:
       summary: Histórico de resgates
       description: Retorna o histórico de resgates do aluno
@@ -713,7 +713,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /students/me/fav:
+  /student/me/fav:
     get:
       summary: Lista parceiros favoritos
       description: Retorna a lista de parceiros favoritos do aluno
@@ -793,7 +793,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /students/me/fav/{pid}:
+  /student/me/fav/{pid}:
     delete:
       summary: Remove parceiro dos favoritos
       description: Remove um parceiro da lista de favoritos do aluno
