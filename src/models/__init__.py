@@ -28,10 +28,7 @@ class ErrorResponse(BaseModel):
 # Cursos disponíveis - Map simples baseado no IDGenerators
 # Não precisa de classe própria pois não haverá modificações administrativas
 COURSES_MAP = {
-    course_name: {
-        "code": course_code,
-        "name": course_name
-    }
+    course_name: {"code": course_code, "name": course_name}
     for course_name, course_code in IDGenerators.CURSO_CODES.items()
 }
 
@@ -123,7 +120,7 @@ class Partner(BaseModel):
     name: str = Field(default="")
     category: str = Field(default="")
     active: bool = Field(default=True)
-    
+
     # Campos opcionais comuns
     tenant_id: str | None = None
     cnpj_hash: str | None = None

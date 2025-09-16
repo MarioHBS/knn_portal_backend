@@ -5,23 +5,17 @@ Este módulo contém testes abrangentes para todos os endpoints
 definidos em src/api/partner.py.
 """
 
-import uuid
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
-from fastapi import status
 from fastapi.testclient import TestClient
 
 from src.api.partner import router
 from src.auth import JWTPayload
 from src.models import (
-    RedeemRequest,
     PromotionRequest,
-    BaseResponse,
-    Partner,
-    Promotion,
-    ValidationCode,
+    RedeemRequest,
 )
 
 
@@ -90,12 +84,15 @@ class TestPartnerRedeemEndpoint:
         self, mock_partner_user, mock_validation_code, mock_student
     ):
         """Testa resgate de código com sucesso."""
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.validate_cnpj", return_value=True), \
-             patch("src.api.partner.hash_cnpj", return_value="hashed_cnpj_123"), \
-             patch("src.api.partner.with_circuit_breaker") as mock_circuit_breaker, \
-             patch("src.api.partner.firestore_client") as mock_firestore:
-
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.validate_cnpj", return_value=True),
+            patch("src.api.partner.hash_cnpj", return_value="hashed_cnpj_123"),
+            patch("src.api.partner.with_circuit_breaker") as mock_circuit_breaker,
+            patch("src.api.partner.firestore_client") as mock_firestore,
+        ):
             # Configurar mocks
             mock_circuit_breaker.side_effect = [
                 {"data": mock_validation_code},  # Busca do código
@@ -106,9 +103,10 @@ class TestPartnerRedeemEndpoint:
 
             # Fazer requisição
             request_data = RedeemRequest(code="123456", cnpj="12345678000195")
-            
+
             # Simular endpoint
             from src.api.partner import redeem_code
+
             result = await redeem_code(request_data, mock_partner_user)
 
             # Verificar resultado
@@ -120,84 +118,119 @@ class TestPartnerRedeemEndpoint:
     @pytest.mark.asyncio
     async def test_redeem_code_invalid_cnpj(self, mock_partner_user):
         """Testa resgate com CNPJ inválido."""
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.validate_cnpj", return_value=False):
-
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.validate_cnpj", return_value=False),
+        ):
             from src.api.partner import redeem_code
+
             request_data = RedeemRequest(code="123456", cnpj="invalid_cnpj")
-            
+
             with pytest.raises(Exception) as exc_info:
                 await redeem_code(request_data, mock_partner_user)
-            
+
             assert "INVALID_CNPJ" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_redeem_code_not_found(self, mock_partner_user):
         """Testa resgate com código não encontrado."""
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.validate_cnpj", return_value=True), \
-             patch("src.api.partner.with_circuit_breaker", return_value={"data": None}):
-
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.validate_cnpj", return_value=True),
+            patch("src.api.partner.with_circuit_breaker", return_value={"data": None}),
+        ):
             from src.api.partner import redeem_code
+
             request_data = RedeemRequest(code="123456", cnpj="12345678000195")
-            
+
             with pytest.raises(Exception) as exc_info:
                 await redeem_code(request_data, mock_partner_user)
-            
+
             assert "NOT_FOUND" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_redeem_code_already_used(self, mock_partner_user, mock_validation_code):
+    async def test_redeem_code_already_used(
+        self, mock_partner_user, mock_validation_code
+    ):
         """Testa resgate com código já utilizado."""
         # Marcar código como usado
         mock_validation_code["used_at"] = datetime.now().isoformat()
-        
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.validate_cnpj", return_value=True), \
-             patch("src.api.partner.with_circuit_breaker", return_value={"data": mock_validation_code}):
 
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.validate_cnpj", return_value=True),
+            patch(
+                "src.api.partner.with_circuit_breaker",
+                return_value={"data": mock_validation_code},
+            ),
+        ):
             from src.api.partner import redeem_code
+
             request_data = RedeemRequest(code="123456", cnpj="12345678000195")
-            
+
             with pytest.raises(Exception) as exc_info:
                 await redeem_code(request_data, mock_partner_user)
-            
+
             assert "CODE_USED" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_redeem_code_wrong_partner(self, mock_partner_user, mock_validation_code):
+    async def test_redeem_code_wrong_partner(
+        self, mock_partner_user, mock_validation_code
+    ):
         """Testa resgate com código de outro parceiro."""
         # Alterar partner_id do código
         mock_validation_code["partner_id"] = "other-partner"
-        
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.validate_cnpj", return_value=True), \
-             patch("src.api.partner.with_circuit_breaker", return_value={"data": mock_validation_code}):
 
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.validate_cnpj", return_value=True),
+            patch(
+                "src.api.partner.with_circuit_breaker",
+                return_value={"data": mock_validation_code},
+            ),
+        ):
             from src.api.partner import redeem_code
+
             request_data = RedeemRequest(code="123456", cnpj="12345678000195")
-            
+
             with pytest.raises(Exception) as exc_info:
                 await redeem_code(request_data, mock_partner_user)
-            
+
             assert "INVALID_PARTNER" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_redeem_code_expired(self, mock_partner_user, mock_validation_code):
         """Testa resgate com código expirado."""
         # Definir código como expirado
-        mock_validation_code["expires"] = (datetime.now() - timedelta(hours=1)).isoformat()
-        
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.validate_cnpj", return_value=True), \
-             patch("src.api.partner.with_circuit_breaker", return_value={"data": mock_validation_code}):
+        mock_validation_code["expires"] = (
+            datetime.now() - timedelta(hours=1)
+        ).isoformat()
 
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.validate_cnpj", return_value=True),
+            patch(
+                "src.api.partner.with_circuit_breaker",
+                return_value={"data": mock_validation_code},
+            ),
+        ):
             from src.api.partner import redeem_code
+
             request_data = RedeemRequest(code="123456", cnpj="12345678000195")
-            
+
             with pytest.raises(Exception) as exc_info:
                 await redeem_code(request_data, mock_partner_user)
-            
+
             assert "EXPIRED" in str(exc_info.value)
 
 
@@ -207,10 +240,17 @@ class TestPartnerPromotionsEndpoints:
     @pytest.mark.asyncio
     async def test_list_promotions_success(self, mock_partner_user, mock_promotion):
         """Testa listagem de promoções com sucesso."""
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.with_circuit_breaker", return_value={"items": [mock_promotion]}):
-
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch(
+                "src.api.partner.with_circuit_breaker",
+                return_value={"items": [mock_promotion]},
+            ),
+        ):
             from src.api.partner import list_partner_promotions
+
             result = await list_partner_promotions(current_user=mock_partner_user)
 
             assert result["msg"] == "ok"
@@ -220,21 +260,27 @@ class TestPartnerPromotionsEndpoints:
     @pytest.mark.asyncio
     async def test_create_promotion_success(self, mock_partner_user):
         """Testa criação de promoção com sucesso."""
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.firestore_client") as mock_firestore:
-
-            mock_firestore.create_document = AsyncMock(return_value={"id": "new-promotion"})
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.firestore_client") as mock_firestore,
+        ):
+            mock_firestore.create_document = AsyncMock(
+                return_value={"id": "new-promotion"}
+            )
 
             from src.api.partner import create_promotion
+
             request_data = PromotionRequest(
                 title="Nova Promoção",
                 type="discount",
                 valid_from=datetime.now(),
                 valid_to=datetime.now() + timedelta(days=30),
                 active=True,
-                audience=["student"]
+                audience=["student"],
             )
-            
+
             result = await create_promotion(request_data, mock_partner_user)
 
             assert result["msg"] == "ok"
@@ -243,65 +289,79 @@ class TestPartnerPromotionsEndpoints:
     @pytest.mark.asyncio
     async def test_create_promotion_invalid_dates(self, mock_partner_user):
         """Testa criação de promoção com datas inválidas."""
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user):
-
+        with patch(
+            "src.api.partner.validate_partner_role", return_value=mock_partner_user
+        ):
             from src.api.partner import create_promotion
+
             request_data = PromotionRequest(
                 title="Promoção Inválida",
                 type="discount",
                 valid_from=datetime.now() + timedelta(days=30),  # Data futura
                 valid_to=datetime.now(),  # Data passada
                 active=True,
-                audience=["student"]
+                audience=["student"],
             )
-            
+
             with pytest.raises(Exception) as exc_info:
                 await create_promotion(request_data, mock_partner_user)
-            
+
             assert "INVALID_DATES" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_update_promotion_success(self, mock_partner_user, mock_promotion):
         """Testa atualização de promoção com sucesso."""
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.with_circuit_breaker", return_value=mock_promotion), \
-             patch("src.api.partner.firestore_client") as mock_firestore:
-
-            mock_firestore.update_document = AsyncMock(return_value={"id": "promotion-123"})
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.with_circuit_breaker", return_value=mock_promotion),
+            patch("src.api.partner.firestore_client") as mock_firestore,
+        ):
+            mock_firestore.update_document = AsyncMock(
+                return_value={"id": "promotion-123"}
+            )
 
             from src.api.partner import update_promotion
+
             request_data = PromotionRequest(
                 title="Promoção Atualizada",
                 type="discount",
                 valid_from=datetime.now(),
                 valid_to=datetime.now() + timedelta(days=30),
                 active=True,
-                audience=["student"]
+                audience=["student"],
             )
-            
-            result = await update_promotion("promotion-123", request_data, mock_partner_user)
+
+            result = await update_promotion(
+                "promotion-123", request_data, mock_partner_user
+            )
 
             assert result["msg"] == "ok"
 
     @pytest.mark.asyncio
     async def test_update_promotion_not_found(self, mock_partner_user):
         """Testa atualização de promoção não encontrada."""
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.with_circuit_breaker", return_value=None):
-
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.with_circuit_breaker", return_value=None),
+        ):
             from src.api.partner import update_promotion
+
             request_data = PromotionRequest(
                 title="Promoção",
                 type="discount",
                 valid_from=datetime.now(),
                 valid_to=datetime.now() + timedelta(days=30),
                 active=True,
-                audience=["student"]
+                audience=["student"],
             )
-            
+
             with pytest.raises(Exception) as exc_info:
                 await update_promotion("invalid-id", request_data, mock_partner_user)
-            
+
             assert "NOT_FOUND" in str(exc_info.value)
 
     @pytest.mark.asyncio
@@ -309,35 +369,43 @@ class TestPartnerPromotionsEndpoints:
         """Testa atualização de promoção de outro parceiro."""
         # Alterar partner_id da promoção
         mock_promotion["partner_id"] = "other-partner"
-        
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.with_circuit_breaker", return_value=mock_promotion):
 
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.with_circuit_breaker", return_value=mock_promotion),
+        ):
             from src.api.partner import update_promotion
+
             request_data = PromotionRequest(
                 title="Promoção",
                 type="discount",
                 valid_from=datetime.now(),
                 valid_to=datetime.now() + timedelta(days=30),
                 active=True,
-                audience=["student"]
+                audience=["student"],
             )
-            
+
             with pytest.raises(Exception) as exc_info:
                 await update_promotion("promotion-123", request_data, mock_partner_user)
-            
+
             assert "FORBIDDEN" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_delete_promotion_success(self, mock_partner_user, mock_promotion):
         """Testa desativação de promoção com sucesso."""
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.with_circuit_breaker", return_value=mock_promotion), \
-             patch("src.api.partner.firestore_client") as mock_firestore:
-
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.with_circuit_breaker", return_value=mock_promotion),
+            patch("src.api.partner.firestore_client") as mock_firestore,
+        ):
             mock_firestore.update_document = AsyncMock()
 
             from src.api.partner import delete_promotion
+
             result = await delete_promotion("promotion-123", mock_partner_user)
 
             assert result["msg"] == "ok"
@@ -360,16 +428,20 @@ class TestPartnerReportsEndpoint:
             {"id": "promo-1", "title": "Promoção 1"},
             {"id": "promo-2", "title": "Promoção 2"},
         ]
-        
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user), \
-             patch("src.api.partner.with_circuit_breaker") as mock_circuit_breaker:
 
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.with_circuit_breaker") as mock_circuit_breaker,
+        ):
             mock_circuit_breaker.side_effect = [
                 {"items": mock_codes},  # Códigos
                 {"items": mock_promotions},  # Promoções
             ]
 
             from src.api.partner import get_partner_reports
+
             result = await get_partner_reports("2024-01", mock_partner_user)
 
             assert result["msg"] == "ok"
@@ -381,13 +453,14 @@ class TestPartnerReportsEndpoint:
     @pytest.mark.asyncio
     async def test_get_reports_invalid_range(self, mock_partner_user):
         """Testa geração de relatório com período inválido."""
-        with patch("src.api.partner.validate_partner_role", return_value=mock_partner_user):
-
+        with patch(
+            "src.api.partner.validate_partner_role", return_value=mock_partner_user
+        ):
             from src.api.partner import get_partner_reports
-            
+
             with pytest.raises(Exception) as exc_info:
                 await get_partner_reports("invalid-range", mock_partner_user)
-            
+
             assert "INVALID_RANGE" in str(exc_info.value)
 
 
@@ -397,9 +470,8 @@ class TestPartnerAPIIntegration:
 
     def test_partner_endpoints_require_authentication(self):
         """Testa que todos os endpoints requerem autenticação."""
-        from fastapi.testclient import TestClient
         from fastapi import FastAPI
-        
+
         app = FastAPI()
         app.include_router(router, prefix="/partner")
         client = TestClient(app)
@@ -424,4 +496,5 @@ class TestPartnerAPIIntegration:
         # Este teste seria implementado com um token válido mas com role incorreta
         # Por simplicidade, apenas verificamos que a validação existe
         from src.api.partner import validate_partner_role
+
         assert validate_partner_role is not None

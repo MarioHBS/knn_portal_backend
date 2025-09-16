@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from src.api.student import router
@@ -35,7 +36,7 @@ def mock_student_user():
 def mock_partner():
     """Fixture para parceiro mock."""
     return {
-        "id": "partner-123",
+        "id": "PTN123456",
         "trade_name": "Parceiro Teste",
         "category": "alimentacao",
         "address": "Rua Teste, 123",
@@ -59,7 +60,7 @@ def mock_promotion():
     """Fixture para promoção mock."""
     return {
         "id": "promotion-123",
-        "partner_id": "partner-123",
+        "partner_id": "PTN123456",
         "title": "Desconto 20%",
         "type": "discount",
         "valid_from": datetime.now().isoformat(),
@@ -75,7 +76,7 @@ def mock_validation_code():
     return {
         "id": "code-123",
         "student_id": "student-123",
-        "partner_id": "partner-123",
+        "partner_id": "PTN123456",
         "code_hash": "123456",
         "expires": (datetime.now() + timedelta(minutes=3)).isoformat(),
         "used_at": datetime.now().isoformat(),
@@ -88,7 +89,7 @@ def mock_favorite():
     return {
         "id": "favorite-123",
         "student_id": "student-123",
-        "partner_id": "partner-123",
+        "partner_id": "PTN123456",
         "created_at": datetime.now().isoformat(),
     }
 
@@ -174,7 +175,7 @@ class TestStudentPartnersEndpoints:
 
             from src.api.student import get_partner_details
 
-            result = await get_partner_details("partner-123", mock_student_user)
+            result = await get_partner_details("PTN123456", mock_student_user)
 
             assert result["msg"] == "ok"
             assert result["data"]["trade_name"] == "Parceiro Teste"
@@ -214,7 +215,7 @@ class TestStudentPartnersEndpoints:
             from src.api.student import get_partner_details
 
             with pytest.raises(Exception) as exc_info:
-                await get_partner_details("partner-123", mock_student_user)
+                await get_partner_details("PTN123456", mock_student_user)
 
             assert "NOT_FOUND" in str(exc_info.value)
 
@@ -239,7 +240,7 @@ class TestStudentValidationCodeEndpoint:
 
             from src.api.student import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="partner-123")
+            request_data = ValidationCodeRequest(partner_id="PTN123456")
 
             result = await create_validation_code(request_data, mock_student_user)
 
@@ -284,7 +285,7 @@ class TestStudentValidationCodeEndpoint:
 
             from src.api.student import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="partner-123")
+            request_data = ValidationCodeRequest(partner_id="PTN123456")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_student_user)
@@ -306,7 +307,7 @@ class TestStudentValidationCodeEndpoint:
 
             from src.api.student import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="partner-123")
+            request_data = ValidationCodeRequest(partner_id="PTN123456")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_student_user)
@@ -332,7 +333,7 @@ class TestStudentValidationCodeEndpoint:
 
             from src.api.student import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="partner-123")
+            request_data = ValidationCodeRequest(partner_id="PTN123456")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_student_user)
@@ -423,17 +424,28 @@ class TestStudentFavoritesEndpoints:
 
     @pytest.mark.asyncio
     async def test_get_student_favorites_success(
-        self, mock_student_user, mock_favorite, mock_partner
+        self, mock_student_user, mock_partner
     ):
         """Testa obtenção de favoritos com sucesso."""
+        # Mock do documento de favoritos do estudante
+        mock_student_favorites = {
+            "id": "student-123",
+            "favorites": ["PTN123456"],
+            "created_at": "2024-01-01T00:00:00",
+            "updated_at": "2024-01-01T00:00:00"
+        }
+        
         with (
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
             ),
-            patch("src.api.student.firestore_client") as mock_firestore,
-            patch("src.api.student.with_circuit_breaker", return_value=mock_partner),
+            patch("src.api.student.with_circuit_breaker") as mock_circuit_breaker,
         ):
-            mock_firestore.query_documents.return_value = {"items": [mock_favorite]}
+            # Configurar circuit breaker para retornar favoritos e depois parceiro
+            mock_circuit_breaker.side_effect = [
+                mock_student_favorites,  # Primeira chamada para obter favoritos
+                mock_partner  # Segunda chamada para obter parceiro
+            ]
 
             from src.api.student import get_student_favorites
 
@@ -441,7 +453,7 @@ class TestStudentFavoritesEndpoints:
 
             assert result["msg"] == "ok"
             assert len(result["data"]) == 1
-            assert result["data"][0]["trade_name"] == "Parceiro Teste"
+            assert result["data"][0].trade_name == "Parceiro Teste"
 
     @pytest.mark.asyncio
     async def test_get_student_favorites_empty(self, mock_student_user):
@@ -450,10 +462,8 @@ class TestStudentFavoritesEndpoints:
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
             ),
-            patch("src.api.student.firestore_client") as mock_firestore,
+            patch("src.api.student.with_circuit_breaker", return_value=None),
         ):
-            mock_firestore.query_documents.return_value = {"items": []}
-
             from src.api.student import get_student_favorites
 
             result = await get_student_favorites(mock_student_user)
@@ -468,44 +478,58 @@ class TestStudentFavoritesEndpoints:
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
             ),
+            patch("src.api.student.with_circuit_breaker") as mock_circuit_breaker,
             patch("src.api.student.firestore_client") as mock_firestore,
         ):
-            mock_firestore.get_document.return_value = mock_partner
-            mock_firestore.query_documents.return_value = {
-                "items": []
-            }  # Não é favorito ainda
+            # Configurar circuit breaker para retornar parceiro e depois None (favoritos não existem)
+            mock_circuit_breaker.side_effect = [
+                mock_partner,  # Primeira chamada para verificar parceiro
+                None  # Segunda chamada para verificar favoritos (não existe ainda)
+            ]
             mock_firestore.create_document = AsyncMock()
 
             from src.api.student import add_student_favorite
 
             result = await add_student_favorite(
-                {"partner_id": "partner-123"}, mock_student_user
+                {"partner_id": "PTN123456"}, mock_student_user
             )
 
-            assert result["msg"] == "ok"
+            assert result.success is True
+            assert "adicionado aos favoritos" in result.message
             mock_firestore.create_document.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_add_student_favorite_already_exists(
-        self, mock_student_user, mock_partner, mock_favorite
+        self, mock_student_user, mock_partner
     ):
         """Testa adição de favorito que já existe."""
+        mock_student_favorites = {
+            "id": "student-123",
+            "favorites": ["PTN123456"],
+            "created_at": "2024-01-01T00:00:00",
+            "updated_at": "2024-01-01T00:00:00"
+        }
+        
         with (
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
             ),
-            patch("src.api.student.firestore_client") as mock_firestore,
+            patch("src.api.student.with_circuit_breaker") as mock_circuit_breaker,
         ):
-            mock_firestore.get_document.return_value = mock_partner
-            mock_firestore.query_documents.return_value = {"items": [mock_favorite]}
+            # Configurar circuit breaker para retornar parceiro e depois favoritos existentes
+            mock_circuit_breaker.side_effect = [
+                mock_partner,  # Primeira chamada para verificar parceiro
+                mock_student_favorites  # Segunda chamada para verificar favoritos
+            ]
 
             from src.api.student import add_student_favorite
 
             result = await add_student_favorite(
-                {"partner_id": "partner-123"}, mock_student_user
+                {"partner_id": "PTN123456"}, mock_student_user
             )
 
-            assert result["msg"] == "ok"
+            assert result.success is True
+            assert "já está nos favoritos" in result.message
 
     @pytest.mark.asyncio
     async def test_add_student_favorite_partner_not_found(self, mock_student_user):
@@ -514,18 +538,17 @@ class TestStudentFavoritesEndpoints:
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
             ),
-            patch("src.api.student.firestore_client") as mock_firestore,
+            patch("src.api.student.with_circuit_breaker", return_value=None),
         ):
-            mock_firestore.get_document.return_value = None
-
             from src.api.student import add_student_favorite
 
-            with pytest.raises(Exception) as exc_info:
+            with pytest.raises(HTTPException) as exc_info:
                 await add_student_favorite(
                     {"partner_id": "invalid-partner"}, mock_student_user
                 )
 
-            assert "NOT_FOUND" in str(exc_info.value)
+            assert exc_info.value.status_code == 404
+            assert "NOT_FOUND" in str(exc_info.value.detail)
 
     @pytest.mark.asyncio
     async def test_add_student_favorite_missing_partner_id(self, mock_student_user):
@@ -535,51 +558,64 @@ class TestStudentFavoritesEndpoints:
         ):
             from src.api.student import add_student_favorite
 
-            with pytest.raises(Exception) as exc_info:
+            with pytest.raises(HTTPException) as exc_info:
                 await add_student_favorite({}, mock_student_user)
 
-            assert "VALIDATION_ERROR" in str(exc_info.value)
+            assert exc_info.value.status_code == 400
+            assert "VALIDATION_ERROR" in str(exc_info.value.detail)
 
     @pytest.mark.asyncio
     async def test_remove_student_favorite_success(
-        self, mock_student_user, mock_favorite
+        self, mock_student_user
     ):
         """Testa remoção de favorito com sucesso."""
+        mock_student_favorites = {
+            "id": "student-123",
+            "favorites": ["PTN123456", "PTN456789"],
+            "created_at": "2024-01-01T00:00:00",
+            "updated_at": "2024-01-01T00:00:00"
+        }
+        
         with (
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
             ),
+            patch("src.api.student.with_circuit_breaker", return_value=mock_student_favorites),
             patch("src.api.student.firestore_client") as mock_firestore,
         ):
-            mock_firestore.query_documents.return_value = {"items": [mock_favorite]}
-            mock_firestore.delete_document = AsyncMock()
+            mock_firestore.update_document = AsyncMock()
 
             from src.api.student import remove_student_favorite
 
-            result = await remove_student_favorite("partner-123", mock_student_user)
+            result = await remove_student_favorite("PTN123456", mock_student_user)
 
-            assert result["msg"] == "ok"
-            mock_firestore.delete_document.assert_called_once_with(
-                "favorites", "favorite-123"
-            )
+            assert result.success is True
+            assert "removido dos favoritos" in result.message
+            mock_firestore.update_document.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_remove_student_favorite_not_found(self, mock_student_user):
         """Testa remoção de favorito não encontrado."""
+        mock_student_favorites = {
+            "id": "student-123",
+            "favorites": ["PTN456789"],
+            "created_at": "2024-01-01T00:00:00",
+            "updated_at": "2024-01-01T00:00:00"
+        }
+        
         with (
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
             ),
-            patch("src.api.student.firestore_client") as mock_firestore,
+            patch("src.api.student.with_circuit_breaker", return_value=mock_student_favorites),
         ):
-            mock_firestore.query_documents.return_value = {"items": []}
-
             from src.api.student import remove_student_favorite
 
-            with pytest.raises(Exception) as exc_info:
-                await remove_student_favorite("partner-123", mock_student_user)
+            with pytest.raises(HTTPException) as exc_info:
+                await remove_student_favorite("PTN123456", mock_student_user)
 
-            assert "NOT_FOUND" in str(exc_info.value)
+            assert exc_info.value.status_code == 404
+            assert "NOT_FOUND" in str(exc_info.value.detail)
 
 
 @pytest.mark.integration

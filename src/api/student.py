@@ -10,7 +10,8 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from src.auth import JWTPayload, validate_student_role
 from src.db import firestore_client, postgres_client, with_circuit_breaker
 from src.models import (
-    BaseResponse,
+    FavoriteRequest,
+    FavoriteResponse,
     FavoritesResponse,
     HistoryResponse,
     Partner,
@@ -57,7 +58,7 @@ async def list_partners(
             limit=limit,
             offset=offset,
             use_circuit_breaker=True,  # Habilitado para estudantes
-            enable_ordering=False,     # Desabilitado para evitar índices
+            enable_ordering=False,  # Desabilitado para evitar índices
         )
 
     except Exception as e:
@@ -397,36 +398,34 @@ async def get_student_favorites(
 ):
     """
     Retorna a lista de parceiros favoritos do aluno.
+
+    Utiliza a nova estrutura de coleções separadas (students_fav).
     """
     try:
         student_id = current_user.sub
 
-        # Obter favoritos do aluno
+        # Obter documento de favoritos do estudante
         async def get_firestore_favorites():
-            return await firestore_client.query_documents(
-                "favorites",
-                filters=[("student_id", "==", student_id)],
-                tenant_id=current_user.tenant,
-            )
+            return await firestore_client.get_document("students_fav", student_id)
 
         async def get_postgres_favorites():
-            return await postgres_client.query_documents(
-                "favorites",
-                filters=[("student_id", "==", student_id)],
-                tenant_id=current_user.tenant,
-            )
+            return await postgres_client.get_document("students_fav", student_id)
 
-        favorites_result = await get_firestore_favorites()
+        favorites_doc = await with_circuit_breaker(
+            get_firestore_favorites, get_postgres_favorites
+        )
+
+        # Se não existe documento de favoritos, retornar lista vazia
+        if not favorites_doc:
+            return {"data": [], "msg": "ok"}
+
+        # Obter lista de IDs dos parceiros favoritos
+        favorite_partner_ids = favorites_doc.get("favorites", [])
 
         # Obter detalhes dos parceiros favoritos
         favorite_partners = []
 
-        for favorite in favorites_result.get("items", []):
-            partner_id = favorite.get("partner_id")
-
-            if not partner_id:
-                continue
-
+        for partner_id in favorite_partner_ids:
             # Obter parceiro
             async def get_firestore_partner(pid=partner_id):
                 return await firestore_client.get_document("partners", pid)
@@ -456,27 +455,18 @@ async def get_student_favorites(
         ) from e
 
 
-@router.post("/me/fav", response_model=BaseResponse)
+@router.post("/me/fav", response_model=FavoriteResponse)
 async def add_student_favorite(
-    partner_id: dict, current_user: JWTPayload = Depends(validate_student_role)
+    request: FavoriteRequest, current_user: JWTPayload = Depends(validate_student_role)
 ):
     """
     Adiciona um parceiro à lista de favoritos do aluno.
+
+    Utiliza a nova estrutura de coleções separadas (students_fav).
     """
     try:
         student_id = current_user.sub
-        partner_id_value = partner_id.get("partner_id")
-
-        if not partner_id_value:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={
-                    "error": {
-                        "code": "VALIDATION_ERROR",
-                        "msg": "ID do parceiro é obrigatório",
-                    }
-                },
-            )
+        partner_id_value = request.partner_id
 
         # Verificar se o parceiro existe e está ativo
         async def get_firestore_partner():
@@ -485,7 +475,9 @@ async def add_student_favorite(
         async def get_postgres_partner():
             return await postgres_client.get_document("partners", partner_id_value)
 
-        partner = await get_firestore_partner()
+        partner = await with_circuit_breaker(
+            get_firestore_partner, get_postgres_partner
+        )
 
         if not partner or not partner.get("active", False):
             raise HTTPException(
@@ -495,45 +487,60 @@ async def add_student_favorite(
                 },
             )
 
+        # Obter documento atual de favoritos
+        async def get_firestore_favorites():
+            return await firestore_client.get_document("students_fav", student_id)
+
+        async def get_postgres_favorites():
+            return await postgres_client.get_document("students_fav", student_id)
+
+        favorites_doc = await with_circuit_breaker(
+            get_firestore_favorites, get_postgres_favorites
+        )
+
+        current_favorites = []
+        if favorites_doc:
+            current_favorites = favorites_doc.get("favorites", [])
+
         # Verificar se já é favorito
-        async def get_firestore_favorite():
-            favorites = await firestore_client.query_documents(
-                "favorites",
-                filters=[
-                    ("student_id", "==", student_id),
-                    ("partner_id", "==", partner_id_value),
-                ],
-                limit=1,
+        if partner_id_value in current_favorites:
+            return FavoriteResponse(
+                success=True,
+                message="Parceiro já está nos favoritos",
+                favorites_count=len(current_favorites),
             )
-            return favorites.get("items", [])[0] if favorites.get("items") else None
-
-        async def get_postgres_favorite():
-            favorites = await postgres_client.query_documents(
-                "favorites",
-                filters=[
-                    ("student_id", "==", student_id),
-                    ("partner_id", "==", partner_id_value),
-                ],
-                limit=1,
-            )
-            return favorites.get("items", [])[0] if favorites.get("items") else None
-
-        existing_favorite = await get_firestore_favorite()
-
-        if existing_favorite:
-            return {"msg": "ok"}
 
         # Adicionar aos favoritos
-        favorite = {
-            "id": str(uuid.uuid4()),
-            "student_id": student_id,
-            "partner_id": partner_id_value,
-            "created_at": datetime.now().isoformat(),
+        current_favorites.append(partner_id_value)
+
+        # Criar ou atualizar documento de favoritos
+        favorites_data = {
+            "id": student_id,
+            "favorites": current_favorites,
+            "updated_at": datetime.now().isoformat(),
         }
 
-        await firestore_client.create_document("favorites", favorite, favorite["id"])
+        if favorites_doc:
+            # Atualizar documento existente
+            await firestore_client.update_document(
+                "students_fav",
+                student_id,
+                {
+                    "favorites": current_favorites,
+                    "updated_at": datetime.now().isoformat(),
+                },
+            )
+        else:
+            # Criar novo documento
+            await firestore_client.create_document(
+                "students_fav", favorites_data, student_id
+            )
 
-        return {"msg": "ok"}
+        return FavoriteResponse(
+            success=True,
+            message="Parceiro adicionado aos favoritos com sucesso",
+            favorites_count=len(current_favorites),
+        )
 
     except HTTPException:
         raise
@@ -547,51 +554,67 @@ async def add_student_favorite(
         ) from e
 
 
-@router.delete("/me/fav/{pid}", response_model=BaseResponse)
+@router.delete("/me/fav/{partner_id}", response_model=FavoriteResponse)
 async def remove_student_favorite(
-    pid: str = Path(..., description="ID do parceiro"),
+    partner_id: str = Path(..., description="ID do parceiro"),
     current_user: JWTPayload = Depends(validate_student_role),
 ):
     """
     Remove um parceiro da lista de favoritos do aluno.
+
+    Utiliza a nova estrutura de coleções separadas (students_fav).
     """
     try:
         student_id = current_user.sub
 
-        # Verificar se é favorito
-        async def get_firestore_favorite():
-            favorites = await firestore_client.query_documents(
-                "favorites",
-                filters=[("student_id", "==", student_id), ("partner_id", "==", pid)],
-                limit=1,
-            )
-            return favorites.get("items", [])[0] if favorites.get("items") else None
+        # Obter documento atual de favoritos
+        async def get_firestore_favorites():
+            return await firestore_client.get_document("students_fav", student_id)
 
-        async def get_postgres_favorite():
-            favorites = await postgres_client.query_documents(
-                "favorites",
-                filters=[("student_id", "==", student_id), ("partner_id", "==", pid)],
-                limit=1,
-            )
-            return favorites.get("items", [])[0] if favorites.get("items") else None
+        async def get_postgres_favorites():
+            return await postgres_client.get_document("students_fav", student_id)
 
-        favorite = await get_firestore_favorite()
+        favorites_doc = await with_circuit_breaker(
+            get_firestore_favorites, get_postgres_favorites
+        )
 
-        if not favorite:
+        if not favorites_doc:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={
-                    "error": {
-                        "code": "NOT_FOUND",
-                        "msg": "Parceiro não encontrado nos favoritos",
-                    }
+                    "error": {"code": "NOT_FOUND", "msg": "Favorito não encontrado"}
+                },
+            )
+
+        current_favorites = favorites_doc.get("favorites", [])
+
+        # Verificar se o parceiro está nos favoritos
+        if partner_id not in current_favorites:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": {"code": "NOT_FOUND", "msg": "Favorito não encontrado"}
                 },
             )
 
         # Remover dos favoritos
-        await firestore_client.delete_document("favorites", favorite["id"])
+        current_favorites.remove(partner_id)
 
-        return {"msg": "ok"}
+        # Atualizar documento
+        await firestore_client.update_document(
+            "students_fav",
+            student_id,
+            {
+                "favorites": current_favorites,
+                "updated_at": datetime.now().isoformat(),
+            },
+        )
+
+        return FavoriteResponse(
+            success=True,
+            message="Parceiro removido dos favoritos com sucesso",
+            favorites_count=len(current_favorites),
+        )
 
     except HTTPException:
         raise

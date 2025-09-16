@@ -5,21 +5,13 @@ Este módulo contém testes unitários para todos os endpoints definidos em src/
 incluindo testes de sucesso, falha, validação de dados e integração com autenticação.
 """
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
-from fastapi.testclient import TestClient
 from fastapi import status
-import uuid
-from datetime import date, datetime
+from fastapi.testclient import TestClient
 
 from src.api.admin import router
-from src.models.admin import (
-    EntityCreateRequest,
-    EntityUpdateRequest,
-    NotificationRequest,
-    MetricsResponse,
-)
-from src.models import BaseResponse
 from src.auth import JWTPayload
 
 
@@ -80,7 +72,11 @@ class TestListPartners:
     @patch("src.api.admin.with_circuit_breaker")
     @patch("src.api.admin.validate_admin_role")
     async def test_list_partners_success(
-        self, mock_validate_role, mock_circuit_breaker, mock_admin_user, mock_partner_data
+        self,
+        mock_validate_role,
+        mock_circuit_breaker,
+        mock_admin_user,
+        mock_partner_data,
     ):
         """Testa listagem bem-sucedida de parceiros."""
         mock_validate_role.return_value = mock_admin_user
@@ -104,7 +100,11 @@ class TestListPartners:
     @patch("src.api.admin.with_circuit_breaker")
     @patch("src.api.admin.validate_admin_role")
     async def test_list_partners_with_filters(
-        self, mock_validate_role, mock_circuit_breaker, mock_admin_user, mock_partner_data
+        self,
+        mock_validate_role,
+        mock_circuit_breaker,
+        mock_admin_user,
+        mock_partner_data,
     ):
         """Testa listagem de parceiros com filtros aplicados."""
         mock_validate_role.return_value = mock_admin_user
@@ -145,7 +145,11 @@ class TestGetPartnerDetails:
     @patch("src.api.admin.with_circuit_breaker")
     @patch("src.api.admin.validate_admin_role")
     async def test_get_partner_details_success(
-        self, mock_validate_role, mock_circuit_breaker, mock_admin_user, mock_partner_data
+        self,
+        mock_validate_role,
+        mock_circuit_breaker,
+        mock_admin_user,
+        mock_partner_data,
     ):
         """Testa obtenção bem-sucedida de detalhes do parceiro."""
         mock_validate_role.return_value = mock_admin_user
@@ -257,9 +261,7 @@ class TestUpdateEntity:
         mock_validate_role.return_value = mock_admin_user
         mock_doc = MagicMock()
         mock_doc.exists = True
-        mock_firestore.collection.return_value.document.return_value.get.return_value = (
-            mock_doc
-        )
+        mock_firestore.collection.return_value.document.return_value.get.return_value = mock_doc
 
         request_data = {
             "entity_type": "partner",
@@ -281,9 +283,7 @@ class TestUpdateEntity:
         mock_validate_role.return_value = mock_admin_user
         mock_doc = MagicMock()
         mock_doc.exists = False
-        mock_firestore.collection.return_value.document.return_value.get.return_value = (
-            mock_doc
-        )
+        mock_firestore.collection.return_value.document.return_value.get.return_value = mock_doc
 
         request_data = {
             "entity_type": "partner",
@@ -309,9 +309,7 @@ class TestDeleteEntity:
         mock_validate_role.return_value = mock_admin_user
         mock_doc = MagicMock()
         mock_doc.exists = True
-        mock_firestore.collection.return_value.document.return_value.get.return_value = (
-            mock_doc
-        )
+        mock_firestore.collection.return_value.document.return_value.get.return_value = mock_doc
 
         with TestClient(router) as client:
             response = client.delete("/entities/partner_123?entity_type=partner")
@@ -328,9 +326,7 @@ class TestDeleteEntity:
         mock_validate_role.return_value = mock_admin_user
         mock_doc = MagicMock()
         mock_doc.exists = False
-        mock_firestore.collection.return_value.document.return_value.get.return_value = (
-            mock_doc
-        )
+        mock_firestore.collection.return_value.document.return_value.get.return_value = mock_doc
 
         with TestClient(router) as client:
             response = client.delete("/entities/nonexistent?entity_type=partner")
@@ -510,9 +506,7 @@ class TestIntegrationScenarios:
         # Mock para leitura/atualização/exclusão
         mock_doc = MagicMock()
         mock_doc.exists = True
-        mock_firestore.collection.return_value.document.return_value.get.return_value = (
-            mock_doc
-        )
+        mock_firestore.collection.return_value.document.return_value.get.return_value = mock_doc
 
         with TestClient(router) as client:
             # Criar

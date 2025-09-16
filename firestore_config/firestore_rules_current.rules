@@ -1,0 +1,207 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Função auxiliar para verificar tenant válido
+    function isValidTenant() {
+      return resource.data.tenant_id == "knn-dev-tenant";
+    }
+
+    // Função auxiliar para verificar se é admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.role == "admin";
+    }
+
+    // Função auxiliar para verificar se é o próprio usuário
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Função para validar dados obrigatórios de estudantes
+    function isValidStudentData() {
+      return request.resource.data.keys().hasAll(['id', 'tenant_id', 'nome', 'livro']) &&
+             request.resource.data.tenant_id == "knn-dev-tenant" &&
+             request.resource.data.nome is string &&
+             request.resource.data.nome.size() > 0 &&
+             request.resource.data.livro is string &&
+             request.resource.data.livro.size() > 0;
+    }
+
+    // Função para validar dados obrigatórios de funcionários
+    function isValidEmployeeData() {
+      return request.resource.data.keys().hasAll(['id', 'tenant_id', 'nome', 'cargo']) &&
+             request.resource.data.tenant_id == "knn-dev-tenant" &&
+             request.resource.data.nome is string &&
+             request.resource.data.nome.size() > 0 &&
+             request.resource.data.cargo is string &&
+             request.resource.data.cargo.size() > 0;
+    }
+
+    // === COLEÇÃO STUDENTS ===
+    match /students/{studentId} {
+      // Leitura: usuários autenticados com tenant válido
+      allow read: if request.auth != null && isValidTenant();
+
+      // Escrita: apenas admins com dados válidos
+      allow write: if isAdmin() && isValidTenant() && isValidStudentData();
+
+      // Criação: admins com dados válidos e tenant correto
+      allow create: if isAdmin() && isValidStudentData();
+
+      // Atualização: admins mantendo o tenant_id
+      allow update: if isAdmin() &&
+                   isValidStudentData() &&
+                   request.resource.data.tenant_id == resource.data.tenant_id;
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin() && isValidTenant();
+    }
+
+    // === COLEÇÃO EMPLOYEES ===
+    match /employees/{employeeId} {
+      // Leitura: usuários autenticados com tenant válido
+      allow read: if request.auth != null && isValidTenant();
+
+      // Escrita: apenas admins com dados válidos
+      allow write: if isAdmin() && isValidTenant() && isValidEmployeeData();
+
+      // Criação: admins com dados válidos e tenant correto
+      allow create: if isAdmin() && isValidEmployeeData();
+
+      // Atualização: admins mantendo o tenant_id
+      allow update: if isAdmin() &&
+                   isValidEmployeeData() &&
+                   request.resource.data.tenant_id == resource.data.tenant_id;
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin() && isValidTenant();
+    }
+
+    // === COLEÇÃO PARTNERS ===
+    match /partners/{partnerId} {
+      // Leitura: todos os usuários autenticados
+      allow read: if request.auth != null;
+
+      // Escrita: apenas administradores
+      allow write: if isAdmin();
+
+      // Criação: apenas admins
+      allow create: if isAdmin();
+
+      // Atualização: apenas admins
+      allow update: if isAdmin();
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin();
+    }
+
+    // === COLEÇÃO PROMOTIONS ===
+    match /promotions/{promotionId} {
+      // Leitura: todos os usuários autenticados
+      allow read: if request.auth != null;
+
+      // Escrita: apenas administradores
+      allow write: if isAdmin();
+
+      // Criação: apenas admins
+      allow create: if isAdmin();
+
+      // Atualização: apenas admins
+      allow update: if isAdmin();
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin();
+    }
+
+    // === COLEÇÃO VALIDATION_CODES ===
+    match /validation_codes/{codeId} {
+      // Leitura: próprio usuário ou admin
+      allow read: if request.auth != null &&
+                 (isOwner(resource.data.student_id) ||
+                  isOwner(resource.data.employee_id) ||
+                  isAdmin());
+
+      // Criação: usuários autenticados para si mesmos ou admins
+      allow create: if request.auth != null &&
+                   (request.resource.data.student_id == request.auth.uid ||
+                    request.resource.data.employee_id == request.auth.uid ||
+                    isAdmin());
+
+      // Atualização: apenas para marcar como usado
+      allow update: if request.auth != null &&
+                   (isOwner(resource.data.student_id) ||
+                    isOwner(resource.data.employee_id) ||
+                    isAdmin()) &&
+                   // Só permite atualizar used_at
+                   request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used_at']);
+
+      // Exclusão: apenas admins
+      allow delete: if isAdmin();
+    }
+
+    // === COLEÇÃO REDEMPTIONS ===
+    match /redemptions/{redemptionId} {
+      // Leitura: usuários autenticados
+      allow read: if request.auth != null;
+
+      // Criação: usuários autenticados
+      allow create: if request.auth != null;
+
+      // Atualização e exclusão: apenas admins
+      allow update, delete: if isAdmin();
+    }
+
+    // === COLEÇÃO STUDENTS_FAV ===
+    match /students_fav/{studentId} {
+      // Leitura: apenas o próprio estudante ou admin
+      allow read: if request.auth != null &&
+                 (isOwner(studentId) || isAdmin());
+
+      // Criação: apenas o próprio estudante ou admin
+      allow create: if request.auth != null &&
+                   (isOwner(studentId) || isAdmin()) &&
+                   request.resource.data.id == studentId;
+
+      // Atualização: apenas o próprio estudante ou admin
+      allow update: if request.auth != null &&
+                   (isOwner(studentId) || isAdmin()) &&
+                   request.resource.data.id == resource.data.id;
+
+      // Exclusão: apenas o próprio estudante ou admin
+      allow delete: if request.auth != null &&
+                   (isOwner(studentId) || isAdmin());
+    }
+
+    // === COLEÇÃO EMPLOYEES_FAV ===
+    match /employees_fav/{employeeId} {
+      // Leitura: apenas o próprio funcionário ou admin
+      allow read: if request.auth != null &&
+                 (isOwner(employeeId) || isAdmin());
+
+      // Criação: apenas o próprio funcionário ou admin
+      allow create: if request.auth != null &&
+                   (isOwner(employeeId) || isAdmin()) &&
+                   request.resource.data.id == employeeId;
+
+      // Atualização: apenas o próprio funcionário ou admin
+      allow update: if request.auth != null &&
+                   (isOwner(employeeId) || isAdmin()) &&
+                   request.resource.data.id == resource.data.id;
+
+      // Exclusão: apenas o próprio funcionário ou admin
+      allow delete: if request.auth != null &&
+                   (isOwner(employeeId) || isAdmin());
+    }
+
+    // === REGRA PADRÃO PARA OUTRAS COLEÇÕES ===
+    // Para desenvolvimento, permite acesso a outras coleções para admins
+    match /{collection}/{document} {
+      allow read, write: if isAdmin();
+    }
+
+    // === SUBCOLEÇÕES ===
+    // Permite acesso a subcoleções seguindo as mesmas regras do documento pai
+    match /{path=**}/subcollection/{doc} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

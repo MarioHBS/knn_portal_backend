@@ -53,8 +53,8 @@ try:
         "/partners",
         "/partners/{id}",
         "/validation-codes",
-        "/students/me/history",
-        "/students/me/fav",
+        "/student/me/history",
+        "/student/me/fav",
         "/partner/redeem",
         "/partner/promotions",
         "/admin/metrics"
