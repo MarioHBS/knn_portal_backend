@@ -153,6 +153,7 @@ class UnifiedDatabaseClient:
     @with_error_handling(DEFAULT_RETRY_CONFIG, "query_documents")
     async def query_documents(
         collection: str,
+        *,
         tenant_id: str,
         filters: list[tuple[str, str, Any]] | None = None,
         order_by: list[tuple[str, str]] | None = None,

@@ -33,30 +33,25 @@ def client():
     # Rotas para testes
     @app.get("/v1/partners")
     async def list_partners(
-        current_user=Depends(lambda: get_current_user(role="student")),
+        current_user=Depends(lambda: get_current_user(role="student"))
     ):
         return {
-            "data": {
-                "items": [
-                    {
-                        "id": str(uuid.uuid4()),
-                        "trade_name": "Parceiro 1",
-                        "category": "Livraria",
-                        "address": "Endereço 1",
-                        "active": True,
-                    },
-                    {
-                        "id": str(uuid.uuid4()),
-                        "trade_name": "Parceiro 2",
-                        "category": "Restaurante",
-                        "address": "Endereço 2",
-                        "active": True,
-                    },
-                ],
-                "total": 2,
-                "limit": 20,
-                "offset": 0,
-            },
+            "data": [
+                {
+                    "id": str(uuid.uuid4()),
+                    "trade_name": "Parceiro 1",
+                    "category": "Livraria",
+                    "address": "Endereço 1",
+                    "active": True,
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "trade_name": "Parceiro 2",
+                    "category": "Restaurante",
+                    "address": "Endereço 2",
+                    "active": True,
+                },
+            ],
             "msg": "ok",
         }
 
@@ -165,27 +160,22 @@ def client():
         current_user=Depends(lambda: get_current_user(role="employee")),
     ):
         return {
-            "data": {
-                "items": [
-                    {
-                        "id": str(uuid.uuid4()),
-                        "trade_name": "Parceiro 1",
-                        "category": "Livraria",
-                        "address": "Endereço 1",
-                        "active": True,
-                    },
-                    {
-                        "id": str(uuid.uuid4()),
-                        "trade_name": "Parceiro 2",
-                        "category": "Restaurante",
-                        "address": "Endereço 2",
-                        "active": True,
-                    },
-                ],
-                "total": 2,
-                "limit": 20,
-                "offset": 0,
-            },
+            "data": [
+                {
+                    "id": str(uuid.uuid4()),
+                    "trade_name": "Parceiro 1",
+                    "category": "Livraria",
+                    "address": "Endereço 1",
+                    "active": True,
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "trade_name": "Parceiro 2",
+                    "category": "Restaurante",
+                    "address": "Endereço 2",
+                    "active": True,
+                },
+            ],
             "msg": "ok",
         }
 
@@ -403,8 +393,8 @@ def test_list_partners(client):
     )
     assert response.status_code == 200
     assert "data" in response.json()
-    assert "items" in response.json()["data"]
-    assert len(response.json()["data"]["items"]) == 2
+    assert isinstance(response.json()["data"], list)
+    assert len(response.json()["data"]) == 2
 
 
 def test_get_partner_details(client):
@@ -627,8 +617,8 @@ def test_employee_list_partners(client):
     )
     assert response.status_code == 200
     assert "data" in response.json()
-    assert "items" in response.json()["data"]
-    assert len(response.json()["data"]["items"]) == 2
+    assert isinstance(response.json()["data"], list)
+    assert len(response.json()["data"]) == 2
 
 
 def test_employee_get_partner_details(client):

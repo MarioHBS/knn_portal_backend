@@ -1,0 +1,264 @@
+{
+  "partners": {
+    "PTN_A1E3018_AUT": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:31.944860",
+      "social_networks": {
+        "facebook": null,
+        "instagram": null,
+        "website": null
+      },
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "benefit": "Foi acordado que todo aluno knn terá 10% de desconto em cima do valor final.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Autoescola Escórcio",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_A1E3018_AUT.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Automotivo",
+      "contact": {
+        "whatsapp": null,
+        "email": null,
+        "phone": null
+      },
+      "address": {
+        "zip": "65040003",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Outeiro da Cruz",
+        "street": "Av. João Pessoa, 20"
+      },
+      "cnpj": "13018958000151",
+      "id": "PTN_A1E3018_AUT"
+    },
+    "PTN_C0P4799_LIV": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:34.614493",
+      "social_networks": {
+        "facebook": null,
+        "instagram": "https://www.instagram.com/clubedopapel/",
+        "website": "https://saoluis.edufor.edu.br/"
+      },
+      "maps": {
+        "google": "https://maps.app.goo.gl/ScDmnkDq5tpkKRP16",
+        "waze": null
+      },
+      "benefit": "Todos os nossos alunos tem desconto de 5% nas compras.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Clube do Papel",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C0P4799_LIV.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Papelaria",
+      "contact": {
+        "whatsapp": "https://api.whatsapp.com/send/?phone=559832384312",
+        "email": "contato@edufor.edu.br",
+        "phone": "983248-0204"
+      },
+      "address": {
+        "zip": "65050000",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Planalto Anil I",
+        "street": "Av. Principal, 12"
+      },
+      "cnpj": "04799927000194",
+      "id": "PTN_C0P4799_LIV"
+    },
+    "PTN_C5C7628_TEC": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:37.651983",
+      "social_networks": {
+        "facebook": null,
+        "instagram": "https://www.instagram.com/cadin.celulares/",
+        "website": null
+      },
+      "maps": {
+        "google": "https://maps.app.goo.gl/x125XLknpxWH2RA29",
+        "waze": null
+      },
+      "benefit": "Todos alunos e colaboradores têm 5% de descontos nas compras até R$3,000,00 e ganha um acessorio na loja.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Cadin Celulares",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C5C7628_TEC.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Tecnologia",
+      "contact": {
+        "whatsapp": null,
+        "email": null,
+        "phone": null
+      },
+      "address": {
+        "zip": "65110000",
+        "state": "MA",
+        "city": "São José de Ribamar",
+        "neighborhood": "Maiobrado",
+        "street": "Av. América do Sul, 2"
+      },
+      "cnpj": "57628555000108",
+      "id": "PTN_C5C7628_TEC"
+    },
+    "PTN_C8A3367_EDU": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:40.516087",
+      "social_networks": {
+        "facebook": null,
+        "instagram": null,
+        "website": null
+      },
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "benefit": "Foi acordado que, todos alunos knn têm 15% de descontos na para estudar na escola.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Colégio Adventista (Cohab)",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C8A3367_EDU.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Educação",
+      "contact": {
+        "whatsapp": null,
+        "email": null,
+        "phone": null
+      },
+      "address": {
+        "zip": "65053240",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Cohab",
+        "street": "Av. 8, III Conjunto Cohab Anil, 12"
+      },
+      "cnpj": "83367326010494",
+      "id": "PTN_C8A3367_EDU"
+    },
+    "PTN_E211033_EDU": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:43.429397",
+      "social_networks": {
+        "facebook": "https://www.facebook.com/eduforfaculdadeslz",
+        "instagram": "https://www.instagram.com/eduforsaoluis",
+        "website": "https://saoluis.edufor.edu.br/"
+      },
+      "maps": {
+        "google": "https://maps.app.goo.gl/5VtCs5HJj9Hf8cXJA",
+        "waze": null
+      },
+      "benefit": "Foi acordado que, todos os alunos têm 70% de descontos nos cursos, exeto medicina.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Edufor",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_E211033_EDU.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Educação",
+      "contact": {
+        "whatsapp": "https://api.whatsapp.com/send?phone=5598988792811",
+        "email": "contato@edufor.edu.br",
+        "phone": "983248-0204"
+      },
+      "address": {
+        "zip": "65065470",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Turu",
+        "street": "Av. São Luís Rei de França, 19"
+      },
+      "cnpj": "21103399000106",
+      "id": "PTN_E211033_EDU"
+    },
+    "PTN_M365611_EDU": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:46.349425",
+      "social_networks": {
+        "facebook": "https://www.facebook.com/Microlinscursosprofissionalizantes",
+        "instagram": null,
+        "website": "https://escolas.microlins.com.br/microlins-cidade-operaria-s-o-lu-s-ma"
+      },
+      "maps": {
+        "google": "https://maps.app.goo.gl/mJDjGD3hQrsF5SYA8",
+        "waze": null
+      },
+      "benefit": "Todos os alunos knn terão 26% de descontos em todos os cursos da instituição.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Microlins",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_M365611_EDU.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Educação",
+      "contact": {
+        "whatsapp": "https://api.whatsapp.com/send?phone=5598991405466",
+        "email": null,
+        "phone": "98991405466"
+      },
+      "address": {
+        "zip": "65058181",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Cidade Operária",
+        "street": "Av. 203, 98"
+      },
+      "cnpj": "36561122000102",
+      "id": "PTN_M365611_EDU"
+    },
+    "PTN_T2F4C65_EDU": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "category": "Educação",
+      "social_networks": {
+        "facebook": null,
+        "instagram": null,
+        "website": null
+      },
+      "contact": {
+        "whatsapp": null,
+        "email": null,
+        "phone": null
+      },
+      "address": {
+        "zip": "65050175",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Cohab Anil III",
+        "street": "Av. Jerônimo de Albuquerque, 123"
+      },
+      "cnpj": "24650966000132",
+      "benefit": "Foi acordado que, todo aluno tem 5% de desconto em qualquer curso da instituição.",
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Tudo Fácil Cursos",
+      "id": "PTN_T2F4C65_EDU"
+    },
+    "PTR_TEST_20250907191053": {
+      "created_at": "2025-09-07 22:10:56.626168+00:00",
+      "cep": "01414-001",
+      "total_beneficios": 25,
+      "is_temp": true,
+      "id": "PTR_TEST_20250907191053",
+      "categoria": "Tecnologia",
+      "endereco": "Rua Augusta, 1000",
+      "rating": 4.5,
+      "website": "https://techsolutions.com.br",
+      "status": "ativo",
+      "updated_at": "2025-09-07 22:10:56.626168+00:00",
+      "active": true,
+      "descricao": "Empresa especializada em soluções tecnológicas para educação",
+      "nome_empresa": "TechSolutions Ltda",
+      "tenant_id": "knn-dev-tenant",
+      "estado": "SP",
+      "created_by": "temp_test_script",
+      "cnpj": "12.345.678/0001-90",
+      "telefone": "(11) 99999-3333",
+      "email": "parceiro.teste@journeyclub.com.br",
+      "cidade": "São Paulo",
+      "firebase_uid": "WaPnrhF1nZXmvwJFawqnfJqB96a2"
+    }
+  }
+}

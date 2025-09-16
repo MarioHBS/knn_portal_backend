@@ -1,0 +1,433 @@
+{
+  "__collection__/employees": {},
+  "__collection__/employees/EMP_A0A0O007_AP": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Aimeê Almeida de Oliveira",
+      "role": "ADM. PEDAGÓGICO",
+      "e-mail": "aimee.almeida2018@gmail.com",
+      "phone": "98991075072",
+      "zip": "65110-000",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_A5C3O0R_CDA": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Ana Carolina de Oliveira Rodrigues",
+      "role": "CDA",
+      "e-mail": "rodriguescarol6813@gmail.com",
+      "phone": "98988217454",
+      "zip": "65053-530",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_A8L4L7B3_PR": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Ana Larissa Leite Barros",
+      "role": "PROFESSORA",
+      "e-mail": "larissaana2704@gmail.com",
+      "phone": "98985911317",
+      "zip": "65052-847",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_C0P0R0B0_PR": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Carmem Patrícia Reis Borges",
+      "role": "PROFESSORA",
+      "e-mail": "carmemprborges@gmail.com",
+      "phone": "98985347029",
+      "zip": "65130-000",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_E2A0B037_PR": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Edilene de Araújo Barbosa",
+      "role": "PROFESSORA",
+      "e-mail": "edillenem@outlook.com",
+      "phone": "98991795370",
+      "zip": "65065-200",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_F0F0O069_CC": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Felipe Ferreira de Oliveira",
+      "role": "CONSULTOR COMERCIAL",
+      "e-mail": "felipedefolive@gmail.com",
+      "phone": "98985916692",
+      "zip": "65138-000",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_J5S7O434_AF": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Juliana Santos Oliveira",
+      "role": "ADM. FINANCEIRO",
+      "e-mail": "julicasssantos@gmail.com",
+      "phone": "98988854341",
+      "zip": "65056-574",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_L6A2S691_AP": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Luana de Abreu Silva",
+      "role": "ADM. PEDAGÓGICO",
+      "e-mail": "luanaabreusilva09@gmail.com",
+      "phone": "98985594916",
+      "zip": "65042-626",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_N4J0E0C9_CC": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Natália de Jesus Everton Câmara",
+      "role": "CONSULTOR COMERCIAL",
+      "e-mail": "n4thyeverton087@gmail.com",
+      "phone": "98988394914",
+      "zip": "65035-400",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_T4M8R2O1_PR": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Tadeu Moraes Rego de Oliveira",
+      "role": "PROFESSOR",
+      "e-mail": "tadeu.mro922@gmail.com",
+      "phone": "98984215158",
+      "zip": "65051-482",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_Y3A2G0C4_PR": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Yago Augusto Gonçalves Costa",
+      "role": "PROFESSOR",
+      "e-mail": "augustocosta993@gmail.com",
+      "phone": "98985022446",
+      "zip": "65066-320",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/employees/EMP_Y7B3G0J6_CP": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Yanna Biankinny Gonçalves de Jesus",
+      "role": "COORD. PEDAGÓGICA",
+      "e-mail": "yannagoncalvesdejesus@gmail.com",
+      "phone": "98981031611",
+      "zip": "65053-730",
+      "active": true,
+      "created_at": "2025-08-28T17:45:13.713115",
+      "updated_at": "2025-08-28T17:45:13.713115"
+    }
+  },
+  "__collection__/partners": {},
+  "__collection__/partners/PTN_C8A3367_EDU": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Colégio Adventista (Cohab)",
+      "benefit": "Foi acordado que, todos alunos knn têm 15% de descontos na para estudar na escola.",
+      "cnpj": "83367326010494",
+      "category": "Educação",
+      "address": {
+        "zip": "65053240",
+        "street": "Av. 8, III Conjunto Cohab Anil, 12",
+        "neighborhood": "Cohab",
+        "city": "São Luís",
+        "state": "MA"
+      },
+      "contact": {
+        "phone": null,
+        "whatsapp": null,
+        "email": null
+      },
+      "social_networks": {
+        "instagram": null,
+        "facebook": null,
+        "website": null
+      },
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "active": true,
+      "created_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      },
+      "updated_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      }
+    }
+  },
+  "__collection__/partners/PTN_T2F4C65_EDU": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Tudo Fácil Cursos",
+      "benefit": "Foi acordado que, todo aluno tem 5% de desconto em qualquer curso da instituição.",
+      "cnpj": "24650966000132",
+      "category": "Educação",
+      "address": {
+        "zip": "65050175",
+        "street": "Av. Jerônimo de Albuquerque, 123",
+        "neighborhood": "Cohab Anil III",
+        "city": "São Luís",
+        "state": "MA"
+      },
+      "contact": {
+        "phone": null,
+        "whatsapp": null,
+        "email": null
+      },
+      "social_networks": {
+        "instagram": null,
+        "facebook": null,
+        "website": null
+      },
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "active": true,
+      "created_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      },
+      "updated_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      }
+    }
+  },
+  "__collection__/partners/PTN_C5C7628_TEC": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Cadin Celulares",
+      "benefit": "Todos alunos e colaboradores têm 5% de descontos nas compras até R$3,000,00 e ganha um acessorio na loja.",
+      "cnpj": "57628555000108",
+      "category": "Tecnologia",
+      "address": {
+        "zip": "65110000",
+        "street": "Av. América do Sul, 2",
+        "neighborhood": "Maiobrado",
+        "city": "São José de Ribamar",
+        "state": "MA"
+      },
+      "contact": {
+        "phone": null,
+        "whatsapp": null,
+        "email": null
+      },
+      "social_networks": {
+        "instagram": "https://www.instagram.com/cadin.celulares/",
+        "facebook": null,
+        "website": null
+      },
+      "maps": {
+        "google": "https://maps.app.goo.gl/x125XLknpxWH2RA29",
+        "waze": null
+      },
+      "active": true,
+      "created_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      },
+      "updated_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      }
+    }
+  },
+  "__collection__/partners/PTN_M365611_EDU": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Microlins",
+      "benefit": "Todos os alunos knn terão 26% de descontos em todos os cursos da instituição.",
+      "cnpj": "36561122000102",
+      "category": "Educação",
+      "address": {
+        "zip": "65058181",
+        "street": "Av. 203, 98",
+        "neighborhood": "Cidade Operária",
+        "city": "São Luís",
+        "state": "MA"
+      },
+      "contact": {
+        "phone": null,
+        "whatsapp": null,
+        "email": null
+      },
+      "social_networks": {
+        "instagram": null,
+        "facebook": null,
+        "website": null
+      },
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "active": true,
+      "created_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      },
+      "updated_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      }
+    }
+  },
+  "__collection__/partners/PTN_C0P4799_LIV": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Clube do papel",
+      "benefit": "Todos os nossos alunos tem desconto de 5% nas compras.",
+      "cnpj": "04799927000194",
+      "category": "Papelaria",
+      "address": {
+        "zip": "65050000",
+        "street": "Av. Principal, 12",
+        "neighborhood": "Planalto Anil I",
+        "city": "São Luís",
+        "state": "MA"
+      },
+      "contact": {
+        "phone": null,
+        "whatsapp": null,
+        "email": null
+      },
+      "social_networks": {
+        "instagram": null,
+        "facebook": null,
+        "website": null
+      },
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "active": true,
+      "created_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      },
+      "updated_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      }
+    }
+  },
+  "__collection__/partners/PTN_A1E3018_AUT": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Autoescola Escórcio",
+      "benefit": "Foi acordado que todo aluno knn terá 10% de desconto em cima do valor final.",
+      "cnpj": "13018958000151",
+      "category": "Automotivo",
+      "address": {
+        "zip": "65040003",
+        "street": "Av. João Pessoa, 20",
+        "neighborhood": "Outeiro da Cruz",
+        "city": "São Luís",
+        "state": "MA"
+      },
+      "contact": {
+        "phone": null,
+        "whatsapp": null,
+        "email": null
+      },
+      "social_networks": {
+        "instagram": null,
+        "facebook": null,
+        "website": null
+      },
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "active": true,
+      "created_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      },
+      "updated_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      }
+    }
+  },
+  "__collection__/partners/PTN_E211033_EDU": {
+    "data": {
+      "tenant_id": "knn-dev-tenant",
+      "name": "Edufor",
+      "benefit": "Foi acordado que, todos os alunos têm 70% de descontos nos cursos, exeto medicina.",
+      "cnpj": "21103399000106",
+      "category": "Educação",
+      "address": {
+        "zip": "65065470",
+        "street": "Av. São Luís Rei de França, 19",
+        "neighborhood": "Turu",
+        "city": "São Luís",
+        "state": "MA"
+      },
+      "contact": {
+        "phone": "9832480204",
+        "whatsapp": null,
+        "email": "contato@edufor.edu.br"
+      },
+      "social_networks": {
+        "instagram": "https://www.instagram.com/eduforsaoluis",
+        "facebook": "https://www.facebook.com/eduforfaculdadeslz",
+        "website": "https://saoluis.edufor.edu.br/"
+      },
+      "maps": {
+        "google": "https://maps.app.goo.gl/5VtCs5HJj9Hf8cXJA",
+        "waze": null
+      },
+      "active": true,
+      "created_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      },
+      "updated_at": {
+        "_seconds": 1757037666,
+        "_nanoseconds": 559931039
+      }
+    }
+  }
+}

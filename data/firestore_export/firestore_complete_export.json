@@ -1,4 +1,1110 @@
 {
+  "benefits": {
+    "BNF_A4E40151_DC": {
+      "created_at": "2025-09-01 20:45:13.415000+00:00",
+      "value": 10,
+      "terms_conditions": "Válido para cursos de habilitação categoria A e B. Apresentar comprovante de matrícula na KNN. Desconto aplicado sobre valor final.",
+      "metadata": {
+        "tags": [
+          "autoescola",
+          "desconto",
+          "estudante",
+          "habilitacao"
+        ],
+        "image_url": "https://example.com/autoescola_escorcio.jpg"
+      },
+      "description": "Desconto de 10% no valor final do curso de habilitação na Autoescola Escórcio",
+      "valid_from": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "type": "discount",
+      "usage_limit_type": "per_user",
+      "audience": "students",
+      "status": "active",
+      "updated_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value_type": "percentage",
+      "valid_until": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "tenant_id": "knn-dev-tenant",
+      "category": "Automotivo",
+      "usage_limit": 1,
+      "title": "Desconto 10% em Carteira de Motorista",
+      "partner_id": "PTN_A1E3018_AUT",
+      "id": "BNF_A4E40151_DC"
+    },
+    "BNF_C0A40494_DC": {
+      "created_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value": 15,
+      "terms_conditions": "Válido apenas para alunos KNN. Apresentar comprovante de matrícula na KNN. Desconto aplicado sobre o valor da mensalidade.",
+      "metadata": {
+        "tags": [
+          "educacao",
+          "desconto",
+          "estudante",
+          "escola"
+        ],
+        "image_url": "https://example.com/colegio_adventista.jpg"
+      },
+      "id": "BNF_C0A40494_DC",
+      "valid_from": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "type": "discount",
+      "usage_limit_type": "per_user_yearly",
+      "description": "Desconto especial de 15% nas mensalidades para alunos KNN estudarem no Colégio Adventista",
+      "audience": "students",
+      "status": "active",
+      "updated_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value_type": "percentage",
+      "valid_until": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "tenant_id": "knn-dev-tenant",
+      "category": "education",
+      "usage_limit": 12,
+      "title": "Desconto 15% em Mensalidades Escolares",
+      "partner_id": "PTN_C8A3367_EDU"
+    },
+    "BNF_C2C20108_DC": {
+      "created_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value": 5,
+      "terms_conditions": "Válido para compras até R$ 3.000,00. Acessório grátis sujeito à disponibilidade. Apresentar comprovante de vínculo com KNN.",
+      "metadata": {
+        "tags": [
+          "tecnologia",
+          "desconto",
+          "celular",
+          "acessorio"
+        ],
+        "image_url": "https://example.com/cadin_celulares.jpg"
+      },
+      "id": "BNF_C2C20108_DC",
+      "valid_from": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "type": "discount",
+      "usage_limit_type": "per_user_monthly",
+      "description": "Desconto de 5% em compras até R$ 3.000 e ganhe um acessório grátis na Cadin Celulares",
+      "audience": "all",
+      "status": "active",
+      "updated_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value_type": "percentage",
+      "valid_until": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "tenant_id": "knn-dev-tenant",
+      "category": "technology",
+      "usage_limit": 2,
+      "created_by": "admin_001",
+      "title": "Desconto 5% + Acessório Grátis",
+      "partner_id": "PTN_C5C7628_TEC"
+    },
+    "BNF_C3D30194_DC": {
+      "created_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value": 5,
+      "terms_conditions": "Válido para compras de material escolar e papelaria. Apresentar comprovante de matrícula na KNN.",
+      "metadata": {
+        "tags": [
+          "papelaria",
+          "desconto",
+          "estudante",
+          "material"
+        ],
+        "image_url": "https://example.com/clube_papel.jpg"
+      },
+      "id": "BNF_C3D30194_DC",
+      "valid_from": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "type": "discount",
+      "usage_limit_type": "per_user_monthly",
+      "description": "Desconto de 5% nas compras de material escolar no Clube do Papel",
+      "audience": "students",
+      "status": "active",
+      "updated_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value_type": "percentage",
+      "valid_until": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "tenant_id": "knn-dev-tenant",
+      "category": "stationery",
+      "usage_limit": 5,
+      "title": "Desconto 5% em Material Escolar",
+      "partner_id": "PTN_C0P4799_LIV"
+    },
+    "BNF_E1E10106_DC": {
+      "created_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value": 70,
+      "terms_conditions": "Válido para todos os cursos superiores exceto medicina. Apresentar comprovante de matrícula na KNN. Sujeito à aprovação no vestibular.",
+      "metadata": {
+        "tags": [
+          "educacao",
+          "desconto",
+          "estudante",
+          "faculdade"
+        ],
+        "image_url": "https://example.com/edufor.jpg"
+      },
+      "id": "BNF_E1E10106_DC",
+      "valid_from": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "type": "discount",
+      "usage_limit_type": "per_user",
+      "description": "Desconto especial de 70% nos cursos superiores da Edufor, exceto medicina",
+      "audience": "students",
+      "status": "active",
+      "updated_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value_type": "percentage",
+      "valid_until": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "tenant_id": "knn-dev-tenant",
+      "category": "education",
+      "usage_limit": 1,
+      "title": "Desconto 70% em Cursos Superiores",
+      "partner_id": "PTN_E211033_EDU"
+    },
+    "BNF_M1M10102_DC": {
+      "created_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value": 26,
+      "terms_conditions": "Válido para todos os cursos oferecidos pela Microlins. Apresentar comprovante de matrícula na KNN.",
+      "metadata": {
+        "tags": [
+          "educacao",
+          "desconto",
+          "estudante",
+          "informatica"
+        ],
+        "image_url": "https://example.com/microlins.jpg"
+      },
+      "id": "BNF_M1M10102_DC",
+      "valid_from": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "type": "discount",
+      "usage_limit_type": "per_user_yearly",
+      "description": "Desconto especial de 26% em todos os cursos da instituição Microlins",
+      "audience": "students",
+      "status": "active",
+      "updated_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value_type": "percentage",
+      "valid_until": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "tenant_id": "knn-dev-tenant",
+      "category": "education",
+      "usage_limit": 3,
+      "title": "Desconto 26% em Cursos Microlins",
+      "partner_id": "PTN_M365611_EDU"
+    },
+    "BNF_T2F40132_DC": {
+      "created_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value": 5,
+      "terms_conditions": "Válido para todos os cursos oferecidos pela instituição. Apresentar comprovante de matrícula na KNN.",
+      "metadata": {
+        "tags": [
+          "educacao",
+          "desconto",
+          "estudante",
+          "curso"
+        ],
+        "image_url": "https://example.com/tudo_facil.jpg"
+      },
+      "id": "BNF_T2F40132_DC",
+      "valid_from": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "type": "discount",
+      "usage_limit_type": "per_user_yearly",
+      "description": "Desconto de 5% em qualquer curso da instituição Tudo Fácil Cursos",
+      "audience": "students",
+      "status": "active",
+      "updated_at": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "value_type": "percentage",
+      "valid_until": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "tenant_id": "knn-dev-tenant",
+      "category": "education",
+      "usage_limit": 2,
+      "created_by": "admin_001",
+      "title": "Desconto 5% em Cursos Profissionalizantes",
+      "partner_id": "PTN_T2F4C65_EDU"
+    }
+  },
+  "courses": {
+    "course_001": {
+      "code": "K1",
+      "name": "KIDS 1",
+      "id": "course_001"
+    },
+    "course_002": {
+      "code": "K2",
+      "name": "KIDS 2",
+      "id": "course_002"
+    },
+    "course_003": {
+      "code": "K3",
+      "name": "KIDS 3",
+      "id": "course_003"
+    },
+    "course_004": {
+      "code": "S1",
+      "name": "SEEDS 1",
+      "id": "course_004"
+    },
+    "course_005": {
+      "code": "S2",
+      "name": "SEEDS 2",
+      "id": "course_005"
+    },
+    "course_006": {
+      "code": "S3",
+      "name": "SEEDS 3",
+      "id": "course_006"
+    },
+    "course_007": {
+      "code": "T1",
+      "name": "TEENS 1",
+      "id": "course_007"
+    },
+    "course_008": {
+      "code": "T2",
+      "name": "TEENS 2",
+      "id": "course_008"
+    },
+    "course_009": {
+      "code": "T3",
+      "name": "TEENS 3",
+      "id": "course_009"
+    },
+    "course_010": {
+      "code": "TW1",
+      "name": "TWEENS 1",
+      "id": "course_010"
+    },
+    "course_011": {
+      "code": "TW2",
+      "name": "TWEENS 2",
+      "id": "course_011"
+    },
+    "course_012": {
+      "code": "TW3",
+      "name": "TWEENS 3",
+      "id": "course_012"
+    },
+    "course_013": {
+      "code": "KT1",
+      "name": "KEEP_TALKING 1",
+      "id": "course_013"
+    },
+    "course_014": {
+      "code": "KT2",
+      "name": "KEEP_TALKING 2",
+      "id": "course_014"
+    },
+    "course_015": {
+      "code": "KT3",
+      "name": "KEEP_TALKING 3",
+      "id": "course_015"
+    },
+    "course_016": {
+      "code": "A1",
+      "name": "ADVANCED 1",
+      "id": "course_016"
+    },
+    "course_017": {
+      "code": "A2",
+      "name": "ADVANCED 2",
+      "id": "course_017"
+    },
+    "course_018": {
+      "code": "KD",
+      "name": "KINDER",
+      "id": "course_018"
+    }
+  },
+  "employees": {
+    "EMP_A0A0O007_AP": {
+      "active": true,
+      "created_at": "2025-08-28 20:45:13.382000+00:00",
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98991075072",
+      "e-mail": "aimee.almeida2018@gmail.com",
+      "role": "ADM. PEDAGÓGICO",
+      "zip": "65110-000",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Aimeê Almeida de Oliveira",
+      "id": "EMP_A0A0O007_AP"
+    },
+    "EMP_A5C3O0R_CDA": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98988217454",
+      "e-mail": "rodriguescarol6813@gmail.com",
+      "role": "CDA",
+      "zip": "65053-530",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Ana Carolina de Oliveira Rodrigues",
+      "id": "EMP_A5C3O0R_CDA"
+    },
+    "EMP_A8L4L7B3_PR": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98985911317",
+      "e-mail": "larissaana2704@gmail.com",
+      "role": "PROFESSORA",
+      "zip": "65052-847",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Ana Larissa Leite Barros",
+      "id": "EMP_A8L4L7B3_PR"
+    },
+    "EMP_C0P0R0B0_PR": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98985347029",
+      "e-mail": "carmemprborges@gmail.com",
+      "role": "PROFESSORA",
+      "zip": "65130-000",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Carmem Patrícia Reis Borges",
+      "id": "EMP_C0P0R0B0_PR"
+    },
+    "EMP_E2A0B037_PR": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98991795370",
+      "e-mail": "edillenem@outlook.com",
+      "role": "PROFESSORA",
+      "zip": "65065-200",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Edilene de Araújo Barbosa",
+      "id": "EMP_E2A0B037_PR"
+    },
+    "EMP_F0F0O069_CC": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98985916692",
+      "e-mail": "felipedefolive@gmail.com",
+      "role": "CONSULTOR COMERCIAL",
+      "zip": "65138-000",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Felipe Ferreira de Oliveira",
+      "id": "EMP_F0F0O069_CC"
+    },
+    "EMP_J5S7O434_AF": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98988854341",
+      "e-mail": "julicasssantos@gmail.com",
+      "role": "ADM. FINANCEIRO",
+      "zip": "65056-574",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Juliana Santos Oliveira",
+      "id": "EMP_J5S7O434_AF"
+    },
+    "EMP_L6A2S691_AP": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98985594916",
+      "e-mail": "luanaabreusilva09@gmail.com",
+      "role": "ADM. PEDAGÓGICO",
+      "zip": "65042-626",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Luana de Abreu Silva",
+      "id": "EMP_L6A2S691_AP"
+    },
+    "EMP_N4J0E0C9_CC": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98988394914",
+      "e-mail": "n4thyeverton087@gmail.com",
+      "role": "CONSULTOR COMERCIAL",
+      "zip": "65035-400",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Natália de Jesus Everton Câmara",
+      "id": "EMP_N4J0E0C9_CC"
+    },
+    "EMP_T4M8R2O1_PR": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98984215158",
+      "e-mail": "tadeu.mro922@gmail.com",
+      "role": "PROFESSOR",
+      "zip": "65051-482",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Tadeu Moraes Rego de Oliveira",
+      "id": "EMP_T4M8R2O1_PR"
+    },
+    "EMP_TEST_20250907191051": {
+      "created_at": "2025-09-07 22:10:53.295954+00:00",
+      "cpf": "987.654.321-00",
+      "cep": "04038-001",
+      "is_temp": true,
+      "id": "EMP_TEST_20250907191051",
+      "endereco": "Rua Vergueiro, 500",
+      "data_admissao": "2022-03-01",
+      "status": "ativo",
+      "updated_at": "2025-09-07 22:10:53.295954+00:00",
+      "nome_completo": "Maria Oliveira Costa",
+      "active": true,
+      "departamento": "Educação",
+      "salario": 8500.0,
+      "tenant_id": "knn-dev-tenant",
+      "rg": "98.765.432-1",
+      "estado": "SP",
+      "created_by": "temp_test_script",
+      "telefone": "(11) 99999-2222",
+      "cargo": "Coordenadora Acadêmica",
+      "email": "funcionario.teste@journeyclub.com.br",
+      "cidade": "São Paulo",
+      "firebase_uid": "6m9KyWtNPGejUqK8xKVZ2f0HLwA2"
+    },
+    "EMP_Y3A2G0C4_PR": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98985022446",
+      "e-mail": "augustocosta993@gmail.com",
+      "role": "PROFESSOR",
+      "zip": "65066-320",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Yago Augusto Gonçalves Costa",
+      "id": "EMP_Y3A2G0C4_PR"
+    },
+    "EMP_Y7B3G0J6_CP": {
+      "created_at": "2025-08-28T17:45:13.713115",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "phone": "98981031611",
+      "e-mail": "yannagoncalvesdejesus@gmail.com",
+      "role": "COORD. PEDAGÓGICA",
+      "zip": "65053-730",
+      "updated_at": "2025-08-28T17:45:13.713115",
+      "name": "Yanna Biankinny Gonçalves de Jesus",
+      "id": "EMP_Y7B3G0J6_CP"
+    }
+  },
+  "metadata": {
+    "collection_info": {
+      "partner_benefits_index": {
+        "description": "Índice agregado para consultas rápidas por parceiro com dados reais",
+        "indexes_recommended": [
+          "tenant_id",
+          "last_updated"
+        ],
+        "total_documents": 7
+      },
+      "benefits": {
+        "description": "Coleção principal com todos os benefícios disponíveis baseados em dados reais dos parceiros",
+        "indexes_recommended": [
+          "partner_id",
+          "audience",
+          "status",
+          "category",
+          "valid_until",
+          "tenant_id"
+        ],
+        "total_documents": 7
+      },
+      "id": "collection_info"
+    },
+    "course_info": {
+      "quantity": 18,
+      "categories": [
+        "KIDS",
+        "SEEDS",
+        "TEENS",
+        "TWEENS",
+        "KEEP_TALKING",
+        "ADVANCED",
+        "KINDER"
+      ],
+      "last_updated": {
+        "_seconds": 1736044267,
+        "_nanoseconds": 0
+      },
+      "id": "course_info"
+    },
+    "created_at": {
+      "_seconds": 1704067200,
+      "_nanoseconds": 0,
+      "id": "created_at"
+    },
+    "employee_info": {
+      "quantity": 12,
+      "role_distribution": {
+        "COORD. PEDAGÓGICA": 1,
+        "ADM. FINANCEIRO": 1,
+        "ADM. PEDAGÓGICO": 2,
+        "CDA": 1,
+        "PROFESSOR": 5,
+        "CONSULTOR COMERCIAL": 2
+      },
+      "last_updated": {
+        "_seconds": 1736044267,
+        "_nanoseconds": 0
+      },
+      "roles": [
+        "ADM. PEDAGÓGICO",
+        "CDA",
+        "PROFESSORA",
+        "PROFESSOR",
+        "CONSULTOR COMERCIAL",
+        "ADM. FINANCEIRO",
+        "COORD. PEDAGÓGICA"
+      ],
+      "id": "employee_info"
+    },
+    "partner_info": {
+      "description": "Partner data for database feeding",
+      "quantity": 7,
+      "generation_date": "2023-10-15 09:45:30",
+      "id": "partner_info"
+    },
+    "student_info": {
+      "quantity": 75,
+      "last_updated": {
+        "_seconds": 1736044267,
+        "_nanoseconds": 0
+      },
+      "id": "student_info"
+    },
+    "updated_at": {
+      "_seconds": 1736150400,
+      "_nanoseconds": 0,
+      "id": "updated_at"
+    }
+  },
+  "partner_benefits_index": {
+    "PTN_A1E3018_AUT": {
+      "tenant_id": "knn-dev-tenant",
+      "categories": [
+        "automotive"
+      ],
+      "last_updated": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "total_benefits": 1,
+      "partner_name": "Autoescola Escórcio",
+      "active_benefits": 1,
+      "benefits_summary": {
+        "BNF_A4E40151_DC": {
+          "valid_until": null,
+          "title": "Desconto 10% em Carteira de Motorista",
+          "type": "discount",
+          "status": "active",
+          "audience": "students"
+        }
+      },
+      "audiences": [
+        "students"
+      ],
+      "id": "PTN_A1E3018_AUT"
+    },
+    "PTN_C0P4799_LIV": {
+      "tenant_id": "knn-dev-tenant",
+      "categories": [
+        "stationery"
+      ],
+      "last_updated": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "total_benefits": 1,
+      "partner_name": "Clube do papel",
+      "active_benefits": 1,
+      "benefits_summary": {
+        "BNF_C3D30194_DC": {
+          "valid_until": {
+            "_seconds": 1735689600,
+            "_nanoseconds": 0
+          },
+          "title": "Desconto 5% em Material Escolar",
+          "type": "discount",
+          "status": "active",
+          "audience": "students"
+        }
+      },
+      "audiences": [
+        "students"
+      ],
+      "id": "PTN_C0P4799_LIV"
+    },
+    "PTN_C5C7628_TEC": {
+      "tenant_id": "knn-dev-tenant",
+      "categories": [
+        "technology"
+      ],
+      "last_updated": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "total_benefits": 1,
+      "partner_name": "Cadin Celulares",
+      "active_benefits": 1,
+      "benefits_summary": {
+        "BNF_C2C20108_DC": {
+          "valid_until": {
+            "_seconds": 1735689600,
+            "_nanoseconds": 0
+          },
+          "title": "Desconto 5% + Acessório Grátis",
+          "type": "discount",
+          "status": "active",
+          "audience": "all"
+        }
+      },
+      "audiences": [
+        "students",
+        "employees"
+      ],
+      "id": "PTN_C5C7628_TEC"
+    },
+    "PTN_C8A3367_EDU": {
+      "tenant_id": "knn-dev-tenant",
+      "categories": [
+        "education"
+      ],
+      "last_updated": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "total_benefits": 1,
+      "partner_name": "Colégio Adventista (Cohab)",
+      "active_benefits": 1,
+      "benefits_summary": {
+        "BNF_C0A40494_DC": {
+          "valid_until": {
+            "_seconds": 1735689600,
+            "_nanoseconds": 0
+          },
+          "title": "Desconto 15% em Mensalidades Escolares",
+          "type": "discount",
+          "status": "active",
+          "audience": "students"
+        }
+      },
+      "audiences": [
+        "students"
+      ],
+      "id": "PTN_C8A3367_EDU"
+    },
+    "PTN_E211033_EDU": {
+      "tenant_id": "knn-dev-tenant",
+      "categories": [
+        "education"
+      ],
+      "last_updated": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "total_benefits": 1,
+      "partner_name": "Edufor",
+      "active_benefits": 1,
+      "benefits_summary": {
+        "BNF_E1E10106_DC": {
+          "valid_until": {
+            "_seconds": 1735689600,
+            "_nanoseconds": 0
+          },
+          "title": "Desconto 70% em Cursos Superiores",
+          "type": "discount",
+          "status": "active",
+          "audience": "students"
+        }
+      },
+      "audiences": [
+        "students"
+      ],
+      "id": "PTN_E211033_EDU"
+    },
+    "PTN_M365611_EDU": {
+      "tenant_id": "knn-dev-tenant",
+      "categories": [
+        "education"
+      ],
+      "last_updated": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "total_benefits": 1,
+      "partner_name": "Microlins",
+      "active_benefits": 1,
+      "benefits_summary": {
+        "BNF_M1M10102_DC": {
+          "valid_until": {
+            "_seconds": 1735689600,
+            "_nanoseconds": 0
+          },
+          "title": "Desconto 26% em Cursos Microlins",
+          "type": "discount",
+          "status": "active",
+          "audience": "students"
+        }
+      },
+      "audiences": [
+        "students"
+      ],
+      "id": "PTN_M365611_EDU"
+    },
+    "PTN_T2F4C65_EDU": {
+      "tenant_id": "knn-dev-tenant",
+      "categories": [
+        "education"
+      ],
+      "last_updated": {
+        "_seconds": 1704067200,
+        "_nanoseconds": 0
+      },
+      "total_benefits": 1,
+      "partner_name": "Tudo Fácil Cursos",
+      "active_benefits": 1,
+      "benefits_summary": {
+        "BNF_T2F40132_DC": {
+          "valid_until": {
+            "_seconds": 1735689600,
+            "_nanoseconds": 0
+          },
+          "title": "Desconto 5% em Cursos Profissionalizantes",
+          "type": "discount",
+          "status": "active",
+          "audience": "students"
+        }
+      },
+      "audiences": [
+        "students"
+      ],
+      "id": "PTN_T2F4C65_EDU"
+    }
+  },
+  "partners": {
+    "PTN_A1E3018_AUT": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:31.944860",
+      "social_networks": {
+        "facebook": null,
+        "instagram": null,
+        "website": null
+      },
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "benefit": "Foi acordado que todo aluno knn terá 10% de desconto em cima do valor final.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Autoescola Escórcio",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_A1E3018_AUT.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Automotivo",
+      "contact": {
+        "whatsapp": null,
+        "email": null,
+        "phone": null
+      },
+      "address": {
+        "zip": "65040003",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Outeiro da Cruz",
+        "street": "Av. João Pessoa, 20"
+      },
+      "cnpj": "13018958000151",
+      "id": "PTN_A1E3018_AUT"
+    },
+    "PTN_C0P4799_LIV": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:34.614493",
+      "social_networks": {
+        "facebook": null,
+        "instagram": "https://www.instagram.com/clubedopapel/",
+        "website": "https://saoluis.edufor.edu.br/"
+      },
+      "maps": {
+        "google": "https://maps.app.goo.gl/ScDmnkDq5tpkKRP16",
+        "waze": null
+      },
+      "benefit": "Todos os nossos alunos tem desconto de 5% nas compras.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Clube do Papel",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C0P4799_LIV.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Papelaria",
+      "contact": {
+        "whatsapp": "https://api.whatsapp.com/send/?phone=559832384312",
+        "email": "contato@edufor.edu.br",
+        "phone": "983248-0204"
+      },
+      "address": {
+        "zip": "65050000",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Planalto Anil I",
+        "street": "Av. Principal, 12"
+      },
+      "cnpj": "04799927000194",
+      "id": "PTN_C0P4799_LIV"
+    },
+    "PTN_C5C7628_TEC": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:37.651983",
+      "social_networks": {
+        "facebook": null,
+        "instagram": "https://www.instagram.com/cadin.celulares/",
+        "website": null
+      },
+      "maps": {
+        "google": "https://maps.app.goo.gl/x125XLknpxWH2RA29",
+        "waze": null
+      },
+      "benefit": "Todos alunos e colaboradores têm 5% de descontos nas compras até R$3,000,00 e ganha um acessorio na loja.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Cadin Celulares",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C5C7628_TEC.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Tecnologia",
+      "contact": {
+        "whatsapp": null,
+        "email": null,
+        "phone": null
+      },
+      "address": {
+        "zip": "65110000",
+        "state": "MA",
+        "city": "São José de Ribamar",
+        "neighborhood": "Maiobrado",
+        "street": "Av. América do Sul, 2"
+      },
+      "cnpj": "57628555000108",
+      "id": "PTN_C5C7628_TEC"
+    },
+    "PTN_C8A3367_EDU": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:40.516087",
+      "social_networks": {
+        "facebook": null,
+        "instagram": null,
+        "website": null
+      },
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "benefit": "Foi acordado que, todos alunos knn têm 15% de descontos na para estudar na escola.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Colégio Adventista (Cohab)",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_C8A3367_EDU.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Educação",
+      "contact": {
+        "whatsapp": null,
+        "email": null,
+        "phone": null
+      },
+      "address": {
+        "zip": "65053240",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Cohab",
+        "street": "Av. 8, III Conjunto Cohab Anil, 12"
+      },
+      "cnpj": "83367326010494",
+      "id": "PTN_C8A3367_EDU"
+    },
+    "PTN_E211033_EDU": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:43.429397",
+      "social_networks": {
+        "facebook": "https://www.facebook.com/eduforfaculdadeslz",
+        "instagram": "https://www.instagram.com/eduforsaoluis",
+        "website": "https://saoluis.edufor.edu.br/"
+      },
+      "maps": {
+        "google": "https://maps.app.goo.gl/5VtCs5HJj9Hf8cXJA",
+        "waze": null
+      },
+      "benefit": "Foi acordado que, todos os alunos têm 70% de descontos nos cursos, exeto medicina.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Edufor",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_E211033_EDU.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Educação",
+      "contact": {
+        "whatsapp": "https://api.whatsapp.com/send?phone=5598988792811",
+        "email": "contato@edufor.edu.br",
+        "phone": "983248-0204"
+      },
+      "address": {
+        "zip": "65065470",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Turu",
+        "street": "Av. São Luís Rei de França, 19"
+      },
+      "cnpj": "21103399000106",
+      "id": "PTN_E211033_EDU"
+    },
+    "PTN_M365611_EDU": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "logo_updated_at": "2025-09-06T10:38:46.349425",
+      "social_networks": {
+        "facebook": "https://www.facebook.com/Microlinscursosprofissionalizantes",
+        "instagram": null,
+        "website": "https://escolas.microlins.com.br/microlins-cidade-operaria-s-o-lu-s-ma"
+      },
+      "maps": {
+        "google": "https://maps.app.goo.gl/mJDjGD3hQrsF5SYA8",
+        "waze": null
+      },
+      "benefit": "Todos os alunos knn terão 26% de descontos em todos os cursos da instituição.",
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Microlins",
+      "active": true,
+      "logo_url": "https://storage.googleapis.com/knn-benefits.firebasestorage.app/partners/logos/PTN_M365611_EDU.png",
+      "tenant_id": "knn-dev-tenant",
+      "category": "Educação",
+      "contact": {
+        "whatsapp": "https://api.whatsapp.com/send?phone=5598991405466",
+        "email": null,
+        "phone": "98991405466"
+      },
+      "address": {
+        "zip": "65058181",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Cidade Operária",
+        "street": "Av. 203, 98"
+      },
+      "cnpj": "36561122000102",
+      "id": "PTN_M365611_EDU"
+    },
+    "PTN_T2F4C65_EDU": {
+      "created_at": "2025-09-05 02:01:06+00:00",
+      "active": true,
+      "tenant_id": "knn-dev-tenant",
+      "category": "Educação",
+      "social_networks": {
+        "facebook": null,
+        "instagram": null,
+        "website": null
+      },
+      "contact": {
+        "whatsapp": null,
+        "email": null,
+        "phone": null
+      },
+      "address": {
+        "zip": "65050175",
+        "state": "MA",
+        "city": "São Luís",
+        "neighborhood": "Cohab Anil III",
+        "street": "Av. Jerônimo de Albuquerque, 123"
+      },
+      "cnpj": "24650966000132",
+      "benefit": "Foi acordado que, todo aluno tem 5% de desconto em qualquer curso da instituição.",
+      "maps": {
+        "google": null,
+        "waze": null
+      },
+      "updated_at": "2025-09-05 02:01:06+00:00",
+      "name": "Tudo Fácil Cursos",
+      "id": "PTN_T2F4C65_EDU"
+    },
+    "PTR_TEST_20250907191053": {
+      "created_at": "2025-09-07 22:10:56.626168+00:00",
+      "cep": "01414-001",
+      "total_beneficios": 25,
+      "is_temp": true,
+      "id": "PTR_TEST_20250907191053",
+      "categoria": "Tecnologia",
+      "endereco": "Rua Augusta, 1000",
+      "rating": 4.5,
+      "website": "https://techsolutions.com.br",
+      "status": "ativo",
+      "updated_at": "2025-09-07 22:10:56.626168+00:00",
+      "active": true,
+      "descricao": "Empresa especializada em soluções tecnológicas para educação",
+      "nome_empresa": "TechSolutions Ltda",
+      "tenant_id": "knn-dev-tenant",
+      "estado": "SP",
+      "created_by": "temp_test_script",
+      "cnpj": "12.345.678/0001-90",
+      "telefone": "(11) 99999-3333",
+      "email": "parceiro.teste@journeyclub.com.br",
+      "cidade": "São Paulo",
+      "firebase_uid": "WaPnrhF1nZXmvwJFawqnfJqB96a2"
+    }
+  },
   "students": {
     "STD_A0D0N002_K3": {
       "created_at": "2025-08-28 17:45:13.713115+00:00",
@@ -1743,6 +2849,77 @@
       "book": "SEEDS 2",
       "name": "Yasmim Silva Lindoso Ferreira",
       "id": "STD_Y0S0L0F8_S2"
+    }
+  },
+  "tenants": {
+    "knn-dev-tenant": {
+      "n": "iqucqiuc",
+      "id": "knn-dev-tenant"
+    }
+  },
+  "users": {
+    "4IFJpVB7dLRvijxW1TQaqjzFGM33": {
+      "role": "student",
+      "email": "aluno.teste@journeyclub.com.br",
+      "tenant_id": "knn-dev-tenant",
+      "first_access": true,
+      "entity_id": "STD_TEST_20250907191047",
+      "name": "João Silva Santos",
+      "id": "4IFJpVB7dLRvijxW1TQaqjzFGM33"
+    },
+    "6m9KyWtNPGejUqK8xKVZ2f0HLwA2": {
+      "role": "employee",
+      "email": "funcionario.teste@journeyclub.com.br",
+      "tenant_id": "knn-dev-tenant",
+      "first_access": true,
+      "entity_id": "EMP_TEST_20250907191051",
+      "name": "Maria Oliveira Costa",
+      "id": "6m9KyWtNPGejUqK8xKVZ2f0HLwA2"
+    },
+    "WaPnrhF1nZXmvwJFawqnfJqB96a2": {
+      "role": "partner",
+      "email": "parceiro.teste@journeyclub.com.br",
+      "tenant_id": "knn-dev-tenant",
+      "first_access": true,
+      "entity_id": "PTR_TEST_20250907191053",
+      "name": "Parceiro Teste",
+      "id": "WaPnrhF1nZXmvwJFawqnfJqB96a2"
+    },
+    "zRC8AsHsjlTDTHVf71AxyFmkEpx1": {
+      "role": "admin",
+      "email": "felipedefolive@gmail.com",
+      "tenant_id": "knn-dev-tenant",
+      "first_access": true,
+      "entity_id": "EMP_F0F0O069_CC",
+      "name": "Felipe Oliveira",
+      "id": "zRC8AsHsjlTDTHVf71AxyFmkEpx1"
+    }
+  },
+  "_export_metadata": {
+    "export_timestamp": "2025-09-15T20:52:47.016061",
+    "tenant_id": "knn-dev-tenant",
+    "collections_exported": [
+      "benefits",
+      "courses",
+      "employees",
+      "metadata",
+      "partner_benefits_index",
+      "partners",
+      "students",
+      "tenants",
+      "users"
+    ],
+    "total_documents": 141,
+    "results_by_collection": {
+      "benefits": 7,
+      "courses": 18,
+      "employees": 13,
+      "metadata": 7,
+      "partner_benefits_index": 7,
+      "partners": 8,
+      "students": 76,
+      "tenants": 1,
+      "users": 4
     }
   }
 }

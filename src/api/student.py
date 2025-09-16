@@ -21,6 +21,7 @@ from src.models import (
     ValidationCodeResponse,
 )
 from src.utils import logger
+from src.utils.partners_service import PartnersService
 
 # Criar router
 router = APIRouter(tags=["student"])
@@ -42,33 +43,21 @@ async def list_partners(
 ):
     """
     Lista parceiros com filtros e paginação.
+    
+    Endpoint específico para estudantes com as seguintes características:
+    - Utiliza circuit breaker para alta disponibilidade
+    - Ordenação desabilitada por padrão (para evitar necessidade de índices)
+    - Acesso apenas a parceiros ativos
     """
     try:
-        # Buscar parceiros ativos no Firestore
-        filters = [("active", "==", True)]
-        if cat:
-            filters.append(("category", "==", cat))
-
-        partners_response = await firestore_client.query_documents(
-            "partners",
-            filters=filters,
-            order_by=None,  # Removendo ordenação para evitar necessidade de índice
+        return await PartnersService.list_partners_common(
+            current_user=current_user,
+            cat=cat,
+            ord=ord,
             limit=limit,
             offset=offset,
-            tenant_id=current_user.tenant,
-        )
-
-        partners_data = partners_response.get("items", [])
-        total = partners_response.get("total", 0)
-
-        logger.info(f"Retornando {len(partners_data)} parceiros para o usuário")
-        return PartnerListResponse(
-            data={
-                "items": partners_data,
-                "total": total,
-                "limit": limit,
-                "offset": offset,
-            }
+            use_circuit_breaker=True,  # Habilitado para estudantes
+            enable_ordering=False,     # Desabilitado para evitar índices
         )
 
     except Exception as e:
@@ -293,11 +282,11 @@ async def get_student_history(
         async def get_firestore_codes():
             return await firestore_client.query_documents(
                 "validation_codes",
+                tenant_id=current_user.tenant,
                 filters=[("student_id", "==", student_id), ("used_at", "!=", None)],
                 order_by=[("used_at", "DESCENDING")],
                 limit=limit,
                 offset=offset,
-                tenant_id=current_user.tenant,
             )
 
         async def get_postgres_codes():

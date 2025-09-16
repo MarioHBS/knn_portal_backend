@@ -527,6 +527,7 @@ async def get_partner_reports(
         async def get_firestore_codes():
             return await firestore_client.query_documents(
                 "validation_codes",
+                tenant_id=current_user.tenant,
                 filters=[
                     ("partner_id", "==", partner_id),
                     ("created_at", ">=", start_date),

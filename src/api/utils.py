@@ -1,19 +1,13 @@
 """Endpoints utilitários da API."""
 
+from fastapi import APIRouter
 
-from fastapi import APIRouter, HTTPException, Request, status
-from pydantic import BaseModel
-
-from src.auth import get_current_user
 from src.db.firestore import db
 from src.utils.id_generators import IDGenerators
 from src.utils.logging import logger
 from src.utils.rate_limit import limiter
 
 router = APIRouter()
-
-
-
 
 
 @router.get("/courses", response_model=list[str])

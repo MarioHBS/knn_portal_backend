@@ -4,6 +4,7 @@ Modelos de dados para o Portal de Benefícios KNN.
 
 import uuid
 from datetime import date, datetime
+from typing import Any
 
 from pydantic import BaseModel, Field, validator
 
@@ -115,34 +116,32 @@ class Employee(BaseModel):
 
 
 class Partner(BaseModel):
-    """Modelo para parceiros."""
+    """Modelo para parceiros - flexível para aceitar dados do Firestore."""
 
+    # Campos obrigatórios mínimos
     id: str = Field(default="")
-    tenant_id: str
-    cnpj_hash: str
-    cnpj: str | None = None  # CNPJ original para geração do ID
-    trade_name: str
-    category: str
-    address: str
-    active: bool = True
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        if not self.id:
-            # Para parceiros, precisamos do CNPJ original
-            cnpj_original = data.get("cnpj", "")
-            if cnpj_original:
-                self.id = IDGenerators.gerar_id_parceiro(
-                    trade_name=self.trade_name,
-                    category=self.category,
-                    cnpj=cnpj_original,
-                )
-            else:
-                # Fallback para UUID se não tiver CNPJ
-                self.id = str(uuid.uuid4())
+    name: str = Field(default="")
+    category: str = Field(default="")
+    active: bool = Field(default=True)
+    
+    # Campos opcionais comuns
+    tenant_id: str | None = None
+    cnpj_hash: str | None = None
+    cnpj: str | None = None
+    trade_name: str | None = None
+    address: Any = None  # Pode ser string, dict ou None
+    benefit: str | None = None
+    logo_url: str | None = None
+    contact: dict | None = None
+    social_networks: dict | None = None
+    maps: dict | None = None
+    created_at: Any = None
+    updated_at: Any = None
+    logo_updated_at: Any = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+        extra = "allow"  # Permite campos extras do Firestore
 
 
 class Promotion(BaseModel):
@@ -313,7 +312,7 @@ class PartnerDetail(Partner):
 class PartnerListResponse(BaseResponse):
     """Modelo para resposta de listagem de parceiros."""
 
-    data: dict
+    data: list[Partner]
 
 
 class PartnerDetailResponse(BaseResponse):

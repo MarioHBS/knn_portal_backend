@@ -1,0 +1,93 @@
+{
+  "metadata": {
+    "collection_info": {
+      "partner_benefits_index": {
+        "description": "Índice agregado para consultas rápidas por parceiro com dados reais",
+        "indexes_recommended": [
+          "tenant_id",
+          "last_updated"
+        ],
+        "total_documents": 7
+      },
+      "benefits": {
+        "description": "Coleção principal com todos os benefícios disponíveis baseados em dados reais dos parceiros",
+        "indexes_recommended": [
+          "partner_id",
+          "audience",
+          "status",
+          "category",
+          "valid_until",
+          "tenant_id"
+        ],
+        "total_documents": 7
+      },
+      "id": "collection_info"
+    },
+    "course_info": {
+      "quantity": 18,
+      "categories": [
+        "KIDS",
+        "SEEDS",
+        "TEENS",
+        "TWEENS",
+        "KEEP_TALKING",
+        "ADVANCED",
+        "KINDER"
+      ],
+      "last_updated": {
+        "_seconds": 1736044267,
+        "_nanoseconds": 0
+      },
+      "id": "course_info"
+    },
+    "created_at": {
+      "_seconds": 1704067200,
+      "_nanoseconds": 0,
+      "id": "created_at"
+    },
+    "employee_info": {
+      "quantity": 12,
+      "role_distribution": {
+        "COORD. PEDAGÓGICA": 1,
+        "ADM. FINANCEIRO": 1,
+        "ADM. PEDAGÓGICO": 2,
+        "CDA": 1,
+        "PROFESSOR": 5,
+        "CONSULTOR COMERCIAL": 2
+      },
+      "last_updated": {
+        "_seconds": 1736044267,
+        "_nanoseconds": 0
+      },
+      "roles": [
+        "ADM. PEDAGÓGICO",
+        "CDA",
+        "PROFESSORA",
+        "PROFESSOR",
+        "CONSULTOR COMERCIAL",
+        "ADM. FINANCEIRO",
+        "COORD. PEDAGÓGICA"
+      ],
+      "id": "employee_info"
+    },
+    "partner_info": {
+      "description": "Partner data for database feeding",
+      "quantity": 7,
+      "generation_date": "2023-10-15 09:45:30",
+      "id": "partner_info"
+    },
+    "student_info": {
+      "quantity": 75,
+      "last_updated": {
+        "_seconds": 1736044267,
+        "_nanoseconds": 0
+      },
+      "id": "student_info"
+    },
+    "updated_at": {
+      "_seconds": 1736150400,
+      "_nanoseconds": 0,
+      "id": "updated_at"
+    }
+  }
+}

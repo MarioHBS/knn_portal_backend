@@ -46,11 +46,11 @@ async def list_partners(
         async def get_firestore_partners():
             return await firestore_client.query_documents(
                 "partners",
+                tenant_id=current_user.tenant,
                 filters=list(filters.items()) if filters else None,
                 order_by=[(ord, "ASCENDING")] if ord else None,
                 limit=limit,
                 offset=offset,
-                tenant_id=current_user.tenant,
             )
 
         async def get_postgres_partners():
@@ -87,12 +87,7 @@ async def list_partners(
         )
 
         return PartnerListResponse(
-            data={
-                "items": partners_result.get("items", []),
-                "total": total,
-                "limit": limit,
-                "offset": offset,
-            }
+            data=partners_result.get("items", [])
         )
 
     except Exception as e:

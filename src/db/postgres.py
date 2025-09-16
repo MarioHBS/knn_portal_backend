@@ -13,7 +13,7 @@ from src.utils import logger
 
 class PostgresClient:
     """Cliente para acesso ao PostgreSQL."""
-    
+
     _pool = None
 
     @classmethod
@@ -46,7 +46,7 @@ class PostgresClient:
         except Exception as e:
             logger.error(f"Erro ao conectar ao PostgreSQL: {str(e)}", exc_info=True)
             raise
-    
+
     @staticmethod
     async def release_connection(conn):
         """Libera uma conexão de volta ao pool."""
@@ -81,6 +81,7 @@ class PostgresClient:
     @staticmethod
     async def query_documents(
         table: str,
+        *,
         tenant_id: str,
         filters: list[tuple[str, str, Any]] | None = None,
         order_by: list[tuple[str, str]] | None = None,
@@ -93,35 +94,35 @@ class PostgresClient:
         conn = None
         try:
             conn = await PostgresClient.get_connection()
-            
+
             query = f"SELECT * FROM {table} WHERE tenant_id = $1"
             params = [tenant_id]
             param_idx = 2
-            
+
             if filters:
                 for f in filters:
                     query += f" AND {f[0]} {f[1]} ${param_idx}"
                     params.append(f[2])
                     param_idx += 1
-                    
+
             if order_by:
                 order_str = ", ".join([f"{o[0]} {o[1]}" for o in order_by])
                 query += f" ORDER BY {order_str}"
-            
+
             # Aplicar limit e offset na query principal
             query += f" LIMIT {limit} OFFSET {offset}"
-            
+
             logger.info(f"Executando query PostgreSQL: {query} com params: {params}")
             rows = await conn.fetch(query, *params)
             logger.info(f"Query executada com sucesso, {len(rows)} registros retornados")
-            
+
             return {
                 "items": [dict(r) for r in rows],
                 "total": len(rows),  # Temporário: usar len dos resultados
                 "limit": limit,
                 "offset": offset
             }
-            
+
         except Exception as e:
             logger.error(f"Erro ao consultar documentos {table}: {str(e)}", exc_info=True)
             raise

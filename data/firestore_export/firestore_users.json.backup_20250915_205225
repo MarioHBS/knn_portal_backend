@@ -1,0 +1,40 @@
+{
+  "users": {
+    "4IFJpVB7dLRvijxW1TQaqjzFGM33": {
+      "role": "student",
+      "email": "aluno.teste@journeyclub.com.br",
+      "tenant_id": "knn-dev-tenant",
+      "first_access": true,
+      "entity_id": "STD_TEST_20250907191047",
+      "name": "João Silva Santos",
+      "id": "4IFJpVB7dLRvijxW1TQaqjzFGM33"
+    },
+    "6m9KyWtNPGejUqK8xKVZ2f0HLwA2": {
+      "role": "employee",
+      "email": "funcionario.teste@journeyclub.com.br",
+      "tenant_id": "knn-dev-tenant",
+      "first_access": true,
+      "entity_id": "EMP_TEST_20250907191051",
+      "name": "Maria Oliveira Costa",
+      "id": "6m9KyWtNPGejUqK8xKVZ2f0HLwA2"
+    },
+    "WaPnrhF1nZXmvwJFawqnfJqB96a2": {
+      "role": "partner",
+      "email": "parceiro.teste@journeyclub.com.br",
+      "tenant_id": "knn-dev-tenant",
+      "first_access": true,
+      "entity_id": "PTR_TEST_20250907191053",
+      "name": "Parceiro Teste",
+      "id": "WaPnrhF1nZXmvwJFawqnfJqB96a2"
+    },
+    "zRC8AsHsjlTDTHVf71AxyFmkEpx1": {
+      "role": "admin",
+      "email": "felipedefolive@gmail.com",
+      "tenant_id": "knn-dev-tenant",
+      "first_access": true,
+      "entity_id": "EMP_F0F0O069_CC",
+      "name": "Felipe Oliveira",
+      "id": "zRC8AsHsjlTDTHVf71AxyFmkEpx1"
+    }
+  }
+}

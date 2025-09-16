@@ -15,6 +15,7 @@ from src.models import (
 )
 from src.utils import logger
 from src.utils.business_rules import business_rules
+from src.utils.partners_service import PartnersService
 
 # Criar router
 router = APIRouter(tags=["employee"])
@@ -33,61 +34,21 @@ async def list_partners(
 ) -> PartnerListResponse:
     """
     Lista parceiros disponíveis para funcionários com filtros e paginação.
+    
+    Endpoint específico para funcionários com as seguintes características:
+    - Utiliza circuit breaker para alta disponibilidade
+    - Ordenação habilitada por padrão
+    - Acesso apenas a parceiros ativos
     """
     try:
-        # Construir filtros
-        filters = {"active": True}
-        if cat:
-            filters["category"] = cat
-
-        # Preparar filtros para query
-        query_filters = []
-        if cat:
-            query_filters.append(("category", "==", cat))
-        query_filters.append(("active", "==", True))
-
-        # Preparar ordenação
-        order_by = []
-        if ord == "name":
-            order_by.append(("trade_name", "ASCENDING"))
-        elif ord == "category":
-            order_by.append(("category", "ASCENDING"))
-        else:
-            order_by.append(("trade_name", "ASCENDING"))
-
-        # Buscar parceiros com circuit breaker
-        async def firestore_query():
-            return await firestore_client.query_documents(
-                "partners",
-                filters=query_filters,
-                order_by=order_by,
-                limit=limit,
-                offset=offset,
-                tenant_id=current_user.tenant,
-            )
-
-        async def postgres_query():
-            return await postgres_client.query_documents(
-                "partners",
-                filters=query_filters,
-                order_by=order_by,
-                limit=limit,
-                offset=offset,
-                tenant_id=current_user.tenant,
-            )
-
-        result = await with_circuit_breaker(firestore_query, postgres_query)
-
-        partners_data = result.get("items", [])
-        total = result.get("total", 0)
-
-        return PartnerListResponse(
-            data={
-                "items": partners_data,
-                "total": total,
-                "limit": limit,
-                "offset": offset,
-            }
+        return await PartnersService.list_partners_common(
+            current_user=current_user,
+            cat=cat,
+            ord=ord,
+            limit=limit,
+            offset=offset,
+            use_circuit_breaker=True,  # Habilitado para funcionários
+            enable_ordering=True,      # Habilitado para funcionários
         )
 
     except Exception as e:
@@ -116,13 +77,13 @@ async def get_employee_validation_history(
         async def get_firestore_codes():
             return await firestore_client.query_documents(
                 "validation_codes",
+                tenant_id=current_user.tenant,
                 filters=[
                     ("employee_id", "==", employee_id),
                     ("used_at", "!=", None),
                 ],
                 order_by=[("used_at", "desc")],
                 limit=50,
-                tenant_id=current_user.tenant,
             )
 
         async def get_postgres_codes():

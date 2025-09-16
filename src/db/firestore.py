@@ -2,13 +2,13 @@
 Implementação da camada de acesso ao Firestore.
 """
 
+import json
 import uuid
 from typing import Any
 
-import json
-from google.cloud import firestore
-from google.cloud.firestore import Client, Query
 from google.auth import default
+from google.cloud import firestore
+from google.cloud.firestore import Client
 from google.oauth2 import service_account
 
 from src.config import (
@@ -16,8 +16,8 @@ from src.config import (
     FIRESTORE_DATABASE,
     FIRESTORE_DATABASES_LIST,
     FIRESTORE_PROJECT,
-    GOOGLE_APPLICATION_CREDENTIALS,
     FIRESTORE_SERVICE_ACCOUNT_KEY,
+    GOOGLE_APPLICATION_CREDENTIALS,
 )
 from src.utils import logger
 
@@ -34,7 +34,7 @@ def initialize_firestore_databases():
         # Configurar credenciais baseado nas variáveis de ambiente
         credentials = None
         project_id = FIRESTORE_PROJECT
-        
+
         if FIRESTORE_SERVICE_ACCOUNT_KEY:
             # Usar service account key como JSON string
             try:
@@ -50,7 +50,7 @@ def initialize_firestore_databases():
             # Usar arquivo de service account key
             try:
                 credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
-                with open(GOOGLE_APPLICATION_CREDENTIALS, 'r') as f:
+                with open(GOOGLE_APPLICATION_CREDENTIALS) as f:
                     service_account_info = json.load(f)
                     if not project_id:
                         project_id = service_account_info.get('project_id')
@@ -64,7 +64,7 @@ def initialize_firestore_databases():
             if not project_id:
                 project_id = detected_project
             logger.info("Usando credenciais padrão (ADC)")
-            
+
         logger.info(f"Inicializando Firestore para projeto: {project_id}")
 
         # Inicializar conexões com todos os bancos configurados
@@ -76,7 +76,7 @@ def initialize_firestore_databases():
                 else:
                     # Cliente para banco específico com suporte nativo
                     client = Client(
-                        project=project_id, 
+                        project=project_id,
                         credentials=credentials,
                         database=database_name
                     )
@@ -180,6 +180,7 @@ class FirestoreClient:
     @staticmethod
     async def query_documents(
         collection: str,
+        *,
         tenant_id: str,
         filters: list[tuple] | None = None,
         order_by: list[tuple] | None = None,

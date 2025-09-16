@@ -13,17 +13,24 @@ from firebase_admin import auth as firebase_auth
 from pydantic import BaseModel
 
 from src.auth import JWTPayload, get_current_user, security
-from src.config import JWT_SECRET_KEY
+from src.config import JWT_SECRET_KEY, TESTING_MODE
 
 router = APIRouter(tags=["authentication"])
 
 
 class LoginRequest(BaseModel):
-    """Modelo para requisição de login."""
+    """Modelo para requisição de login com credenciais."""
 
     username: str
     password: str
     role: str | None = "student"  # student, admin, employee, partner
+
+
+class FirebaseLoginRequest(BaseModel):
+    """Modelo para requisição de login com token Firebase."""
+
+    firebase_token: str
+    role: str | None = None  # Opcional, será extraído do token se não fornecido
 
 
 class LoginResponse(BaseModel):
@@ -72,12 +79,12 @@ TEST_USERS = {
 }
 
 
-def create_jwt_token(user_data: dict, expires_hours: int = 24) -> str:
+def create_jwt_token(user_data: dict, expires_minutes: int = 30) -> str:
     """Cria um token JWT válido.
 
     Args:
         user_data: Dados do usuário
-        expires_hours: Horas até expiração do token
+        expires_minutes: Minutos até expiração do token
 
     Returns:
         Token JWT assinado
@@ -87,7 +94,7 @@ def create_jwt_token(user_data: dict, expires_hours: int = 24) -> str:
         "sub": user_data["username"],
         "role": user_data["role"],
         "tenant": user_data["tenant"],
-        "exp": now + timedelta(hours=expires_hours),
+        "exp": now + timedelta(minutes=expires_minutes),
         "iat": now,
         "iss": "knn-portal-local",
         "aud": "knn-portal",
@@ -133,38 +140,47 @@ async def login(request: LoginRequest):
     Raises:
         HTTPException: Se as credenciais forem inválidas
     """
-    # Primeiro, tentar validar credenciais nos usuários de teste
-    user = TEST_USERS.get(request.username)
-    if user and user["password"] == request.password:
-        # Verificar se o role solicitado é válido
-        if request.role and request.role != user["role"]:
+    # Primeiro, tentar validar credenciais nos usuários de teste (apenas se TESTING_MODE estiver ativo)
+    if TESTING_MODE:
+        user = TEST_USERS.get(request.username)
+        if (
+            user
+            and user["password"] == request.password
+            and (not request.role or request.role == user["role"])
+        ):
+            # Preparar dados do usuário de teste
+            user_data = {
+                "username": request.username,
+                "role": user["role"],
+                "tenant": user["tenant"],
+                "name": user["name"],
+            }
+
+            # Gerar token
+            token = create_jwt_token(user_data)
+
+            return LoginResponse(
+                access_token=token,
+                expires_in=1800,  # 30 minutos em segundos
+                user_info={
+                    "username": request.username,
+                    "role": user["role"],
+                    "tenant": user["tenant"],
+                    "name": user["name"],
+                },
+            )
+        elif (
+            user
+            and user["password"] == request.password
+            and request.role
+            and request.role != user["role"]
+        ):
             raise HTTPException(
                 status_code=403,
                 detail=f"Usuário não tem permissão para role '{request.role}'",
             )
 
-        # Preparar dados do usuário de teste
-        user_data = {
-            "username": request.username,
-            "role": user["role"],
-            "tenant": user["tenant"],
-            "name": user["name"],
-        }
-
-        # Gerar token
-        token = create_jwt_token(user_data)
-
-        return LoginResponse(
-            access_token=token,
-            user_info={
-                "username": request.username,
-                "role": user["role"],
-                "tenant": user["tenant"],
-                "name": user["name"],
-            },
-        )
-
-    # Se não encontrou nos usuários de teste, tentar autenticar com Firebase
+    # Se não encontrou nos usuários de teste ou TESTING_MODE está desabilitado, tentar autenticar com Firebase
     try:
         # Tentar obter usuário do Firebase por email
         firebase_user = firebase_auth.get_user_by_email(request.username)
@@ -194,6 +210,7 @@ async def login(request: LoginRequest):
 
         return LoginResponse(
             access_token=token,
+            expires_in=1800,  # 30 minutos em segundos
             user_info={
                 "username": firebase_user.email,
                 "role": user_role,
@@ -211,6 +228,79 @@ async def login(request: LoginRequest):
 
     # Se chegou até aqui, credenciais inválidas
     raise HTTPException(status_code=401, detail="Credenciais inválidas")
+
+
+@router.post("/login-firebase", response_model=LoginResponse)
+async def login_firebase(request: FirebaseLoginRequest):
+    """Endpoint de login com token Firebase.
+
+    Valida o token Firebase recebido e gera um JWT local com expiração de 30 minutos.
+
+    Args:
+        request: Dados contendo o token Firebase
+
+    Returns:
+        Token JWT local e informações do usuário
+
+    Raises:
+        HTTPException: Se o token Firebase for inválido
+    """
+    try:
+        # Importar a função de verificação do Firebase
+        from src.auth import verify_firebase_token
+
+        # Validar o token Firebase
+        firebase_payload = await verify_firebase_token(request.firebase_token)
+
+        # Extrair informações do usuário do token Firebase
+        try:
+            firebase_user = firebase_auth.get_user(firebase_payload.sub)
+            user_email = firebase_user.email
+            user_name = firebase_user.display_name or firebase_user.email
+        except Exception:
+            # Fallback se não conseguir obter dados do usuário
+            user_email = firebase_payload.sub
+            user_name = firebase_payload.name or firebase_payload.sub
+
+        # Verificar role solicitado vs role do token
+        token_role = firebase_payload.role
+        if request.role and request.role != token_role:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Usuário não tem permissão para role '{request.role}'",
+            )
+
+        # Preparar dados do usuário
+        user_data = {
+            "username": user_email,
+            "role": token_role,
+            "tenant": firebase_payload.tenant,
+            "name": user_name,
+        }
+
+        # Gerar token JWT local com expiração de 30 minutos
+        token = create_jwt_token(user_data, expires_minutes=30)
+
+        return LoginResponse(
+            access_token=token,
+            expires_in=1800,  # 30 minutos em segundos
+            user_info={
+                "username": user_email,
+                "role": token_role,
+                "tenant": firebase_payload.tenant,
+                "name": user_name,
+            },
+        )
+
+    except HTTPException:
+        # Re-raise HTTPExceptions (como token inválido)
+        raise
+    except Exception as e:
+        # Capturar outros erros
+        raise HTTPException(
+            status_code=401,
+            detail=f"Erro ao processar token Firebase: {str(e)}",
+        ) from e
 
 
 @router.post("/validate", response_model=TokenValidationResponse)
@@ -272,10 +362,11 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Depends(secu
         "name": getattr(payload, "name", payload.sub),
     }
 
-    new_token = create_jwt_token(user_data)
+    new_token = create_jwt_token(user_data, expires_minutes=30)
 
     return LoginResponse(
         access_token=new_token,
+        expires_in=1800,  # 30 minutos em segundos
         user_info={
             "username": payload.sub,
             "role": payload.role,
@@ -283,3 +374,65 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Depends(secu
             "name": getattr(payload, "name", payload.sub),
         },
     )
+
+
+class FirebaseTokenRequest(BaseModel):
+    """Modelo para requisição de teste de token Firebase."""
+
+    token: str
+
+
+class FirebaseTokenResponse(BaseModel):
+    """Modelo para resposta de teste de token Firebase."""
+
+    message: str
+    token_valid: bool
+    user_info: dict | None = None
+
+
+@router.post("/test-firebase-token")
+async def test_firebase_token(request: FirebaseTokenRequest):
+    """Endpoint de teste exclusivo para receber e validar tokens Firebase.
+
+    Este endpoint é usado para testar a recepção e validação de tokens Firebase
+    enviados pelo frontend. Retorna uma confirmação de recebimento e o status
+    de validação do token.
+
+    Args:
+        request: Objeto contendo o token Firebase
+
+    Returns:
+        Mensagem de confirmação e informações de validação
+    """
+    try:
+        # Importar a função de verificação do Firebase
+        from src.auth import verify_firebase_token
+
+        # Tentar validar o token Firebase
+        payload = await verify_firebase_token(request.token)
+
+        return FirebaseTokenResponse(
+            message="OK, token recebido e validado com sucesso",
+            token_valid=True,
+            user_info={
+                "sub": payload.sub,
+                "email": getattr(payload, "email", None),
+                "role": payload.role,
+                "tenant": payload.tenant,
+                "exp": payload.exp,
+            },
+        )
+
+    except HTTPException as e:
+        # Token inválido ou erro de validação
+        return FirebaseTokenResponse(
+            message=f"OK, token recebido mas inválido: {e.detail}",
+            token_valid=False,
+        )
+
+    except Exception as e:
+        # Erro inesperado
+        return FirebaseTokenResponse(
+            message=f"OK, token recebido mas erro na validação: {str(e)}",
+            token_valid=False,
+        )
