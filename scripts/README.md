@@ -9,6 +9,9 @@ Scripts para desenvolvimento e preparação de dados:
 - `generate_test_data.py` - Gera dados simulados para testes locais
 - `prepare_firestore_data.py` - Prepara dados para formato Firestore
 - `seed_dev.py` - Popula dados de desenvolvimento/QA
+- `analyze_and_organize_images.py` - Análise e organização de imagens de parceiros
+- `analyze_partners_images.py` - Análise específica de imagens de parceiros
+- `create_test_entities.py` - Criação de entidades de teste (Aluno, Funcionário, Parceiro)
 
 ### 📁 maintenance/
 Scripts para manutenção e verificação do sistema:
@@ -16,6 +19,10 @@ Scripts para manutenção e verificação do sistema:
 - `debug_courses.py` - Lista cursos para depuração
 - `validate_artifacts.py` - Valida artefatos gerados do projeto
 - `courses_operations.py` - **Script consolidado** para operações de cursos (check, debug, populate)
+- `verify_auth_sync.py` - Verificação de sincronização entre Firestore e Firebase Auth
+- `verify_users_collection.py` - Verificação da integridade da coleção de usuários
+- `verify_employees_upload.py` - Verificação de upload de funcionários
+- `sync_users_collection.py` - Sincronização da coleção de usuários com Firebase Auth
 
 ### 📁 migration/
 Scripts de migração de dados e estruturas:
@@ -32,7 +39,9 @@ Scripts para testes e validação:
 
 ### 📁 temp/
 Scripts temporários (não versionados):
-- Contém scripts de análise e limpeza temporários
+- **Pasta limpa e reorganizada** - Scripts obsoletos foram removidos
+- Scripts úteis foram movidos para pastas apropriadas (development, maintenance)
+- Contém apenas README.md para orientação de uso
 - Arquivos com prefixo `temp_` são automaticamente ignorados pelo Git
 
 ## Scripts na Raiz

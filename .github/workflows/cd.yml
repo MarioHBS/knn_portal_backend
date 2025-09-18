@@ -1,0 +1,85 @@
+name: CD - Deploy para Google Cloud Run
+
+on:
+  push:
+    branches: [ master ]
+  workflow_run:
+    workflows: ["CI - Integração Contínua"]
+    types:
+      - completed
+    branches: [ master ]
+
+jobs:
+  deploy:
+    name: Deploy para Google Cloud Run
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
+    
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v4
+      
+    - name: Configurar Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        
+    - name: Configurar Docker para GCR
+      run: gcloud auth configure-docker
+      
+    - name: Gerar tag da versão
+      id: version
+      run: |
+        TAG=$(date +%Y%m%d-%H%M%S)
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+        echo "image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/portal-beneficios-api:$TAG" >> $GITHUB_OUTPUT
+        
+    - name: Build da imagem Docker usando Cloud Build
+      run: |
+        gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/portal-beneficios-api:${{ steps.version.outputs.tag }}
+        gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/portal-beneficios-api:latest
+        
+    - name: Deploy para Cloud Run
+      id: deploy
+      run: |
+        gcloud run deploy portal-beneficios-api \
+          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/portal-beneficios-api:${{ steps.version.outputs.tag }} \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --memory=512Mi \
+          --cpu=1 \
+          --concurrency=80 \
+          --max-instances=10 \
+          --set-env-vars="MODE=production" \
+          --set-env-vars="FIRESTORE_PROJECT=${{ secrets.GCP_PROJECT_ID }}" \
+          --set-env-vars="POSTGRES_CONNECTION_STRING=${{ secrets.POSTGRES_CONNECTION_STRING }}" \
+          --set-env-vars="JWKS_URL=${{ secrets.JWKS_URL }}" \
+          --set-env-vars="JWKS_CACHE_TTL=600" \
+          --set-env-vars="CNPJ_HASH_SALT=${{ secrets.CNPJ_HASH_SALT }}"
+          
+        URL=$(gcloud run services describe portal-beneficios-api --platform managed --region us-central1 --format 'value(status.url)')
+        echo "url=$URL" >> $GITHUB_OUTPUT
+        
+    - name: Testar endpoint de health
+      run: |
+        sleep 30  # Aguardar o serviço ficar disponível
+        curl -f "${{ steps.deploy.outputs.url }}/v1/health" || exit 1
+        
+    - name: Notificar sucesso do deploy
+      if: success()
+      run: |
+        echo "✅ Deploy realizado com sucesso!"
+        echo "🌐 URL: ${{ steps.deploy.outputs.url }}"
+        echo "📦 Versão: ${{ steps.version.outputs.tag }}"
+        
+    - name: Notificar falha do deploy
+      if: failure()
+      run: |
+        echo "❌ Deploy falhou!"
+        echo "🔍 Verifique os logs para mais detalhes"

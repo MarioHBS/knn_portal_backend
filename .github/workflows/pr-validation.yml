@@ -1,0 +1,58 @@
+name: Validação de Pull Request
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate-pr:
+    name: Validar Pull Request
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v4
+      
+    - name: Validar título do PR
+      run: |
+        if [[ ! "${{ github.event.pull_request.title }}" =~ ^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: ]]; then
+          echo "❌ Título do PR deve seguir o padrão: tipo(escopo): descrição"
+          echo "Exemplos: feat(api): adicionar endpoint de parceiros"
+          echo "         fix(auth): corrigir validação de token"
+          exit 1
+        fi
+        
+    - name: Verificar arquivos modificados
+      run: |
+        echo "📁 Arquivos modificados neste PR:"
+        git diff --name-only origin/${{ github.base_ref }}..HEAD
+        
+    - name: Verificar se há testes para novos arquivos
+      run: |
+        NEW_PY_FILES=$(git diff --name-only --diff-filter=A origin/${{ github.base_ref }}..HEAD | grep "src/.*\.py$" || true)
+        if [ ! -z "$NEW_PY_FILES" ]; then
+          echo "🧪 Novos arquivos Python detectados. Verificando testes..."
+          for file in $NEW_PY_FILES; do
+            test_file="tests/test_$(basename $file)"
+            if [ ! -f "$test_file" ]; then
+              echo "⚠️  Considere adicionar testes para: $file"
+            fi
+          done
+        fi
+        
+    - name: Verificar tamanho do PR
+      run: |
+        CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}..HEAD | wc -l)
+        CHANGED_LINES=$(git diff --stat origin/${{ github.base_ref }}..HEAD | tail -1 | grep -o '[0-9]\+ insertions\|[0-9]\+ deletions' | grep -o '[0-9]\+' | paste -sd+ | bc || echo "0")
+        
+        echo "📊 Estatísticas do PR:"
+        echo "   - Arquivos modificados: $CHANGED_FILES"
+        echo "   - Linhas alteradas: $CHANGED_LINES"
+        
+        if [ $CHANGED_FILES -gt 20 ]; then
+          echo "⚠️  PR grande detectado ($CHANGED_FILES arquivos). Considere dividir em PRs menores."
+        fi
+        
+        if [ $CHANGED_LINES -gt 500 ]; then
+          echo "⚠️  Muitas alterações detectadas ($CHANGED_LINES linhas). Considere dividir em PRs menores."
+        fi
