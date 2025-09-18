@@ -78,16 +78,34 @@ class IDGenerators:
             return []
 
         # Remover acentos e caracteres especiais, manter apenas letras e espaços
-        nome_limpo = re.sub(r'[^a-zA-ZÀ-ÿ\s]', '', nome)
+        nome_limpo = re.sub(r"[^a-zA-ZÀ-ÿ\s]", "", nome)
 
         # Normalizar acentos (conversão básica)
         acentos = {
-            'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a',
-            'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
-            'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i',
-            'ò': 'o', 'ó': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o',
-            'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'u',
-            'ç': 'c', 'ñ': 'n'
+            "à": "a",
+            "á": "a",
+            "â": "a",
+            "ã": "a",
+            "ä": "a",
+            "è": "e",
+            "é": "e",
+            "ê": "e",
+            "ë": "e",
+            "ì": "i",
+            "í": "i",
+            "î": "i",
+            "ï": "i",
+            "ò": "o",
+            "ó": "o",
+            "ô": "o",
+            "õ": "o",
+            "ö": "o",
+            "ù": "u",
+            "ú": "u",
+            "û": "u",
+            "ü": "u",
+            "ç": "c",
+            "ñ": "n",
         }
 
         for acento, letra in acentos.items():
@@ -119,12 +137,12 @@ class IDGenerators:
             return ""
 
         # Remover hífen e manter apenas dígitos
-        digitos = re.sub(r'[^0-9]', '', cep)
+        digitos = re.sub(r"[^0-9]", "", cep)
 
         if len(digitos) >= 3:
             return digitos[-3:]
 
-        return digitos.ljust(3, '0')  # Preencher com zeros se necessário
+        return digitos.ljust(3, "0")  # Preencher com zeros se necessário
 
     @classmethod
     def extrair_digitos_telefone(cls, telefone: str) -> str:
@@ -140,12 +158,12 @@ class IDGenerators:
             return ""
 
         # Remover caracteres não numéricos
-        digitos = re.sub(r'[^0-9]', '', telefone)
+        digitos = re.sub(r"[^0-9]", "", telefone)
 
         if len(digitos) >= 3:
             return digitos[-3:]
 
-        return digitos.ljust(3, '0')  # Preencher com zeros se necessário
+        return digitos.ljust(3, "0")  # Preencher com zeros se necessário
 
     @classmethod
     def extrair_digitos_cnpj(cls, cnpj: str, quantidade: int) -> str:
@@ -162,18 +180,20 @@ class IDGenerators:
             return "0" * quantidade
 
         # Dividir por barra e pegar o primeiro grupo
-        primeiro_grupo = cnpj.split('/')[0]
+        primeiro_grupo = cnpj.split("/")[0]
 
         # Remover pontos e manter apenas dígitos
-        digitos = re.sub(r'[^0-9]', '', primeiro_grupo)
+        digitos = re.sub(r"[^0-9]", "", primeiro_grupo)
 
         if len(digitos) >= quantidade:
             return digitos[-quantidade:]
 
-        return digitos.ljust(quantidade, '0')  # Preencher com zeros se necessário
+        return digitos.ljust(quantidade, "0")  # Preencher com zeros se necessário
 
     @classmethod
-    def intercalar_iniciais_digitos(cls, iniciais: list[str], digitos: str, tamanho_secao: int) -> str:
+    def intercalar_iniciais_digitos(
+        cls, iniciais: list[str], digitos: str, tamanho_secao: int
+    ) -> str:
         """Intercala iniciais com dígitos para formar a seção central do ID.
 
         Args:
@@ -198,7 +218,7 @@ class IDGenerators:
                 idx_digito += 1
             else:
                 # Preencher com zero se não houver mais dígitos
-                resultado.append('0')
+                resultado.append("0")
 
         # Se ainda temos iniciais e espaço, intercalar com dígitos
         if len(iniciais) < tamanho_secao:
@@ -218,14 +238,16 @@ class IDGenerators:
                     idx_digito += 1
                 else:
                     # Preencher com zero
-                    resultado_intercalado.append('0')
+                    resultado_intercalado.append("0")
 
-            return ''.join(resultado_intercalado)
+            return "".join(resultado_intercalado)
 
-        return ''.join(resultado)
+        return "".join(resultado)
 
     @classmethod
-    def gerar_id_aluno(cls, nome: str, curso: str, cep: str = "", celular: str = "", email: str = "") -> str:
+    def gerar_id_aluno(
+        cls, nome: str, curso: str, cep: str = "", celular: str = "", email: str = ""
+    ) -> str:
         """Gera ID para aluno seguindo o padrão STD_XXXXXXXX_XX.
 
         Args:
@@ -252,19 +274,23 @@ class IDGenerators:
         digitos_celular = cls.extrair_digitos_telefone(celular)
 
         # Extrair dígitos do email se necessário
-        digitos_email = re.sub(r'[^0-9]', '', email) if email else ""
+        digitos_email = re.sub(r"[^0-9]", "", email) if email else ""
 
         # Combinar todos os dígitos
         todos_digitos = digitos_cep + digitos_celular + digitos_email
 
         # 5. Intercalar iniciais com dígitos
-        secao_central = cls.intercalar_iniciais_digitos(iniciais, todos_digitos, tamanho_secao)
+        secao_central = cls.intercalar_iniciais_digitos(
+            iniciais, todos_digitos, tamanho_secao
+        )
 
         # 6. Construir ID final
         return f"STD_{secao_central}_{codigo_curso}"
 
     @classmethod
-    def gerar_id_funcionario(cls, nome: str, cargo: str, cep: str = "", telefone: str = "") -> str:
+    def gerar_id_funcionario(
+        cls, nome: str, cargo: str, cep: str = "", telefone: str = ""
+    ) -> str:
         """Gera ID para funcionário seguindo o padrão EMP_XXXXXXXX_XX.
 
         Args:
@@ -293,7 +319,9 @@ class IDGenerators:
         todos_digitos = digitos_cep + digitos_telefone
 
         # 5. Intercalar iniciais com dígitos
-        secao_central = cls.intercalar_iniciais_digitos(iniciais, todos_digitos, tamanho_secao)
+        secao_central = cls.intercalar_iniciais_digitos(
+            iniciais, todos_digitos, tamanho_secao
+        )
 
         # 6. Construir ID final
         return f"EMP_{secao_central}_{codigo_cargo}"
@@ -326,7 +354,9 @@ class IDGenerators:
         digitos_cnpj = cls.extrair_digitos_cnpj(cnpj, digitos_necessarios)
 
         # 6. Intercalar iniciais com dígitos do CNPJ
-        secao_central = cls.intercalar_iniciais_digitos(iniciais, digitos_cnpj, tamanho_secao)
+        secao_central = cls.intercalar_iniciais_digitos(
+            iniciais, digitos_cnpj, tamanho_secao
+        )
 
         # 7. Construir ID final
         return f"PTN_{secao_central}_{codigo_categoria}"
@@ -345,12 +375,12 @@ class IDGenerators:
         if not id_str or len(id_str) != 15:
             return False
 
-        if tipo == 'student':
-            return bool(re.match(r'^STD_[A-Z0-9]{8}_[A-Z0-9]{2}$', id_str))
-        elif tipo == 'employee':
-            return bool(re.match(r'^EMP_[A-Z0-9]{7,8}_[A-Z]{2,3}$', id_str))
-        elif tipo == 'partner':
-            return bool(re.match(r'^PTN_[A-Z0-9]{7}_[A-Z]{3}$', id_str))
+        if tipo == "student":
+            return bool(re.match(r"^STD_[A-Z0-9]{8}_[A-Z0-9]{2}$", id_str))
+        elif tipo == "employee":
+            return bool(re.match(r"^EMP_[A-Z0-9]{7,8}_[A-Z]{2,3}$", id_str))
+        elif tipo == "partner":
+            return bool(re.match(r"^PTN_[A-Z0-9]{7}_[A-Z]{3}$", id_str))
 
         return False
 

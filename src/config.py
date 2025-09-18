@@ -45,12 +45,13 @@ CORS_ORIGINS = [
 ]
 
 
-
 # Configurações de autenticação
 JWKS_URL = os.getenv("JWKS_URL", "https://auth.knnidiomas.com.br/.well-known/jwks.json")
 JWKS_CACHE_TTL = int(os.getenv("JWKS_CACHE_TTL", "600"))  # 10 minutos em segundos
 JWT_ALGORITHM = "RS256"
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "knn-dev-jwt-secret-key-change-in-production")
+JWT_SECRET_KEY = os.getenv(
+    "JWT_SECRET_KEY", "knn-dev-jwt-secret-key-change-in-production"
+)
 
 # Configurações do banco de dados
 FIRESTORE_PROJECT = os.getenv("FIRESTORE_PROJECT", "knn-benefits")

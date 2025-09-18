@@ -212,7 +212,7 @@ class ErrorHandler:
                         "error_code": classified_error.error_code,
                         "function": func.__name__,
                         "attempt": attempt + 1,
-                        "delay": delay
+                        "delay": delay,
                     },
                 )
 

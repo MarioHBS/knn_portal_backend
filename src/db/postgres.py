@@ -21,12 +21,14 @@ class PostgresClient:
         """Obtém o pool de conexões PostgreSQL."""
         if cls._pool is None:
             try:
-                logger.info(f"Criando pool de conexões PostgreSQL: {POSTGRES_CONNECTION_STRING}")
+                logger.info(
+                    f"Criando pool de conexões PostgreSQL: {POSTGRES_CONNECTION_STRING}"
+                )
                 cls._pool = await asyncpg.create_pool(
                     POSTGRES_CONNECTION_STRING,
                     min_size=1,
                     max_size=10,
-                    command_timeout=30
+                    command_timeout=30,
                 )
                 logger.info("Pool de conexões PostgreSQL criado com sucesso")
             except Exception as e:
@@ -114,17 +116,21 @@ class PostgresClient:
 
             logger.info(f"Executando query PostgreSQL: {query} com params: {params}")
             rows = await conn.fetch(query, *params)
-            logger.info(f"Query executada com sucesso, {len(rows)} registros retornados")
+            logger.info(
+                f"Query executada com sucesso, {len(rows)} registros retornados"
+            )
 
             return {
                 "items": [dict(r) for r in rows],
                 "total": len(rows),  # Temporário: usar len dos resultados
                 "limit": limit,
-                "offset": offset
+                "offset": offset,
             }
 
         except Exception as e:
-            logger.error(f"Erro ao consultar documentos {table}: {str(e)}", exc_info=True)
+            logger.error(
+                f"Erro ao consultar documentos {table}: {str(e)}", exc_info=True
+            )
             raise
         finally:
             if conn:

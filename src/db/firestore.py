@@ -39,9 +39,11 @@ def initialize_firestore_databases():
             # Usar service account key como JSON string
             try:
                 service_account_info = json.loads(FIRESTORE_SERVICE_ACCOUNT_KEY)
-                credentials = service_account.Credentials.from_service_account_info(service_account_info)
+                credentials = service_account.Credentials.from_service_account_info(
+                    service_account_info
+                )
                 if not project_id:
-                    project_id = service_account_info.get('project_id')
+                    project_id = service_account_info.get("project_id")
                 logger.info("Usando service account key do ambiente")
             except json.JSONDecodeError as e:
                 logger.error(f"Erro ao decodificar FIRESTORE_SERVICE_ACCOUNT_KEY: {e}")
@@ -49,12 +51,16 @@ def initialize_firestore_databases():
         elif GOOGLE_APPLICATION_CREDENTIALS:
             # Usar arquivo de service account key
             try:
-                credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
+                credentials = service_account.Credentials.from_service_account_file(
+                    GOOGLE_APPLICATION_CREDENTIALS
+                )
                 with open(GOOGLE_APPLICATION_CREDENTIALS) as f:
                     service_account_info = json.load(f)
                     if not project_id:
-                        project_id = service_account_info.get('project_id')
-                logger.info(f"Usando service account key do arquivo: {GOOGLE_APPLICATION_CREDENTIALS}")
+                        project_id = service_account_info.get("project_id")
+                logger.info(
+                    f"Usando service account key do arquivo: {GOOGLE_APPLICATION_CREDENTIALS}"
+                )
             except Exception as e:
                 logger.error(f"Erro ao carregar service account key: {e}")
                 credentials, project_id = default()
@@ -78,7 +84,7 @@ def initialize_firestore_databases():
                     client = Client(
                         project=project_id,
                         credentials=credentials,
-                        database=database_name
+                        database=database_name,
                     )
 
                 databases[database_name] = client

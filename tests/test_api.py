@@ -33,7 +33,7 @@ def client():
     # Rotas para testes
     @app.get("/v1/partners")
     async def list_partners(
-        current_user=Depends(lambda: get_current_user(role="student"))
+        current_user=Depends(lambda: get_current_user(role="student")),
     ):
         return {
             "data": [

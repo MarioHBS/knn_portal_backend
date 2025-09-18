@@ -1,6 +1,7 @@
 """
 Utilitários para logging estruturado com mascaramento de CPF.
 """
+
 import re
 from typing import Any
 
@@ -18,9 +19,7 @@ def mask_cpf(text: str) -> str:
     return CPF_PATTERN.sub(CPF_MASKED, text)
 
 
-def mask_cpf_in_log(
-    log_event: dict[str, Any] | str
-) -> dict[str, Any] | str:
+def mask_cpf_in_log(log_event: dict[str, Any] | str) -> dict[str, Any] | str:
     """
     Mascara CPFs em eventos de log, seja dicionário ou string.
     """

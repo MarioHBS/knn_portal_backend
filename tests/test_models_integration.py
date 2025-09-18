@@ -4,7 +4,7 @@ import unittest
 from datetime import date
 
 # Adicionar o diretório src ao path para importar os módulos
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from models import Employee, Partner, Student
 
@@ -24,13 +24,13 @@ class TestModelsIntegration(unittest.TestCase):
             celular_aluno="(11) 99999-9999",
             cep_aluno="12345-678",
             bairro="Centro",
-            active_until=date(2024, 12, 31)
+            active_until=date(2024, 12, 31),
         )
 
         # Verifica se o ID foi gerado automaticamente
         self.assertIsNotNone(student.id)
-        self.assertTrue(student.id.startswith('STD_'))
-        self.assertTrue(student.id.endswith('_K1'))
+        self.assertTrue(student.id.startswith("STD_"))
+        self.assertTrue(student.id.endswith("_K1"))
         self.assertEqual(len(student.id), 15)
 
     def test_student_with_existing_id(self):
@@ -42,7 +42,7 @@ class TestModelsIntegration(unittest.TestCase):
             cpf_hash="hash_123",
             nome_aluno="João Silva Santos",
             curso="KIDS 1",
-            active_until=date(2024, 12, 31)
+            active_until=date(2024, 12, 31),
         )
 
         # Verifica se o ID existente foi mantido
@@ -58,13 +58,13 @@ class TestModelsIntegration(unittest.TestCase):
             department="PROFESSORA",
             cep="54321-876",
             telefone="(21) 88888-8888",
-            active=True
+            active=True,
         )
 
         # Verifica se o ID foi gerado automaticamente
         self.assertIsNotNone(employee.id)
-        self.assertTrue(employee.id.startswith('EMP_'))
-        self.assertTrue(employee.id.endswith('_PR'))
+        self.assertTrue(employee.id.startswith("EMP_"))
+        self.assertTrue(employee.id.endswith("_PR"))
         self.assertEqual(len(employee.id), 15)
 
     def test_employee_with_existing_id(self):
@@ -76,7 +76,7 @@ class TestModelsIntegration(unittest.TestCase):
             cpf_hash="hash_456",
             name="Maria Oliveira",
             email="maria@empresa.com",
-            department="PROFESSORA"
+            department="PROFESSORA",
         )
 
         # Verifica se o ID existente foi mantido
@@ -91,13 +91,13 @@ class TestModelsIntegration(unittest.TestCase):
             trade_name="Empresa ABC Ltda",
             category="TECNOLOGIA",
             address="Rua das Flores, 123",
-            active=True
+            active=True,
         )
 
         # Verifica se o ID foi gerado automaticamente
         self.assertIsNotNone(partner.id)
-        self.assertTrue(partner.id.startswith('PTN_'))
-        self.assertTrue(partner.id.endswith('_TEC'))
+        self.assertTrue(partner.id.startswith("PTN_"))
+        self.assertTrue(partner.id.endswith("_TEC"))
         self.assertEqual(len(partner.id), 15)
 
     def test_partner_without_cnpj_fallback(self):
@@ -108,14 +108,14 @@ class TestModelsIntegration(unittest.TestCase):
             trade_name="Empresa ABC Ltda",
             category="TECNOLOGIA",
             address="Rua das Flores, 123",
-            active=True
+            active=True,
         )
 
         # Verifica se foi usado UUID como fallback
         self.assertIsNotNone(partner.id)
         # UUID tem 36 caracteres com hífens
         self.assertEqual(len(partner.id), 36)
-        self.assertIn('-', partner.id)
+        self.assertIn("-", partner.id)
 
     def test_partner_with_existing_id(self):
         """Testa que ID existente não é sobrescrito para parceiro."""
@@ -127,7 +127,7 @@ class TestModelsIntegration(unittest.TestCase):
             cnpj="12.345.678/0001-90",
             trade_name="Empresa ABC Ltda",
             category="TECNOLOGIA",
-            address="Rua das Flores, 123"
+            address="Rua das Flores, 123",
         )
 
         # Verifica se o ID existente foi mantido
@@ -144,7 +144,7 @@ class TestModelsIntegration(unittest.TestCase):
                 cpf_hash="hash_123",
                 nome_aluno="Aluno Teste",
                 curso=curso,
-                active_until=date(2024, 12, 31)
+                active_until=date(2024, 12, 31),
             )
 
             self.assertTrue(student.id.endswith(suffix))
@@ -160,7 +160,7 @@ class TestModelsIntegration(unittest.TestCase):
                 cpf_hash="hash_456",
                 name="Funcionario Teste",
                 email="teste@empresa.com",
-                department=dept
+                department=dept,
             )
 
             self.assertTrue(employee.id.endswith(suffix))
@@ -177,11 +177,11 @@ class TestModelsIntegration(unittest.TestCase):
                 cnpj="12.345.678/0001-90",
                 trade_name="Empresa Teste",
                 category=category,
-                address="Endereço Teste"
+                address="Endereço Teste",
             )
 
             self.assertTrue(partner.id.endswith(suffix))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
