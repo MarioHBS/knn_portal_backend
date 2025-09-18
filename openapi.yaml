@@ -500,7 +500,7 @@ components:
         format: uuid
     
     PartnerIdParam:
-      name: pid
+      name: id
       in: path
       description: ID do parceiro
       required: true
@@ -793,7 +793,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /student/me/fav/{pid}:
+  /student/me/fav/{id}:
     delete:
       summary: Remove parceiro dos favoritos
       description: Remove um parceiro da lista de favoritos do aluno
@@ -1236,8 +1236,6 @@ paths:
                             type: string
                             format: date-time
                             description: "Data e hora do resgate"
-                              - name
-                              - course
                           promotion:
                             type: object
                             properties:
@@ -1246,7 +1244,10 @@ paths:
                             required:
                               - title
                         required:
-                          - student
+                          - user
+                          - user_type
+                          - code
+                          - redeemed_at
                           - promotion
         '401':
           description: Token inválido
