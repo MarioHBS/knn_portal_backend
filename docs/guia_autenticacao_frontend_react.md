@@ -16,7 +16,7 @@ Este documento detalha o fluxo completo de autenticação que o frontend React d
 
 ```bash
 npm install firebase
-```
+`$language
 
 ### Configuração do Firebase
 
@@ -36,7 +36,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-```
+`$language
 
 ## 2. Implementação do Login
 
@@ -147,7 +147,7 @@ const loginWithFirebaseToken = async (firebaseToken) => {
     throw error;
   }
 };
-```
+`$language
 
 ## 3. Componente de Login
 
@@ -207,7 +207,7 @@ const Login = () => {
 };
 
 export default Login;
-```
+`$language
 
 ## 4. Serviço de API
 
@@ -311,7 +311,7 @@ class ApiService {
 }
 
 export const apiService = new ApiService();
-```
+`$language
 
 ## 5. Hook para Dados da API
 
@@ -359,7 +359,7 @@ export const useApiData = (endpoint, dependencies = []) => {
 
   return { data, loading, error, refetch };
 };
-```
+`$language
 
 ## 6. Componente de Exemplo - Lista de Estudantes
 
@@ -392,7 +392,7 @@ const StudentsList = () => {
 };
 
 export default StudentsList;
-```
+`$language
 
 ## 7. Contexto de Autenticação
 
@@ -420,7 +420,7 @@ export const useAuthContext = () => {
   }
   return context;
 };
-```
+`$language
 
 ## 8. Componente de Rota Protegida
 
@@ -445,7 +445,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 export default ProtectedRoute;
-```
+`$language
 
 ## 9. App Principal
 
@@ -470,18 +470,20 @@ function App() {
 }
 
 export default App;
-```
+`$language
 
 ## 10. Fluxo Detalhado das Requisições
 
 ### Passo 1: Login Firebase
+
 ```javascript
 // O usuário faz login com email/senha no Firebase
 const userCredential = await signInWithEmailAndPassword(auth, email, password);
 const firebaseToken = await userCredential.user.getIdToken();
-```
+`$language
 
 ### Passo 2: Troca de Token
+
 ```javascript
 // Envia o token Firebase para o backend
 POST /v1/users/login
@@ -501,9 +503,10 @@ Content-Type: application/json
     "tenant": "tenant_id"
   }
 }
-```
+`$language
 
 ### Passo 3: Requisições Autenticadas
+
 ```javascript
 // Todas as requisições subsequentes usam o JWT
 GET /v1/users/me
@@ -521,7 +524,7 @@ Content-Type: application/json
   "email": "joao@example.com",
   "curso": "Engenharia"
 }
-```
+`$language
 
 ## 11. Tratamento de Erros
 
@@ -551,16 +554,18 @@ export const handleApiError = (error) => {
   
   return error.message || 'Erro desconhecido.';
 };
-```
+`$language
 
 ## 12. Endpoints Disponíveis
 
 ### Autenticação
+
 - `POST /v1/users/login` - Login com token Firebase
 - `GET /v1/users/me` - Dados do usuário atual
 - `POST /v1/users/test-firebase-token` - Teste de validação de token
 
 ### Estudantes
+
 - `GET /v1/students` - Listar estudantes
 - `POST /v1/students` - Criar estudante
 - `GET /v1/students/{id}` - Obter estudante específico
@@ -568,6 +573,7 @@ export const handleApiError = (error) => {
 - `DELETE /v1/students/{id}` - Deletar estudante
 
 ### Parceiros
+
 - `GET /v1/partners` - Listar parceiros
 - `POST /v1/partners` - Criar parceiro
 - `GET /v1/partners/{id}` - Obter parceiro específico
@@ -575,6 +581,7 @@ export const handleApiError = (error) => {
 - `DELETE /v1/partners/{id}` - Deletar parceiro
 
 ### Funcionários
+
 - `GET /v1/employees` - Listar funcionários
 - `POST /v1/employees` - Criar funcionário
 - `GET /v1/employees/{id}` - Obter funcionário específico
@@ -657,6 +664,6 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-```
+`$language
 
 Este guia fornece uma implementação completa do fluxo de autenticação entre o frontend React e o backend KNN Portal Journey Club, incluindo todos os exemplos de código necessários para uma integração bem-sucedida.

@@ -102,11 +102,11 @@ async def get_employee_favorites(
 
         for partner_id in favorite_partner_ids:
 
-            async def get_firestore_partner():
-                return await firestore_client.get_document("partners", partner_id)
+            async def get_firestore_partner(pid=partner_id):
+                return await firestore_client.get_document("partners", pid)
 
-            async def get_postgres_partner():
-                return await postgres_client.get_document("partners", partner_id)
+            async def get_postgres_partner(pid=partner_id):
+                return await postgres_client.get_document("partners", pid)
 
             partner = await with_circuit_breaker(
                 get_firestore_partner, get_postgres_partner
@@ -349,14 +349,14 @@ async def get_employee_validation_history(
             partner_id = code.get("partner_id")
 
             # Buscar dados do parceiro
-            async def get_firestore_partner():
+            async def get_firestore_partner(pid=partner_id):
                 return await firestore_client.get_document(
-                    "partners", partner_id, tenant_id=current_user.tenant
+                    "partners", pid, tenant_id=current_user.tenant
                 )
 
-            async def get_postgres_partner():
+            async def get_postgres_partner(pid=partner_id):
                 return await postgres_client.get_document(
-                    "partners", partner_id, tenant_id=current_user.tenant
+                    "partners", pid, tenant_id=current_user.tenant
                 )
 
             try:
@@ -615,4 +615,4 @@ async def create_validation_code(
                     "msg": "Erro ao gerar código de validação",
                 }
             },
-        )
+        ) from e

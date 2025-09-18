@@ -11,9 +11,11 @@ O servidor JWKS em `https://auth.knnidiomas.com.br/.well-known/jwks.json` não e
 **TESTING_MODE=true** - Já implementado e funcionando
 
 ```env
+
 # .env
+
 TESTING_MODE=true
-```
+`$language
 
 **Vantagens:**
 
@@ -35,7 +37,9 @@ Criar endpoints de autenticação locais que geram JWTs válidos.
 1. **Adicionar endpoint de login:**
 
 ```python
+
 # src/api/auth_local.py
+
 from datetime import datetime, timedelta
 import jwt
 from fastapi import APIRouter, HTTPException
@@ -73,22 +77,26 @@ async def login(request: LoginRequest):
         return LoginResponse(access_token=token)
 
     raise HTTPException(status_code=401, detail="Credenciais inválidas")
-```
+`$language
 
 2. **Adicionar configuração:**
 
 ```env
+
 # .env
+
 JWT_SECRET_KEY=sua_chave_secreta_muito_forte_aqui
 TESTING_MODE=false
-```
+`$language
 
 3. **Modificar auth.py para suportar JWT local:**
 
 ```python
-# Em src/auth.py, adicionar na função verify_token:
 
-# Após falha do Firebase, antes do JWKS externo:
+# Em src/auth.py, adicionar na função verify_token
+
+# Após falha do Firebase, antes do JWKS externo
+
 try:
     # Tentar decodificar com chave local
     from src.config import JWT_SECRET_KEY
@@ -97,7 +105,7 @@ try:
 except jwt.InvalidTokenError:
     # Continuar para JWKS externo
     pass
-```
+`$language
 
 ### 3. Configurar Firebase Auth Adequadamente
 
@@ -110,23 +118,27 @@ Se preferir usar Firebase Auth:
 2. **Configurar variáveis:**
 
 ```env
+
 # .env
+
 FIREBASE_PROJECT_ID=seu-projeto-firebase
 GOOGLE_APPLICATION_CREDENTIALS=credentials/default-service-account-key.json
-```
+`$language
 
 3. **Testar conexão:**
 
 ```bash
 python scripts/maintenance/test_firebase_connection.py
-```
+`$language
 
 ### 4. Criar Mock Server JWKS Local
 
 Para testes mais realistas:
 
 ```python
+
 # scripts/mock_jwks_server.py
+
 from fastapi import FastAPI
 import uvicorn
 from cryptography.hazmat.primitives import serialization
@@ -137,6 +149,7 @@ import json
 app = FastAPI()
 
 # Gerar chave RSA para testes
+
 private_key = rsa.generate_private_key(
     public_exponent=65537,
     key_size=2048
@@ -166,17 +179,19 @@ async def get_jwks():
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=9000)
-```
+`$language
 
 Executar em terminal separado:
+
 ```bash
 python scripts/mock_jwks_server.py
-```
+`$language
 
 E alterar no .env:
+
 ```env
 JWKS_URL=http://localhost:9000/.well-known/jwks.json
-```
+`$language
 
 ### 5. Configurar Servidor JWKS Completo (Produção)
 
@@ -200,7 +215,7 @@ Para um ambiente de produção completo:
 
 ## Recomendações
 
-### Para Desenvolvimento Local:
+### Para Desenvolvimento Local
 
 1. **Manter TESTING_MODE=true** (mais simples)
 2. **Ou implementar JWT local** (mais realista)
@@ -216,10 +231,14 @@ Para um ambiente de produção completo:
 Após implementar qualquer solução:
 
 ```bash
+
 # Testar endpoint
+
 curl -X GET "http://localhost:8080/v1/student/partners" \
+
   -H "Authorization: Bearer SEU_TOKEN_AQUI"
-```
+
+`$language
 
 ## Status Atual
 

@@ -7,11 +7,13 @@ Este documento define as regras de segurança para o banco de dados Firestore de
 ## Configuração Atual
 
 ### Projeto Firebase
+
 - **ID do Projeto**: `knn-benefits`
 - **Ambiente**: Produção
 - **Tenant ID**: `knn-benefits-tenant`
 
 ### Coleções Principais
+
 - `tenants` - Metadados das escolas/unidades
 - `metadata` - Metadados das coleções
 - `students` - Dados dos alunos (74 registros)
@@ -176,7 +178,7 @@ service cloud.firestore {
     }
   }
 }
-```
+`$language
 
 ## Configurações de Autenticação
 
@@ -185,7 +187,9 @@ service cloud.firestore {
 Para produção, os tokens devem incluir informações específicas:
 
 ```python
+
 # Token para administrador
+
 custom_token = {
     "uid": "admin-user-id",
     "role": "admin",
@@ -194,6 +198,7 @@ custom_token = {
 }
 
 # Token para aluno
+
 custom_token = {
     "uid": "STD_XXXXXXXX",  # ID do estudante
     "role": "student",
@@ -202,19 +207,21 @@ custom_token = {
 }
 
 # Token para funcionário
+
 custom_token = {
     "uid": "EMP_XXXXXXXX",  # ID do funcionário
     "role": "employee",
     "tenant_id": "knn-benefits-tenant",
     "permissions": ["read_own", "update_own"]
 }
-```
+`$language
 
 ## Validação dos Dados
 
 ### Campos Obrigatórios por Coleção
 
 #### Students
+
 - `id` (string) - ID único do estudante
 - `tenant_id` (string) = "knn-benefits-tenant"
 - `nome` (string) - Nome completo
@@ -222,6 +229,7 @@ custom_token = {
 - `updated_at` (timestamp) - Data de atualização
 
 #### Employees
+
 - `id` (string) - ID único do funcionário
 - `tenant_id` (string) = "knn-benefits-tenant"
 - `nome` (string) - Nome completo
@@ -247,42 +255,50 @@ function isValidPhone(phone) {
 function isValidCPFHash(cpf_hash) {
   return cpf_hash is string && cpf_hash.size() == 64; // SHA-256
 }
-```
+`$language
 
 ## Monitoramento e Auditoria
 
 ### Métricas Críticas para Produção
+
 - **Operações negadas**: > 100/hora = Alerta
 - **Uso de quota**: > 90% = Alerta crítico
 - **Latência**: > 1000ms = Investigação
 - **Tentativas de acesso não autorizado**: > 10/hora = Alerta de segurança
 
 ### Logs de Auditoria
+
 ```javascript
 // Adicionar logs para operações sensíveis
 allow delete: if isAdmin() &&
                  debug('AUDIT: Admin ' + request.auth.uid + ' deleting document ' + resource.id);
-```
+`$language
 
 ## Backup e Recuperação
 
 ### Configurações Recomendadas
+
 - **Backup automático**: Diário às 02:00 UTC
 - **Retenção**: 30 dias para backups diários, 12 meses para backups mensais
 - **Teste de recuperação**: Mensal
 
 ### Comandos de Backup
+
 ```bash
+
 # Exportar dados
+
 gcloud firestore export gs://knn-benefits-backup/$(date +%Y-%m-%d) --project=knn-benefits
 
 # Importar dados (em caso de recuperação)
+
 gcloud firestore import gs://knn-benefits-backup/2025-01-28 --project=knn-benefits
-```
+`$language
 
 ## Índices Recomendados
 
 ### Índices Compostos Necessários
+
 ```javascript
 // Para consultas por tenant_id + status
 {
@@ -303,20 +319,25 @@ gcloud firestore import gs://knn-benefits-backup/2025-01-28 --project=knn-benefi
     {"fieldPath": "valid_to", "order": "DESCENDING"}
   ]
 }
-```
+`$language
 
 ## Implementação das Regras
 
 ### 1. Via Firebase CLI
+
 ```bash
+
 # Fazer deploy das regras
+
 firebase deploy --only firestore:rules --project=knn-benefits
 
 # Testar regras antes do deploy
+
 firebase firestore:rules:test --project=knn-benefits
-```
+`$language
 
 ### 2. Via Console Firebase
+
 1. Acesse [Firebase Console](https://console.firebase.google.com/)
 2. Selecione o projeto `knn-benefits`
 3. Vá para "Firestore Database" > "Regras"
@@ -349,8 +370,10 @@ firebase firestore:rules:test --project=knn-benefits
    - ✅ Pode ler parceiros e promoções
 
 ### Script de Teste Automatizado
+
 ```python
 #!/usr/bin/env python3
+
 # test_firestore_security.py
 
 import firebase_admin
@@ -371,11 +394,12 @@ def test_student_isolation():
     """Testa que alunos só acessam próprios dados"""
     # Implementar teste
     pass
-```
+`$language
 
 ## Checklist de Implementação
 
 ### Pré-Deploy
+
 - [ ] Revisar todas as regras de segurança
 - [ ] Testar regras em ambiente de staging
 - [ ] Validar tokens de autenticação
@@ -383,12 +407,14 @@ def test_student_isolation():
 - [ ] Testar performance das consultas
 
 ### Deploy
+
 - [ ] Fazer backup dos dados atuais
 - [ ] Implementar regras em horário de baixo tráfego
 - [ ] Monitorar logs por 24h após deploy
 - [ ] Validar funcionamento de todas as operações
 
 ### Pós-Deploy
+
 - [ ] Configurar alertas de monitoramento
 - [ ] Documentar mudanças implementadas
 - [ ] Treinar equipe sobre novas regras
@@ -396,8 +422,8 @@ def test_student_isolation():
 
 ## Contatos e Suporte
 
-- **Console Firebase**: https://console.firebase.google.com/project/knn-benefits
-- **Documentação**: https://firebase.google.com/docs/firestore/security/rules-structure
+- **Console Firebase**: <https://console.firebase.google.com/project/knn-benefits>
+- **Documentação**: <https://firebase.google.com/docs/firestore/security/rules-structure>
 - **Monitoramento**: Google Cloud Console > Firestore
 
 ---

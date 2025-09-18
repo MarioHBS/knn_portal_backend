@@ -82,13 +82,7 @@ async def list_partners(
                 tenant_id=current_user.tenant,
             )
 
-        total = await with_circuit_breaker(
-            count_firestore_partners, count_postgres_partners
-        )
-
-        return PartnerListResponse(
-            data=partners_result.get("items", [])
-        )
+        return PartnerListResponse(data=partners_result.get("items", []))
 
     except Exception as e:
         logger.error(

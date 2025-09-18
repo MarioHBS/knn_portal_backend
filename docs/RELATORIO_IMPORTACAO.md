@@ -85,7 +85,7 @@ projects = {
         ]
     }
 }
-```
+`$language
 
 ## Arquivos de Dados
 
@@ -97,7 +97,7 @@ data/firestore_import/
 ├── firestore_data_production.json  # Dados para banco knn-benefits
 ├── import_with_service_account.py  # Script de importação
 └── *.json                         # Chaves de conta de serviço
-```
+`$language
 
 ### Formato dos Dados
 
@@ -127,23 +127,27 @@ data/firestore_import/
     }
   ]
 }
-```
+`$language
 
 ## Instruções de Uso
 
 ### 1. Preparar Chaves de Serviço
 
 ```bash
+
 # Baixar chaves do Firebase Console
+
+
 # Salvar no diretório data/firestore_import/
-```
+
+`$language
 
 ### 2. Executar Importação
 
 ```bash
 cd data/firestore_import
 python import_with_service_account.py
-```
+`$language
 
 ### 3. Verificar Resultados
 

@@ -20,7 +20,7 @@ function validarNome(nome) {
   }
   return null;
 }
-```
+`$language
 
 #### Email
 
@@ -34,7 +34,7 @@ function validarEmail(email) {
   }
   return null;
 }
-```
+`$language
 
 #### Telefone
 
@@ -57,7 +57,7 @@ function validarTelefone(telefone) {
   
   return null;
 }
-```
+`$language
 
 #### CEP
 
@@ -74,7 +74,7 @@ function validarCEP(cep) {
   
   return null;
 }
-```
+`$language
 
 #### Data de Nascimento
 
@@ -98,7 +98,7 @@ function validarDataNascimento(data) {
   
   return null;
 }
-```
+`$language
 
 ### 2. Validações Específicas - Estudantes
 
@@ -171,9 +171,10 @@ async function inicializarCursos() {
   cursosValidos = await buscarCursosDisponiveis();
   console.log('Cursos carregados:', cursosValidos.length);
 }
-```
+`$language
 
 #### Nome do Responsável (para menores de idade)
+
 ```javascript
 function validarNomeResponsavel(nomeResponsavel, dataNascimento) {
   const idade = calcularIdade(dataNascimento);
@@ -202,11 +203,12 @@ function calcularIdade(dataNascimento) {
   
   return idade;
 }
-```
+`$language
 
 ### 3. Validações Específicas - Funcionários
 
 #### Cargo
+
 ```javascript
 const cargosValidos = [
   'Professor',
@@ -232,11 +234,12 @@ function validarCargo(cargo) {
   
   return null;
 }
-```
+`$language
 
 ### 4. Validações Específicas - Parceiros
 
 #### CNPJ
+
 ```javascript
 function validarCNPJ(cnpj) {
   if (!cnpj) {
@@ -291,9 +294,10 @@ function validarDigitosCNPJ(cnpj) {
   
   return parseInt(cnpj[13]) === digito2;
 }
-```
+`$language
 
 #### Categoria
+
 ```javascript
 const categoriasValidas = [
   'Tecnologia',
@@ -319,11 +323,12 @@ function validarCategoria(categoria) {
   
   return null;
 }
-```
+`$language
 
 ## Máscaras de Entrada
 
 ### Telefone
+
 ```javascript
 function aplicarMascaraTelefone(valor) {
   const apenasNumeros = valor.replace(/\D/g, '');
@@ -334,27 +339,30 @@ function aplicarMascaraTelefone(valor) {
     return apenasNumeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
   }
 }
-```
+`$language
 
 ### CEP
+
 ```javascript
 function aplicarMascaraCEP(valor) {
   const apenasNumeros = valor.replace(/\D/g, '');
   return apenasNumeros.replace(/(\d{5})(\d{3})/, '$1-$2');
 }
-```
+`$language
 
 ### CNPJ
+
 ```javascript
 function aplicarMascaraCNPJ(valor) {
   const apenasNumeros = valor.replace(/\D/g, '');
   return apenasNumeros.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
 }
-```
+`$language
 
 ## Validação Completa do Formulário
 
 ### Estudante
+
 ```javascript
 function validarFormularioEstudante(dados) {
   const erros = {};
@@ -385,9 +393,10 @@ function validarFormularioEstudante(dados) {
     erros
   };
 }
-```
+`$language
 
 ### Funcionário
+
 ```javascript
 function validarFormularioFuncionario(dados) {
   const erros = {};
@@ -415,9 +424,10 @@ function validarFormularioFuncionario(dados) {
     erros
   };
 }
-```
+`$language
 
 ### Parceiro
+
 ```javascript
 function validarFormularioParceiro(dados) {
   const erros = {};
@@ -442,7 +452,7 @@ function validarFormularioParceiro(dados) {
     erros
   };
 }
-```
+`$language
 
 ## Exemplo de Uso
 
@@ -482,7 +492,7 @@ function enviarFormularioEstudante(dadosFormulario) {
     // Tratar erro da API
   });
 }
-```
+`$language
 
 ## Observações Importantes
 

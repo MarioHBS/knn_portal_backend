@@ -9,19 +9,28 @@ Este documento descreve a implementação de suporte a múltiplos bancos de dado
 As seguintes variáveis devem ser configuradas no arquivo `.env`:
 
 ```env
+
 # Projeto principal do Firestore
+
 FIRESTORE_PROJECT=knn-benefits
 
 # Lista de bancos disponíveis (formato JSON)
+
 FIRESTORE_DATABASES=["(default)","knn-benefits"]
 
 # Índice do banco principal (0-based)
+
 FIRESTORE_DATABASE=0
 
 # Configurações de autenticação (opcionais)
+
+
 # GOOGLE_APPLICATION_CREDENTIALS=./credentials/service-account-key.json
+
+
 # FIRESTORE_SERVICE_ACCOUNT_KEY={"type":"service_account",...}
-```
+
+`$language
 
 ### Explicação das Variáveis
 
@@ -39,24 +48,26 @@ O sistema suporta múltiplas formas de autenticação, em ordem de prioridade:
 2. **Service Account File**: Via variável `GOOGLE_APPLICATION_CREDENTIALS`
 3. **Application Default Credentials (ADC)**: Credenciais padrão do ambiente
 
-#### Exemplo com Service Account Key:
+#### Exemplo com Service Account Key
 
 ```env
 FIRESTORE_SERVICE_ACCOUNT_KEY='{"type":"service_account","project_id":"knn-benefits",...}'
-```
+`$language
 
-#### Exemplo com Arquivo de Credenciais:
+#### Exemplo com Arquivo de Credenciais
 
 ```env
 GOOGLE_APPLICATION_CREDENTIALS=./credentials/service-account-key.json
-```
+`$language
 
-#### Usando ADC (Recomendado para desenvolvimento):
+#### Usando ADC (Recomendado para desenvolvimento)
 
 ```bash
+
 # Configure as credenciais padrão
+
 gcloud auth application-default login
-```
+`$language
 
 ## Funcionalidades Implementadas
 
@@ -68,8 +79,11 @@ O sistema inicializa automaticamente conexões com todos os bancos configurados:
 from src.db.firestore import db, databases
 
 # db = banco principal configurado
+
+
 # databases = dicionário com todas as conexões
-```
+
+`$language
 
 ### 2. Acesso ao Banco Principal
 
@@ -77,10 +91,11 @@ from src.db.firestore import db, databases
 from src.db.firestore import db
 
 # Usar o banco principal diretamente
+
 if db:
     collection = db.collection('users')
     doc = collection.document('user_id').get()
-```
+`$language
 
 ### 3. Acesso a Bancos Específicos
 
@@ -88,12 +103,14 @@ if db:
 from src.db.firestore import get_database
 
 # Acessar um banco específico
+
 benefits_db = get_database('knn-benefits')
 default_db = get_database('(default)')
 
 # Se não especificar, retorna o banco principal
+
 main_db = get_database()  # mesmo que usar 'db' diretamente
-```
+`$language
 
 ### 4. Utilitários
 
@@ -104,13 +121,15 @@ from src.db.firestore import (
 )
 
 # Listar todos os bancos disponíveis
+
 available = list_available_databases()
 print(f"Bancos disponíveis: {available}")
 
 # Obter nome do banco principal
+
 current = get_current_database_name()
 print(f"Banco principal: {current}")
-```
+`$language
 
 ## Exemplos de Uso
 
@@ -128,7 +147,7 @@ def get_user_data(user_id: str, tenant: str):
         db = get_database('(default)')
 
     return db.collection('users').document(user_id).get()
-```
+`$language
 
 ### Exemplo 2: Migração de Dados
 
@@ -147,7 +166,7 @@ def migrate_data_between_databases():
     # Escrever no banco destino
     for doc in docs:
         target_db.collection('data').document(doc.id).set(doc.to_dict())
-```
+`$language
 
 ### Exemplo 3: Operações Paralelas
 
@@ -166,7 +185,7 @@ async def query_all_databases(collection_name: str):
         results[db_name] = [doc.to_dict() for doc in docs]
 
     return results
-```
+`$language
 
 ## Configurações Avançadas
 
@@ -175,18 +194,22 @@ async def query_all_databases(collection_name: str):
 Para alterar qual banco é usado como principal, modifique a variável `FIRESTORE_DATABASE`:
 
 ```env
+
 # Para usar o segundo banco da lista como principal
+
 FIRESTORE_DATABASE=1
-```
+`$language
 
 ### Adicionando Novos Bancos
 
 Para adicionar um novo banco, atualize a lista `FIRESTORE_DATABASES`:
 
 ```env
+
 # Adicionar um terceiro banco
+
 FIRESTORE_DATABASES=["(default)","knn-benefits","knn-analytics"]
-```
+`$language
 
 ## Tratamento de Erros
 
@@ -212,7 +235,7 @@ def safe_database_operation(database_name: str):
     except Exception as e:
         logger.error(f"Erro ao acessar {database_name}: {e}")
         return None
-```
+`$language
 
 ## Logs e Monitoramento
 
@@ -230,7 +253,7 @@ INFO: Conexão estabelecida com banco: (default)
 INFO: Conexão estabelecida com banco: knn-benefits
 INFO: Banco principal definido: (default)
 WARNING: Banco analytics não encontrado, usando banco principal
-```
+`$language
 
 ## Script de Teste
 
@@ -238,7 +261,7 @@ Use o script de exemplo para testar a funcionalidade:
 
 ```bash
 python scripts/examples/multi_database_example.py
-```
+`$language
 
 Este script demonstra:
 
@@ -257,8 +280,9 @@ from src.config import FB_PROJECT_ID
 from src.db.firestore import db
 
 # Código usava FB_PROJECT_ID
+
 project = FB_PROJECT_ID
-```
+`$language
 
 ### Depois (código atualizado)
 
@@ -267,11 +291,13 @@ from src.config import FIRESTORE_PROJECT
 from src.db.firestore import db, get_database
 
 # Agora usa FIRESTORE_PROJECT
+
 project = FIRESTORE_PROJECT
 
 # Pode acessar bancos específicos
+
 specific_db = get_database('knn-benefits')
-```
+`$language
 
 ## Considerações de Performance
 
@@ -286,7 +312,7 @@ specific_db = get_database('knn-benefits')
 
 ```text
 WARNING: Banco analytics não encontrado, usando banco principal
-```
+`$language
 
 **Solução**: Verifique se o banco está listado em `FIRESTORE_DATABASES`
 
@@ -294,7 +320,7 @@ WARNING: Banco analytics não encontrado, usando banco principal
 
 ```text
 ERROR: Erro ao conectar com banco knn-benefits: [Firestore] Database 'knn-benefits' does not exist
-```
+`$language
 
 **Solução**: Verifique se o banco existe no projeto Firebase
 
@@ -302,7 +328,7 @@ ERROR: Erro ao conectar com banco knn-benefits: [Firestore] Database 'knn-benefi
 
 ```text
 ERROR: Erro ao inicializar Firebase com credenciais padrão
-```
+`$language
 
 **Solução**: Configure as credenciais do Firebase ou use o emulador
 
@@ -320,7 +346,7 @@ from firebase_admin import firestore
 
 app = firebase_admin.initialize_app()
 db = firestore.client(app)
-```
+`$language
 
 #### Depois (google-cloud-firestore)
 
@@ -329,12 +355,14 @@ from google.cloud import firestore
 from google.oauth2 import service_account
 
 # Com credenciais específicas
+
 credentials = service_account.Credentials.from_service_account_info(key_info)
 client = firestore.Client(project=project_id, credentials=credentials, database=database_id)
 
 # Com credenciais padrão
+
 client = firestore.Client(project=project_id, database=database_id)
-```
+`$language
 
 ### Vantagens da Migração
 
@@ -346,10 +374,14 @@ client = firestore.Client(project=project_id, database=database_id)
 ### Dependências Atualizadas
 
 ```txt
+
 # requirements.txt
+
 google-cloud-firestore==2.19.0
+
 # firebase-admin removido (não mais necessário para Firestore)
-```
+
+`$language
 
 ## Compatibilidade
 

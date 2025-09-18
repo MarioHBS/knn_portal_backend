@@ -21,7 +21,7 @@ Instale o Firebase SDK:
 
 ```bash
 npm install firebase
-```
+`$language
 
 Crie o arquivo `src/config/firebase.js`:
 
@@ -41,17 +41,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export default app;
-```
+`$language
 
 ### 2. Variáveis de Ambiente
 
 Crie o arquivo `.env.local` no projeto frontend:
 
 ```env
+
 # URL da API backend
+
 VITE_API_BASE_URL=http://localhost:8080/v1
 
 # Configurações do Firebase
+
 VITE_FIREBASE_API_KEY=sua-api-key
 VITE_FIREBASE_AUTH_DOMAIN=knn-benefits.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=knn-benefits
@@ -60,8 +63,9 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=sua-app-id
 
 # Ambiente de desenvolvimento
+
 VITE_ENVIRONMENT=development
-```
+`$language
 
 ### 3. Headers de Autenticação
 
@@ -72,7 +76,7 @@ const headers = {
   'Authorization': `Bearer ${token}`,
   'Content-Type': 'application/json'
 };
-```
+`$language
 
 ## Implementação da Autenticação
 
@@ -165,7 +169,7 @@ class FirebaseAuthService {
 }
 
 export const firebaseAuthService = new FirebaseAuthService();
-```
+`$language
 
 ### 2. Integração com Backend
 
@@ -221,7 +225,7 @@ class BackendAuthService {
 }
 
 export const backendAuthService = new BackendAuthService();
-```
+`$language
 
 ### 3. Gerenciamento de Tokens
 
@@ -247,7 +251,7 @@ O token JWT do Firebase contém informações padrão:
     "sign_in_provider": "password"
   }
 }
-```
+`$language
 
 #### 3.2. Perfil do Usuário
 
@@ -264,7 +268,7 @@ O backend retorna informações adicionais após validação:
   "first_access": true,        // Primeiro acesso
   "active": true               // Status ativo
 }
-```
+`$language
 
 #### 3.3. Renovação Automática de Tokens
 
@@ -301,7 +305,7 @@ class TokenManager {
 }
 
 export const tokenManager = new TokenManager();
-```
+`$language
 
 ## Serviço de Autenticação Unificado
 
@@ -453,7 +457,7 @@ class AuthService {
 }
 
 export const authService = new AuthService();
-```
+`$language
 
 ## Cliente HTTP com Tratamento de Erros
 
@@ -579,7 +583,7 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
-```
+`$language
 
 ## Tratamento de Erros
 
@@ -625,7 +629,7 @@ export const firebaseErrorMap = {
 export function getFirebaseErrorMessage(errorCode) {
   return firebaseErrorMap[errorCode] || 'Erro desconhecido. Tente novamente.';
 }
-```
+`$language
 
 ### 2. Hook de Tratamento de Erros
 
@@ -673,7 +677,7 @@ export function useErrorHandler() {
     clearError
   };
 }
-```
+`$language
 
 ### 3. Componente de Notificação de Erros
 
@@ -696,7 +700,7 @@ export function ErrorNotification({ error, onClose }) {
     </div>
   );
 }
-```
+`$language
 
 ## Exemplos Práticos de Uso
 
@@ -757,7 +761,7 @@ export function LoginPage() {
     </div>
   );
 }
-```
+`$language
 
 ### 2. Hook de Autenticação
 
@@ -806,11 +810,12 @@ export function useAuth() {
     signOut
   };
 }
-```
+`$language
 
 ## Endpoints Disponíveis por Role
 
 ### Student (Aluno)
+
 - `GET /v1/student/partners` - Listar parceiros
 - `GET /v1/student/partners/{partner_id}` - Detalhes do parceiro
 - `POST /v1/student/partners/{partner_id}/favorite` - Favoritar parceiro
@@ -819,17 +824,20 @@ export function useAuth() {
 - `GET /v1/student/history` - Histórico de resgates
 
 ### Partner (Parceiro)
+
 - `POST /v1/partner/redeem` - Validar código de resgate
 - `GET /v1/partner/profile` - Perfil do parceiro
 - `PUT /v1/partner/profile` - Atualizar perfil
 
 ### Employee (Funcionário)
+
 - `GET /v1/employee/partners` - Gerenciar parceiros
 - `POST /v1/employee/partners` - Criar parceiro
 - `PUT /v1/employee/partners/{partner_id}` - Atualizar parceiro
 - `GET /v1/employee/students` - Gerenciar alunos
 
 ### Admin (Administrador)
+
 - Todos os endpoints acima
 - `GET /v1/admin/analytics` - Relatórios e analytics
 - `GET /v1/admin/users` - Gerenciar usuários
@@ -848,7 +856,7 @@ if (userInfo?.role !== 'student') {
 // Fazer requisição
 const partners = await apiClient.get('/student/partners?cat=Alimentação&limit=10');
 console.log(partners.data);
-```
+`$language
 
 ### 2. Validar Código de Resgate (Partner)
 
@@ -864,7 +872,7 @@ const result = await apiClient.post('/partner/redeem', {
   validation_code: 'ABC123'
 });
 console.log(result.msg); // "Código validado com sucesso"
-```
+`$language
 
 ## Tratamento de Erros
 
@@ -891,15 +899,18 @@ try {
     alert(`Erro: ${error.message}`);
   }
 }
-```
+`$language
 
 ## Configuração de Desenvolvimento Local
 
 ### 1. Configuração do Frontend
 
 #### Arquivo .env.local
+
 ```bash
+
 # Frontend - .env.local
+
 VITE_API_BASE_URL=http://localhost:8000
 VITE_FIREBASE_API_KEY=your_api_key
 VITE_FIREBASE_AUTH_DOMAIN=knn-benefits.firebaseapp.com
@@ -909,16 +920,18 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=1:123456789:web:abcdef123456
 
 # Desenvolvimento
+
 VITE_DEBUG=true
 VITE_TEST_MODE=false
-```
+`$language
 
 #### Iniciar Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
-```
+`$language
 
 ### 2. Verificação de Conectividade
 
@@ -946,7 +959,7 @@ useEffect(() => {
     }
   });
 }, []);
-```
+`$language
 
 ## Boas Práticas de Segurança
 
@@ -993,22 +1006,24 @@ const routes = [
     beforeEnter: requireAuth(['partner'])
   }
 ];
-```
+`$language
 
 ## Troubleshooting
 
 ### Problemas Comuns
 
 #### 1. Token Inválido
+
 ```javascript
 // Verificar se o Firebase está configurado corretamente
 console.log('Firebase config:', firebaseConfig);
 
 // Verificar se o usuário está autenticado
 console.log('User authenticated:', firebaseAuthService.isAuthenticated());
-```
+`$language
 
 #### 2. Backend Não Responde
+
 ```javascript
 // Verificar se a URL da API está correta
 console.log('API URL:', import.meta.env.VITE_API_BASE_URL);
@@ -1017,9 +1032,10 @@ console.log('API URL:', import.meta.env.VITE_API_BASE_URL);
 fetch(`${import.meta.env.VITE_API_BASE_URL}/health`)
   .then(response => console.log('Backend status:', response.status))
   .catch(error => console.error('Backend error:', error));
-```
+`$language
 
 #### 3. Problemas de Rede
+
 ```javascript
 // Implementar retry com backoff
 const retryRequest = async (fn, retries = 3) => {
@@ -1032,7 +1048,7 @@ const retryRequest = async (fn, retries = 3) => {
     }
   }
 };
-```
+`$language
 
 ### Debug Avançado
 
@@ -1057,7 +1073,7 @@ console.log('Firebase Config:', {
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID
 });
-```
+`$language
 
 ## Health Check
 
@@ -1068,11 +1084,12 @@ Verifique se a API está funcionando:
 const health = await fetch(`${import.meta.env.VITE_API_BASE_URL}/health`);
 const status = await health.json();
 console.log(status); // { "status": "ok", "mode": "normal" }
-```
+`$language
 
 ## Checklist de Implementação
 
 ### Frontend
+
 - [ ] Instalar Firebase SDK (`npm install firebase`)
 - [ ] Configurar Firebase no arquivo `src/config/firebase.js`
 - [ ] Criar arquivo `.env.local` com variáveis do Firebase
@@ -1083,6 +1100,7 @@ console.log(status); // { "status": "ok", "mode": "normal" }
 - [ ] Testar fluxo completo de autenticação
 
 ### Testes
+
 - [ ] Testar login com credenciais válidas
 - [ ] Testar login com credenciais inválidas
 - [ ] Testar registro de novo usuário

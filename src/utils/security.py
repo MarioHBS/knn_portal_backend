@@ -1,6 +1,7 @@
 """
 Utilitários de segurança para o Portal de Benefícios KNN.
 """
+
 import hashlib
 import re
 
@@ -22,12 +23,9 @@ def validate_cnpj(cnpj: str) -> bool:
         return False
 
     # Verificar se todos os dígitos são iguais (caso inválido)
-    if len(set(cnpj)) == 1:
-        return False
-
     # Em uma implementação real, verificaríamos os dígitos verificadores
     # Para simplificar, consideramos válido se não for todos dígitos iguais
-    return True
+    return len(set(cnpj)) != 1
 
 
 def hash_cnpj(cnpj: str, salt: str | None = None) -> str:
@@ -59,12 +57,9 @@ def validate_cpf(cpf: str) -> bool:
         return False
 
     # Verificar se todos os dígitos são iguais (caso inválido)
-    if len(set(cpf)) == 1:
-        return False
-
     # Em uma implementação real, verificaríamos os dígitos verificadores
     # Para simplificar, consideramos válido se não for todos dígitos iguais
-    return True
+    return len(set(cpf)) != 1
 
 
 def hash_cpf(cpf: str, salt: str | None = None) -> str:

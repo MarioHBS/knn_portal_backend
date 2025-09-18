@@ -7,11 +7,13 @@ Este documento fornece informações técnicas sobre os algoritmos de geração 
 ## Estrutura dos IDs Gerados
 
 ### Formato Geral
+
 Todos os IDs seguem o padrão: `PREFIXO_CODIGO_INTERCALADO_SUFIXO`
 
 ### Tipos de Entidades
 
 #### 1. Alunos (Students)
+
 - **Prefixo**: `STD_`
 - **Algoritmo**: Intercalação de iniciais do nome + dígitos do CEP + dígitos do celular + dígitos do email
 - **Sufixos por Curso**:
@@ -23,9 +25,11 @@ Todos os IDs seguem o padrão: `PREFIXO_CODIGO_INTERCALADO_SUFIXO`
   - Outros → `_OT`
 
 **Exemplo**: João Silva Santos, KIDS 1, CEP 12345-678, Celular (11) 99999-9999
+
 → `STD_J6S7S899_K1`
 
 #### 2. Funcionários (Employees)
+
 - **Prefixo**: `EMP_`
 - **Algoritmo**: Intercalação de iniciais do nome + dígitos do CEP + dígitos do telefone
 - **Sufixos por Cargo**:
@@ -36,9 +40,11 @@ Todos os IDs seguem o padrão: `PREFIXO_CODIGO_INTERCALADO_SUFIXO`
   - Outros → `_OT`
 
 **Exemplo**: Carlos Eduardo, PROFESSORA, CEP 11111-222, Telefone (11) 55555-5555
+
 → `EMP_C2E22555_PR`
 
 #### 3. Parceiros (Partners)
+
 - **Prefixo**: `PTN_`
 - **Algoritmo**: Intercalação de iniciais do trade_name + dígitos do CNPJ
 - **Sufixos por Categoria**:
@@ -51,6 +57,7 @@ Todos os IDs seguem o padrão: `PREFIXO_CODIGO_INTERCALADO_SUFIXO`
   - Outros → `_OT`
 
 **Exemplo**: Tech Solutions, TECNOLOGIA, CNPJ 12.345.678/0001-90
+
 → `PTN_T4S5678_TEC`
 
 ## Integração com Frontend
@@ -63,11 +70,12 @@ Os IDs são gerados automaticamente pelo backend nos seguintes endpoints:
 POST /api/students
 POST /api/employees  
 POST /api/partners
-```
+`$language
 
 ### 2. Campos Obrigatórios por Entidade
 
-#### Para Alunos:
+#### Para Alunos
+
 ```json
 {
   "nome_aluno": "string (obrigatório)",
@@ -76,9 +84,10 @@ POST /api/partners
   "celular": "string (formato brasileiro)",
   "email": "string (opcional)"
 }
-```
+`$language
 
-#### Para Funcionários:
+#### Para Funcionários
+
 ```json
 {
   "name": "string (obrigatório)",
@@ -86,16 +95,17 @@ POST /api/partners
   "cep": "string (formato: XXXXX-XXX)",
   "telefone": "string (formato brasileiro)"
 }
-```
+`$language
 
-#### Para Parceiros:
+#### Para Parceiros
+
 ```json
 {
   "trade_name": "string (obrigatório)",
   "category": "string (obrigatório)",
   "cnpj": "string (formato: XX.XXX.XXX/XXXX-XX)"
 }
-```
+`$language
 
 ### 3. Comportamento da API
 
@@ -106,6 +116,7 @@ POST /api/partners
 ### 4. Validação no Frontend
 
 #### Formato de ID Válido
+
 ```javascript
 // Regex para validação de IDs gerados
 const ID_PATTERN = /^(STD|EMP|PTN)_[A-Z0-9]+_(K[1-3]|T[1-3]|A[1-3]|CV|BZ|PR|CDA|AF|CO|TEC|SAU|EDU|ALI|VAR|SER|OT)$/;
@@ -113,9 +124,10 @@ const ID_PATTERN = /^(STD|EMP|PTN)_[A-Z0-9]+_(K[1-3]|T[1-3]|A[1-3]|CV|BZ|PR|CDA|
 function isValidCustomID(id) {
   return ID_PATTERN.test(id);
 }
-```
+`$language
 
 #### Validação de Campos
+
 ```javascript
 // Validação de CEP brasileiro
 function isValidCEP(cep) {
@@ -131,11 +143,12 @@ function isValidPhone(phone) {
 function isValidCNPJ(cnpj) {
   return /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj);
 }
-```
+`$language
 
 ### 5. Exemplos de Requisições
 
 #### Criando um Aluno
+
 ```javascript
 const studentData = {
   nome_aluno: "Maria Silva Santos",
@@ -156,9 +169,10 @@ fetch('/api/students', {
 .then(data => {
   console.log('ID gerado:', data.id); // Ex: STD_M1S2S4321_T2
 });
-```
+`$language
 
 #### Criando um Funcionário
+
 ```javascript
 const employeeData = {
   name: "João Carlos Silva",
@@ -178,9 +192,10 @@ fetch('/api/employees', {
 .then(data => {
   console.log('ID gerado:', data.id); // Ex: EMP_J5C6S8888_PR
 });
-```
+`$language
 
 #### Criando um Parceiro
+
 ```javascript
 const partnerData = {
   trade_name: "Tecnologia & Inovação Ltda",
@@ -198,7 +213,7 @@ fetch('/api/partners', {
 .then(data => {
   console.log('ID gerado:', data.id); // Ex: PTN_T6I7678_TEC
 });
-```
+`$language
 
 ### 6. Tratamento de Erros
 
@@ -227,7 +242,7 @@ fetch('/api/students', {
 .catch(error => {
   console.error('Erro ao criar estudante:', error);
 });
-```
+`$language
 
 ### 7. Considerações Importantes
 
@@ -240,6 +255,7 @@ fetch('/api/students', {
 ### 8. Testes de Validação
 
 O backend possui 26 testes unitários que validam:
+
 - Geração correta de IDs para cada tipo de entidade
 - Mapeamento correto de cursos, cargos e categorias
 - Tratamento de casos extremos (nomes acentuados, dados incompletos)

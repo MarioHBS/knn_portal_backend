@@ -54,7 +54,7 @@
     "name": "João Silva Santos",
     "expires_at": 1757984871
 }
-```
+`$language
 
 ## Validações Realizadas
 
@@ -118,6 +118,7 @@
 ---
 
 **Próximos Passos:**
+
 1. Implementar testes unitários automatizados
 2. Adicionar este endpoint à documentação da API
 3. Considerar testes de carga se necessário

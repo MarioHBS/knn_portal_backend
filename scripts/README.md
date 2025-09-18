@@ -5,7 +5,9 @@ Este diretório contém scripts organizados por categoria para facilitar a manut
 ## Estrutura de Pastas
 
 ### 📁 development/
+
 Scripts para desenvolvimento e preparação de dados:
+
 - `generate_test_data.py` - Gera dados simulados para testes locais
 - `prepare_firestore_data.py` - Prepara dados para formato Firestore
 - `seed_dev.py` - Popula dados de desenvolvimento/QA
@@ -14,7 +16,9 @@ Scripts para desenvolvimento e preparação de dados:
 - `create_test_entities.py` - Criação de entidades de teste (Aluno, Funcionário, Parceiro)
 
 ### 📁 maintenance/
+
 Scripts para manutenção e verificação do sistema:
+
 - `check_courses.py` - Verifica presença de cursos no Firestore
 - `debug_courses.py` - Lista cursos para depuração
 - `validate_artifacts.py` - Valida artefatos gerados do projeto
@@ -25,20 +29,26 @@ Scripts para manutenção e verificação do sistema:
 - `sync_users_collection.py` - Sincronização da coleção de usuários com Firebase Auth
 
 ### 📁 migration/
+
 Scripts de migração de dados e estruturas:
+
 - `migrate_audience_field.py` - Migra campo target_profile para audience
 - `migrate_data_to_firestore.py` - Migra dados de JSON para Firestore
 - `remove_active_field.py` - Remove campo 'active' dos cursos
 - `update_courses_structure.py` - Atualiza estrutura dos cursos
 
 ### 📁 testing/
+
 Scripts para testes e validação:
+
 - `test_audience_implementation.py` - Testa validação do modelo audience
 - `test_endpoints.py` - Testa endpoints do Portal de Benefícios
 - `test_suite.py` - **Suite consolidada** de testes (audience, endpoints, filtragem)
 
 ### 📁 temp/
+
 Scripts temporários (não versionados):
+
 - **Pasta limpa e reorganizada** - Scripts obsoletos foram removidos
 - Scripts úteis foram movidos para pastas apropriadas (development, maintenance)
 - Contém apenas README.md para orientação de uso
@@ -47,6 +57,7 @@ Scripts temporários (não versionados):
 ## Scripts na Raiz
 
 ### Scripts Principais
+
 - `populate_courses.py` - Popula base de dados com cursos disponíveis
 - `run_server.py` - Inicia servidor FastAPI para testes locais
 

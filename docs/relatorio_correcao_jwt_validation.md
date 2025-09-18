@@ -21,7 +21,9 @@ O endpoint `/v1/users/me` estava falhando com erro "JWT inválido" mesmo com tok
 **Evidência:**
 
 ```python
-# Token gerado incluía:
+
+# Token gerado incluía
+
 {
     "sub": "aluno.teste@journeyclub.com.br",
     "role": "student",
@@ -33,7 +35,8 @@ O endpoint `/v1/users/me` estava falhando com erro "JWT inválido" mesmo com tok
     "aud": "knn-portal"
 }
 
-# Modelo JWTPayload original (sem campo name):
+# Modelo JWTPayload original (sem campo name)
+
 class JWTPayload(BaseModel):
     sub: str
     role: str
@@ -43,35 +46,43 @@ class JWTPayload(BaseModel):
     iss: str
     aud: str
     # name: str | None = None  # AUSENTE!
-```
+`$language
 
 ### 2. Função Inexistente no Middleware
 
 **Problema:**
+
 - O middleware `with_tenant` tentava importar `verify_token` que não existia
 - Isso causava exceção não tratada, resultando em "JWT inválido"
 
 **Evidência:**
+
 ```python
-# Código problemático no middleware:
+
+# Código problemático no middleware
+
 from src.auth import verify_token  # ❌ Função não existe
 
 payload = await verify_token(token)  # ❌ Falha aqui
-```
+`$language
 
 ### 3. Chamada Síncrona de Função Assíncrona
 
 **Problema:**
+
 - Após corrigir o import para `verify_local_jwt`, a função era chamada sem `await`
 - `verify_local_jwt` é uma função assíncrona que retorna uma corrotina
 - O middleware tentava acessar `.tenant` em uma corrotina não aguardada
 
 **Evidência:**
+
 ```python
-# Código problemático:
+
+# Código problemático
+
 payload = verify_local_jwt(token)  # ❌ Sem await
 tenant = payload.tenant  # ❌ payload é uma corrotina, não JWTPayload
-```
+`$language
 
 ## Soluções Implementadas
 
@@ -101,7 +112,7 @@ class JWTPayload(BaseModel):
     iss: str
     aud: str
     name: str | None = None  # ✅ CAMPO ADICIONADO
-```
+`$language
 
 ### Correção 2: Atualização do Endpoint `/me`
 
@@ -120,7 +131,7 @@ async def get_me(
         "name": current_user.name or current_user.sub,  # ✅ CORRIGIDO
         "expires_at": current_user.exp,
     }
-```
+`$language
 
 **Mudança:** Substituído `getattr(current_user, "name", current_user.sub)` por `current_user.name or current_user.sub`
 
@@ -147,9 +158,10 @@ async def with_tenant(request: Request, call_next):
         request.state.tenant = tenant
     except Exception:
         return JSONResponse(status_code=401, content={"error": {"msg": "JWT inválido"}})
-```
+`$language
 
 **Mudanças:**
+
 1. Import corrigido: `verify_token` → `verify_local_jwt`
 2. Adicionado `await` na chamada da função assíncrona
 
@@ -186,7 +198,9 @@ async def with_tenant(request: Request, call_next):
 ### Teste Final Bem-Sucedido
 
 ```bash
+
 # Login
+
 POST /v1/users/login
 {
     "username": "aluno.teste@journeyclub.com.br",
@@ -197,10 +211,12 @@ POST /v1/users/login
 # Resposta: Token válido gerado
 
 # Teste do endpoint /me
+
 GET /v1/users/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
-# Resposta bem-sucedida:
+# Resposta bem-sucedida
+
 {
     "username": "aluno.teste@journeyclub.com.br",
     "role": "student",
@@ -208,7 +224,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "name": "João Silva Santos",
     "expires_at": 1757813337
 }
-```
+`$language
 
 ## Impacto das Correções
 
@@ -265,6 +281,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 O problema foi resolvido com sucesso através de uma abordagem sistemática de debugging. As correções implementadas não apenas resolveram o problema imediato, mas também melhoraram a robustez e consistência do sistema de autenticação.
 
 O sistema agora funciona corretamente com:
+
 - Validação JWT adequada
 - Middleware de tenant operacional
 - Endpoint `/me` retornando dados corretos

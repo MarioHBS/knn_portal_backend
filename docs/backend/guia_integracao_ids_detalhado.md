@@ -48,7 +48,7 @@
   
   <button type="submit">Cadastrar Aluno</button>
 </form>
-```
+`$language
 
 ```javascript
 // Validação e submissão do formulário
@@ -184,7 +184,7 @@ class StudentFormHandler {
 document.addEventListener('DOMContentLoaded', () => {
   new StudentFormHandler();
 });
-```
+`$language
 
 ### 2. Lista de Entidades com IDs Personalizados
 
@@ -288,7 +288,7 @@ class StudentList {
     this.container.innerHTML = `<div class="error-message">${message}</div>`;
   }
 }
-```
+`$language
 
 ### 3. Busca e Filtros por Tipo de ID
 
@@ -438,7 +438,7 @@ class EntitySearch {
     return localStorage.getItem('authToken');
   }
 }
-```
+`$language
 
 ### 4. Componente React para Integração
 
@@ -658,7 +658,7 @@ const StudentForm = ({ onSubmit, onCancel }) => {
 };
 
 export default StudentForm;
-```
+`$language
 
 ## Resumo de Implementação
 

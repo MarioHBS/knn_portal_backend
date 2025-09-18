@@ -15,16 +15,19 @@ Esta pasta contém todos os arquivos relacionados à configuração, importaçã
 ### 🔧 scripts/ - Scripts Python
 
 #### Scripts de Importação
+
 - `import_to_firestore.py` - Script principal de importação (com suporte a emulador)
 - `import_with_service_account.py` - Importação usando chaves de conta de serviço
 - `list_firestore_databases.py` - Lista bancos de dados disponíveis
 - `deploy_firestore_rules.py` - Deploy de regras do Firestore
 
 #### Scripts de Usuários Admin
+
 - `setup_admin_user.py` - Configuração de usuário admin para projeto default
 - `create_admin_user_knn_benefits.py` - Criação de usuário admin para knn-benefits
 
 #### Scripts de Teste
+
 - `test_default_database.py` - Testa conexão com banco default
 - `test_knn_benefits_database.py` - Testa conexão com banco knn-benefits
 
@@ -49,6 +52,7 @@ Esta pasta contém todos os arquivos relacionados à configuração, importaçã
 ## 📋 Organização Recente
 
 Esta pasta foi reorganizada para melhor estruturação:
+
 - **docs/**: Toda documentação consolidada
 - **scripts/**: Todos os scripts Python organizados por função
 - **data/**: Arquivos de dados JSON

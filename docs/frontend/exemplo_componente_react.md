@@ -298,7 +298,7 @@ const CadastroEstudante = () => {
 };
 
 export default CadastroEstudante;
-```
+`$language
 
 ## Arquivo de API (api.js)
 
@@ -376,7 +376,7 @@ export const buscarEstudantePorId = async (id) => {
 
   return response.json();
 };
-```
+`$language
 
 ## Arquivo de Validações (validacoes.js)
 
@@ -436,7 +436,7 @@ export function validarFormularioEstudante(dados) {
     erros
   };
 }
-```
+`$language
 
 ## Estilos CSS (cadastro-estudante.css)
 
@@ -560,21 +560,24 @@ export function validarFormularioEstudante(dados) {
     padding: 15px;
   }
 }
-```
+`$language
 
 ## Como Usar
 
 1. **Instalar dependências:**
+
 ```bash
 npm install
-```
+`$language
 
 2. **Configurar variáveis de ambiente (.env):**
-```
+
+`$language
 REACT_APP_API_URL=http://localhost:8000/api/v1
-```
+`$language
 
 3. **Importar e usar o componente:**
+
 ```jsx
 import CadastroEstudante from './components/CadastroEstudante';
 import './components/cadastro-estudante.css';
@@ -586,7 +589,7 @@ function App() {
     </div>
   );
 }
-```
+`$language
 
 ## Funcionalidades Implementadas
 

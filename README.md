@@ -54,7 +54,7 @@ portal-knn/
 ├── seed_dev.py               # Script para criar dados iniciais
 ├── manual_tests.md           # Documentação de testes manuais
 └── README.md                 # Documentação principal
-```
+`$language
 
 ## Perfis de Usuário
 
@@ -114,17 +114,20 @@ Para iniciar o servidor em modo de desenvolvimento:
 
 ```bash
 python scripts/run_server.py
-```
+`$language
 
 Para executar com dados simulados (sem Firestore/PostgreSQL reais):
 
 ```bash
+
 # Opção 1: Definir variável de ambiente
+
 KNN_USE_TEST_DATABASE=true python scripts/run_server.py
 
 # Opção 2: Editar o arquivo .env e definir KNN_USE_TEST_DATABASE=true
+
 python scripts/run_server.py
-```
+`$language
 
 ### Variáveis de Ambiente
 
@@ -147,14 +150,14 @@ Para executar todos os testes automatizados (incluindo linting com Ruff):
 
 ```bash
 ./run_tests.sh
-```
+`$language
 
 Para executar apenas o linting:
 
 ```bash
 ruff check src/
 ruff format src/
-```
+`$language
 
 Para testes manuais, siga as instruções em `manual_tests.md`.
 
@@ -164,7 +167,7 @@ Para fazer deploy no Google Cloud Run:
 
 ```bash
 ./deploy_cloudrun.sh
-```
+`$language
 
 ## Tokens JWT para Testes
 
@@ -174,19 +177,19 @@ Para facilitar os testes, você pode usar os seguintes tokens JWT:
 
 ```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHVkZW50LWlkIiwicm9sZSI6InN0dWRlbnQiLCJleHAiOjE3MTY5OTIwMDAsImlhdCI6MTcxNjkwNTYwMH0.8Uj7hl5vYGnEZQGR5QeQQOdTKB4ZXEfEiqxJxlE5Pjw
-```
+`$language
 
 ### Token de Parceiro
 
 ```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYXJ0bmVyLWlkIiwicm9sZSI6InBhcnRuZXIiLCJleHAiOjE3MTY5OTIwMDAsImlhdCI6MTcxNjkwNTYwMH0.Hn5Fq5qSVBN5QjuoYd2KBjTIGJJoV9OQh-VzpNqJrSs
-```
+`$language
 
 ### Token de Administrador
 
 ```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi1pZCIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTcxNjk5MjAwMCwiaWF0IjoxNzE2OTA1NjAwfQ.jQyOq0-KnzH0vqBQwKsqzTBGzKqGLYVj9WdAZKbK5Hs
-```
+`$language
 
 ## Documentação da API
 

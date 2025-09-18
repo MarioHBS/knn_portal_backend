@@ -114,7 +114,7 @@ service cloud.firestore {
     }
   }
 }
-```
+`$language
 
 ### 2. Regras Alternativas - Mais Restritivas
 
@@ -171,7 +171,7 @@ service cloud.firestore {
     }
   }
 }
-```
+`$language
 
 ### 3. Regras Ultra-Permissivas (Apenas para Testes Iniciais)
 
@@ -185,7 +185,7 @@ service cloud.firestore {
     }
   }
 }
-```
+`$language
 
 ## Configurações de Autenticação
 
@@ -194,7 +194,9 @@ service cloud.firestore {
 Para testar as regras com diferentes perfis, configure tokens personalizados:
 
 ```python
+
 # Exemplo de token para administrador
+
 custom_token = {
     "uid": "admin-user-id",
     "role": "admin",
@@ -202,6 +204,7 @@ custom_token = {
 }
 
 # Exemplo de token para aluno
+
 custom_token = {
     "uid": "STD_A3C1M7L7_S4",
     "role": "student",
@@ -209,18 +212,20 @@ custom_token = {
 }
 
 # Exemplo de token para funcionário
+
 custom_token = {
     "uid": "EMP_A0A0O007_AP",
     "role": "employee",
     "tenant_id": "knn-dev-tenant"
 }
-```
+`$language
 
 ## Validação dos Dados
 
 ### Campos Obrigatórios por Coleção
 
 #### Students
+
 - `id` (string)
 - `tenant_id` (string) = "knn-dev-tenant"
 - `nome` (string)
@@ -230,6 +235,7 @@ custom_token = {
 - `updated_at` (timestamp)
 
 #### Employees
+
 - `id` (string)
 - `tenant_id` (string) = "knn-dev-tenant"
 - `nome` (string)
@@ -249,17 +255,19 @@ match /students/{studentId} {
     request.resource.data.nome is string &&
     request.resource.data.nome.size() > 0;
 }
-```
+`$language
 
 ## Monitoramento e Logs
 
 ### Métricas Importantes
+
 - Número de operações de leitura/escrita por coleção
 - Tentativas de acesso negadas
 - Uso de quota do Firestore
 - Latência das consultas
 
 ### Alertas Recomendados
+
 - Mais de 1000 operações negadas por hora
 - Uso de quota acima de 80%
 - Latência média acima de 500ms
@@ -269,18 +277,23 @@ match /students/{studentId} {
 ### Comandos para Testar
 
 ```bash
+
 # Instalar o emulador do Firebase
+
 npm install -g firebase-tools
 
 # Inicializar o projeto
+
 firebase init firestore
 
 # Executar o emulador
+
 firebase emulators:start --only firestore
 
 # Testar regras específicas
+
 firebase firestore:rules:test --project=knn-portal-dev
-```
+`$language
 
 ### Casos de Teste
 
@@ -305,6 +318,7 @@ firebase firestore:rules:test --project=knn-portal-dev
 ## Migração para Produção
 
 ### Diferenças Principais
+
 - Regras mais restritivas
 - Validação de dados mais rigorosa
 - Logs de auditoria obrigatórios
@@ -312,6 +326,7 @@ firebase firestore:rules:test --project=knn-portal-dev
 - Monitoramento 24/7
 
 ### Checklist de Migração
+
 - [ ] Testar todas as regras no ambiente de teste
 - [ ] Validar performance das consultas
 - [ ] Configurar índices necessários
@@ -330,9 +345,9 @@ firebase firestore:rules:test --project=knn-portal-dev
 
 ## Contatos e Suporte
 
-- **Documentação Firebase**: https://firebase.google.com/docs/firestore/security/rules-structure
-- **Console Firebase**: https://console.firebase.google.com/project/knn-portal-dev
-- **Emulador Local**: http://localhost:4000/firestore
+- **Documentação Firebase**: <https://firebase.google.com/docs/firestore/security/rules-structure>
+- **Console Firebase**: <https://console.firebase.google.com/project/knn-portal-dev>
+- **Emulador Local**: <http://localhost:4000/firestore>
 
 ---
 

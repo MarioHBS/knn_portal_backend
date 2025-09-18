@@ -1,6 +1,7 @@
 """
 Implementação de regras de negócio específicas para o Portal de Benefícios KNN.
 """
+
 import hashlib
 import random
 import re
@@ -105,12 +106,9 @@ class BusinessRules:
             return False
 
         # Verificar se todos os dígitos são iguais (caso inválido)
-        if len(set(cnpj)) == 1:
-            return False
-
         # Em uma implementação real, verificaríamos os dígitos verificadores
         # Para simplificar, consideramos válido se não for todos dígitos iguais
-        return True
+        return len(set(cnpj)) != 1
 
     @staticmethod
     def hash_cnpj(cnpj: str, salt: str | None = None) -> str:

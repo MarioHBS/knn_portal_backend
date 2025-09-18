@@ -19,12 +19,17 @@
 - **employees**: { id, tenant_id, cpf_hash, name, email, department, active }
 - **partners**: { id, trade_name, category, address, active }
 - **promotions**: { id, partner_id, title, type, target_profile, valid_from,
+
   valid_to, active }
+
 - **validation_codes**: { id, student_id, partner_id, code_hash, expires,
+
   used_at }
+
 - **redemptions**: { id, validation_code_id, value, used_at }
 
 **Observação**: students, employees, partners e validation_codes são
+
 replicados em PostgreSQL via worker para garantir leitura em modo degradado.
 
 ## 3. Rotas da API
@@ -39,7 +44,9 @@ replicados em PostgreSQL via worker para garantir leitura em modo degradado.
   - Parâmetros: cat (categoria), ord (ordenação)
 - **GET /partners/{id}**: Detalhes do parceiro + promoções ativas
 - **POST /validation-codes**: Gera código de validação de 6 dígitos
+
   (expira em 3 min)
+
   - Payload: { partner_id }
 - **GET /students/me/history**: Histórico de resgates do aluno
 - **GET /students/me/fav**: Lista parceiros favoritos
@@ -51,9 +58,13 @@ replicados em PostgreSQL via worker para garantir leitura em modo degradado.
 - **GET /employees/partners**: Lista parceiros com filtros/paginação
   - Parâmetros: cat (categoria), ord (ordenação)
 - **GET /employees/partners/{id}**: Detalhes do parceiro + promoções ativas
+
   para funcionários
+
 - **POST /employees/validation-codes**: Gera código de validação de 6 dígitos
+
   (expira em 3 min)
+
   - Payload: { partner_id }
 - **GET /employees/me/history**: Histórico de resgates do funcionário
 - **GET /employees/me/fav**: Lista parceiros favoritos

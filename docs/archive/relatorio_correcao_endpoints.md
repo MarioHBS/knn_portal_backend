@@ -7,11 +7,13 @@ Este relatório documenta a correção bem-sucedida dos problemas de conectivida
 ## Problemas Identificados
 
 ### 1. Erros 500 - Conexão PostgreSQL
+
 - **Sintoma**: Endpoints administrativos retornando erro 500
 - **Causa**: Falhas de conexão com PostgreSQL durante fallback do circuit breaker
 - **Impacto**: Impossibilidade de acessar funcionalidades administrativas
 
 ### 2. Erros 404 - Recursos Não Encontrados
+
 - **Sintoma**: Todos os endpoints retornando 404 após ativação do modo de teste
 - **Causa**: Implementação incorreta do circuit breaker e dados de teste ausentes
 - **Impacto**: API completamente inacessível
@@ -19,18 +21,22 @@ Este relatório documenta a correção bem-sucedida dos problemas de conectivida
 ## Soluções Implementadas
 
 ### 1. Ativação do Modo de Teste
+
 ```env
 KNN_USE_TEST_DATABASE=true
-```
+`$language
+
 - Configurado para usar banco de dados simulado (mock_db)
 - Evita problemas de conectividade com PostgreSQL em desenvolvimento
 
 ### 2. Criação de Dados de Teste
+
 - **Arquivo**: `src/db/test_data/partners.json`
 - **Conteúdo**: 5 parceiros de teste com diferentes categorias
 - **Estrutura**: Compatível com o modelo de dados da aplicação
 
 ### 3. Correção da Implementação do Circuit Breaker
+
 - **Arquivo**: `src/api/admin.py`
 - **Mudança**: Correção da assinatura das funções para usar com `with_circuit_breaker`
 - **Resultado**: Endpoints funcionando corretamente com dados simulados
@@ -51,11 +57,13 @@ KNN_USE_TEST_DATABASE=true
 ### Análise dos Resultados
 
 **✅ Sucessos:**
+
 - Todos os endpoints administrativos funcionando corretamente
 - Sistema de autenticação validando permissões adequadamente
 - Dados de teste sendo carregados e retornados corretamente
 
 **⚠️ Comportamentos Esperados:**
+
 - Endpoints de student/employee retornando 403 com token admin (segurança funcionando)
 - Sistema de roles funcionando corretamente
 

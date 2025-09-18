@@ -22,15 +22,16 @@ src/
 │   ├── StudentDashboard.jsx
 │   └── PartnersList.jsx
 └── App.jsx
-```
+`$language
 
 ## 1. Configuração Inicial
 
 ### .env
+
 ```env
 VITE_API_BASE_URL=http://localhost:8080/v1
 VITE_AUTH_URL=https://auth.knnidiomas.com.br
-```
+`$language
 
 ### package.json (dependências relevantes)
 
@@ -43,7 +44,7 @@ VITE_AUTH_URL=https://auth.knnidiomas.com.br
     "@tanstack/react-query": "^4.24.0"
   }
 }
-```
+`$language
 
 ## 2. Serviços de Autenticação
 
@@ -174,7 +175,7 @@ class AuthService {
 }
 
 export const authService = new AuthService();
-```
+`$language
 
 ### src/services/api.client.js
 
@@ -250,7 +251,7 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
-```
+`$language
 
 ## 3. Hooks Personalizados
 
@@ -309,7 +310,7 @@ export function useAuth() {
     handleAuthCallback
   };
 }
-```
+`$language
 
 ### src/hooks/useApi.js
 
@@ -349,7 +350,7 @@ export function useApi() {
     queryClient
   };
 }
-```
+`$language
 
 ## 4. Componentes
 
@@ -377,7 +378,7 @@ export function ProtectedRoute({ children, allowedRoles = [] }) {
 
   return children;
 }
-```
+`$language
 
 ### src/components/UserProfile.jsx
 
@@ -412,7 +413,7 @@ export function UserProfile() {
     </div>
   );
 }
-```
+`$language
 
 ## 5. Páginas
 
@@ -456,7 +457,7 @@ export function LoginPage() {
     </div>
   );
 }
-```
+`$language
 
 ### src/pages/StudentDashboard.jsx
 
@@ -520,7 +521,7 @@ export function StudentDashboard() {
     </div>
   );
 }
-```
+`$language
 
 ## 6. Configuração do App Principal
 
@@ -587,7 +588,7 @@ export default function App() {
     </QueryClientProvider>
   );
 }
-```
+`$language
 
 ## 7. Estilos CSS (Exemplo)
 
@@ -708,7 +709,7 @@ export default function App() {
   text-align: center;
   padding: 2rem;
 }
-```
+`$language
 
 ## 8. Exemplo de Uso Avançado
 
@@ -752,7 +753,7 @@ export function FavoriteButton({ partnerId, isFavorited: initialFavorited }) {
     </button>
   );
 }
-```
+`$language
 
 ## Conclusão
 

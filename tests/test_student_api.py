@@ -423,18 +423,16 @@ class TestStudentFavoritesEndpoints:
     """Testes para os endpoints de favoritos do estudante."""
 
     @pytest.mark.asyncio
-    async def test_get_student_favorites_success(
-        self, mock_student_user, mock_partner
-    ):
+    async def test_get_student_favorites_success(self, mock_student_user, mock_partner):
         """Testa obtenção de favoritos com sucesso."""
         # Mock do documento de favoritos do estudante
         mock_student_favorites = {
             "id": "student-123",
             "favorites": ["PTN123456"],
             "created_at": "2024-01-01T00:00:00",
-            "updated_at": "2024-01-01T00:00:00"
+            "updated_at": "2024-01-01T00:00:00",
         }
-        
+
         with (
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
@@ -444,7 +442,7 @@ class TestStudentFavoritesEndpoints:
             # Configurar circuit breaker para retornar favoritos e depois parceiro
             mock_circuit_breaker.side_effect = [
                 mock_student_favorites,  # Primeira chamada para obter favoritos
-                mock_partner  # Segunda chamada para obter parceiro
+                mock_partner,  # Segunda chamada para obter parceiro
             ]
 
             from src.api.student import get_student_favorites
@@ -484,7 +482,7 @@ class TestStudentFavoritesEndpoints:
             # Configurar circuit breaker para retornar parceiro e depois None (favoritos não existem)
             mock_circuit_breaker.side_effect = [
                 mock_partner,  # Primeira chamada para verificar parceiro
-                None  # Segunda chamada para verificar favoritos (não existe ainda)
+                None,  # Segunda chamada para verificar favoritos (não existe ainda)
             ]
             mock_firestore.create_document = AsyncMock()
 
@@ -507,9 +505,9 @@ class TestStudentFavoritesEndpoints:
             "id": "student-123",
             "favorites": ["PTN123456"],
             "created_at": "2024-01-01T00:00:00",
-            "updated_at": "2024-01-01T00:00:00"
+            "updated_at": "2024-01-01T00:00:00",
         }
-        
+
         with (
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
@@ -519,7 +517,7 @@ class TestStudentFavoritesEndpoints:
             # Configurar circuit breaker para retornar parceiro e depois favoritos existentes
             mock_circuit_breaker.side_effect = [
                 mock_partner,  # Primeira chamada para verificar parceiro
-                mock_student_favorites  # Segunda chamada para verificar favoritos
+                mock_student_favorites,  # Segunda chamada para verificar favoritos
             ]
 
             from src.api.student import add_student_favorite
@@ -565,22 +563,23 @@ class TestStudentFavoritesEndpoints:
             assert "VALIDATION_ERROR" in str(exc_info.value.detail)
 
     @pytest.mark.asyncio
-    async def test_remove_student_favorite_success(
-        self, mock_student_user
-    ):
+    async def test_remove_student_favorite_success(self, mock_student_user):
         """Testa remoção de favorito com sucesso."""
         mock_student_favorites = {
             "id": "student-123",
             "favorites": ["PTN123456", "PTN456789"],
             "created_at": "2024-01-01T00:00:00",
-            "updated_at": "2024-01-01T00:00:00"
+            "updated_at": "2024-01-01T00:00:00",
         }
-        
+
         with (
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
             ),
-            patch("src.api.student.with_circuit_breaker", return_value=mock_student_favorites),
+            patch(
+                "src.api.student.with_circuit_breaker",
+                return_value=mock_student_favorites,
+            ),
             patch("src.api.student.firestore_client") as mock_firestore,
         ):
             mock_firestore.update_document = AsyncMock()
@@ -600,14 +599,17 @@ class TestStudentFavoritesEndpoints:
             "id": "student-123",
             "favorites": ["PTN456789"],
             "created_at": "2024-01-01T00:00:00",
-            "updated_at": "2024-01-01T00:00:00"
+            "updated_at": "2024-01-01T00:00:00",
         }
-        
+
         with (
             patch(
                 "src.api.student.validate_student_role", return_value=mock_student_user
             ),
-            patch("src.api.student.with_circuit_breaker", return_value=mock_student_favorites),
+            patch(
+                "src.api.student.with_circuit_breaker",
+                return_value=mock_student_favorites,
+            ),
         ):
             from src.api.student import remove_student_favorite
 
