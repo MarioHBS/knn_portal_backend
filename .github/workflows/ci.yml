@@ -103,7 +103,7 @@ jobs:
         bandit -r src/ -f json -o bandit-report.json || true
 
     - name: Upload dos resultados de segurança
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-report
         path: bandit-report.json
