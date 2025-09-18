@@ -27,14 +27,16 @@ class StudentFavorites(BaseModel):
     )
 
     @field_validator("id")
-    def validate_student_id(self, v):
+    @classmethod
+    def validate_student_id(cls, v):
         """Valida o formato do ID do estudante."""
         if not v or not v.startswith("STU"):
             raise ValueError('ID do estudante deve começar com "STU"')
         return v
 
     @field_validator("favorites")
-    def validate_favorites_list(self, v):
+    @classmethod
+    def validate_favorites_list(cls, v):
         """Valida a lista de favoritos."""
         if len(v) > 1000:  # Limite prático para evitar documentos muito grandes
             raise ValueError("Máximo de 1000 favoritos permitidos por estudante")
@@ -84,14 +86,16 @@ class EmployeeFavorites(BaseModel):
     )
 
     @field_validator("id")
-    def validate_employee_id(self, v):
+    @classmethod
+    def validate_employee_id(cls, v):
         """Valida o formato do ID do funcionário."""
         if not v or not v.startswith("EMP"):
             raise ValueError('ID do funcionário deve começar com "EMP"')
         return v
 
     @field_validator("favorites")
-    def validate_favorites_list(self, v):
+    @classmethod
+    def validate_favorites_list(cls, v):
         """Valida a lista de favoritos."""
         if len(v) > 1000:  # Limite prático para evitar documentos muito grandes
             raise ValueError("Máximo de 1000 favoritos permitidos por funcionário")
@@ -134,7 +138,8 @@ class FavoriteRequest(BaseModel):
     )
 
     @field_validator("partner_id")
-    def validate_partner_id(self, v):
+    @classmethod
+    def validate_partner_id(cls, v):
         """Valida o formato do ID do parceiro."""
         if not v or not v.startswith("PTN"):
             raise ValueError('ID do parceiro deve começar com "PTN"')

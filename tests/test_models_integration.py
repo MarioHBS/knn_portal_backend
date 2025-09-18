@@ -1,12 +1,7 @@
-import os
-import sys
 import unittest
 from datetime import date
 
-# Adicionar o diretório src ao path para importar os módulos
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
-from models import Employee, Partner, Student
+from src.models import Employee, Partner, Student
 
 
 class TestModelsIntegration(unittest.TestCase):

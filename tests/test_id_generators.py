@@ -1,11 +1,6 @@
-import os
-import sys
 import unittest
 
-# Adicionar o diretório src ao path para importar os módulos
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
-from utils.id_generators import IDGenerators
+from src.utils.id_generators import IDGenerators
 
 
 class TestIDGenerators(unittest.TestCase):

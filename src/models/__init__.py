@@ -382,3 +382,7 @@ class EntityListResponse(BaseResponse):
     """Modelo para resposta de listagem de entidades."""
 
     data: dict
+
+
+# Importar modelos de outros arquivos
+from .favorites import FavoriteRequest, FavoriteResponse
