@@ -1,0 +1,25 @@
+{
+  "students": 5,
+  "partners": 3,
+  "promotions": 4,
+  "validation_codes": 4,
+  "redemptions": 2,
+  "student_ids": [
+    "c3a5582f-ac24-4e4d-bb00-fdaa1da3bc59",
+    "8463f29a-419f-45a0-951a-b0b92b65294d",
+    "df6e93c7-44ee-428c-9bd9-fc43e3501af8",
+    "dcf5f9c7-7436-48a1-bf5d-787cd3071c78",
+    "be5c7758-09bd-4123-bbbc-868048c1da57"
+  ],
+  "partner_ids": [
+    "273d9e1b-a6a8-4ef5-898b-56f825c8b638",
+    "ea1bd9c7-f3af-420d-b88b-f6ae0c364dd2",
+    "b0675270-d6a5-41d7-81e0-6733ae839c5c"
+  ],
+  "promotion_ids": [
+    "7ab7554a-6efd-4204-bd10-d844c8aedbf5",
+    "dd745047-c3b7-480d-8955-de2f9fb7201d",
+    "ad6bbf71-bf7e-4869-bc02-20318f34ce75",
+    "d922090f-3a07-4316-8805-52ed4cb53222"
+  ]
+}

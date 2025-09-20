@@ -143,6 +143,8 @@ async def with_tenant(request: Request, call_next):
         f"/{API_VERSION}/users/login-firebase",
         f"/{API_VERSION}/users/register",
         f"/{API_VERSION}/users/test-firebase-token",
+        f"/{API_VERSION}/partners/logos",  # Temporariamente público para teste
+        f"/{API_VERSION}/partners/logos/",
         "/docs",
         "/redoc",
         "/openapi.json",

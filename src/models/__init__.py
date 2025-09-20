@@ -8,6 +8,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field, validator
 
+from src.models.favorites import FavoriteRequest, FavoriteResponse
 from src.utils.id_generators import IDGenerators
 
 
@@ -384,5 +385,33 @@ class EntityListResponse(BaseResponse):
     data: dict
 
 
-# Importar modelos de outros arquivos
-from .favorites import FavoriteRequest, FavoriteResponse
+# Exportações explícitas do módulo
+__all__ = [
+    # Modelos base
+    "BaseResponse",
+    "ErrorResponse",
+    # Modelos de entidades
+    "Partner",
+    "Student",
+    "Employee",
+    "User",
+    "Tenant",
+    "Course",
+    "Benefit",
+    "ValidationCode",
+    # Modelos de resposta
+    "PartnersResponse",
+    "StudentsResponse",
+    "EmployeesResponse",
+    "UsersResponse",
+    "TenantsResponse",
+    "CoursesResponse",
+    "BenefitsResponse",
+    "ValidationCodesResponse",
+    "FavoritesResponse",
+    "EntityResponse",
+    "EntityListResponse",
+    # Modelos de favoritos
+    "FavoriteRequest",
+    "FavoriteResponse",
+]

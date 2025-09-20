@@ -9,7 +9,7 @@ from typing import Any
 
 from src.auth import JWTPayload
 from src.db import firestore_client, postgres_client, with_circuit_breaker
-from src.models import PartnerListResponse
+from src.models import Partner, PartnerListResponse
 from src.utils import logger
 
 
@@ -91,14 +91,32 @@ class PartnersService:
                 )
 
             # Extrair dados dos parceiros
+            logger.info(f"DEBUG - Resultado da consulta Firestore: {result}")
             partners_data = result.get("items", [])
+            logger.info(f"DEBUG - Quantidade de partners_data extraídos: {len(partners_data)}")
 
+            # Converter dados brutos para objetos Partner
+            partner_objects = []
+            for i, partner_data in enumerate(partners_data):
+                try:
+                    logger.info(f"DEBUG - Convertendo parceiro {i+1}: {partner_data}")
+                    partner_obj = Partner(**partner_data)
+                    partner_objects.append(partner_obj)
+                    logger.info(f"DEBUG - Parceiro {i+1} convertido com sucesso")
+                except Exception as e:
+                    logger.warning(
+                        f"Erro ao converter parceiro {partner_data.get('id', 'N/A')}: {e}"
+                    )
+                    logger.info(f"DEBUG - Dados do parceiro que falhou: {partner_data}")
+                    continue
+
+            logger.info(f"DEBUG - Total de partner_objects criados: {len(partner_objects)}")
             logger.info(
-                f"Retornando {len(partners_data)} parceiros para usuário "
+                f"Retornando {len(partner_objects)} parceiros para usuário "
                 f"{current_user.role} (tenant: {current_user.tenant})"
             )
 
-            return PartnerListResponse(data=partners_data)
+            return PartnerListResponse(data=partner_objects)
 
         except Exception as e:
             logger.error(

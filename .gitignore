@@ -159,6 +159,10 @@ temp_*.py
 *_temp.py
 
 # Technical documentation (non-versioned)
+comands.txt
+cnpj_mapping.txt
+error.ci.txt
+error.cosole.txt
 relatorio_tecnico.md
 lista_tarefas_implementacao.md
 

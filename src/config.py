@@ -93,5 +93,8 @@ CIRCUIT_BREAKER_TIMEOUT = 300  # Tempo em segundos para tentar novamente o Fires
 # Configurações de rate limit
 RATE_LIMIT_REDEEM = "5/minute"  # 5 requisições por minuto para /partner/redeem
 
+# Configurações do Firebase Storage
+FIREBASE_STORAGE_BUCKET = os.getenv("FIREBASE_STORAGE_BUCKET", "knn-benefits.firebasestorage.app")
+
 # Modo de operação
 MODE = os.getenv("MODE", "normal")  # normal ou degraded

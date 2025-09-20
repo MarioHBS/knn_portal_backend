@@ -302,3 +302,35 @@ async def validate_employee_role(
             },
         )
     return token
+
+
+async def validate_authenticated_user(
+    token: JWTPayload = Depends(get_current_user),
+) -> JWTPayload:
+    """
+    Valida se o usuário está autenticado (qualquer role válida).
+    """
+    # Se estiver em modo de teste, retornar dados mock
+    if TESTING_MODE:
+        return JWTPayload(
+            sub="test-user-123",
+            role="student",
+            tenant="test-tenant",
+            exp=9999999999,
+            iat=1000000000,
+        )
+
+    # Verificar se o token tem uma role válida
+    valid_roles = ["student", "partner", "admin", "employee"]
+    if token.role not in valid_roles:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "error": {
+                    "code": "INVALID_ROLE",
+                    "msg": f"Role '{token.role}' não é válida",
+                }
+            },
+        )
+    
+    return token
