@@ -239,7 +239,7 @@ for i in range(4):
 def save_firestore_data():
     """Salva dados no formato de exportação do Firestore"""
     import copy
-    
+
     collections = {
         "students": copy.deepcopy(students),
         "partners": copy.deepcopy(partners),
@@ -347,7 +347,7 @@ TRUNCATE TABLE students CASCADE;
         complemento = f"'{student['complemento_aluno']}'" if student['complemento_aluno'] else 'NULL'
         nome_resp = f"'{student['nome_responsavel']}'" if student['nome_responsavel'] else 'NULL'
         email_resp = f"'{student['email_responsavel']}'" if student['email_responsavel'] else 'NULL'
-        
+
         sql.append(f"""
 INSERT INTO students (id, tenant_id, cpf_hash, nome_aluno, curso, ocupacao_aluno, email_aluno, celular_aluno, cep_aluno, bairro, complemento_aluno, nome_responsavel, email_responsavel, active_until)
 VALUES (
@@ -452,7 +452,7 @@ def main():
         "45678901234": "Daniel Pereira (TWEENS 4)",
         "56789012345": "Eduarda Costa (KINDER 6A - expirado)",
     }
-    
+
     # Salvar mapeamento de CNPJs para facilitar testes
     cnpj_mapping = {
         "12345678000195": "Livraria Cultura",

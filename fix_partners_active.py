@@ -4,8 +4,10 @@ Script para adicionar o campo 'active' aos parceiros no Firestore.
 """
 
 import os
+
 import firebase_admin
 from firebase_admin import credentials, firestore
+
 
 def initialize_firebase():
     """Inicializa o Firebase Admin SDK."""
@@ -29,41 +31,41 @@ def fix_partners_active_field():
     try:
         if not initialize_firebase():
             return
-        
+
         db = firestore.client()
         print("✅ Cliente Firestore inicializado")
-        
+
         # Obter todos os parceiros
         partners_ref = db.collection('partners')
         partners = partners_ref.get()
-        
+
         if not partners:
             print("⚠️ Nenhum parceiro encontrado")
             return
-        
+
         print(f"🔧 Adicionando campo 'active' para {len(partners)} parceiros...")
-        
+
         batch = db.batch()
         updated_count = 0
-        
+
         for partner in partners:
             partner_data = partner.to_dict()
             current_active = partner_data.get('active')
-            
+
             # Se active não existe ou não é boolean, definir como True
             if current_active is None or not isinstance(current_active, bool):
                 partner_ref = partners_ref.document(partner.id)
                 batch.update(partner_ref, {'active': True})
                 updated_count += 1
                 print(f"  ✓ Atualizando parceiro {partner.id}: active = True")
-        
+
         if updated_count > 0:
             # Executar as atualizações em batch
             batch.commit()
             print(f"✅ {updated_count} parceiros atualizados com sucesso!")
         else:
             print("ℹ️ Nenhum parceiro precisou ser atualizado")
-            
+
         # Verificar os resultados
         print("\n🔍 Verificando resultados:")
         partners_updated = partners_ref.get()
@@ -74,9 +76,9 @@ def fix_partners_active_field():
             if active_status == True:
                 active_count += 1
             print(f"  - {partner.id}: active = {active_status}")
-            
+
         print(f"\n📊 Total de parceiros ativos: {active_count}")
-            
+
     except Exception as e:
         print(f"❌ Erro ao corrigir campo active dos parceiros: {e}")
 

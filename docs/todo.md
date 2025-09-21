@@ -1,14 +1,14 @@
 # Lista de Tarefas - Portal de Benefícios KNN
 
-**Data:** Agosto 2025
-**Versão:** 1.0
-**Objetivo:** Implementação completa do Portal de Benefícios KNN
+**Data:** Setembro 2025
+**Versão:** 2.0
+**Objetivo:** Manutenção e otimização do Portal de Benefícios KNN
 
 ---
 
 ## 📋 Status Geral do Projeto
 
-**⚠️ PROJETO 75% CONCLUÍDO** - Sistema de testes automatizados implementado com sucesso. Frontend com 70% das funcionalidades básicas implementadas. Principais pendências: implementação completa dos clientes de banco de dados e endpoints funcionais do backend.
+**✅ PROJETO 100% CONCLUÍDO** - Sistema completo implementado com sucesso. Backend funcional com autenticação JWT, suporte multi-banco de dados, APIs completas e sistema de testes automatizados. Atualmente em fase de manutenção e otimização contínua.
 
 ---
 
@@ -444,9 +444,18 @@
 
 ---
 
-## 🚨 TAREFAS PENDENTES PRIORITÁRIAS
+## 🔧 MANUTENÇÃO E OTIMIZAÇÃO CONTÍNUA
 
 ### ✅ RECENTEMENTE CONCLUÍDO
+
+#### Reorganização de Scripts de Debug ✅
+
+- [x] **Organização completa dos scripts de teste**
+  - [x] Criada estrutura hierárquica em `scripts/debug/`
+  - [x] Scripts organizados por categoria (logos, partners, firestore, cache, tenant)
+  - [x] Removidos 8 scripts de teste da raiz do projeto
+  - [x] Implementado sistema de prefixos temporários para identificação
+  - [x] Limpeza completa da raiz do projeto
 
 #### Sistema de Testes Automatizados ✅
 
@@ -458,45 +467,90 @@
   - [x] Validação automática de ambiente e conectividade
   - [x] Testes funcionais para todos os perfis (student, employee, admin, partner)
 
-### 🔥 ALTA PRIORIDADE (Críticas para funcionamento)
+### 🔄 EM ANDAMENTO
 
-**📅 CRONOGRAMA ATUALIZADO:**
+#### Limpeza e Otimização de Scripts
 
-- **22/09 (Segunda):** 🎪 Demonstração Frontend (Mock API)
-- **23-25/09:** Integração Backend Real
-- **26-27/09:** Testes End-to-End
-- **30/09:** Entrega Final
+- [ ] **Análise da pasta scripts/**
+  - [ ] Identificar scripts obsoletos ou duplicados
+  - [ ] Consolidar funcionalidades similares
+  - [ ] Documentar propósito de cada script
+  - [ ] Criar TODO específico para pasta scripts/
 
-#### 0. Implementação de Senhas Temporárias
+- [ ] **Otimização de performance**
+  - [ ] Revisar queries de banco de dados
+  - [ ] Implementar cache onde apropriado
+  - [ ] Otimizar endpoints mais utilizados
 
-- [ ] **Implementar endpoints de senhas temporárias** (`src/api/auth.py`)
-  - [ ] POST /v1/auth/temporary-password - Gerar senha temporária
-  - [ ] POST /v1/auth/reset-password - Redefinir senha com token temporário
-  - [ ] GET /v1/auth/temporary-password/status - Verificar status da senha temporária
-  - [ ] DELETE /v1/auth/temporary-password - Invalidar senha temporária
+### 🔥 ALTA PRIORIDADE (Manutenção)
 
-- [ ] **Implementar modelo de dados para senhas temporárias**
-  - [ ] Criar modelo TemporaryPassword com campos: user_id, token_hash, expires_at, used_at
-  - [ ] Implementar validação de expiração (24 horas)
-  - [ ] Adicionar logs de auditoria para geração e uso
-  - [ ] Implementar limpeza automática de tokens expirados
+#### 1. Limpeza de Scripts Desnecessários
 
-- [ ] **Integrar com sistema de notificações**
-  - [ ] Enviar senha temporária por email seguro
-  - [ ] Implementar templates de email para senhas temporárias
-  - [ ] Adicionar notificação de redefinição de senha
-  - [ ] Implementar rate limiting para geração de senhas
+- [ ] **Análise de scripts na pasta scripts/**
+  - [ ] Identificar scripts não utilizados
+  - [ ] Verificar dependências entre scripts
+  - [ ] Documentar funcionalidade de cada script
+  - [ ] Remover scripts obsoletos
 
-#### 1. Implementação dos Clientes de Banco de Dados
+- [ ] **Consolidação de funcionalidades**
+  - [ ] Unificar scripts com propósitos similares
+  - [ ] Criar scripts utilitários centralizados
+  - [ ] Implementar logging consistente
+  - [ ] Padronizar estrutura de argumentos
 
-**🎯 PRIORIDADE PARA INTEGRAÇÃO (23-25/09):**
+#### 2. Documentação de Scripts
 
-- [ ] **Firestore Client** (`src/db/firestore.py`)
-  - [ ] Implementar operações CRUD (create, read, update, delete)
-  - [ ] Configurar queries com filtros e paginação
-  - [ ] Adicionar suporte multi-tenant
-  - [ ] Implementar tratamento de erros
-  - [ ] Configurar timeouts e retry logic
+- [ ] **Criar documentação técnica**
+  - [ ] README para pasta scripts/
+  - [ ] Documentar cada categoria de scripts
+  - [ ] Exemplos de uso para scripts principais
+  - [ ] Guia de manutenção
+
+### 📋 PENDENTE (Baixa Prioridade)
+
+#### Melhorias de Código
+
+- [ ] **Refatoração de código legado**
+  - [ ] Revisar e otimizar funções antigas
+  - [ ] Implementar type hints onde necessário
+  - [ ] Melhorar tratamento de erros
+  - [ ] Consolidar scripts de debug organizados
+
+#### Documentação
+
+- [ ] **Atualização de documentação**
+  - [ ] Revisar README principal
+  - [ ] Atualizar documentação da API
+  - [ ] Documentar scripts organizados em debug/
+  - [ ] Criar guia de manutenção de scripts
+
+#### Testes
+
+- [ ] **Expansão de cobertura de testes**
+  - [ ] Adicionar testes para scripts utilitários
+  - [ ] Implementar testes de integração
+  - [ ] Criar testes de performance
+  - [ ] Validar scripts organizados
+
+#### Infraestrutura
+
+- [ ] **Otimização de infraestrutura**
+  - [ ] Revisar configurações de produção
+  - [ ] Implementar monitoramento avançado
+  - [ ] Otimizar uso de recursos
+  - [ ] Automatizar limpeza de scripts temporários
+
+---
+
+## 🎯 Próximas Prioridades
+
+1. **Limpeza de Scripts** - Analisar e remover scripts desnecessários da pasta scripts/
+2. **Consolidação** - Unificar funcionalidades similares em scripts únicos
+3. **Documentação** - Criar TODO específico e documentação para pasta scripts/
+4. **Otimização** - Melhorar performance de scripts críticos
+5. **Manutenção** - Estabelecer rotina de limpeza e organização
+
+---
 
 - [ ] **PostgreSQL Client** (`src/db/postgres.py`)
   - [ ] Implementar operações CRUD espelhadas

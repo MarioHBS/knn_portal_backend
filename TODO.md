@@ -2,83 +2,83 @@
 
 ## ✅ Concluído
 
-### Reorganização de Scripts (Janeiro 2025)
+### Infraestrutura e Organização
 
-- [x] Análise completa da pasta `scripts/` e subpastas
-- [x] Identificação e remoção de scripts obsoletos
-- [x] Reorganização por categoria (development, maintenance, migration, testing)
-- [x] Limpeza da pasta `scripts/temp/`
-- [x] Atualização da documentação (READMEs)
-
-#### Scripts Reorganizados
-
-**Movidos para `development/`:**
-
-- `analyze_and_organize_images.py` - Análise e organização de imagens
-- `analyze_partners_images.py` - Análise específica de imagens de parceiros
-- `create_test_entities.py` - Criação de entidades de teste
-
-**Movidos para `maintenance/`:**
-
-- `verify_auth_sync.py` - Verificação de sincronização de autenticação
-- `verify_users_collection.py` - Verificação da coleção de usuários
-- `verify_employees_upload.py` - Verificação de upload de funcionários
-- `sync_users_collection.py` - Sincronização da coleção de usuários
-
-**Scripts Removidos (obsoletos):**
-
-- Scripts de debug pontuais já executados
-- Scripts de conversão de dados já aplicados
-- Scripts de export/import específicos concluídos
-- Scripts de limpeza e upload pontuais finalizados
+- [x] Reorganização completa da pasta `scripts/` por categoria
+- [x] Correção de linting com Ruff (354 → 21 erros, 94% de melhoria)
+- [x] Estruturação de documentação em `docs/`
+- [x] Limpeza da raiz do projeto
 
 ## 🔄 Em Andamento
 
-*Nenhuma tarefa em andamento no momento*
+### Desenvolvimento de Funcionalidades
+
+- [ ] Implementação de novos endpoints da API
+- [ ] Melhorias na autenticação e autorização
+- [ ] Otimização de performance do backend
 
 ## 📋 Pendente
 
+### Funcionalidades do Portal
+
+- [ ] Sistema de notificações para usuários
+- [ ] Dashboard administrativo avançado
+- [ ] Relatórios de uso e analytics
+- [ ] Sistema de backup automatizado
+
+### API e Integração
+
+- [ ] Documentação completa da API (OpenAPI)
+- [ ] Versionamento da API
+- [ ] Rate limiting avançado
+- [ ] Webhooks para integrações externas
+
 ### Melhorias de Código
 
-- [ ] Implementar validação com Ruff em todos os arquivos Python
-- [ ] Adicionar docstrings nos scripts reorganizados
-- [ ] Revisar e padronizar tratamento de erros
+- [ ] Implementar cache distribuído (Redis)
+- [ ] Otimizar queries do banco de dados
+- [ ] Implementar circuit breaker pattern
+- [ ] Adicionar métricas de monitoramento
 
-### Documentação
+### Testes e Qualidade
 
-- [ ] Criar guias de uso para scripts de maintenance
-- [ ] Documentar processo de criação de entidades de teste
-- [ ] Atualizar documentação da API
-
-### Testes
-
-- [ ] Implementar testes unitários para scripts críticos
-- [ ] Validar funcionamento dos scripts reorganizados
-- [ ] Criar suite de testes automatizados
+- [ ] Cobertura de testes unitários (>80%)
+- [ ] Testes de integração automatizados
+- [ ] Testes de carga e performance
+- [ ] Validação de segurança (OWASP)
 
 ### Infraestrutura
 
-- [ ] Configurar CI/CD para validação automática
-- [ ] Implementar logs estruturados nos scripts
-- [ ] Configurar monitoramento de execução
+- [ ] Configurar ambiente de staging
+- [ ] Implementar CI/CD completo
+- [ ] Monitoramento e alertas (Prometheus/Grafana)
+- [ ] Backup e disaster recovery
 
 ## 🚫 Bloqueado
 
 *Nenhuma tarefa bloqueada no momento*
 
-## 📝 Notas
+## 📝 Notas de Desenvolvimento
 
-- Scripts temporários devem usar prefixo `temp_` e ser colocados em `scripts/temp/`
-- Todos os scripts devem seguir as convenções do projeto (Ruff, docstrings)
-- Operações em massa requerem confirmação explícita do usuário
-- Credenciais devem ser mantidas na pasta `/credentials/` e ignoradas pelo Git
+- Usar ambiente virtual Python para desenvolvimento
+- Seguir padrões de linting com Ruff
+- Validar mudanças com testes antes do deploy
+- Documentar novas funcionalidades na pasta `docs/`
 
 ## 🎯 Próximas Prioridades
 
-1. Implementar validação com Ruff nos scripts reorganizados
-2. Adicionar testes unitários para scripts críticos
-3. Documentar processo de uso dos scripts de maintenance
-4. Configurar CI/CD para validação automática
+1. **API Documentation:** Completar documentação OpenAPI
+2. **Performance:** Implementar cache distribuído
+3. **Monitoring:** Configurar métricas e alertas
+4. **Testing:** Aumentar cobertura de testes
+5. **Security:** Implementar validações OWASP
+
+## 📚 Documentação de Referência
+
+- **Changelog de Scripts:** `docs/CHANGELOG_REORGANIZACAO_SCRIPTS.md`
+- **Relatório de Linting:** `docs/relatorio_linting_corrigido.md`
+- **Documentação da API:** `docs/backend/`
+- **Guias de Configuração:** `docs/`
 
 ---
 *Última atualização: Setembro 2025*

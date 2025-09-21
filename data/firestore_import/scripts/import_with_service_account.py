@@ -123,7 +123,7 @@ def import_data_to_firestore(
 if __name__ == "__main__":
     # Configurar chaves específicas para cada projeto
     current_dir = Path(__file__).parent
-    
+
     # Configurar os bancos Firestore no projeto KNNBenefits
     # Existem dois bancos no mesmo projeto: (default) e knn-benefits
     projects = {
@@ -136,7 +136,7 @@ if __name__ == "__main__":
             ]
         },
         "production": {
-            "project_id": "knn-benefits", 
+            "project_id": "knn-benefits",
             "database_id": "knn-benefits",
             "service_account_files": [
                 current_dir / "knn-benefits-service-account-key.json",
@@ -144,28 +144,28 @@ if __name__ == "__main__":
             ]
         }
     }
-    
+
     success_count = 0
-    
+
     for env, config in projects.items():
         print(f"\n{'='*50}")
         print(f"🚀 Importando para {env} ({config['project_id']})")
         print(f"{'='*50}")
-        
+
         # Procurar chave de conta de serviço específica para este projeto
         service_account_path = None
         for file_path in config['service_account_files']:
             if file_path.exists():
                 service_account_path = str(file_path)
                 break
-        
+
         if not service_account_path:
             print(f"❌ Nenhuma chave de conta de serviço encontrada para {env}")
             print(f"   Arquivos procurados: {[str(f) for f in config['service_account_files']]}")
             continue
-        
+
         data_file = f"firestore_data_{env}.json"
-        
+
         if import_data_to_firestore(config['project_id'], data_file, service_account_path, config['database_id']):
             success_count += 1
         else:

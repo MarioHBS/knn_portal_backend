@@ -22,7 +22,7 @@ def check_partners():
     # Encontrar parceiros
     partners = [
         k
-        for k in data.keys()
+        for k in data
         if k.startswith("__collection__/partners/") and k != "__collection__/partners"
     ]
 
@@ -39,7 +39,7 @@ def check_partners():
     # Verificar funcionários também
     employees = [
         k
-        for k in data.keys()
+        for k in data
         if k.startswith("__collection__/employees/") and k != "__collection__/employees"
     ]
     print(f"\nTotal de funcionários: {len(employees)}")

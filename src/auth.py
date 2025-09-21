@@ -332,5 +332,5 @@ async def validate_authenticated_user(
                 }
             },
         )
-    
+
     return token

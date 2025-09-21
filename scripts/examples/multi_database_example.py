@@ -17,6 +17,8 @@ FIRESTORE_DATABASE=0
 import os
 import sys
 
+from firebase_admin import firestore
+
 # Adicionar o diretório raiz ao path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
@@ -87,13 +89,13 @@ def demonstrate_multi_database_usage():
     logger.info("\n=== Exemplo de Operações CRUD ===")
 
     # Usando banco principal
-    main_db = get_database()  # None = banco principal
+    # main_db = get_database()  # None = banco principal
     logger.info(f"Operações no banco principal: {get_current_database_name()}")
 
     # Usando banco específico
     if "knn-benefits" in available_dbs:
         benefits_db = get_database("knn-benefits")
-        logger.info("Operações no banco knn-benefits")
+        logger.info(f"Operações no banco: {benefits_db}")
 
     # 6. Mostrar estatísticas
     logger.info("\n=== Estatísticas ===")

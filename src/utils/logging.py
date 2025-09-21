@@ -3,6 +3,7 @@ Utilitários para logging estruturado com mascaramento de CPF.
 """
 
 import re
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import structlog
@@ -40,6 +41,22 @@ def mask_cpf_in_log(log_event: dict[str, Any] | str) -> dict[str, Any] | str:
     return log_event
 
 
+def local_timestamp_processor(logger, method_name, event_dict):
+    """
+    Processor personalizado para adicionar timestamp em horário local brasileiro (UTC-3).
+    """
+    # Criar timezone para horário de Brasília (UTC-3)
+    brasilia_tz = timezone(timedelta(hours=-3))
+
+    # Obter timestamp atual em horário de Brasília
+    local_time = datetime.now(brasilia_tz)
+
+    # Adicionar timestamp formatado ao evento
+    event_dict["timestamp"] = local_time.isoformat()
+
+    return event_dict
+
+
 # Configuração do structlog
 def configure_logging():
     """
@@ -49,7 +66,7 @@ def configure_logging():
         processors=[
             structlog.contextvars.merge_contextvars,
             structlog.processors.add_log_level,
-            structlog.processors.TimeStamper(fmt="iso"),
+            local_timestamp_processor,  # Usar processor personalizado para timestamp local
             # Processor personalizado para mascarar CPFs
             lambda logger, method_name, event_dict: {
                 "event": mask_cpf_in_log(event_dict.get("event", "")),

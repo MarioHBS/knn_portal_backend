@@ -127,9 +127,9 @@ def verify_jwt_token(token: str) -> JWTPayload:
         raise HTTPException(status_code=401, detail="Token inválido") from None
 
 
-@router.post("/login", response_model=LoginResponse)
-async def login(request: LoginRequest):
-    """Endpoint de login que gera JWT local.
+@router.post("/login-legacy", response_model=LoginResponse)
+async def login_legacy(request: LoginRequest):
+    """Endpoint de login que gera JWT local (método legado).
 
     Args:
         request: Dados de login
@@ -230,11 +230,12 @@ async def login(request: LoginRequest):
     raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
 
-@router.post("/login-firebase", response_model=LoginResponse)
-async def login_firebase(request: FirebaseLoginRequest):
-    """Endpoint de login com token Firebase.
+@router.post("/login", response_model=LoginResponse)
+async def login(request: FirebaseLoginRequest):
+    """Endpoint principal de login com token Firebase.
 
     Valida o token Firebase recebido e gera um JWT local com expiração de 30 minutos.
+    Este é o método de autenticação recomendado.
 
     Args:
         request: Dados contendo o token Firebase

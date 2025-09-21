@@ -9,18 +9,18 @@ from pathlib import Path
 
 import requests
 
+from src.models.promotion import Promotion
+from src.utils.logging import logger
+
 # Adicionar o diretório raiz ao path para imports
 root_dir = Path(__file__).parent.parent.parent
 sys.path.append(str(root_dir))
-
-from src.models.promotion import Promotion
-from src.utils.logging import logger
 
 
 class TestSuite:
     """Suite consolidada de testes."""
 
-    def __init__(self, base_url: str = "http://localhost:8000"):
+    def __init__(self, base_url: str = "http://localhost:8080"):
         self.base_url = base_url
         self.test_results = []
 
@@ -40,7 +40,7 @@ class TestSuite:
 
         # Teste 1: Audience válido
         try:
-            valid_promotion = Promotion(
+            Promotion(
                 id="test_promo_1",
                 title="Promoção Teste",
                 description="Descrição teste",
@@ -53,7 +53,7 @@ class TestSuite:
 
         # Teste 2: Audience inválido
         try:
-            invalid_promotion = Promotion(
+            Promotion(
                 id="test_promo_2",
                 title="Promoção Teste",
                 description="Descrição teste",
@@ -120,7 +120,7 @@ class TestSuite:
                                 message += f", Items: {len(data['data'])}"
                             elif "items" in data:
                                 message += f", Items: {len(data['items'])}"
-                    except:
+                    except (ValueError, KeyError, TypeError):
                         pass
 
                 self.log_test_result(endpoint["name"], success, message)

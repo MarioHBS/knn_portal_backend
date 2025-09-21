@@ -84,11 +84,10 @@ def verify_auth_sync():
                 firestore_email = user["email"]
                 auth_email = auth_user.email or "N/A"
 
-                if firestore_email != "N/A" and auth_email != "N/A":
-                    if firestore_email.lower() != auth_email.lower():
-                        print("   ⚠️  ATENÇÃO: Emails diferentes!")
-                        print(f"      Firestore: {firestore_email}")
-                        print(f"      Auth: {auth_email}")
+                if firestore_email != "N/A" and auth_email != "N/A" and firestore_email.lower() != auth_email.lower():
+                    print("   ⚠️  ATENÇÃO: Emails diferentes!")
+                    print(f"      Firestore: {firestore_email}")
+                    print(f"      Auth: {auth_email}")
 
                 sync_results["synced"].append(
                     {

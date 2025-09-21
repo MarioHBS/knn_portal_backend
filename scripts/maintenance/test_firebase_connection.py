@@ -25,7 +25,7 @@ def test_firebase_initialization():
     try:
         # Verifica se já foi inicializado
         try:
-            app = firebase_admin.get_app()
+            firebase_admin.get_app()
             print("✅ Firebase já inicializado")
             return True
         except ValueError:

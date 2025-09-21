@@ -24,7 +24,7 @@ class LogosService:
     def __init__(self):
         self._bucket = None
         self._cache = {}
-        self._cache_ttl = datetime.now()  # Cache TTL de 1 hora
+        self._cache_ttl = timedelta(hours=1)  # Cache TTL de 1 hora
 
     def _get_bucket(self):
         """Obtém referência do bucket Firebase Storage."""
@@ -74,18 +74,19 @@ class LogosService:
 
             # Verificar se já existe um token de download
             download_token = None
-            if blob.metadata and 'firebaseStorageDownloadTokens' in blob.metadata:
-                download_token = blob.metadata['firebaseStorageDownloadTokens']
+            if blob.metadata and "firebaseStorageDownloadTokens" in blob.metadata:
+                download_token = blob.metadata["firebaseStorageDownloadTokens"]
 
             # Se não existe token, gerar um novo
             if not download_token:
                 import uuid
+
                 download_token = str(uuid.uuid4())
 
                 # Atualizar metadados do blob com o novo token
                 if not blob.metadata:
                     blob.metadata = {}
-                blob.metadata['firebaseStorageDownloadTokens'] = download_token
+                blob.metadata["firebaseStorageDownloadTokens"] = download_token
                 blob.patch()
 
                 logger.info(f"Token gerado para {blob.name}: {download_token}")
@@ -135,11 +136,12 @@ class LogosService:
 
             # Gerar URL assinada
             signed_url = blob.generate_signed_url(
-                expiration=expiration_time,
-                method="GET"
+                expiration=expiration_time, method="GET"
             )
 
-            logger.info(f"URL assinada gerada para {blob.name}, expira em: {expiration_time.isoformat()}")
+            logger.info(
+                f"URL assinada gerada para {blob.name}, expira em: {expiration_time.isoformat()}"
+            )
             return signed_url
 
         except Exception as e:
@@ -246,7 +248,9 @@ class LogosService:
 
                 # Gerar URL pública permanente no formato Firebase Storage
                 public_url = self._generate_public_url(blob)
-                logger.debug(f"URL pública gerada para {filename}: {public_url}")
+                logger.debug(
+                    f"URL pública gerada para {name_without_ext}: {public_url}"
+                )
 
                 # Obter metadados
                 try:
@@ -259,12 +263,9 @@ class LogosService:
                 logo_info = {
                     "partner_id": name_without_ext,
                     "filename": filename,
-                    "name": metadata.get(
-                        "display_name", name_without_ext.replace("_", " ").title()
-                    ),
                     "url": public_url,
                     "category": category,
-                    "format": file_extension,
+                    # "format": file_extension,
                     "size": str(blob.size) if blob.size else "0",
                     "last_modified": blob.time_created.isoformat()
                     if blob.time_created

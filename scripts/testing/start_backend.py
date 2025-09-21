@@ -75,7 +75,7 @@ class BackendManager:
             # Verificar se tem os arquivos de configuração E o main.py
             has_config = any((current_dir / indicator).exists() for indicator in indicators)
             has_main = any((current_dir / indicator).exists() for indicator in src_indicators)
-            
+
             if has_config and has_main:
                 logger.info(f"Diretório do projeto encontrado: {current_dir}")
                 return current_dir
@@ -165,11 +165,8 @@ class BackendManager:
 
         # Comando para iniciar o servidor
         # Determinar o módulo correto baseado na localização do main.py
-        if "src" in str(main_file):
-            app_module = "src.main:app"
-        else:
-            app_module = "main:app"
-            
+        app_module = "src.main:app" if "src" in str(main_file) else "main:app"
+
         cmd = [
             sys.executable,
             "-m",
