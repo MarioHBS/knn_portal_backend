@@ -12,9 +12,9 @@ from src.config import CNPJ_HASH_SALT, RATE_LIMIT_REDEEM
 from src.db import firestore_client, postgres_client, with_circuit_breaker
 from src.models import (
     BaseResponse,
-    PromotionListResponse,
-    PromotionRequest,
-    PromotionResponse,
+    BenefitListResponse,
+    BenefitRequest,
+    BenefitResponse,
     RedeemRequest,
     RedeemResponse,
     ReportResponse,
@@ -247,7 +247,7 @@ async def redeem_code(
         ) from e
 
 
-@router.get("/promotions", response_model=PromotionListResponse)
+@router.get("/promotions", response_model=BenefitListResponse)
 async def list_partner_promotions(
     limit: int = Query(
         20, ge=1, le=100, description="Número máximo de itens por página"
@@ -296,9 +296,10 @@ async def list_partner_promotions(
         ) from None
 
 
-@router.post("/promotions", response_model=PromotionResponse)
+@router.post("/promotions", response_model=BenefitResponse)
 async def create_promotion(
-    request: PromotionRequest, current_user: JWTPayload = Depends(validate_partner_role)
+    promotion_data: BenefitRequest,
+    current_user: JWTPayload = Depends(validate_partner_role),
 ):
     """
     Cria uma nova promoção para o parceiro.
@@ -307,7 +308,7 @@ async def create_promotion(
         partner_id = current_user.sub
 
         # Validar datas
-        if request.valid_from >= request.valid_to:
+        if promotion_data.valid_from >= promotion_data.valid_to:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail={
@@ -322,12 +323,12 @@ async def create_promotion(
         promotion = {
             "id": str(uuid.uuid4()),
             "partner_id": partner_id,
-            "title": request.title,
-            "type": request.type,
-            "valid_from": request.valid_from.isoformat(),
-            "valid_to": request.valid_to.isoformat(),
-            "active": request.active,
-            "audience": request.audience,
+            "title": promotion_data.title,
+            "type": promotion_data.type,
+            "valid_from": promotion_data.valid_from.isoformat(),
+            "valid_to": promotion_data.valid_to.isoformat(),
+            "active": promotion_data.active,
+            "audience": promotion_data.audience,
         }
 
         result = await firestore_client.create_document(
@@ -346,10 +347,10 @@ async def create_promotion(
         ) from e
 
 
-@router.put("/promotions/{id}", response_model=PromotionResponse)
+@router.put("/promotions/{id}", response_model=BenefitResponse)
 async def update_promotion(
     id: str = Path(..., description="ID da promoção"),
-    request: PromotionRequest = None,
+    promotion_data: BenefitRequest = None,
     current_user: JWTPayload = Depends(validate_partner_role),
 ):
     """
@@ -389,7 +390,7 @@ async def update_promotion(
             )
 
         # Validar datas
-        if request.valid_from >= request.valid_to:
+        if promotion_data.valid_from >= promotion_data.valid_to:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail={
@@ -402,12 +403,12 @@ async def update_promotion(
 
         # Atualizar promoção
         updated_promotion = {
-            "title": request.title,
-            "type": request.type,
-            "valid_from": request.valid_from.isoformat(),
-            "valid_to": request.valid_to.isoformat(),
-            "active": request.active,
-            "audience": request.audience,
+            "title": promotion_data.title,
+            "type": promotion_data.type,
+            "valid_from": promotion_data.valid_from.isoformat(),
+            "valid_to": promotion_data.valid_to.isoformat(),
+            "active": promotion_data.active,
+            "audience": promotion_data.audience,
         }
 
         result = await firestore_client.update_document(

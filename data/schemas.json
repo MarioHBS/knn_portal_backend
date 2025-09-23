@@ -1,0 +1,778 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KNN Benefits - Schemas de Entidades",
+  "description": "Esquemas JSON para as entidades do sistema KNN Benefits",
+  "version": "1.0.0",
+  "created_at": "2025-09-18",
+  "schemas": {
+    "partner": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Parceiro",
+      "description": "Esquema para a entidade Parceiro do sistema KNN Benefits",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "description": "Dados principais do parceiro",
+          "properties": {
+            "trade_name": {
+              "type": "string",
+              "description": "Nome comercial do parceiro",
+              "minLength": 1,
+              "maxLength": 50,
+              "example": "Autoescola Escórcio"
+            },
+            "tenant_id": {
+              "type": "string",
+              "description": "ID do tenant do parceiro",
+              "minLength": 1,
+              "maxLength": 30,
+              "example": "knn-dev-tenant"
+            },
+            "benefits_count": {
+              "type": ["integer", "null"],
+              "description": "Número total de benefícios oferecidos pelo parceiro",
+              "minimum": 0,
+              "default": 0,
+              "example": 1
+            },
+            "has_active_benefits": {
+              "type": "boolean",
+              "description": "Indica se o parceiro possui benefícios ativos",
+              "default": false,
+              "example": true
+            },
+            "cnpj": {
+              "type": "string",
+              "description": "CNPJ do parceiro no formato XX.XXX.XXX/XXXX-XX",
+              "pattern": "^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$",
+              "example": "13.018.958/0001-51"
+            },
+            "logo_url": {
+              "type": ["string", "null"],
+              "description": "URL do logo do parceiro no Firebase Storage",
+              "format": "uri",
+              "example": "https://firebasestorage.googleapis.com/v0/b/knn-benefits.firebasestorage.app/o/partners%2Flogos%2FPTN_A1E8958_AUT.png?alt=media&token=90d02e32-5c16-4669-85a2-7edfabc97cf6"
+            },
+            "address": {
+              "type": "object",
+              "description": "Endereço do parceiro",
+              "properties": {
+                "zip": {
+                  "type": ["string", "null"],
+                  "description": "CEP no formato XXXXX-XXX",
+                  "pattern": "^\\d{5}-\\d{3}$",
+                  "example": "65040-003"
+                },
+                "street": {
+                  "type": ["string", "null"],
+                  "description": "Nome da rua/logradouro",
+                  "maxLength": 255,
+                  "example": "Rua das Flores, 123"
+                },
+                "neighborhood": {
+                  "type": ["string", "null"],
+                  "description": "Nome do bairro",
+                  "maxLength": 100,
+                  "example": "Outeiro da Cruz"
+                },
+                "city": {
+                  "type": ["string", "null"],
+                  "description": "Nome da cidade",
+                  "maxLength": 100,
+                  "example": "São Luís"
+                },
+                "state": {
+                  "type": ["string", "null"],
+                  "description": "Sigla do estado (UF)",
+                  "pattern": "^[A-Z]{2}$",
+                  "example": "MA"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "social_networks": {
+              "type": "object",
+              "description": "Redes sociais do parceiro",
+              "properties": {
+                "instagram": {
+                  "type": ["string", "null"],
+                  "description": "URL ou handle do Instagram",
+                  "example": "@autoescola_escorcio"
+                },
+                "facebook": {
+                  "type": ["string", "null"],
+                  "description": "URL da página do Facebook",
+                  "example": "https://facebook.com/autoescola.escorcio"
+                },
+                "website": {
+                  "type": ["string", "null"],
+                  "description": "URL do site oficial",
+                  "format": "uri",
+                  "example": "https://www.autoescolaescorcio.com.br"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "geolocation": {
+              "type": "object",
+              "description": "Links de geolocalização",
+              "properties": {
+                "google": {
+                  "type": ["string", "null"],
+                  "description": "URL do Google Maps",
+                  "format": "uri",
+                  "example": "https://maps.google.com/?q=Autoescola+Escorcio"
+                },
+                "waze": {
+                  "type": ["string", "null"],
+                  "description": "URL do Waze",
+                  "format": "uri",
+                  "example": "https://waze.com/ul/hsv8vtgq2k"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "category": {
+              "type": "string",
+              "description": "Categoria do parceiro",
+              "enum": [
+                "Automotivo",
+                "Educação",
+                "Tecnologia",
+                "Alimentação",
+                "Saúde",
+                "Beleza",
+                "Entretenimento",
+                "Varejo",
+                "Serviços",
+                "Papelaria",
+                "Outros"
+              ],
+              "example": "Automotivo"
+            },
+            "contact": {
+              "type": "object",
+              "description": "Informações de contato do parceiro",
+              "properties": {
+                "phone": {
+                  "type": ["string", "null"],
+                  "description": "Número de telefone",
+                  "example": "98848-4642"
+                },
+                "whatsapp": {
+                  "type": ["string", "null"],
+                  "description": "Número do WhatsApp",
+                  "example": "(98) 98848-4642"
+                },
+                "email": {
+                  "type": ["string", "null"],
+                  "description": "Endereço de email",
+                  "format": "email",
+                  "example": "contato@autoescolaescorcio.com.br"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "trade_name",
+            "tenant_id",
+            "cnpj",
+            "address",
+            "social_networks",
+            "geolocation",
+            "category",
+            "contact"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": ["data"],
+      "additionalProperties": false
+    },
+    "benefit": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Benefício",
+      "description": "Esquema para a entidade Benefício do sistema KNN Benefits",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "description": "Dados principais do benefício",
+          "patternProperties": {
+            "^BNF_[A-Z]+_\\d{2}_[A-Z]{2}$": {
+              "type": "object",
+              "description": "Benefício individual com ID no formato BNF_[INICIAIS]_[CONTADOR]_[TIPO]",
+              "properties": {
+                "metadata": {
+                  "type": "object",
+                  "description": "Metadados do benefício",
+                  "properties": {
+                    "tags": {
+                      "type": "array",
+                      "description": "Tags para categorização e busca",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 50
+                      },
+                      "example": ["automotivo", "desconto", "estudante"]
+                    }
+                  },
+                  "required": ["tags"],
+                  "additionalProperties": false
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Título do benefício",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "example": "BNF_AE_00_DC"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Descrição detalhada do benefício",
+                  "minLength": 1,
+                  "maxLength": 1000,
+                  "example": "Desconto de 10% - alunos têm 10% de desconto em cima do valor final"
+                },
+                "configuration": {
+                  "type": "object",
+                  "description": "Configurações específicas do benefício",
+                  "properties": {
+                    "value": {
+                      "type": "number",
+                      "description": "Valor do benefício (percentual ou valor fixo)",
+                      "minimum": 0,
+                      "example": 10
+                    },
+                    "value_type": {
+                      "type": "string",
+                      "description": "Tipo do valor do benefício",
+                      "enum": ["percentage", "fixed_amount", "free", "other"],
+                      "example": "percentage"
+                    },
+                    "calculation_method": {
+                      "type": "string",
+                      "description": "Método de cálculo do benefício",
+                      "enum": ["final_amount", "subtotal", "per_item", "fixed", "other"],
+                      "example": "final_amount"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Descrição da configuração",
+                      "maxLength": 500,
+                      "example": "Desconto de 10% - alunos têm 10% de desconto em cima do valor final"
+                    },
+                    "terms_conditions": {
+                      "type": "string",
+                      "description": "Termos e condições do benefício",
+                      "maxLength": 2000,
+                      "example": "alunos têm 10% de desconto em cima do valor final"
+                    },
+                    "requirements": {
+                      "type": "array",
+                      "description": "Requisitos para usar o benefício",
+                      "items": {
+                        "type": "string",
+                        "enum": ["comprovante_vinculo_knn", "carteirinha_estudante", "documento_identidade", "other"]
+                      },
+                      "example": ["comprovante_vinculo_knn"]
+                    },
+                    "applicable_services": {
+                      "type": "array",
+                      "description": "Serviços onde o benefício se aplica",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": []
+                    },
+                    "excluded_services": {
+                      "type": "array",
+                      "description": "Serviços excluídos do benefício",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": []
+                    },
+                    "additional_benefits": {
+                      "type": "array",
+                      "description": "Benefícios adicionais",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": []
+                    },
+                    "restrictions": {
+                      "type": "object",
+                      "description": "Restrições do benefício",
+                      "properties": {
+                        "minimum_purchase": {
+                          "type": "number",
+                          "description": "Valor mínimo de compra",
+                          "minimum": 0,
+                          "example": 0
+                        },
+                        "maximum_discount_amount": {
+                          "type": ["number", "null"],
+                          "description": "Valor máximo de desconto",
+                          "minimum": 0,
+                          "example": null
+                        },
+                        "valid_locations": {
+                          "type": "array",
+                          "description": "Locais válidos para o benefício",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["todas"]
+                        }
+                      },
+                      "required": ["minimum_purchase", "maximum_discount_amount", "valid_locations"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["value", "value_type", "calculation_method", "description", "terms_conditions", "requirements", "applicable_services", "excluded_services", "additional_benefits", "restrictions"],
+                  "additionalProperties": false
+                },
+                "limits": {
+                  "type": "object",
+                  "description": "Limites de uso do benefício",
+                  "properties": {
+                    "usage": {
+                      "type": "object",
+                      "description": "Limites de frequência de uso",
+                      "properties": {
+                        "per_day": {
+                          "type": "integer",
+                          "description": "Usos por dia (-1 = ilimitado)",
+                          "minimum": -1,
+                          "example": -1
+                        },
+                        "per_week": {
+                          "type": "integer",
+                          "description": "Usos por semana (-1 = ilimitado)",
+                          "minimum": -1,
+                          "example": -1
+                        },
+                        "per_month": {
+                          "type": "integer",
+                          "description": "Usos por mês (-1 = ilimitado)",
+                          "minimum": -1,
+                          "example": 1
+                        },
+                        "per_year": {
+                          "type": "integer",
+                          "description": "Usos por ano (-1 = ilimitado)",
+                          "minimum": -1,
+                          "example": -1
+                        },
+                        "lifetime": {
+                          "type": "integer",
+                          "description": "Usos vitalícios (-1 = ilimitado)",
+                          "minimum": -1,
+                          "example": -1
+                        }
+                      },
+                      "required": ["per_day", "per_week", "per_month", "per_year", "lifetime"],
+                      "additionalProperties": false
+                    },
+                    "temporal": {
+                      "type": "object",
+                      "description": "Limites temporais",
+                      "properties": {
+                        "cooldown_period": {
+                          "type": "object",
+                          "description": "Período de carência entre usos",
+                          "properties": {
+                            "days": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "example": 0
+                            },
+                            "weeks": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "example": 0
+                            },
+                            "months": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "example": 0
+                            },
+                            "description": {
+                              "type": "string",
+                              "maxLength": 200,
+                              "example": "Sem período de carência"
+                            }
+                          },
+                          "required": ["days", "weeks", "months", "description"],
+                          "additionalProperties": false
+                        },
+                        "valid_hours": {
+                          "type": "object",
+                          "description": "Horários válidos para uso",
+                          "properties": {
+                            "start": {
+                              "type": "string",
+                              "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
+                              "example": "00:00"
+                            },
+                            "end": {
+                              "type": "string",
+                              "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
+                              "example": "23:59"
+                            }
+                          },
+                          "required": ["start", "end"],
+                          "additionalProperties": false
+                        },
+                        "valid_days": {
+                          "type": "array",
+                          "description": "Dias da semana válidos",
+                          "items": {
+                            "type": "string",
+                            "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                          },
+                          "example": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                        }
+                      },
+                      "required": ["cooldown_period", "valid_hours", "valid_days"],
+                      "additionalProperties": false
+                    },
+                    "financial": {
+                      "type": "object",
+                      "description": "Limites financeiros",
+                      "properties": {
+                        "max_discount_amount": {
+                          "type": ["number", "null"],
+                          "description": "Valor máximo de desconto",
+                          "minimum": 0,
+                          "example": null
+                        },
+                        "min_purchase_amount": {
+                          "type": "number",
+                          "description": "Valor mínimo de compra",
+                          "minimum": 0,
+                          "example": 0
+                        },
+                        "max_purchase_amount": {
+                          "type": ["number", "null"],
+                          "description": "Valor máximo de compra",
+                          "minimum": 0,
+                          "example": null
+                        }
+                      },
+                      "required": ["max_discount_amount", "min_purchase_amount", "max_purchase_amount"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["usage", "temporal", "financial"],
+                  "additionalProperties": false
+                },
+                "dates": {
+                  "type": "object",
+                  "description": "Datas importantes do benefício",
+                  "properties": {
+                    "created_at": {
+                      "type": "string",
+                      "description": "Data de criação do benefício",
+                      "format": "date-time",
+                      "example": "2025-09-17 22:24:00.332124+00:00"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "description": "Data de última atualização do benefício",
+                      "format": "date-time",
+                      "example": "2025-09-17 22:24:00.332124+00:00"
+                    },
+                    "valid_from": {
+                      "type": "object",
+                      "description": "Data de início da validade (Firestore format)",
+                      "properties": {
+                        "_seconds": {
+                          "type": "integer",
+                          "description": "Segundos desde epoch"
+                        },
+                        "_nanoseconds": {
+                          "type": "integer",
+                          "description": "Nanossegundos"
+                        }
+                      },
+                      "required": ["_seconds", "_nanoseconds"],
+                      "additionalProperties": false
+                    },
+                    "valid_until": {
+                      "type": "string",
+                      "description": "Data de fim da validade",
+                      "format": "date-time",
+                      "example": "2025-09-17 22:24:00.332124+00:00"
+                    }
+                  },
+                  "required": ["created_at", "updated_at", "valid_from", "valid_until"],
+                  "additionalProperties": false
+                },
+                "system": {
+                  "type": "object",
+                  "description": "Informações do sistema",
+                  "properties": {
+                    "tenant_id": {
+                      "type": "string",
+                      "description": "ID do tenant/inquilino",
+                      "example": "knn-dev-tenant"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Status do benefício",
+                      "enum": ["active", "inactive", "expired", "suspended"],
+                      "example": "active"
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "Tipo do benefício",
+                      "enum": ["discount", "cashback", "freebie", "upgrade", "other"],
+                      "example": "discount"
+                    },
+                    "audience": {
+                      "type": "string",
+                      "description": "Público-alvo do benefício",
+                      "enum": ["students", "employees", "all", "other"],
+                      "example": "students"
+                    },
+                    "category": {
+                      "type": "string",
+                      "description": "Categoria do benefício (deve corresponder à categoria do parceiro)",
+                      "enum": [
+                        "Automotivo",
+                        "Educação",
+                        "Tecnologia",
+                        "Alimentação",
+                        "Saúde",
+                        "Beleza",
+                        "Entretenimento",
+                        "Varejo",
+                        "Serviços",
+                        "Papelaria",
+                        "Outros"
+                      ],
+                      "example": "Automotivo"
+                    }
+                  },
+                  "required": ["tenant_id", "status", "type", "audience", "category"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["metadata", "title", "description", "configuration", "limits", "dates", "system"],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["data"],
+      "additionalProperties": false
+    },
+    "student": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Estudante",
+      "description": "Esquema para a entidade Estudante do sistema KNN Benefits",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "description": "Dados principais do estudante",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Nome completo do estudante",
+              "minLength": 1,
+              "maxLength": 100,
+              "example": "Alba Clarissa Maciel Lopes"
+            },
+            "book": {
+              "type": "string",
+              "description": "Livro/nível do curso atual do estudante",
+              "enum": [
+                "KINDER 6A",
+                "KIDS 1",
+                "KIDS 2", 
+                "KIDS 3",
+                "TWEENS 2",
+                "TWEENS 3",
+                "TWEENS 4",
+                "TEENS 1",
+                "TEENS 3",
+                "SEEDS 1",
+                "SEEDS 2",
+                "SEEDS 3",
+                "SEEDS 4",
+                "ADVANCED 1"
+              ],
+              "example": "SEEDS 4"
+            },
+            "occupation": {
+              "type": ["string", "null"],
+              "description": "Ocupação/profissão do estudante",
+              "maxLength": 100,
+              "example": "Psicologa"
+            },
+            "tenant_id": {
+              "type": "string",
+              "description": "ID do tenant do estudante",
+              "minLength": 1,
+              "maxLength": 30,
+              "example": "knn-dev-tenant"
+            },
+            "contact": {
+              "type": "object",
+              "description": "Informações de contato do estudante",
+              "properties": {
+                "email": {
+                  "type": ["string", "null"],
+                  "description": "Endereço de email do estudante",
+                  "format": "email",
+                  "example": "albaclarissa19@gmail.com"
+                },
+                "phone": {
+                  "type": ["string", "null"],
+                  "description": "Número de telefone do estudante",
+                  "pattern": "^[0-9]{10,11}$",
+                  "example": "98981194700"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "address": {
+              "type": "object",
+              "description": "Endereço do estudante",
+              "properties": {
+                "zip": {
+                  "type": ["string", "null"],
+                  "description": "CEP no formato XXXXX-XXX",
+                  "pattern": "^\\d{5}-\\d{3}$",
+                  "example": "65055-317"
+                },
+                "neighborhood": {
+                  "type": ["string", "null"],
+                  "description": "Nome do bairro",
+                  "maxLength": 100,
+                  "example": "COHAPAM"
+                },
+                "complement": {
+                  "type": ["string", "null"],
+                  "description": "Complemento do endereço",
+                  "maxLength": 200,
+                  "example": "Apartamento 101"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "guardian": {
+              "type": "object",
+              "description": "Informações do responsável (para menores de idade)",
+              "properties": {
+                "name": {
+                  "type": ["string", "null"],
+                  "description": "Nome completo do responsável",
+                  "maxLength": 100,
+                  "example": "Clara Rebeca Silva do Reis"
+                },
+                "email": {
+                  "type": ["string", "null"],
+                  "description": "Email do responsável",
+                  "format": "email",
+                  "example": "clarinhabeca.45@gmail.com"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "name",
+            "book",
+            "tenant_id",
+            "contact",
+            "address",
+            "guardian"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": ["data"],
+      "additionalProperties": false
+    },
+    "firestore_collection": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Coleção Firestore - Parceiros",
+      "description": "Esquema para a estrutura da coleção de parceiros no Firestore",
+      "type": "object",
+      "properties": {
+        "__collection__/partners": {
+          "type": "object",
+          "description": "Metadados da coleção partners",
+          "additionalProperties": true
+        }
+      },
+      "patternProperties": {
+        "^__collection__/partners/PTN_[A-Z0-9]{7}_[A-Z]{3}$": {
+          "$ref": "#/schemas/partner",
+          "description": "Documento de parceiro com ID no formato PTN_XXXXXXX_XXX"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "partner_id_pattern": {
+      "type": "string",
+      "pattern": "^PTN_[A-Z0-9]{7}_[A-Z]{3}$",
+      "description": "Padrão de ID do parceiro: PTN_ + 7 caracteres alfanuméricos + _ + 3 letras da categoria",
+      "examples": [
+        "PTN_A1E8958_AUT",
+        "PTN_C2C8555_TEC",
+        "PTN_E8E6311_EDU"
+      ]
+    },
+    "categories_mapping": {
+      "AUT": "Automotivo",
+      "EDU": "Educação", 
+      "TEC": "Tecnologia",
+      "ALI": "Alimentação",
+      "SAU": "Saúde",
+      "BEL": "Beleza",
+      "ENT": "Entretenimento",
+      "VAR": "Varejo",
+      "SER": "Serviços",
+      "PAP": "Papelaria",
+      "OUT": "Outros"
+    }
+  },
+  "metadata": {
+    "project": "KNN Benefits",
+    "environment": "production",
+    "firestore_database": "knn-benefits",
+    "collection_name": "partners",
+    "last_updated": "2025-09-18T21:30:00Z",
+    "total_partners_analyzed": 1,
+    "schema_validation": {
+      "json_schema_version": "draft-07",
+      "validation_tools": ["ajv", "jsonschema"],
+      "strict_mode": true
+    },
+    "notes": [
+      "Schema baseado na análise do arquivo firestore_partners.json",
+      "Todos os campos opcionais podem ser null",
+      "IDs seguem o padrão PTN_XXXXXXX_XXX",
+      "URLs de logo são geradas automaticamente pelo Firebase Storage",
+      "Categorias são mapeadas para códigos de 3 letras no ID"
+    ]
+  }
+}

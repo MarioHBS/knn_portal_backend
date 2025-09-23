@@ -1,0 +1,194 @@
+# REGRAS DE CRIAÇÃO DE ID DOS BENEFÍCIOS - VERSÃO SIMPLIFICADA
+
+Baseado na implementação atual do sistema e alinhado com o schema de benefícios,
+este documento estabelece as regras simplificadas para criação de IDs únicos dos benefícios.
+
+## ESTRUTURA DO ID
+
+O ID do benefício segue o padrão simplificado:
+**BNF_[INICIAIS]_[CONTADOR]_[TIPO]**
+
+Onde:
+- **BNF_**: Prefixo fixo identificando benefícios
+- **[INICIAIS]**: Iniciais do nome do parceiro (quantidade variável)
+- **[CONTADOR]**: Contador sequencial de 2 dígitos (00, 01, 02...)
+- **[TIPO]**: Código do tipo de benefício (2 letras)
+
+## COMPONENTES DO ID
+
+### 1. Prefixo Padrão
+- **Formato**: `BNF_`
+- **Função**: Identificação padronizada indicando registro de benefício
+- **Tamanho**: 4 caracteres fixos
+
+### 2. Iniciais do Parceiro
+- **Regra**: Extrair as primeiras letras de cada palavra significativa do nome
+- **Exceções**: Ignorar preposições e artigos como "da", "de", "do", "dos", "das", "e", "&"
+- **Formato**: Letras maiúsculas, quantidade variável
+- **Exemplos**:
+  - "Autoescola Escórcio" → AE
+  - "Colégio Adventista" → CA
+  - "Cadin Celulares" → CC
+
+### 3. Contador Sequencial
+- **Formato**: 2 dígitos numéricos
+- **Regra**: Começar em 00 para o primeiro benefício do parceiro
+- **Incremento**: +1 para cada novo benefício do mesmo parceiro
+- **Exemplos**: 00, 01, 02, 03...
+
+### 4. Código do Tipo
+- **Formato**: 2 letras maiúsculas
+- **Função**: Identificar o tipo específico do benefício
+
+## CÓDIGOS DE TIPOS DE BENEFÍCIO
+
+| Código | Tipo de Benefício |
+|--------|-------------------|
+| **DC** | Desconto |
+| **FG** | Frete Grátis |
+| **CB** | Cashback |
+| **PG** | Produto Grátis |
+| **SG** | Serviço Gratuito |
+| **PT** | Pontos/Milhas |
+| **AE** | Acesso Exclusivo |
+| **UP** | Upgrade |
+| **CP** | Combo/Pacote |
+
+## EXEMPLOS PRÁTICOS
+
+### Exemplo 1: Autoescola Escórcio - Primeiro Desconto
+- **Parceiro**: "Autoescola Escórcio"
+- **Iniciais**: AE (Autoescola + Escórcio)
+- **Contador**: 00 (primeiro benefício)
+- **Tipo**: DC (Desconto)
+- **ID Final**: `BNF_AE_00_DC`
+
+### Exemplo 2: Colégio Adventista - Segundo Benefício (Frete Grátis)
+- **Parceiro**: "Colégio Adventista"
+- **Iniciais**: CA (Colégio + Adventista)
+- **Contador**: 01 (segundo benefício)
+- **Tipo**: FG (Frete Grátis)
+- **ID Final**: `BNF_CA_01_FG`
+
+### Exemplo 3: Cadin Celulares - Cashback
+- **Parceiro**: "Cadin Celulares"
+- **Iniciais**: CC (Cadin + Celulares)
+- **Contador**: 00 (primeiro benefício)
+- **Tipo**: CB (Cashback)
+- **ID Final**: `BNF_CC_00_CB`
+
+### Exemplo 4: Mercado da Esquina - Produto Grátis
+- **Parceiro**: "Mercado da Esquina"
+- **Iniciais**: ME (Mercado + Esquina, ignorando "da")
+- **Contador**: 02 (terceiro benefício)
+- **Tipo**: PG (Produto Grátis)
+- **ID Final**: `BNF_ME_02_PG`
+
+## ALGORITMO DE GERAÇÃO
+
+```python
+def gerar_id_beneficio(nome_parceiro: str, contador: int, tipo_beneficio: str) -> str:
+    """
+    Gera ID único para benefício seguindo padrão simplificado
+    
+    Args:
+        nome_parceiro: Nome completo do parceiro
+        contador: Número sequencial do benefício (0, 1, 2...)
+        tipo_beneficio: Código do tipo (DC, FG, CB, etc.)
+    
+    Returns:
+        ID único do benefício no formato BNF_[INICIAIS]_[CONTADOR]_[TIPO]
+    """
+    # Extrair iniciais do parceiro
+    iniciais = extrair_iniciais_parceiro(nome_parceiro)
+    
+    # Formatar contador com 2 dígitos
+    contador_formatado = f"{contador:02d}"
+    
+    # Montar ID final
+    id_beneficio = f"BNF_{iniciais}_{contador_formatado}_{tipo_beneficio}"
+    
+    return id_beneficio
+
+def extrair_iniciais_parceiro(nome: str) -> str:
+    """
+    Extrai iniciais do nome do parceiro ignorando preposições
+    """
+    preposicoes = {"da", "de", "do", "dos", "das", "e", "&", "em", "na", "no"}
+    palavras = nome.split()
+    iniciais = ""
+    
+    for palavra in palavras:
+        palavra_limpa = palavra.lower().strip("()[]{}.,;:")
+        if palavra_limpa not in preposicoes and palavra_limpa:
+            iniciais += palavra[0].upper()
+    
+    return iniciais
+```
+
+## REGRAS DE VALIDAÇÃO
+
+### Formato do ID
+- **Padrão Regex**: `^BNF_[A-Z]+_\d{2}_[A-Z]{2}$`
+- **Estrutura**: BNF_ + iniciais + _ + contador + _ + tipo
+- **Caracteres**: Apenas letras maiúsculas, números e underscores
+
+### Unicidade
+- Cada ID deve ser único no sistema
+- Verificação obrigatória antes da criação
+- Em caso de conflito, incrementar contador
+
+### Consistência
+- Iniciais devem corresponder ao nome do parceiro
+- Contador deve ser sequencial por parceiro
+- Tipo deve corresponder à categoria real do benefício
+
+## VANTAGENS DO SISTEMA SIMPLIFICADO
+
+1. **Simplicidade**: Estrutura clara e fácil de entender
+2. **Legibilidade**: IDs interpretáveis por humanos
+3. **Flexibilidade**: Suporte a nomes de parceiros variados
+4. **Escalabilidade**: Contador permite múltiplos benefícios por parceiro
+5. **Manutenibilidade**: Regras simples facilitam manutenção
+6. **Consistência**: Alinhamento com implementação atual do sistema
+
+## INTEGRAÇÃO COM SISTEMA ATUAL
+
+### Estrutura no Firestore
+- Benefícios organizados por ID do parceiro
+- Cada benefício tem ID único dentro do documento do parceiro
+- Exemplo de estrutura:
+```json
+{
+  "__collection__/benefits/PTN_A1E8958_AUT": {
+    "data": {
+      "BNF_AE_00_DC": {
+        "title": "Desconto 10% - Autoescola Escórcio",
+        "description": "Desconto de 10% para alunos",
+        // ... outros campos
+      }
+    }
+  }
+}
+```
+
+### Relacionamento com Parceiros
+- ID do benefício referencia o parceiro através das iniciais
+- Manter consistência com dados do parceiro
+- Validar existência do parceiro antes de criar benefício
+
+## MIGRAÇÃO DE DADOS EXISTENTES
+
+Para benefícios já criados com padrão anterior:
+1. Manter IDs existentes para compatibilidade
+2. Aplicar novo padrão apenas para novos benefícios
+3. Considerar migração gradual se necessário
+4. Documentar exceções e casos especiais
+
+---
+
+**Documento atualizado em**: 2025-01-19  
+**Versão**: 2.0 (Simplificada)  
+**Baseado em**: Implementação atual do schema e estrutura do Firestore  
+**Compatível com**: schemas.json, firestore_benefits.json  
+**Status**: Implementado e em uso

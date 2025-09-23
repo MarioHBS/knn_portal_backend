@@ -69,6 +69,36 @@ components:
         - status
         - mode
 
+    AddressObject:
+      type: object
+      properties:
+        city:
+          type: string
+          example: São Luís
+          description: Cidade do endereço
+        neighborhood:
+          type: string
+          example: Outeiro da Cruz
+          description: Bairro do endereço
+        state:
+          type: string
+          example: MA
+          description: Estado do endereço (sigla)
+        street:
+          type: string
+          example: Av. João Pessoa, 20
+          description: Rua e número do endereço
+        zip:
+          type: string
+          example: 65040003
+          description: CEP do endereço
+      required:
+        - city
+        - neighborhood
+        - state
+        - street
+        - zip
+
     Partner:
       type: object
       properties:
@@ -82,8 +112,16 @@ components:
           type: string
           example: Livraria
         address:
-          type: string
-          example: Av. Paulista, 2073 - São Paulo/SP
+          oneOf:
+            - $ref: '#/components/schemas/AddressObject'
+            - type: "null"
+          description: Endereço do parceiro como objeto estruturado ou null se não fornecido
+          example:
+            city: São Luís
+            neighborhood: Outeiro da Cruz
+            state: MA
+            street: Av. João Pessoa, 20
+            zip: 65040003
         active:
           type: boolean
           default: true
@@ -91,7 +129,6 @@ components:
         - id
         - trade_name
         - category
-        - address
         - active
 
     PartnerDetail:

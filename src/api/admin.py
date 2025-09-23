@@ -3,6 +3,7 @@ Implementação dos endpoints para o perfil de administrador (admin).
 """
 
 import uuid
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
@@ -15,6 +16,8 @@ from src.models import (
     EntityResponse,
     MetricsResponse,
     NotificationRequest,
+    Partner,
+    PartnerDetail,
     PartnerDetailResponse,
     PartnerListResponse,
 )
@@ -82,7 +85,23 @@ async def list_partners(
                 tenant_id=current_user.tenant,
             )
 
-        return PartnerListResponse(data=partners_result.get("items", []))
+        # Converter dados brutos para objetos Partner (garantindo logo_url)
+        partner_objects = []
+        for partner_data in partners_result.get("items", []):
+            try:
+                # Garantir que logo_url esteja presente, usando placeholder se necessário
+                if not partner_data.get("logo_url"):
+                    partner_data["logo_url"] = "/data/placeholder.png"
+
+                partner_obj = Partner(**partner_data)
+                partner_objects.append(partner_obj)
+            except Exception as e:
+                logger.warning(
+                    f"Erro ao converter parceiro {partner_data.get('id', 'N/A')}: {e}"
+                )
+                continue
+
+        return PartnerListResponse(data=partner_objects)
 
     except Exception as e:
         logger.error(
@@ -129,7 +148,15 @@ async def get_partner_details(
                 },
             )
 
-        return PartnerDetailResponse(data=partner_data)
+        # Garantir que logo_url esteja presente, usando placeholder se necessário
+        partner_raw_data = partner_data.get("data", partner_data)
+        if not partner_raw_data.get("logo_url"):
+            partner_raw_data["logo_url"] = "/data/placeholder.png"
+
+        # Criar objeto PartnerDetail
+        partner_detail = PartnerDetail(**partner_raw_data)
+
+        return PartnerDetailResponse(data=partner_detail)
 
     except HTTPException:
         raise
@@ -243,7 +270,7 @@ async def create_entity(
     """
     try:
         # Validar tipo de entidade
-        valid_entities = ["students", "employees", "partners", "promotions"]
+        valid_entities = ["students", "employees", "partners", "promotions", "benefits"]
         if entity not in valid_entities:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -264,13 +291,124 @@ async def create_entity(
                 },
             )
 
+        # Tratamento especial para benefícios - estrutura baseada no documento PTN_A7E6314_EDU
+        if entity == "benefits":
+            # Validar se partner_id está presente
+            if "partner_id" not in data:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail={
+                        "error": {"code": "VALIDATION_ERROR", "msg": "partner_id é obrigatório para benefícios"}
+                    },
+                )
+            
+            partner_id = data["partner_id"]
+            benefit_id = f"BNF_AE_{str(uuid.uuid4()).replace('-', '')[:2]}_DC"
+            
+            # Criar estrutura do benefício baseada no schema
+            current_time = datetime.now(timezone.utc).isoformat()
+            
+            benefit_structure = {
+                "metadata": {
+                    "tags": ["educação", "desconto", "funcionário"]
+                },
+                "title": benefit_id,
+                "description": data.get("description", "Benefício criado via admin"),
+                "configuration": {
+                    "value": data.get("value", 10),
+                    "value_type": "percentage",
+                    "calculation_method": "final_amount",
+                    "description": data.get("description", "Benefício criado via admin"),
+                    "terms_conditions": data.get("terms_conditions", ""),
+                    "requirements": ["comprovante_vinculo_knn"],
+                    "applicable_services": [],
+                    "excluded_services": [],
+                    "additional_benefits": [],
+                    "restrictions": {
+                        "minimum_purchase": 0,
+                        "maximum_discount_amount": None,
+                        "valid_locations": ["todas"]
+                    }
+                },
+                "limits": {
+                    "usage": {
+                        "per_day": -1,
+                        "per_week": -1,
+                        "per_month": 1,
+                        "per_year": -1,
+                        "lifetime": -1
+                    },
+                    "temporal": {
+                        "cooldown_period": {
+                            "days": 0,
+                            "weeks": 0,
+                            "months": 0,
+                            "description": "Sem período de carência"
+                        },
+                        "valid_hours": {
+                            "start": "00:00",
+                            "end": "23:59"
+                        },
+                        "valid_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                    },
+                    "financial": {
+                        "max_discount_amount": None,
+                        "min_purchase_amount": 0,
+                        "max_purchase_amount": None
+                    }
+                },
+                "dates": {
+                    "created_at": current_time,
+                    "updated_at": current_time,
+                    "valid_from": current_time,
+                    "valid_until": None
+                }
+            }
+            
+            # Verificar se já existe documento do parceiro
+            try:
+                partner_doc = await firestore_client.get_document("benefits", partner_id, current_user.tenant)
+                if partner_doc:
+                    # Documento existe, adicionar novo benefício na seção data
+                    if "data" not in partner_doc:
+                        partner_doc["data"] = {}
+                    partner_doc["data"][benefit_id] = benefit_structure
+                    partner_doc["updated_at"] = current_time
+                    result = await firestore_client.update_document("benefits", partner_id, partner_doc, current_user.tenant)
+                else:
+                    # Documento não existe, criar novo seguindo o schema
+                    new_doc = {
+                        "data": {
+                            benefit_id: benefit_structure
+                        },
+                        "tenant_id": current_user.tenant,
+                        "partner_id": partner_id,
+                        "created_at": current_time,
+                        "updated_at": current_time
+                    }
+                    result = await firestore_client.create_document("benefits", new_doc, doc_id=partner_id)
+                
+                return {"data": {"benefit_id": benefit_id, "structure": benefit_structure}, "msg": "ok"}
+                
+            except Exception as e:
+                logger.error(f"Erro ao criar benefício para parceiro {partner_id}: {str(e)}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail={
+                        "error": {
+                            "code": "SERVER_ERROR",
+                            "msg": f"Erro ao criar benefício para parceiro {partner_id}",
+                        }
+                    },
+                ) from e
+
         # Gerar ID se não fornecido
         if "id" not in data:
             data["id"] = str(uuid.uuid4())
 
-        # Criar entidade
+        # Criar entidade (comportamento padrão para outras entidades)
         result = await firestore_client.create_document(
-            entity, data, data["id"], tenant_id=current_user.tenant
+            entity, data, data["id"]
         )
 
         return {"data": result, "msg": "ok"}

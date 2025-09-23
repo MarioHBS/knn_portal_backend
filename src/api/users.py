@@ -246,6 +246,30 @@ async def login(request: FirebaseLoginRequest):
     Raises:
         HTTPException: Se o token Firebase for inválido
     """
+    # Se estiver em modo de teste, usar dados mock
+    if TESTING_MODE:
+        # Simular validação bem-sucedida para qualquer token em modo de teste
+        user_data = {
+            "username": "admin@knn.com.br",
+            "role": "admin",
+            "tenant": "test-tenant",
+            "name": "Administrador Teste",
+        }
+
+        # Gerar token JWT local
+        token = create_jwt_token(user_data)
+
+        return LoginResponse(
+            access_token=token,
+            expires_in=1800,  # 30 minutos em segundos
+            user_info={
+                "username": "admin@knn.com.br",
+                "role": "admin",
+                "tenant": "test-tenant",
+                "name": "Administrador Teste",
+            },
+        )
+
     try:
         # Importar a função de verificação do Firebase
         from src.auth import verify_firebase_token
