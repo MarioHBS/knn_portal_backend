@@ -40,6 +40,15 @@ class CircuitBreaker:
         self.failures = 0
         self.state = "closed"
 
+    def reset(self):
+        """
+        Reseta o circuit breaker para o estado inicial.
+        """
+        self.failures = 0
+        self.last_failure_time = 0
+        self.state = "closed"
+        logger.info("Circuit breaker resetado para estado inicial")
+
     def can_execute(self):
         """
         Verifica se o Firestore pode ser acessado.
@@ -82,6 +91,8 @@ async def with_circuit_breaker(
     # Importar aqui para evitar circular imports
     from src.config import POSTGRES_ENABLED
 
+    firestore_error = None
+
     if circuit_breaker.can_execute():
         try:
             # Tentar Firestore
@@ -91,6 +102,7 @@ async def with_circuit_breaker(
         except Exception as e:
             # Registrar falha
             circuit_breaker.record_failure()
+            firestore_error = e
             logger.error(
                 f"Erro no Firestore, fazendo fallback para PostgreSQL: {str(e)}"
             )
@@ -99,7 +111,12 @@ async def with_circuit_breaker(
 
     # Verificar se PostgreSQL está habilitado
     if not POSTGRES_ENABLED:
-        logger.warning("PostgreSQL desabilitado, retornando dados vazios")
+        logger.warning("PostgreSQL desabilitado, propagando erro do Firestore")
+        # Se temos um erro do Firestore, propagar ele
+        if firestore_error:
+            raise firestore_error
+        # Se não temos erro do Firestore (circuit breaker aberto), retornar dados vazios apenas para consultas
+        # Para operações de escrita/delete, isso deve ser tratado no endpoint
         return {"data": [], "total": 0, "limit": 0, "offset": 0}
 
     # Fallback para PostgreSQL

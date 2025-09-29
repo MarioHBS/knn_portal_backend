@@ -10,6 +10,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
 from src.auth import JWTPayload, validate_admin_role
 from src.db import firestore_client, postgres_client, with_circuit_breaker
+from src.db.firestore import db
 from src.models import (
     BaseResponse,
     EntityListResponse,
@@ -126,93 +127,6 @@ async def get_partner_details(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "error": {"code": "INTERNAL_ERROR", "msg": "Erro interno do servidor"}
-            },
-        ) from e
-
-
-@router.get("/{entity}", response_model=EntityListResponse)
-async def list_entities(
-    entity: str = Path(..., description="Tipo de entidade"),
-    limit: int = Query(
-        20, ge=1, le=100, description="Número máximo de itens por página"
-    ),
-    offset: int = Query(0, ge=0, description="Offset para paginação"),
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Retorna lista de entidades (students, partners, promotions, etc.).
-    """
-    try:
-        # Validar tipo de entidade
-        valid_entities = [
-            "students",
-            "employees",
-            "partners",
-            "promotions",
-            "validation_codes",
-            "redemptions",
-        ]
-        if entity not in valid_entities:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {
-                        "code": "INVALID_ENTITY",
-                        "msg": f"Entidade inválida. Use: {', '.join(valid_entities)}",
-                    }
-                },
-            )
-
-        # Consultar entidades
-        async def get_firestore_entities():
-            return await firestore_client.query_documents(
-                entity, limit=limit, offset=offset, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_entities():
-            return await postgres_client.query_documents(
-                entity, limit=limit, offset=offset, tenant_id=current_user.tenant
-            )
-
-        entities_data = await with_circuit_breaker(
-            get_firestore_entities, get_postgres_entities
-        )
-
-        # Contar total
-        async def count_firestore_entities():
-            return await firestore_client.count_documents(
-                entity, tenant_id=current_user.tenant
-            )
-
-        async def count_postgres_entities():
-            return await postgres_client.count_documents(
-                entity, tenant_id=current_user.tenant
-            )
-
-        total = await with_circuit_breaker(
-            count_firestore_entities, count_postgres_entities
-        )
-
-        return EntityListResponse(
-            data={
-                "items": entities_data.get("items", []),
-                "total": total,
-                "limit": limit,
-                "offset": offset,
-            }
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao listar entidades {entity}: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": f"Erro ao listar entidades {entity}",
-                }
             },
         ) from e
 
@@ -381,95 +295,332 @@ async def create_partner(
         ) from e
 
 
-@router.put(f"/benefits/{id}")
+@router.get("/benefits", response_model=EntityListResponse)
+async def list_all_benefits(
+    partner_id: str | None = Query(None, description="Filtro por ID do parceiro"),
+    category: str | None = Query(None, description="Filtro por categoria"),
+    status: str | None = Query(
+        None, description="Filtro por status", enum=["active", "inactive", "expired"]
+    ),
+    limit: int = Query(
+        20, ge=1, le=100, description="Número máximo de itens por página"
+    ),
+    offset: int = Query(0, ge=0, description="Offset para paginação"),
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Lista todos os benefícios do sistema com filtros e paginação.
+
+    Endpoint específico para administradores com as seguintes características:
+    - Lista benefícios de todos os parceiros
+    - Inclui partner_id na resposta para filtragem na tela
+    - Suporte a filtros por parceiro, categoria e status
+    - Paginação para performance
+    - Circuit breaker para alta disponibilidade
+    """
+    try:
+        # Obter tenant_id do JWT token
+        tenant_id = current_user.tenant
+        admin_id = current_user.sub
+        logger.info(
+            f"Admin {admin_id} listando benefícios - Tenant: {tenant_id} - Filtros: partner_id={partner_id}, category={category}, status={status}"
+        )
+
+        # Função auxiliar para converter dados do Firestore
+        def convert_firestore_data(data):
+            """Converte dados do Firestore para formato compatível com Pydantic."""
+            if isinstance(data, dict):
+                converted = {k: convert_firestore_data(v) for k, v in data.items()}
+                # Normalizar campo audience para string se for lista
+                if "system" in converted and "audience" in converted["system"]:
+                    audience = converted["system"]["audience"]
+                    if isinstance(audience, list):
+                        # Converter lista para string separada por vírgula
+                        converted["system"]["audience"] = ",".join(audience)
+                return converted
+            elif hasattr(data, "timestamp"):  # DatetimeWithNanoseconds
+                return data.timestamp()
+            elif isinstance(data, list):
+                return [convert_firestore_data(item) for item in data]
+            else:
+                return data
+
+        # Buscar todos os documentos da coleção benefits usando a mesma abordagem do partner
+        async def get_firestore_all_benefits():
+            from src.db.firestore import get_database
+
+            db = get_database()
+            all_benefits = []
+
+            # Buscar todos os documentos da coleção benefits
+            benefits_collection = db.collection("benefits")
+            docs = benefits_collection.stream()
+
+            for doc in docs:
+                partner_doc_id = doc.id
+                partner_data = doc.to_dict()
+
+                if not isinstance(partner_data, dict):
+                    continue
+
+                # Processar benefícios do parceiro
+                for benefit_key, benefit_data in partner_data.items():
+                    if benefit_key.startswith("BNF_") and isinstance(
+                        benefit_data, dict
+                    ):
+                        try:
+                            # Converter dados do Firestore para formato compatível
+                            converted_benefit_data = convert_firestore_data(
+                                benefit_data
+                            )
+
+                            # Adicionar partner_id ao benefício
+                            benefit_with_partner = {
+                                **converted_benefit_data,
+                                "benefit_id": benefit_key,
+                                "partner_id": partner_doc_id,
+                            }
+
+                            # Aplicar filtros
+                            if partner_id and partner_doc_id != partner_id:
+                                continue
+
+                            if (
+                                category
+                                and benefit_data.get("system", {}).get("category")
+                                != category
+                            ):
+                                continue
+
+                            if (
+                                status
+                                and benefit_data.get("system", {}).get("status")
+                                != status
+                            ):
+                                continue
+
+                            all_benefits.append(benefit_with_partner)
+
+                        except Exception as e:
+                            logger.warning(
+                                f"Erro ao processar benefício {benefit_key} do parceiro {partner_doc_id}: {str(e)}"
+                            )
+                            continue
+
+            return {"data": all_benefits}
+
+        async def get_postgres_all_benefits():
+            # Fallback para PostgreSQL se necessário
+            return {"data": []}
+
+        # Usar circuit breaker para operações do Firestore
+        benefits_result = await with_circuit_breaker(
+            get_firestore_all_benefits, get_postgres_all_benefits
+        )
+
+        benefits_list = benefits_result.get("data", [])
+
+        # Ordenar por data de criação (mais recente primeiro)
+        benefits_list.sort(
+            key=lambda x: x.get("dates", {}).get("created_at", ""), reverse=True
+        )
+
+        # Aplicar paginação
+        total_count = len(benefits_list)
+        paginated_benefits = benefits_list[offset : offset + limit]
+
+        logger.info(
+            f"Retornando {len(paginated_benefits)} benefícios de {total_count} total"
+        )
+
+        return {
+            "data": {
+                "items": paginated_benefits,
+                "total": total_count,
+                "limit": limit,
+                "offset": offset,
+            },
+            "msg": "Benefícios listados com sucesso",
+        }
+
+    except Exception as e:
+        logger.error(f"Erro ao listar benefícios: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {"code": "SERVER_ERROR", "msg": "Erro ao listar benefícios"}
+            },
+        ) from e
+
+
+@router.get("/benefits/{partner_id}/{benefit_id}", response_model=EntityResponse)
+async def get_benefit_details(
+    partner_id: str = Path(..., description="ID do parceiro"),
+    benefit_id: str = Path(..., description="ID do benefício"),
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Obtém detalhes de um benefício específico.
+
+    Endpoint para administradores visualizarem benefícios específicos
+    de qualquer parceiro do sistema.
+    """
+    try:
+        logger.info(
+            f"Admin {current_user.sub} buscando benefício {benefit_id} do parceiro {partner_id}"
+        )
+
+        # Usar circuit breaker para operações do Firestore
+        @with_circuit_breaker
+        async def get_benefit():
+            partner_doc = await firestore_client.get_document(
+                "benefits", partner_id, current_user.tenant
+            )
+
+            if not partner_doc:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail={
+                        "error": {
+                            "code": "PARTNER_NOT_FOUND",
+                            "msg": f"Parceiro {partner_id} não encontrado",
+                        }
+                    },
+                )
+
+            if benefit_id not in partner_doc:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail={
+                        "error": {
+                            "code": "BENEFIT_NOT_FOUND",
+                            "msg": f"Benefício {benefit_id} não encontrado para o parceiro {partner_id}",
+                        }
+                    },
+                )
+
+            benefit_data = partner_doc[benefit_id]
+
+            # Adicionar informações do parceiro e benefício
+            benefit_with_ids = {
+                **benefit_data,
+                "benefit_id": benefit_id,
+                "partner_id": partner_id,
+            }
+
+            return benefit_with_ids
+
+        benefit = await get_benefit()
+
+        logger.info(f"Benefício {benefit_id} encontrado para parceiro {partner_id}")
+
+        return {"data": benefit, "msg": "Benefício encontrado com sucesso"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            f"Erro ao buscar benefício {benefit_id} do parceiro {partner_id}: {str(e)}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {"code": "SERVER_ERROR", "msg": "Erro ao buscar benefício"}
+            },
+        ) from e
+
+
+@router.put("/benefits/{partner_id}/{benefit_id}", response_model=EntityResponse)
 async def update_benefit(
-    id: str = Path(..., description="ID do Benefício"),
+    partner_id: str = Path(..., description="ID do parceiro"),
+    benefit_id: str = Path(..., description="ID do benefício"),
     benefit_data: BenefitRequest = None,
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
+    """
+    Atualiza um benefício específico de um parceiro.
+
+    Endpoint para administradores atualizarem benefícios de qualquer parceiro,
+    seguindo a nova estrutura com partner_id e benefit_id na URL.
+    """
     try:
-        # Validar se partner_id está presente
-        if "partner_id" not in benefit_data:
+        logger.info(
+            f"Admin {current_user.sub} atualizando benefício {benefit_id} do parceiro {partner_id}"
+        )
+
+        # Validar campos obrigatórios do benefício
+        if not benefit_data.title:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail={
                     "error": {
                         "code": "VALIDATION_ERROR",
-                        "msg": "partner_id é obrigatório para benefícios",
+                        "msg": "Campo obrigatório: title",
                     }
                 },
             )
-        # Validar campos obrigatórios do benefício
-        required_fields = ["title", "description", "value", "category"]
-        for field in required_fields:
-            if field not in benefit_data:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail={
-                        "error": {
-                            "code": "VALIDATION_ERROR",
-                            "msg": f"Campo obrigatório: {field}",
-                        }
-                    },
-                )
 
         current_time = datetime.now(UTC).isoformat()
 
-        partner_id = benefit_data["partner_id"]
-        benefit_id = id  # o id do Benefício que será atualizado
-
         benefit_structure = {
             "metadata": {
-                "tags": benefit_data.get(
-                    "tags", [benefit_data.get("category", "").lower(), "desconto"]
+                "tags": getattr(
+                    benefit_data,
+                    "tags",
+                    [getattr(benefit_data, "category", "").lower(), "desconto"],
                 )
             },
-            "title": benefit_data["title"],
-            "description": benefit_data["description"],
+            "title": benefit_data.title,
+            "description": getattr(benefit_data, "description", ""),
             "configuration": {
-                "value": benefit_data["value"],
-                "value_type": benefit_data.get("value_type", "percentage"),
-                "calculation_method": benefit_data.get(
-                    "calculation_method", "final_amount"
+                "value": getattr(benefit_data, "value", 0),
+                "value_type": getattr(benefit_data, "value_type", "percentage"),
+                "calculation_method": getattr(
+                    benefit_data, "calculation_method", "final_amount"
                 ),
-                "description": benefit_data["description"],
-                "terms_conditions": benefit_data.get("terms_conditions", ""),
-                "requirements": benefit_data.get(
-                    "requirements", ["comprovante_vinculo_knn"]
+                "description": getattr(benefit_data, "description", ""),
+                "terms_conditions": getattr(benefit_data, "terms_conditions", ""),
+                "requirements": getattr(
+                    benefit_data, "requirements", ["comprovante_vinculo_knn"]
                 ),
-                "applicable_services": benefit_data.get("applicable_services", []),
-                "excluded_services": benefit_data.get("excluded_services", []),
-                "additional_benefits": benefit_data.get("additional_benefits", []),
+                "applicable_services": getattr(benefit_data, "applicable_services", []),
+                "excluded_services": getattr(benefit_data, "excluded_services", []),
+                "additional_benefits": getattr(benefit_data, "additional_benefits", []),
                 "restrictions": {
-                    "minimum_purchase": benefit_data.get("minimum_purchase", 0),
-                    "maximum_discount_amount": benefit_data.get(
-                        "maximum_discount_amount"
+                    "minimum_purchase": getattr(benefit_data, "minimum_purchase", 0),
+                    "maximum_discount_amount": getattr(
+                        benefit_data, "maximum_discount_amount", None
                     ),
-                    "valid_locations": benefit_data.get("valid_locations", ["todas"]),
+                    "valid_locations": getattr(
+                        benefit_data, "valid_locations", ["todas"]
+                    ),
                 },
             },
             "limits": {
                 "usage": {
-                    "per_day": benefit_data.get("per_day", -1),
-                    "per_week": benefit_data.get("per_week", -1),
-                    "per_month": benefit_data.get("per_month", 1),
-                    "per_year": benefit_data.get("per_year", -1),
-                    "lifetime": benefit_data.get("lifetime", -1),
+                    "per_day": getattr(benefit_data, "per_day", -1),
+                    "per_week": getattr(benefit_data, "per_week", -1),
+                    "per_month": getattr(benefit_data, "per_month", 1),
+                    "per_year": getattr(benefit_data, "per_year", -1),
+                    "lifetime": getattr(benefit_data, "lifetime", -1),
                 },
                 "temporal": {
                     "cooldown_period": {
-                        "days": benefit_data.get("cooldown_days", 0),
-                        "weeks": benefit_data.get("cooldown_weeks", 0),
-                        "months": benefit_data.get("cooldown_months", 0),
-                        "description": benefit_data.get(
-                            "cooldown_description", "Sem período de carência"
+                        "days": getattr(benefit_data, "cooldown_days", 0),
+                        "weeks": getattr(benefit_data, "cooldown_weeks", 0),
+                        "months": getattr(benefit_data, "cooldown_months", 0),
+                        "description": getattr(
+                            benefit_data,
+                            "cooldown_description",
+                            "Sem período de carência",
                         ),
                     },
                     "valid_hours": {
-                        "start": benefit_data.get("valid_hours_start", "00:00"),
-                        "end": benefit_data.get("valid_hours_end", "23:59"),
+                        "start": getattr(benefit_data, "valid_hours_start", "00:00"),
+                        "end": getattr(benefit_data, "valid_hours_end", "23:59"),
                     },
-                    "valid_days": benefit_data.get(
+                    "valid_days": getattr(
+                        benefit_data,
                         "valid_days",
                         [
                             "monday",
@@ -483,66 +634,315 @@ async def update_benefit(
                     ),
                 },
                 "financial": {
-                    "max_discount_amount": benefit_data.get("max_discount_amount"),
-                    "min_purchase_amount": benefit_data.get("min_purchase_amount", 0),
-                    "max_purchase_amount": benefit_data.get("max_purchase_amount"),
+                    "max_discount_amount": getattr(
+                        benefit_data, "max_discount_amount", None
+                    ),
+                    "min_purchase_amount": getattr(
+                        benefit_data, "min_purchase_amount", 0
+                    ),
+                    "max_purchase_amount": getattr(
+                        benefit_data, "max_purchase_amount", None
+                    ),
                 },
             },
             "dates": {
-                "created_at": benefit_data.get("created_at", current_time),
+                "created_at": getattr(benefit_data, "created_at", current_time),
                 "updated_at": current_time,
-                "valid_from": benefit_data.get("valid_from", current_time),
-                "valid_until": benefit_data.get("valid_until"),
+                "valid_from": benefit_data.valid_from.isoformat()
+                if hasattr(benefit_data, "valid_from") and benefit_data.valid_from
+                else current_time,
+                "valid_until": benefit_data.valid_to.isoformat()
+                if hasattr(benefit_data, "valid_to") and benefit_data.valid_to
+                else None,
             },
             "system": {
                 "tenant_id": current_user.tenant,
-                "status": benefit_data.get("status", "active"),
-                "type": benefit_data.get("type", "discount"),
-                "audience": benefit_data.get("audience", "students"),
-                "category": benefit_data["category"],
+                "status": getattr(benefit_data, "status", "active"),
+                "type": benefit_data.type,
+                "audience": benefit_data.audience,
+                "category": getattr(benefit_data, "category", "desconto"),
             },
         }
 
-        try:
-            partner_doc = await firestore_client.get_document(
-                "benefits", partner_id, current_user.tenant
-            )
-            partner_doc[benefit_id] = benefit_structure
-            result = await firestore_client.update_document(
-                "benefits", partner_id, partner_doc, current_user.tenant
+        # Função para atualizar no Firestore
+        async def update_benefit_firestore():
+            # Buscar documento de benefícios do parceiro (seguindo a mesma lógica do partner.py)
+            doc_ref = db.collection("benefits").document(partner_id)
+            doc = doc_ref.get()
+
+            if not doc.exists:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail={
+                        "error": {
+                            "code": "PARTNER_NOT_FOUND",
+                            "msg": f"Documento de benefícios não encontrado para parceiro {partner_id}",
+                        }
+                    },
+                )
+
+            # Verificar se o benefício específico existe no documento do parceiro
+            benefits_data = doc.to_dict()
+            if benefit_id not in benefits_data:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail={
+                        "error": {
+                            "code": "BENEFIT_NOT_FOUND",
+                            "msg": f"Benefício {benefit_id} não encontrado no parceiro {partner_id}",
+                        }
+                    },
+                )
+
+            # Obter o benefício existente e atualizar mantendo a estrutura original
+            existing_benefit = benefits_data[benefit_id].copy()
+
+            # Atualizar campos principais
+            existing_benefit["title"] = benefit_data.title
+            if hasattr(benefit_data, "description") and benefit_data.description:
+                existing_benefit["description"] = benefit_data.description
+
+            # Atualizar campos do system
+            if "system" not in existing_benefit:
+                existing_benefit["system"] = {}
+            existing_benefit["system"]["type"] = benefit_data.type
+            existing_benefit["system"]["status"] = getattr(
+                benefit_data, "status", "active"
             )
 
+            # Converter audience se necessário
+            if hasattr(benefit_data, "audience"):
+                if isinstance(benefit_data.audience, list):
+                    audience_mapping = {
+                        frozenset(["student"]): "students",
+                        frozenset(["employee"]): "employees",
+                        frozenset(["student", "employee"]): "all",
+                    }
+                    firestore_audience = audience_mapping.get(
+                        frozenset(benefit_data.audience), "students"
+                    )
+                    existing_benefit["system"]["audience"] = firestore_audience
+                else:
+                    existing_benefit["system"]["audience"] = benefit_data.audience
+
+            # Atualizar campos de datas
+            if "dates" not in existing_benefit:
+                existing_benefit["dates"] = {}
+            existing_benefit["dates"]["updated_at"] = current_time
+
+            if hasattr(benefit_data, "valid_from") and benefit_data.valid_from:
+                existing_benefit["dates"]["valid_from"] = (
+                    benefit_data.valid_from.isoformat()
+                )
+            if hasattr(benefit_data, "valid_to") and benefit_data.valid_to:
+                existing_benefit["dates"]["valid_until"] = (
+                    benefit_data.valid_to.isoformat()
+                )
+
+            # Atualizar configuração se fornecida
+            if "configuration" not in existing_benefit:
+                existing_benefit["configuration"] = {}
+
+            if hasattr(benefit_data, "value"):
+                existing_benefit["configuration"]["value"] = benefit_data.value
+            if hasattr(benefit_data, "value_type"):
+                existing_benefit["configuration"]["value_type"] = (
+                    benefit_data.value_type
+                )
+
+            # Atualizar o documento com o benefício modificado
+            update_data = {benefit_id: existing_benefit}
+            doc_ref.update(update_data)
+
+            logger.info(f"Benefício {benefit_id} atualizado no Firestore com sucesso")
             return {
-                "data": {
-                    "benefit_id": benefit_id,
-                    "partner_id": partner_id,
-                    "structure": benefit_structure,
-                },
-                "msg": "Benefício atualizdo com sucesso",
+                "success": True,
+                "benefit_id": benefit_id,
+                "updated_benefit": existing_benefit,
             }
 
-        except Exception as e:
-            logger.error(
-                f"Erro ao criar benefício para parceiro {partner_id}: {str(e)}"
+        # Função de fallback para PostgreSQL (placeholder)
+        async def update_benefit_postgres():
+            # TODO: Implementar fallback para PostgreSQL quando necessário
+            logger.warning(
+                "Fallback para PostgreSQL não implementado para update_benefit"
             )
+            return {"success": True}
+
+        # Usar circuit breaker corretamente
+        result = await with_circuit_breaker(
+            update_benefit_firestore, update_benefit_postgres
+        )
+
+        # Verificar se a atualização foi bem-sucedida
+        if not result or not result.get("success"):
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail={
                     "error": {
-                        "code": "SERVER_ERROR",
-                        "msg": f"Erro ao criar benefício para parceiro {partner_id}",
+                        "code": "UPDATE_FAILED",
+                        "msg": "Falha ao atualizar benefício",
                     }
                 },
-            ) from e
+            )
+
+        logger.info(
+            f"Benefício {benefit_id} atualizado com sucesso para parceiro {partner_id}"
+        )
+
+        return {
+            "data": {
+                "benefit_id": benefit_id,
+                "partner_id": partner_id,
+                "updated_benefit": result.get("updated_benefit", {}),
+            },
+            "msg": "Benefício atualizado com sucesso",
+        }
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Erro ao atualizar Benefício: {str(e)}")
+        logger.error(
+            f"Erro ao atualizar benefício {benefit_id} do parceiro {partner_id}: {str(e)}"
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao atualizar benefício"}
+            },
+        ) from e
+
+
+@router.delete("/benefits/{partner_id}/{benefit_id}", response_model=BaseResponse)
+async def delete_benefit(
+    partner_id: str = Path(..., description="ID do parceiro"),
+    benefit_id: str = Path(..., description="ID do benefício"),
+    soft_delete: bool = Query(False, description="Usar soft delete (padrão: False - Hard Delete)"),
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Remove um benefício específico de um parceiro.
+
+    Endpoint para administradores removerem benefícios de qualquer parceiro.
+    Por padrão, realiza hard delete (remoção completa). Use soft_delete=true para manter o benefício marcado como inativo.
+    """
+    try:
+        logger.info(
+            f"Admin {current_user.sub} removendo benefício {benefit_id} do parceiro {partner_id} (soft_delete={soft_delete})"
+        )
+
+        # Usar circuit breaker para operações do Firestore
+        async def delete_benefit_firestore():
+            # Acesso direto ao documento sem prefixo de tenant
+            from src.db.firestore import db
+
+            doc_ref = db.collection("benefits").document(partner_id)
+            doc = doc_ref.get()
+
+            if not doc.exists:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail={
+                        "error": {
+                            "code": "PARTNER_NOT_FOUND",
+                            "msg": f"Parceiro {partner_id} não encontrado",
+                        }
+                    },
+                )
+
+            partner_doc = doc.to_dict()
+
+            if benefit_id not in partner_doc:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail={
+                        "error": {
+                            "code": "BENEFIT_NOT_FOUND",
+                            "msg": f"Benefício {benefit_id} não encontrado para o parceiro {partner_id}",
+                        }
+                    },
+                )
+
+            if soft_delete:
+                # Soft delete: marcar como inativo
+                benefit_data = partner_doc[benefit_id]
+                if isinstance(benefit_data, dict):
+                    benefit_data["system"]["status"] = "inactive"
+                    benefit_data["dates"]["updated_at"] = datetime.now(UTC).isoformat()
+                    benefit_data["dates"]["deleted_at"] = datetime.now(UTC).isoformat()
+
+                    partner_doc[benefit_id] = benefit_data
+
+                    # Atualizar documento diretamente
+                    doc_ref.set(partner_doc)
+
+                    logger.info(f"Soft delete realizado para benefício {benefit_id}")
+                    return "soft_deleted"
+                else:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail={
+                            "error": {
+                                "code": "INVALID_BENEFIT_STRUCTURE",
+                                "msg": "Estrutura do benefício inválida para soft delete",
+                            }
+                        },
+                    )
+            else:
+                # Hard delete: remover completamente
+                del partner_doc[benefit_id]
+
+                # Atualizar documento diretamente
+                doc_ref.set(partner_doc)
+
+                logger.info(f"Hard delete realizado para benefício {benefit_id}")
+                return "hard_deleted"
+
+        async def delete_benefit_postgres():
+            # Fallback para PostgreSQL (ainda não implementado)
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail={
+                    "error": {
+                        "code": "FIRESTORE_UNAVAILABLE",
+                        "msg": "Firestore indisponível e fallback PostgreSQL não implementado",
+                    }
+                },
+            )
+
+        delete_type = await with_circuit_breaker(
+            delete_benefit_firestore, delete_benefit_postgres
+        )
+
+        # Verificar se o resultado é válido (não é dados vazios do circuit breaker)
+        if isinstance(delete_type, dict) and delete_type.get("data") == []:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail={
+                    "error": {
+                        "code": "SERVICE_UNAVAILABLE",
+                        "msg": "Serviço temporariamente indisponível",
+                    }
+                },
+            )
+
+        action_msg = "inativado" if delete_type == "soft_deleted" else "removido"
+        logger.info(
+            f"Benefício {benefit_id} {action_msg} com sucesso para parceiro {partner_id}"
+        )
+
+        return {"msg": f"Benefício {action_msg} com sucesso"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            f"Erro ao remover benefício {benefit_id} do parceiro {partner_id}: {str(e)}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {"code": "SERVER_ERROR", "msg": "Erro ao remover benefício"}
             },
         ) from e
 
@@ -587,6 +987,10 @@ async def create_benefit(
 
         # Gerar ID único para o benefício
         benefit_id = f"BNF_{str(uuid.uuid4()).replace('-', '')[:6].upper()}_DC"
+
+        logger.info(
+            f"🆔 Gerando novo benefício com ID: {benefit_id} para parceiro: {partner_id}"
+        )
 
         # Criar estrutura do benefício baseada no schema do JSON
         current_time = datetime.now(UTC).isoformat()
@@ -670,29 +1074,60 @@ async def create_benefit(
 
         # Verificar se já existe documento do parceiro na coleção benefits
         try:
-            partner_doc = await firestore_client.get_document(
-                "benefits", partner_id, current_user.tenant
-            )
-            if partner_doc:
-                # Documento existe, adicionar novo benefício na seção data
-                if benefit_id not in partner_doc:
-                    partner_doc[benefit_id] = {}  # se benefício não existe, cria
-                    partner_doc[benefit_id] = benefit_structure
-                else:
-                    partner_doc[benefit_id]["dates"]["updated_at"] = current_time
+            # Buscar documento diretamente pelo partner_id (sem tenant prefix)
+            # O tenant está armazenado dentro dos dados do benefício em system.tenant_id
+            doc_ref = db.collection("benefits").document(partner_id)
+            doc = doc_ref.get()
+            partner_doc = {**doc.to_dict(), "id": doc.id} if doc.exists else None
 
-                result = await firestore_client.update_document(
-                    "benefits", partner_id, partner_doc, current_user.tenant
+            logger.info(
+                f"📄 Documento do parceiro {partner_id} {'encontrado' if partner_doc else 'não encontrado'}"
+            )
+
+            if partner_doc:
+                logger.info(
+                    f"📊 Benefícios existentes no documento: {list(partner_doc.keys()) if isinstance(partner_doc, dict) else 'N/A'}"
+                )
+
+                # Documento existe, adicionar apenas o novo benefício
+                update_data = {
+                    benefit_id: benefit_structure,
+                    "updated_at": current_time,
+                }
+
+                logger.info(
+                    f"🔄 Atualizando documento existente com novo benefício {benefit_id}"
+                )
+
+                # Atualizar documento usando o firestore_client
+                await firestore_client.update_document(
+                    "benefits", partner_id, update_data
+                )
+
+                logger.info(
+                    f"✅ Benefício {benefit_id} adicionado ao documento existente"
                 )
             else:
-                # Documento não existe, criar novo seguindo o schema
+                # Documento não existe, criar novo com benefício diretamente
                 new_doc = {
-                    "data": {benefit_id: benefit_structure},
+                    benefit_id: benefit_structure,
                     "created_at": current_time,
                     "updated_at": current_time,
                 }
-                result = await firestore_client.create_document(
+
+                logger.info(
+                    f"🆕 Criando novo documento para parceiro {partner_id} com benefício {benefit_id}"
+                )
+
+                # Usar apenas o partner_id como ID do documento (sem tenant prefix)
+                # A informação do tenant está dentro dos dados do benefício em system.tenant_id
+
+                await firestore_client.create_document(
                     "benefits", new_doc, doc_id=partner_id
+                )
+
+                logger.info(
+                    f"✅ Novo documento criado com ID {partner_id} e benefício {benefit_id}"
                 )
 
             return {
@@ -726,413 +1161,6 @@ async def create_benefit(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao criar benefício"}
-            },
-        ) from e
-
-
-@router.post("/{entity}", response_model=EntityResponse)
-async def create_entity(
-    entity: str = Path(..., description="Tipo de entidade"),
-    data: dict[str, Any] = Body(..., description="Dados da entidade"),
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Cria uma nova entidade (student, partner, promotion, etc.).
-    DEPRECATED: Use os endpoints específicos /admin/students, /admin/employees, /admin/partners, /admin/benefits
-    """
-    try:
-        # Validar tipo de entidade
-        valid_entities = ["students", "employees", "partners", "promotions", "benefits"]
-        if entity not in valid_entities:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {
-                        "code": "INVALID_ENTITY",
-                        "msg": f"Entidade inválida. Use: {', '.join(valid_entities)}",
-                    }
-                },
-            )
-
-        # Validar dados
-        if not data:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={
-                    "error": {"code": "VALIDATION_ERROR", "msg": "Dados inválidos"}
-                },
-            )
-
-        # Tratamento especial para benefícios - estrutura baseada no documento PTN_A7E6314_EDU
-        if entity == "benefits":
-            # Validar se partner_id está presente
-            if "partner_id" not in data:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail={
-                        "error": {
-                            "code": "VALIDATION_ERROR",
-                            "msg": "partner_id é obrigatório para benefícios",
-                        }
-                    },
-                )
-
-            partner_id = data["partner_id"]
-            benefit_id = f"BNF_AE_{str(uuid.uuid4()).replace('-', '')[:2]}_DC"
-
-            # Criar estrutura do benefício baseada no schema
-            current_time = datetime.now(UTC).isoformat()
-
-            benefit_structure = {
-                "metadata": {"tags": ["educação", "desconto", "funcionário"]},
-                "title": benefit_id,
-                "description": data.get("description", "Benefício criado via admin"),
-                "configuration": {
-                    "value": data.get("value", 10),
-                    "value_type": "percentage",
-                    "calculation_method": "final_amount",
-                    "description": data.get(
-                        "description", "Benefício criado via admin"
-                    ),
-                    "terms_conditions": data.get("terms_conditions", ""),
-                    "requirements": ["comprovante_vinculo_knn"],
-                    "applicable_services": [],
-                    "excluded_services": [],
-                    "additional_benefits": [],
-                    "restrictions": {
-                        "minimum_purchase": 0,
-                        "maximum_discount_amount": None,
-                        "valid_locations": ["todas"],
-                    },
-                },
-                "limits": {
-                    "usage": {
-                        "per_day": -1,
-                        "per_week": -1,
-                        "per_month": 1,
-                        "per_year": -1,
-                        "lifetime": -1,
-                    },
-                    "temporal": {
-                        "cooldown_period": {
-                            "days": 0,
-                            "weeks": 0,
-                            "months": 0,
-                            "description": "Sem período de carência",
-                        },
-                        "valid_hours": {"start": "00:00", "end": "23:59"},
-                        "valid_days": [
-                            "monday",
-                            "tuesday",
-                            "wednesday",
-                            "thursday",
-                            "friday",
-                            "saturday",
-                            "sunday",
-                        ],
-                    },
-                    "financial": {
-                        "max_discount_amount": None,
-                        "min_purchase_amount": 0,
-                        "max_purchase_amount": None,
-                    },
-                },
-                "dates": {
-                    "created_at": current_time,
-                    "updated_at": current_time,
-                    "valid_from": current_time,
-                    "valid_until": None,
-                },
-            }
-
-            # Verificar se já existe documento do parceiro
-            try:
-                partner_doc = await firestore_client.get_document(
-                    "benefits", partner_id, current_user.tenant
-                )
-                if partner_doc:
-                    # Documento existe, adicionar novo benefício na seção data
-                    if "data" not in partner_doc:
-                        partner_doc["data"] = {}
-                    partner_doc["data"][benefit_id] = benefit_structure
-                    partner_doc["updated_at"] = current_time
-                    result = await firestore_client.update_document(
-                        "benefits", partner_id, partner_doc, current_user.tenant
-                    )
-                else:
-                    # Documento não existe, criar novo seguindo o schema
-                    new_doc = {
-                        "data": {benefit_id: benefit_structure},
-                        "tenant_id": current_user.tenant,
-                        "partner_id": partner_id,
-                        "created_at": current_time,
-                        "updated_at": current_time,
-                    }
-                    result = await firestore_client.create_document(
-                        "benefits", new_doc, doc_id=partner_id
-                    )
-
-                return {
-                    "data": {"benefit_id": benefit_id, "structure": benefit_structure},
-                    "msg": "ok",
-                }
-
-            except Exception as e:
-                logger.error(
-                    f"Erro ao criar benefício para parceiro {partner_id}: {str(e)}"
-                )
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail={
-                        "error": {
-                            "code": "SERVER_ERROR",
-                            "msg": f"Erro ao criar benefício para parceiro {partner_id}",
-                        }
-                    },
-                ) from e
-
-        # Gerar ID se não fornecido
-        if "id" not in data:
-            data["id"] = str(uuid.uuid4())
-
-        # Criar entidade (comportamento padrão para outras entidades)
-        result = await firestore_client.create_document(entity, data, data["id"])
-
-        return {"data": result, "msg": "ok"}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao criar entidade {entity}: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": f"Erro ao criar entidade {entity}",
-                }
-            },
-        ) from e
-
-
-@router.get("/{entity}/{id}", response_model=EntityResponse)
-async def get_entity(
-    entity: str = Path(..., description="Tipo de entidade"),
-    id: str = Path(..., description="ID da entidade"),
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Busca uma entidade específica por ID (student, partner, promotion, etc.).
-    """
-    try:
-        # Validar tipo de entidade
-        valid_entities = ["students", "employees", "partners", "promotions"]
-        if entity not in valid_entities:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {
-                        "code": "INVALID_ENTITY",
-                        "msg": f"Entidade inválida. Use: {', '.join(valid_entities)}",
-                    }
-                },
-            )
-
-        # Buscar entidade
-        async def get_firestore_entity():
-            return await firestore_client.get_document(
-                entity, id, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_entity():
-            return await postgres_client.get_document(
-                entity, id, tenant_id=current_user.tenant
-            )
-
-        result = await with_circuit_breaker(get_firestore_entity, get_postgres_entity)
-
-        if not result:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {
-                        "code": "NOT_FOUND",
-                        "msg": f"Entidade {entity} com ID {id} não encontrada",
-                    }
-                },
-            )
-
-        return {"data": result, "msg": "ok"}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao buscar entidade {entity}/{id}: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": f"Erro ao buscar entidade {entity}/{id}",
-                }
-            },
-        ) from e
-
-
-@router.put("/{entity}/{id}", response_model=EntityResponse)
-async def update_entity(
-    entity: str = Path(..., description="Tipo de entidade"),
-    id: str = Path(..., description="ID da entidade"),
-    data: dict[str, Any] = Body(..., description="Dados da entidade"),
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Atualiza uma entidade existente (student, partner, promotion, etc.).
-    """
-    try:
-        # Validar tipo de entidade
-        valid_entities = ["students", "employees", "partners", "promotions"]
-        if entity not in valid_entities:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {
-                        "code": "INVALID_ENTITY",
-                        "msg": f"Entidade inválida. Use: {', '.join(valid_entities)}",
-                    }
-                },
-            )
-
-        # Validar dados
-        if not data:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={
-                    "error": {"code": "VALIDATION_ERROR", "msg": "Dados inválidos"}
-                },
-            )
-
-        # Verificar se a entidade existe
-        async def get_firestore_entity():
-            return await firestore_client.get_document(
-                entity, id, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_entity():
-            return await postgres_client.get_document(
-                entity, id, tenant_id=current_user.tenant
-            )
-
-        existing_entity = await with_circuit_breaker(
-            get_firestore_entity, get_postgres_entity
-        )
-
-        if not existing_entity:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {
-                        "code": "NOT_FOUND",
-                        "msg": f"Entidade {entity} com ID {id} não encontrada",
-                    }
-                },
-            )
-
-        # Atualizar entidade
-        result = await firestore_client.update_document(
-            entity, id, data, tenant_id=current_user.tenant
-        )
-
-        return {"data": result, "msg": "ok"}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao atualizar entidade {entity}/{id}: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": f"Erro ao atualizar entidade {entity}/{id}",
-                }
-            },
-        ) from e
-
-
-@router.delete("/{entity}/{id}", response_model=BaseResponse)
-async def delete_entity(
-    entity: str = Path(..., description="Tipo de entidade"),
-    id: str = Path(..., description="ID da entidade"),
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Remove ou inativa uma entidade existente (student, partner, promotion, etc.).
-    """
-    try:
-        # Validar tipo de entidade
-        valid_entities = ["students", "employees", "partners", "promotions"]
-        if entity not in valid_entities:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {
-                        "code": "INVALID_ENTITY",
-                        "msg": f"Entidade inválida. Use: {', '.join(valid_entities)}",
-                    }
-                },
-            )
-
-        # Verificar se a entidade existe
-        async def get_firestore_entity():
-            return await firestore_client.get_document(
-                entity, id, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_entity():
-            return await postgres_client.get_document(
-                entity, id, tenant_id=current_user.tenant
-            )
-
-        existing_entity = await with_circuit_breaker(
-            get_firestore_entity, get_postgres_entity
-        )
-
-        if not existing_entity:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {
-                        "code": "NOT_FOUND",
-                        "msg": f"Entidade {entity} com ID {id} não encontrada",
-                    }
-                },
-            )
-
-        # Para entidades que suportam soft delete, apenas inativar
-        if entity in ["students", "employees", "partners", "promotions"]:
-            await firestore_client.update_document(
-                entity, id, {"active": False}, tenant_id=current_user.tenant
-            )
-        else:
-            # Para outras entidades, remover completamente
-            await firestore_client.delete_document(
-                entity, id, tenant_id=current_user.tenant
-            )
-
-        return {"msg": "ok"}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao remover entidade {entity}/{id}: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": f"Erro ao remover entidade {entity}/{id}",
-                }
             },
         ) from e
 
