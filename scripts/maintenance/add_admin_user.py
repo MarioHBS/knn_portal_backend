@@ -12,13 +12,14 @@ Uso:
 """
 
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Adicionar o diretório raiz ao path
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from firebase_admin import auth, credentials, firestore
+from firebase_admin import auth, firestore
+
 from src.auth import initialize_firebase
 
 
@@ -36,16 +37,21 @@ def get_employee_data(employee_id: str) -> dict | None:
         import json
 
         # Caminho para o arquivo de funcionários
-        employees_file = Path(__file__).parent.parent.parent / "data" / "firestore_export" / "firestore_employees.json"
+        employees_file = (
+            Path(__file__).parent.parent.parent
+            / "data"
+            / "firestore_export"
+            / "firestore_employees.json"
+        )
 
         if not employees_file.exists():
             print(f"❌ Arquivo de funcionários não encontrado: {employees_file}")
             return None
 
-        with open(employees_file, 'r', encoding='utf-8') as f:
+        with open(employees_file, encoding="utf-8") as f:
             data = json.load(f)
 
-        employees = data.get('employees', {})
+        employees = data.get("employees", {})
         employee_data = employees.get(employee_id)
 
         if not employee_data:
@@ -71,8 +77,8 @@ def create_admin_user(employee_data: dict, password: str) -> str | None:
         str: UID do usuário criado ou None se erro
     """
     try:
-        email = employee_data.get('e-mail')
-        name = employee_data.get('name')
+        email = employee_data.get("e-mail")
+        name = employee_data.get("name")
 
         if not email:
             print("❌ Email do funcionário não encontrado")
@@ -88,11 +94,11 @@ def create_admin_user(employee_data: dict, password: str) -> str | None:
                 "role": "admin",
                 "tenant": "knn-dev-tenant",
                 "entity_type": "employee",
-                "entity_id": employee_data.get('id')
+                "entity_id": employee_data.get("id"),
             }
 
             auth.set_custom_user_claims(existing_user.uid, custom_claims)
-            print(f"✅ Custom claims de admin aplicadas para usuário existente")
+            print("✅ Custom claims de admin aplicadas para usuário existente")
 
             return existing_user.uid
 
@@ -111,12 +117,12 @@ def create_admin_user(employee_data: dict, password: str) -> str | None:
                 "role": "admin",
                 "tenant": "knn-dev-tenant",
                 "entity_type": "employee",
-                "entity_id": employee_data.get('id')
+                "entity_id": employee_data.get("id"),
             }
 
             # Aplicar custom claims
             auth.set_custom_user_claims(user.uid, custom_claims)
-            print(f"✅ Custom claims de admin aplicadas")
+            print("✅ Custom claims de admin aplicadas")
 
             return user.uid
 
@@ -143,24 +149,24 @@ def update_users_collection(old_uid: str, new_uid: str, employee_data: dict) -> 
         # Preparar dados do novo documento
         user_data = {
             "role": "admin",
-            "email": employee_data.get('e-mail'),
+            "email": employee_data.get("e-mail"),
             "tenant_id": "knn-dev-tenant",
             "first_access": True,
-            "entity_id": employee_data.get('id'),
-            "name": employee_data.get('name'),
+            "entity_id": employee_data.get("id"),
+            "name": employee_data.get("name"),
             "id": new_uid,
-            "updated_at": datetime.now(timezone.utc),
-            "created_at": datetime.now(timezone.utc)
+            "updated_at": datetime.now(UTC),
+            "created_at": datetime.now(UTC),
         }
 
         # Criar novo documento com o novo UID
-        new_doc_ref = db.collection('users').document(new_uid)
+        new_doc_ref = db.collection("users").document(new_uid)
         new_doc_ref.set(user_data)
         print(f"✅ Novo documento criado na coleção 'users': {new_uid}")
 
         # Remover documento antigo se for diferente
         if old_uid != new_uid:
-            old_doc_ref = db.collection('users').document(old_uid)
+            old_doc_ref = db.collection("users").document(old_uid)
             old_doc_ref.delete()
             print(f"✅ Documento antigo removido: {old_uid}")
 
@@ -194,7 +200,9 @@ def main():
             print("❌ Não foi possível obter dados do funcionário")
             return False
 
-        print(f"✅ Dados obtidos: {employee_data.get('name')} - {employee_data.get('e-mail')}\n")
+        print(
+            f"✅ Dados obtidos: {employee_data.get('name')} - {employee_data.get('e-mail')}\n"
+        )
 
         # Criar usuário administrador no Firebase Auth
         print("👤 Criando usuário administrador no Firebase Authentication...")
@@ -222,7 +230,7 @@ def main():
         print(f"🔑 Senha: {PASSWORD}")
         print(f"🆔 Novo UID: {new_uid}")
         print(f"👤 Nome: {employee_data.get('name')}")
-        print(f"🏢 Função: admin")
+        print("🏢 Função: admin")
 
         return True
 

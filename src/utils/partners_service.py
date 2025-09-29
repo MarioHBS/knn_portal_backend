@@ -91,9 +91,9 @@ class PartnersService:
                 )
 
             # Extrair dados dos parceiros
-            logger.info(f"DEBUG - Resultado da consulta Firestore: {result}")
+            logger.info(f"DEBUG COMMON - Resultado da consulta Firestore: {result}")
             partners_data = result.get("items", [])
-            logger.info(f"DEBUG - Quantidade de partners_data extraídos: {len(partners_data)}")
+            logger.info(f"DEBUG COMMON - Quantidade de partners_data extraídos: {len(partners_data)}")
 
             # Converter dados brutos para objetos Partner
             partner_objects = []

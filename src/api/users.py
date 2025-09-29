@@ -99,6 +99,7 @@ def create_jwt_token(user_data: dict, expires_minutes: int = 30) -> str:
         "iss": "knn-portal-local",
         "aud": "knn-portal",
         "name": user_data.get("name", user_data["username"]),
+        "entity_id": user_data.get("entity_id"),  # Incluir entity_id na abordagem híbrida
     }
 
     return jwt.encode(payload, JWT_SECRET_KEY, algorithm="HS256")
@@ -295,12 +296,29 @@ async def login(request: FirebaseLoginRequest):
                 detail=f"Usuário não tem permissão para role '{request.role}'",
             )
 
+        # Buscar entity_id na coleção users do Firestore usando o Firebase UID
+        entity_id = None
+        try:
+            from src.db.firestore import get_database
+            db = get_database()
+            user_doc = db.collection("users").document(firebase_payload.sub).get()
+            if user_doc.exists:
+                user_data_firestore = user_doc.to_dict()
+                entity_id = user_data_firestore.get("entity_id")
+                print(f"DEBUG - Entity ID encontrado no Firestore: {entity_id}")
+            else:
+                print(f"DEBUG - Documento do usuário não encontrado no Firestore para UID: {firebase_payload.sub}")
+        except Exception as e:
+            # Log do erro mas não falhar o login se não conseguir buscar entity_id
+            print(f"Aviso: Não foi possível buscar entity_id do Firestore: {e}")
+
         # Preparar dados do usuário
         user_data = {
             "username": user_email,
             "role": token_role,
             "tenant": firebase_payload.tenant,
             "name": user_name,
+            "entity_id": entity_id,  # Incluir entity_id obtido do Firestore
         }
 
         # Gerar token JWT local com expiração de 30 minutos
@@ -310,7 +328,7 @@ async def login(request: FirebaseLoginRequest):
             access_token=token,
             expires_in=1800,  # 30 minutos em segundos
             user_info={
-                "username": user_email,
+                "email": user_email,
                 "role": token_role,
                 "tenant": firebase_payload.tenant,
                 "name": user_name,

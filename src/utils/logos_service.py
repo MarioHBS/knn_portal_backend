@@ -296,23 +296,24 @@ class LogosService:
             ) from e
 
     async def get_partner_logo_url(
-        self, partner_id: str, force_refresh: bool = False
-    ) -> str | None:
+        self, partner_id: str, force_refresh: bool = False, use_placeholder: bool = True
+    ) -> str:
         """
         Obtém URL do logo de um parceiro específico.
 
         Args:
             partner_id: ID do parceiro (ex: "PTN_A1E3018_AUT")
             force_refresh: Se True, força regeneração da URL
+            use_placeholder: Se True, retorna placeholder quando logo não encontrado
 
         Returns:
-            URL assinada do logo ou None se não encontrado
+            URL do logo ou URL do placeholder se não encontrado
         """
         try:
             # Buscar na lista de logos disponíveis (com possível refresh forçado)
             logos = await self.list_available_logos(force_refresh=force_refresh)
 
-            # Procurar logo do parceiro
+            # Procurar logo do parceiro seguindo padrão {partner_id}.png
             for logo in logos:
                 if logo["partner_id"] == partner_id:
                     logger.debug(
@@ -320,11 +321,22 @@ class LogosService:
                     )
                     return logo["url"]
 
+            # Se não encontrou o logo e use_placeholder é True, retornar placeholder
+            if use_placeholder:
+                placeholder_url = "/data/placeholder.png"
+                logger.info(f"Logo não encontrado para parceiro {partner_id}, usando placeholder: {placeholder_url}")
+                return placeholder_url
+
             logger.warning(f"Logo não encontrado para parceiro: {partner_id}")
             return None
 
         except Exception as e:
             logger.error(f"Erro ao obter logo do parceiro {partner_id}: {e}")
+            # Em caso de erro, retornar placeholder se solicitado
+            if use_placeholder:
+                placeholder_url = "/data/placeholder.png"
+                logger.info(f"Erro ao buscar logo, usando placeholder: {placeholder_url}")
+                return placeholder_url
             return None
 
     async def get_logos_by_category(self, category: str) -> list[dict[str, str]]:

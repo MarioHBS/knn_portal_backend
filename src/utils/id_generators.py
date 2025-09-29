@@ -63,6 +63,26 @@ class IDGenerators:
         "OUTROS": "OUT",
     }
 
+    # Mapeamento de tipos de benefícios para códigos
+    TIPO_BENEFICIO_CODES = {
+        "DESCONTO": "DC",
+        "FRETE GRÁTIS": "FG",
+        "FRETE GRATIS": "FG",
+        "CASHBACK": "CB",
+        "PRODUTO GRÁTIS": "PG",
+        "PRODUTO GRATIS": "PG",
+        "SERVIÇO GRATUITO": "SG",
+        "SERVICO GRATUITO": "SG",
+        "PONTOS": "PT",
+        "MILHAS": "PT",
+        "PONTOS/MILHAS": "PT",
+        "ACESSO EXCLUSIVO": "AE",
+        "UPGRADE": "UP",
+        "COMBO": "CP",
+        "PACOTE": "CP",
+        "COMBO/PACOTE": "CP",
+    }
+
     @classmethod
     def extrair_iniciais(cls, nome: str, max_iniciais: int = 4) -> list[str]:
         """Extrai as iniciais de um nome, ignorando preposições.
@@ -362,25 +382,163 @@ class IDGenerators:
         return f"PTN_{secao_central}_{codigo_categoria}"
 
     @classmethod
+    def extrair_iniciais_parceiro(cls, nome: str) -> str:
+        """Extrai iniciais do nome do parceiro ignorando preposições.
+
+        Método específico para benefícios que retorna string ao invés de lista.
+
+        Args:
+            nome: Nome completo do parceiro
+
+        Returns:
+            String com iniciais em maiúsculo
+        """
+        preposicoes = {"da", "de", "do", "dos", "das", "e", "&", "em", "na", "no"}
+        palavras = nome.split()
+        iniciais = ""
+
+        for palavra in palavras:
+            palavra_limpa = palavra.lower().strip("()[]{}.,;:")
+            if palavra_limpa not in preposicoes and palavra_limpa:
+                iniciais += palavra[0].upper()
+
+        return iniciais
+
+    @classmethod
+    def gerar_id_beneficio(
+        cls, nome_parceiro: str, contador: int, tipo_beneficio: str
+    ) -> str:
+        """Gera ID único para benefício seguindo padrão simplificado.
+
+        Formato: BNF_[INICIAIS]_[CONTADOR]_[TIPO]
+
+        Args:
+            nome_parceiro: Nome completo do parceiro
+            contador: Número sequencial do benefício (0, 1, 2...)
+            tipo_beneficio: Tipo do benefício (DESCONTO, CASHBACK, etc.)
+
+        Returns:
+            ID único do benefício no formato BNF_[INICIAIS]_[CONTADOR]_[TIPO]
+
+        Examples:
+            >>> cls.gerar_id_beneficio("Autoescola Escórcio", 0, "DESCONTO")
+            'BNF_AE_00_DC'
+            >>> cls.gerar_id_beneficio("Colégio Adventista", 1, "FRETE GRÁTIS")
+            'BNF_CA_01_FG'
+        """
+        # Extrair iniciais do parceiro
+        iniciais = "".join(cls.extrair_iniciais(nome_parceiro))
+
+        # Formatar contador com 2 dígitos
+        contador_formatado = f"{contador:02d}"
+
+        # Obter código do tipo de benefício
+        codigo_tipo = cls.TIPO_BENEFICIO_CODES.get(tipo_beneficio.upper(), "DC")
+
+        # Montar ID final
+        id_beneficio = f"BNF_{iniciais}_{contador_formatado}_{codigo_tipo}"
+
+        return id_beneficio
+
+    @classmethod
+    def gerar_id_beneficio_timestamp(
+        cls, iniciais_parceiro: str, tipo_beneficio: str = "DESCONTO"
+    ) -> str:
+        """Gera ID único para benefício baseado em timestamp + hash.
+
+        Formato: BNF_[INICIAIS]_[TIMESTAMP_BASE36]_[TIPO]
+
+        Vantagens:
+        - Não depende de contagem sequencial
+        - Único por natureza (baseado em timestamp)
+        - Não precisa consultar benefícios existentes
+        - Resistente a exclusões e concorrência
+        - Mantém ordem cronológica aproximada
+
+        Args:
+            iniciais_parceiro: Iniciais do parceiro (ex: "TL", "AE")
+            tipo_beneficio: Tipo do benefício (DESCONTO, CASHBACK, etc.)
+
+        Returns:
+            ID único do benefício no formato BNF_[INICIAIS]_[TIMESTAMP]_[TIPO]
+
+        Examples:
+            >>> cls.gerar_id_beneficio_timestamp("TL", "DESCONTO")
+            'BNF_TL_1A2B3C_DC'
+            >>> cls.gerar_id_beneficio_timestamp("AE", "CASHBACK")
+            'BNF_AE_1A2B3D_CB'
+        """
+        import hashlib
+        import time
+
+        # Obter timestamp atual em milissegundos
+        timestamp_ms = int(time.time() * 1000)
+
+        # Converter para base36 para compactar (usa 0-9 e A-Z)
+        def to_base36(num):
+            alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            if num == 0:
+                return "0"
+            result = ""
+            while num > 0:
+                result = alphabet[num % 36] + result
+                num //= 36
+            return result
+
+        # Gerar hash curto para garantir unicidade adicional
+        hash_input = f"{iniciais_parceiro}_{timestamp_ms}_{tipo_beneficio}"
+        hash_short = hashlib.md5(hash_input.encode()).hexdigest()[:2].upper()
+
+        # Timestamp em base36 (mais compacto)
+        timestamp_b36 = to_base36(timestamp_ms)[-6:]  # Últimos 6 caracteres
+
+        # Combinar timestamp + hash para garantir unicidade
+        identificador = f"{timestamp_b36}{hash_short}"
+
+        # Obter código do tipo de benefício
+        codigo_tipo = cls.TIPO_BENEFICIO_CODES.get(tipo_beneficio.upper(), "DC")
+
+        # Montar ID final
+        id_beneficio = f"BNF_{iniciais_parceiro}_{identificador}_{codigo_tipo}"
+
+        return id_beneficio
+
+    @classmethod
     def validar_id_formato(cls, id_str: str, tipo: str) -> bool:
         """Valida se um ID está no formato correto.
 
         Args:
             id_str: ID a ser validado
-            tipo: Tipo do ID ('student', 'employee', 'partner')
+            tipo: Tipo do ID ('student', 'employee', 'partner', 'benefit')
 
         Returns:
             True se o formato estiver correto
         """
-        if not id_str or len(id_str) != 15:
+        if not id_str or len(id_str) < 10:
             return False
 
         if tipo == "student":
-            return bool(re.match(r"^STD_[A-Z0-9]{8}_[A-Z0-9]{2}$", id_str))
+            return (
+                bool(re.match(r"^STD_[A-Z0-9]{8}_[A-Z0-9]{2}$", id_str))
+                and len(id_str) == 15
+            )
         elif tipo == "employee":
-            return bool(re.match(r"^EMP_[A-Z0-9]{7,8}_[A-Z]{2,3}$", id_str))
+            return (
+                bool(re.match(r"^EMP_[A-Z0-9]{7,8}_[A-Z]{2,3}$", id_str))
+                and len(id_str) == 15
+            )
         elif tipo == "partner":
-            return bool(re.match(r"^PTN_[A-Z0-9]{7}_[A-Z]{3}$", id_str))
+            return (
+                bool(re.match(r"^PTN_[A-Z0-9]{7}_[A-Z]{3}$", id_str))
+                and len(id_str) == 15
+            )
+        elif tipo == "benefit":
+            # Suporte a ambos os formatos:
+            # Formato antigo (sequencial): BNF_[INICIAIS]_[00-99]_[TIPO]
+            # Formato novo (timestamp): BNF_[INICIAIS]_[TIMESTAMP+HASH]_[TIPO]
+            formato_antigo = bool(re.match(r"^BNF_[A-Z]+_\d{2}_[A-Z]{2}$", id_str))
+            formato_novo = bool(re.match(r"^BNF_[A-Z]+_[A-Z0-9]{8}_[A-Z]{2}$", id_str))
+            return formato_antigo or formato_novo
 
         return False
 

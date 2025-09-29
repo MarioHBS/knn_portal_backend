@@ -27,6 +27,7 @@
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
+    "editor.fontSize": 12,
     "workbench.colorTheme": "Visual Studio Dark",
     // "workbench.preferredDarkColorTheme": "Orange Theme",
     "explorer.fileNesting.enabled": true,

@@ -16,6 +16,7 @@ from src.models import (
     EntityResponse,
     MetricsResponse,
     NotificationRequest,
+    Partner,
     PartnerDetail,
     PartnerDetailResponse,
     PartnerListResponse,
@@ -57,8 +58,8 @@ async def list_partners(
             ord=ord,
             limit=limit,
             offset=offset,
-            use_circuit_breaker=False,  # Desabilitado para usar apenas Firestore
-            enable_ordering=True,  # Habilitado após criação do índice composto
+            use_circuit_breaker=True,  # Habilitado para administradores
+            enable_ordering=True,  # Habilitado para administradores
         )
 
     except Exception as e:

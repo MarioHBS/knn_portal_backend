@@ -90,6 +90,7 @@ class JWTPayload(BaseModel):
         iss: Issuer - Identificador do emissor do token (opcional)
         aud: Audience - Audiência pretendida do token, pode ser string ou lista (opcional)
         name: Nome do usuário (opcional)
+        entity_id: ID da entidade associada ao usuário
     """
 
     sub: str
@@ -100,6 +101,7 @@ class JWTPayload(BaseModel):
     iss: str | None = None
     aud: str | list[str] | None = None
     name: str | None = None
+    entity_id: str | None = None
 
 
 async def verify_firebase_token(token: str) -> JWTPayload:

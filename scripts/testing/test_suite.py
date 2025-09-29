@@ -9,7 +9,7 @@ from pathlib import Path
 
 import requests
 
-from src.models.promotion import Promotion
+from src.models.benefit import Benefit
 from src.utils.logging import logger
 
 # Adicionar o diretório raiz ao path para imports
@@ -40,7 +40,7 @@ class TestSuite:
 
         # Teste 1: Audience válido
         try:
-            Promotion(
+            Benefit(
                 id="test_promo_1",
                 title="Promoção Teste",
                 description="Descrição teste",
@@ -53,7 +53,7 @@ class TestSuite:
 
         # Teste 2: Audience inválido
         try:
-            Promotion(
+            Benefit(
                 id="test_promo_2",
                 title="Promoção Teste",
                 description="Descrição teste",

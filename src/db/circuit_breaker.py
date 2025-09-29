@@ -79,6 +79,9 @@ async def with_circuit_breaker(
     Returns:
         Resultado da função
     """
+    # Importar aqui para evitar circular imports
+    from src.config import POSTGRES_ENABLED
+
     if circuit_breaker.can_execute():
         try:
             # Tentar Firestore
@@ -93,6 +96,11 @@ async def with_circuit_breaker(
             )
     else:
         logger.info("Circuit breaker aberto, usando PostgreSQL diretamente")
+
+    # Verificar se PostgreSQL está habilitado
+    if not POSTGRES_ENABLED:
+        logger.warning("PostgreSQL desabilitado, retornando dados vazios")
+        return {"data": [], "total": 0, "limit": 0, "offset": 0}
 
     # Fallback para PostgreSQL
     try:

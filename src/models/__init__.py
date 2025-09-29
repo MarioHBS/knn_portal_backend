@@ -1,15 +1,50 @@
-"""
-Modelos de dados para o Portal de Benefícios KNN.
-"""
+"""Modelos de dados para o Portal de Benefícios KNN."""
 
 import uuid
 from datetime import date, datetime
-from typing import Any
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from src.models.favorites import FavoriteRequest, FavoriteResponse
 from src.utils.id_generators import IDGenerators
+
+from .benefit import (
+    Benefit,
+    BenefitListResponse,
+    BenefitRequest,
+    BenefitResponse,
+)
+from .favorites import EmployeeFavorites, StudentFavorites
+from .partner import (
+    Partner,
+    PartnerAddress,
+    PartnerCategory,
+    PartnerContact,
+    PartnerGeolocation,
+    PartnerSocialNetworks,
+)
+
+__all__ = [
+    "Benefit",
+    "BenefitListResponse", 
+    "BenefitRequest",
+    "BenefitResponse",
+    "EmployeeFavorites",
+    "StudentFavorites",
+    "Partner",
+    "PartnerAddress",
+    "PartnerCategory",
+    "PartnerContact",
+    "PartnerGeolocation",
+    "PartnerSocialNetworks",
+    "FavoriteRequest",
+    "FavoriteResponse",
+    "BaseResponse",
+    "ErrorResponse",
+    "COURSES_MAP",
+    "get_course_by_name",
+    "get_course_by_code",
+]
 
 
 # Modelos base
@@ -113,78 +148,6 @@ class Employee(BaseModel):
         orm_mode = True
 
 
-class Partner(BaseModel):
-    """Modelo para parceiros - flexível para aceitar dados do Firestore."""
-
-    # Campos obrigatórios mínimos
-    id: str = Field(default="")
-    name: str = Field(default="")
-    category: str = Field(default="")
-    active: bool = Field(default=True)
-
-    # Campos opcionais comuns
-    tenant_id: str | None = None
-    cnpj_hash: str | None = None
-    cnpj: str | None = None
-    trade_name: str | None = None
-    address: Any = None  # Pode ser string, dict ou None
-    benefit: str | None = None
-    logo_url: str | None = None
-    contact: dict | None = None
-    social_networks: dict | None = None
-    maps: dict | None = None
-    created_at: Any = None
-    updated_at: Any = None
-    logo_updated_at: Any = None
-
-    class Config:
-        from_attributes = True
-        extra = "allow"  # Permite campos extras do Firestore
-
-
-class Promotion(BaseModel):
-    """Modelo para promoções."""
-
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    tenant_id: str
-    partner_id: str
-    title: str
-    type: str
-    valid_from: datetime
-    valid_to: datetime
-    active: bool = True
-    audience: list[str] = Field(
-        default=["student", "employee"],
-        description="Público-alvo: lista com 'student' e/ou 'employee'",
-    )
-
-    @validator("audience")
-    @classmethod
-    def validate_audience(cls, v):
-        if not isinstance(v, list) or not v:
-            raise ValueError("audience deve ser uma lista não vazia")
-
-        valid_values = {"student", "employee"}
-        for item in v:
-            if item not in valid_values:
-                raise ValueError(
-                    'audience deve conter apenas "student" e/ou "employee"'
-                )
-
-        # Remove duplicatas mantendo a ordem
-        seen = set()
-        unique_audience = []
-        for item in v:
-            if item not in seen:
-                seen.add(item)
-                unique_audience.append(item)
-
-        return unique_audience
-
-    class Config:
-        orm_mode = True
-
-
 class ValidationCode(BaseModel):
     """Modelo para códigos de validação."""
 
@@ -225,14 +188,14 @@ class RedeemRequest(BaseModel):
     code: str
     cnpj: str
 
-    @validator("code")
+    @field_validator("code")
     @classmethod
     def validate_code(cls, v):
         if not v.isdigit() or len(v) != 6:
             raise ValueError("Código deve conter 6 dígitos numéricos")
         return v
 
-    @validator("cnpj")
+    @field_validator("cnpj")
     @classmethod
     def validate_cnpj(cls, v):
         if not v.isdigit() or len(v) != 14:
@@ -240,9 +203,13 @@ class RedeemRequest(BaseModel):
         return v
 
 
-class PromotionRequest(BaseModel):
-    """Modelo para requisição de criação/atualização de promoção."""
+# Modelo legado - manter para compatibilidade temporária
+class Promotion(BaseModel):
+    """Modelo legado - usar Benefit ao invés desta classe."""
 
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tenant_id: str
+    partner_id: str
     title: str
     type: str
     valid_from: datetime
@@ -252,8 +219,20 @@ class PromotionRequest(BaseModel):
         default=["student", "employee"],
         description="Público-alvo: lista com 'student' e/ou 'employee'",
     )
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
 
-    @validator("audience")
+    def __init__(self, **data):
+        import warnings
+
+        warnings.warn(
+            "Promotion está depreciado. Use Benefit ao invés desta classe.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(**data)
+
+    @field_validator("audience")
     @classmethod
     def validate_audience(cls, v):
         if not isinstance(v, list) or not v:
@@ -276,6 +255,62 @@ class PromotionRequest(BaseModel):
 
         return unique_audience
 
+    @field_validator("valid_to")
+    @classmethod
+    def validate_dates(cls, v, values):
+        """Valida se a data de término é posterior à data de início."""
+        if "valid_from" in values and v <= values["valid_from"]:
+            raise ValueError("Data de término deve ser posterior à data de início")
+        return v
+
+    class Config:
+        orm_mode = True
+
+
+class PromotionRequest(BaseModel):
+    """Modelo para requisição de criação/atualização de promoção."""
+
+    title: str
+    type: str
+    valid_from: datetime
+    valid_to: datetime
+    active: bool = True
+    audience: list[str] = Field(
+        default=["student", "employee"],
+        description="Público-alvo: lista com 'student' e/ou 'employee'",
+    )
+
+    @field_validator("audience")
+    @classmethod
+    def validate_audience(cls, v):
+        if not isinstance(v, list) or not v:
+            raise ValueError("audience deve ser uma lista não vazia")
+
+        valid_values = {"student", "employee"}
+        for item in v:
+            if item not in valid_values:
+                raise ValueError(
+                    'audience deve conter apenas "student" e/ou "employee"'
+                )
+
+        # Remove duplicatas mantendo a ordem
+        seen = set()
+        unique_audience = []
+        for item in v:
+            if item not in seen:
+                seen.add(item)
+                unique_audience.append(item)
+
+        return unique_audience
+
+    @field_validator("valid_to")
+    @classmethod
+    def validate_dates(cls, v, values):
+        """Valida se a data de término é posterior à data de início."""
+        if "valid_from" in values and v <= values["valid_from"]:
+            raise ValueError("Data de término deve ser posterior à data de início")
+        return v
+
 
 class NotificationRequest(BaseModel):
     """Modelo para requisição de envio de notificações."""
@@ -285,14 +320,14 @@ class NotificationRequest(BaseModel):
     message: str
     type: str = "both"
 
-    @validator("target")
+    @field_validator("target")
     @classmethod
     def validate_target(cls, v):
         if v not in ["students", "partners"]:
             raise ValueError('Target deve ser "students" ou "partners"')
         return v
 
-    @validator("type")
+    @field_validator("type")
     @classmethod
     def validate_type(cls, v):
         if v not in ["email", "push", "both"]:
@@ -327,18 +362,6 @@ class ValidationCodeResponse(BaseResponse):
 
 class RedeemResponse(BaseResponse):
     """Modelo para resposta de resgate de código."""
-
-    data: dict
-
-
-class PromotionResponse(BaseResponse):
-    """Modelo para resposta de criação/atualização de promoção."""
-
-    data: Promotion
-
-
-class PromotionListResponse(BaseResponse):
-    """Modelo para resposta de listagem de promoções."""
 
     data: dict
 
@@ -392,26 +415,59 @@ __all__ = [
     "ErrorResponse",
     # Modelos de entidades
     "Partner",
+    "PartnerAddress",
+    "PartnerSocialNetworks",
+    "PartnerGeolocation",
+    "PartnerContact",
+    "PartnerCategory",
+    "Benefit",
+    "BenefitConfiguration",
+    "BenefitLimits",
+    "BenefitDates",
+    "BenefitSystem",
+    "BenefitMetadata",
+    "BenefitRestrictions",
+    "BenefitUsageLimits",
+    "BenefitCooldownPeriod",
+    "BenefitValidHours",
+    "BenefitTemporalLimits",
+    "BenefitFinancialLimits",
+    "FirestoreTimestamp",
+    "BenefitValueType",
+    "BenefitCalculationMethod",
+    "BenefitRequirement",
+    "BenefitStatus",
+    "BenefitType",
+    "BenefitAudience",
+    "BenefitCategory",
+    "WeekDay",
+    "StudentFavorites",
+    "EmployeeFavorites",
+    "FavoriteRequest",
+    "FavoriteResponse",
     "Student",
     "Employee",
-    "User",
-    "Tenant",
-    "Course",
-    "Benefit",
     "ValidationCode",
+    "Redemption",
+    "Promotion",
+    "PromotionRequest",
     # Modelos de resposta
-    "PartnersResponse",
-    "StudentsResponse",
-    "EmployeesResponse",
-    "UsersResponse",
-    "TenantsResponse",
-    "CoursesResponse",
-    "BenefitsResponse",
-    "ValidationCodesResponse",
+    "PartnerDetail",
+    "PartnerListResponse",
+    "PartnerDetailResponse",
+    "ValidationCodeResponse",
+    "RedeemResponse",
+    "BenefitResponse",
+    "BenefitListResponse",
+    "ReportResponse",
+    "MetricsResponse",
+    "NotificationResponse",
+    "HistoryResponse",
     "FavoritesResponse",
     "EntityResponse",
     "EntityListResponse",
-    # Modelos de favoritos
-    "FavoriteRequest",
-    "FavoriteResponse",
+    # Funções utilitárias
+    "get_course_by_name",
+    "get_course_by_code",
+    "get_all_courses",
 ]

@@ -8,7 +8,7 @@ administrativos para validação de entrada e formatação de resposta.
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from src.models import BaseResponse
 
@@ -49,7 +49,7 @@ class NotificationRequest(BaseModel):
     target_audience: list[str] = Field(..., description="Público-alvo da notificação")
     priority: str = Field("normal", description="Prioridade da notificação")
 
-    @validator("priority")
+    @field_validator("priority")
     def validate_priority(self, cls, v):
         """Valida a prioridade da notificação."""
         allowed_priorities = ["low", "normal", "high", "urgent"]

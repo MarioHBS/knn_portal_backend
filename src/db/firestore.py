@@ -324,6 +324,33 @@ class FirestoreClient:
             raise
 
     @staticmethod
+    async def delete_field(collection: str, doc_id: str, field_name: str) -> bool:
+        """
+        Remove um campo específico de um documento no Firestore.
+
+        Args:
+            collection: Nome da coleção
+            doc_id: ID do documento
+            field_name: Nome do campo a ser removido
+
+        Returns:
+            bool: True se a operação foi bem-sucedida
+        """
+        if not db:
+            logger.error("Firestore não inicializado")
+            return False
+
+        try:
+            doc_ref = db.collection(collection).document(doc_id)
+            doc_ref.update({field_name: firestore.DELETE_FIELD})
+            return True
+        except Exception as e:
+            logger.error(
+                f"Erro ao remover campo {field_name} do documento {collection}/{doc_id}: {str(e)}"
+            )
+            raise
+
+    @staticmethod
     async def batch_operation(operations: list[dict[str, Any]]) -> bool:
         """
         Executa operações em lote no Firestore.

@@ -463,6 +463,101 @@ def toggle_firestore_failure_mode():
     )
 
 
+class MockStorageClient:
+    """
+    Simulação do Firebase Storage para testes locais.
+    """
+
+    def __init__(self):
+        self.buckets = {}
+
+    def bucket(self, bucket_name="knn-benefits.firebasestorage.app"):
+        """Retorna um mock bucket."""
+        if bucket_name not in self.buckets:
+            self.buckets[bucket_name] = MockBucket(bucket_name)
+        return self.buckets[bucket_name]
+
+
+class MockBucket:
+    """
+    Simulação de um bucket do Firebase Storage.
+    """
+
+    def __init__(self, name):
+        self.name = name
+        self.blobs = {}
+
+    def blob(self, blob_name):
+        """Retorna um mock blob."""
+        if blob_name not in self.blobs:
+            self.blobs[blob_name] = MockBlob(blob_name, self)
+        return self.blobs[blob_name]
+
+    def list_blobs(self, prefix=None):
+        """Lista blobs com prefixo opcional."""
+        if prefix:
+            return [blob for name, blob in self.blobs.items() if name.startswith(prefix)]
+        return list(self.blobs.values())
+
+
+class MockBlob:
+    """
+    Simulação de um blob do Firebase Storage.
+    """
+
+    def __init__(self, name, bucket):
+        self.name = name
+        self.bucket = bucket
+        self.exists_flag = False
+        self.content = b""
+        self.content_type = "application/octet-stream"
+
+    def exists(self):
+        """Verifica se o blob existe."""
+        return self.exists_flag
+
+    def upload_from_file(self, file_obj, content_type=None):
+        """Simula upload de arquivo."""
+        self.content = file_obj.read()
+        if content_type:
+            self.content_type = content_type
+        self.exists_flag = True
+        print(f"Mock upload: {self.name} ({len(self.content)} bytes)")
+
+    def upload_from_string(self, data, content_type=None):
+        """Simula upload de string."""
+        if isinstance(data, str):
+            self.content = data.encode()
+        else:
+            self.content = data
+        if content_type:
+            self.content_type = content_type
+        self.exists_flag = True
+        print(f"Mock upload: {self.name} ({len(self.content)} bytes)")
+
+    def delete(self):
+        """Simula exclusão do blob."""
+        self.exists_flag = False
+        self.content = b""
+        print(f"Mock delete: {self.name}")
+
+    def make_public(self):
+        """Simula tornar o blob público."""
+        print(f"Mock make_public: {self.name}")
+
+    @property
+    def public_url(self):
+        """Retorna URL pública simulada."""
+        return f"https://storage.googleapis.com/{self.bucket.name}/{self.name}"
+
+
+# Instâncias globais
+mock_firestore = MockFirestore()
+mock_postgres = MockPostgres()
+mock_circuit_breaker = MockCircuitBreaker()
+mock_storage_client = MockStorageClient()
+
+
 if __name__ == "__main__":
     print("Módulo de simulação de banco de dados para testes locais.")
     print(
