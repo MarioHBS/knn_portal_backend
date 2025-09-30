@@ -1,0 +1,2612 @@
+components:
+  schemas:
+    BaseResponse:
+      description: Modelo base para respostas da API.
+      properties:
+        msg:
+          default: ok
+          title: Msg
+          type: string
+      title: BaseResponse
+      type: object
+    Benefit:
+      description: Modelo principal do Benefício.
+      properties:
+        active:
+          default: true
+          title: Active
+          type: boolean
+        audience:
+          description: 'Público-alvo: lista com ''student'' e/ou ''employee'''
+          items:
+            type: string
+          title: Audience
+          type: array
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          title: Id
+          type: string
+        partner_id:
+          title: Partner Id
+          type: string
+        tags:
+          items:
+            type: string
+          title: Tags
+          type: array
+        tenant_id:
+          title: Tenant Id
+          type: string
+        title:
+          title: Title
+          type: string
+        type:
+          title: Type
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+        valid_from:
+          format: date-time
+          title: Valid From
+          type: string
+        valid_to:
+          format: date-time
+          title: Valid To
+          type: string
+        value:
+          title: Value
+          type: integer
+        value_type:
+          default: percentage
+          description: percentage | fixed
+          title: Value Type
+          type: string
+      required:
+      - tenant_id
+      - partner_id
+      - title
+      - value
+      - type
+      - valid_from
+      - valid_to
+      title: Benefit
+      type: object
+    BenefitRequest:
+      description: 'Modelo para requisições de criação/atualização de benefícios.
+
+
+        Usado nos endpoints da API para receber dados de benefícios
+
+        dos parceiros com validações apropriadas.'
+      properties:
+        active:
+          default: true
+          title: Active
+          type: boolean
+        audience:
+          default:
+          - all
+          - employee
+          - student
+          description: 'Público-alvo: lista com ''student'' e/ou ''employee'''
+          items:
+            type: string
+          title: Audience
+          type: array
+        title:
+          title: Title
+          type: string
+        type:
+          title: Type
+          type: string
+        valid_from:
+          format: date-time
+          title: Valid From
+          type: string
+        valid_to:
+          format: date-time
+          title: Valid To
+          type: string
+      required:
+      - title
+      - type
+      - valid_from
+      - valid_to
+      title: BenefitRequest
+      type: object
+    BenefitResponse:
+      description: 'Modelo para respostas da API contendo dados de benefícios.
+
+
+        Usado para retornar dados de benefícios nos endpoints da API
+
+        com formatação apropriada para o frontend.'
+      properties:
+        data:
+          $ref: '#/components/schemas/Benefit'
+        msg:
+          default: ok
+          title: Msg
+          type: string
+      required:
+      - data
+      title: BenefitResponse
+      type: object
+    Body_upload_partner_logo_v1_sync_sync_upload_post:
+      properties:
+        category:
+          description: Categoria do parceiro (EDU, SAU, etc.)
+          title: Category
+          type: string
+        file:
+          description: Arquivo de logo
+          format: binary
+          title: File
+          type: string
+        overwrite:
+          default: false
+          description: Sobrescrever arquivo existente
+          title: Overwrite
+          type: boolean
+        partner_id:
+          description: ID do parceiro
+          title: Partner Id
+          type: string
+      required:
+      - partner_id
+      - category
+      - file
+      title: Body_upload_partner_logo_v1_sync_sync_upload_post
+      type: object
+    EntityListResponse:
+      description: Modelo para resposta de listagem de entidades.
+      properties:
+        data:
+          title: Data
+          type: object
+        msg:
+          default: ok
+          title: Msg
+          type: string
+      required:
+      - data
+      title: EntityListResponse
+      type: object
+    EntityResponse:
+      description: Modelo para resposta de entidade.
+      properties:
+        data:
+          title: Data
+          type: object
+      required:
+      - data
+      title: EntityResponse
+      type: object
+    FavoriteRequest:
+      description: Modelo para requisições de adição/remoção de favoritos.
+      properties:
+        partner_id:
+          description: ID do parceiro a ser adicionado/removido dos favoritos
+          title: Partner Id
+          type: string
+      required:
+      - partner_id
+      title: FavoriteRequest
+      type: object
+    FavoriteResponse:
+      description: Modelo para respostas de operações de favoritos.
+      properties:
+        favorites_count:
+          default: 0
+          description: Número total de favoritos após a operação
+          title: Favorites Count
+          type: integer
+        message:
+          description: Mensagem descritiva da operação
+          title: Message
+          type: string
+        success:
+          description: Indica se a operação foi bem-sucedida
+          title: Success
+          type: boolean
+      required:
+      - success
+      - message
+      title: FavoriteResponse
+      type: object
+    FavoritesResponse:
+      description: Modelo para resposta de favoritos.
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/Partner'
+          title: Data
+          type: array
+        msg:
+          default: ok
+          title: Msg
+          type: string
+      required:
+      - data
+      title: FavoritesResponse
+      type: object
+    FirebaseLoginRequest:
+      description: Modelo para requisição de login com token Firebase.
+      properties:
+        firebase_token:
+          title: Firebase Token
+          type: string
+        role:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Role
+      required:
+      - firebase_token
+      title: FirebaseLoginRequest
+      type: object
+    FirebaseTokenRequest:
+      description: Modelo para requisição de teste de token Firebase.
+      properties:
+        token:
+          title: Token
+          type: string
+      required:
+      - token
+      title: FirebaseTokenRequest
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    LoginRequest:
+      description: Modelo para requisição de login com credenciais.
+      properties:
+        password:
+          title: Password
+          type: string
+        role:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: student
+          title: Role
+        username:
+          title: Username
+          type: string
+      required:
+      - username
+      - password
+      title: LoginRequest
+      type: object
+    LoginResponse:
+      description: Modelo para resposta de login.
+      properties:
+        access_token:
+          title: Access Token
+          type: string
+        expires_in:
+          default: 86400
+          title: Expires In
+          type: integer
+        token_type:
+          default: bearer
+          title: Token Type
+          type: string
+        user_info:
+          title: User Info
+          type: object
+      required:
+      - access_token
+      - user_info
+      title: LoginResponse
+      type: object
+    MetricsResponse:
+      description: Modelo para resposta de métricas.
+      properties:
+        data:
+          title: Data
+          type: object
+        msg:
+          default: ok
+          title: Msg
+          type: string
+      required:
+      - data
+      title: MetricsResponse
+      type: object
+    NotificationRequest:
+      description: Modelo para requisição de envio de notificações.
+      properties:
+        filter:
+          default: {}
+          title: Filter
+          type: object
+        message:
+          title: Message
+          type: string
+        target:
+          title: Target
+          type: string
+        type:
+          default: both
+          title: Type
+          type: string
+      required:
+      - target
+      - message
+      title: NotificationRequest
+      type: object
+    Partner:
+      description: 'Modelo principal do Parceiro.
+
+
+        Representa um parceiro do sistema KNN Benefits com todas as suas
+
+        informações de contato, endereço, categoria e configurações.'
+      properties:
+        active:
+          default: true
+          description: Status ativo/inativo do parceiro
+          title: Active
+          type: boolean
+        address:
+          anyOf:
+          - $ref: '#/components/schemas/PartnerAddress'
+          - type: 'null'
+          description: Endereço do parceiro
+        benefits_count:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          default: 0
+          description: Número total de benefícios oferecidos
+          title: Benefits Count
+        category:
+          $ref: '#/components/schemas/PartnerCategory'
+          description: Categoria do parceiro
+        cnpj:
+          description: CNPJ do parceiro no formato XX.XXX.XXX/XXXX-XX
+          title: Cnpj
+          type: string
+        contact:
+          $ref: '#/components/schemas/PartnerContact'
+          description: Informações de contato do parceiro
+        created_at:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: Data de criação
+          title: Created At
+        geolocation:
+          $ref: '#/components/schemas/PartnerGeolocation'
+          description: Links de geolocalização
+        has_active_benefits:
+          default: false
+          description: Indica se o parceiro possui benefícios ativos
+          title: Has Active Benefits
+          type: boolean
+        id:
+          description: ID único do parceiro no formato PTN_XXXXXXX_XXX
+          title: Id
+          type: string
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: URL do logo do parceiro no Firebase Storage
+          title: Logo Url
+        social_networks:
+          $ref: '#/components/schemas/PartnerSocialNetworks'
+          description: Redes sociais do parceiro
+        tenant_id:
+          description: ID do tenant do parceiro
+          maxLength: 30
+          minLength: 1
+          title: Tenant Id
+          type: string
+        trade_name:
+          description: Nome comercial do parceiro
+          maxLength: 50
+          minLength: 1
+          title: Trade Name
+          type: string
+        updated_at:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: Data de última atualização
+          title: Updated At
+      required:
+      - id
+      - trade_name
+      - tenant_id
+      - cnpj
+      - social_networks
+      - geolocation
+      - category
+      - contact
+      title: Partner
+      type: object
+    PartnerAddress:
+      description: Modelo para endereço do parceiro.
+      properties:
+        city:
+          anyOf:
+          - maxLength: 100
+            type: string
+          - type: 'null'
+          description: Nome da cidade
+          title: City
+        neighborhood:
+          anyOf:
+          - maxLength: 100
+            type: string
+          - type: 'null'
+          description: Nome do bairro
+          title: Neighborhood
+        state:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Sigla do estado (UF)
+          title: State
+        street:
+          anyOf:
+          - maxLength: 255
+            type: string
+          - type: 'null'
+          description: Nome da rua/logradouro
+          title: Street
+        zip:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: CEP no formato XXXXX-XXX
+          title: Zip
+      title: PartnerAddress
+      type: object
+    PartnerCategory:
+      description: Categorias disponíveis para parceiros.
+      enum:
+      - Automotivo
+      - Educação
+      - Tecnologia
+      - Alimentação
+      - Entretenimento
+      - Varejo
+      - Serviços
+      - Papelaria
+      - Esporte
+      - Saúde e Bem-estar
+      - Turismo e Viagem
+      - Moda
+      - Outros
+      title: PartnerCategory
+      type: string
+    PartnerContact:
+      description: Modelo para informações de contato do parceiro.
+      properties:
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Endereço de email
+          title: Email
+        phone:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Número de telefone
+          title: Phone
+        whatsapp:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Número do WhatsApp
+          title: Whatsapp
+      title: PartnerContact
+      type: object
+    PartnerDetail:
+      description: Modelo para detalhes de parceiro com promoções.
+      properties:
+        active:
+          default: true
+          description: Status ativo/inativo do parceiro
+          title: Active
+          type: boolean
+        address:
+          anyOf:
+          - $ref: '#/components/schemas/PartnerAddress'
+          - type: 'null'
+          description: Endereço do parceiro
+        benefits_count:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          default: 0
+          description: Número total de benefícios oferecidos
+          title: Benefits Count
+        category:
+          $ref: '#/components/schemas/PartnerCategory'
+          description: Categoria do parceiro
+        cnpj:
+          description: CNPJ do parceiro no formato XX.XXX.XXX/XXXX-XX
+          title: Cnpj
+          type: string
+        contact:
+          $ref: '#/components/schemas/PartnerContact'
+          description: Informações de contato do parceiro
+        created_at:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: Data de criação
+          title: Created At
+        geolocation:
+          $ref: '#/components/schemas/PartnerGeolocation'
+          description: Links de geolocalização
+        has_active_benefits:
+          default: false
+          description: Indica se o parceiro possui benefícios ativos
+          title: Has Active Benefits
+          type: boolean
+        id:
+          description: ID único do parceiro no formato PTN_XXXXXXX_XXX
+          title: Id
+          type: string
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: URL do logo do parceiro no Firebase Storage
+          title: Logo Url
+        promotions:
+          default: []
+          items:
+            $ref: '#/components/schemas/Promotion'
+          title: Promotions
+          type: array
+        social_networks:
+          $ref: '#/components/schemas/PartnerSocialNetworks'
+          description: Redes sociais do parceiro
+        tenant_id:
+          description: ID do tenant do parceiro
+          maxLength: 30
+          minLength: 1
+          title: Tenant Id
+          type: string
+        trade_name:
+          description: Nome comercial do parceiro
+          maxLength: 50
+          minLength: 1
+          title: Trade Name
+          type: string
+        updated_at:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: Data de última atualização
+          title: Updated At
+      required:
+      - id
+      - trade_name
+      - tenant_id
+      - cnpj
+      - social_networks
+      - geolocation
+      - category
+      - contact
+      title: PartnerDetail
+      type: object
+    PartnerDetailResponse:
+      description: Modelo para resposta de detalhes de parceiro.
+      properties:
+        data:
+          $ref: '#/components/schemas/PartnerDetail'
+        msg:
+          default: ok
+          title: Msg
+          type: string
+      required:
+      - data
+      title: PartnerDetailResponse
+      type: object
+    PartnerGeolocation:
+      description: Modelo para links de geolocalização.
+      properties:
+        google:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: URL do Google Maps
+          title: Google
+        waze:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: URL do Waze
+          title: Waze
+      title: PartnerGeolocation
+      type: object
+    PartnerListResponse:
+      description: Modelo para resposta de listagem de parceiros.
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/Partner'
+          title: Data
+          type: array
+        msg:
+          default: ok
+          title: Msg
+          type: string
+      required:
+      - data
+      title: PartnerListResponse
+      type: object
+    PartnerSocialNetworks:
+      description: Modelo para redes sociais do parceiro.
+      properties:
+        facebook:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: URL da página do Facebook
+          title: Facebook
+        instagram:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: URL ou handle do Instagram
+          title: Instagram
+        website:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: URL do site oficial
+          title: Website
+      title: PartnerSocialNetworks
+      type: object
+    Promotion:
+      description: Modelo legado - usar Benefit ao invés desta classe.
+      properties:
+        active:
+          default: true
+          title: Active
+          type: boolean
+        audience:
+          default:
+          - student
+          - employee
+          description: 'Público-alvo: lista com ''student'' e/ou ''employee'''
+          items:
+            type: string
+          title: Audience
+          type: array
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          title: Id
+          type: string
+        partner_id:
+          title: Partner Id
+          type: string
+        tenant_id:
+          title: Tenant Id
+          type: string
+        title:
+          title: Title
+          type: string
+        type:
+          title: Type
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+        valid_from:
+          format: date-time
+          title: Valid From
+          type: string
+        valid_to:
+          format: date-time
+          title: Valid To
+          type: string
+      required:
+      - tenant_id
+      - partner_id
+      - title
+      - type
+      - valid_from
+      - valid_to
+      title: Promotion
+      type: object
+    RedeemResponse:
+      description: Modelo para resposta de resgate de código.
+      properties:
+        data:
+          title: Data
+          type: object
+        msg:
+          default: ok
+          title: Msg
+          type: string
+      required:
+      - data
+      title: RedeemResponse
+      type: object
+    ReportResponse:
+      description: Modelo para resposta de relatório.
+      properties:
+        data:
+          title: Data
+          type: object
+        msg:
+          default: ok
+          title: Msg
+          type: string
+      required:
+      - data
+      title: ReportResponse
+      type: object
+    TokenValidationResponse:
+      description: Modelo para resposta de validação de token.
+      properties:
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+        payload:
+          anyOf:
+          - type: object
+          - type: 'null'
+          title: Payload
+        valid:
+          title: Valid
+          type: boolean
+      required:
+      - valid
+      title: TokenValidationResponse
+      type: object
+    ValidationCodeCreationRequest:
+      description: DTO for creating a validation code.
+      properties:
+        partner_id:
+          description: ID of the partner for which the code is being generated.
+          title: Partner Id
+          type: string
+      required:
+      - partner_id
+      title: ValidationCodeCreationRequest
+      type: object
+    ValidationCodeRedeemRequest:
+      description: DTO para a requisição de resgate de um código de validação.
+      properties:
+        cnpj:
+          description: CNPJ do parceiro que está resgatando o código.
+          title: Cnpj
+          type: string
+        code:
+          description: Código de validação de 6 dígitos.
+          title: Code
+          type: string
+      required:
+      - code
+      - cnpj
+      title: ValidationCodeRedeemRequest
+      type: object
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+  securitySchemes:
+    HTTPBearer:
+      scheme: bearer
+      type: http
+info:
+  description: API para o Portal de Benefícios KNN, permitindo que alunos da KNN Idiomas
+    acessem promoções exclusivas de parceiros comerciais.
+  title: Portal de Benefícios KNN API
+  version: v1
+openapi: 3.1.0
+paths:
+  /:
+    get:
+      description: Endpoint raiz da API.
+      operationId: root__get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      summary: Root
+  /health:
+    get:
+      description: Endpoint de verificação de saúde da API.
+      operationId: health_check_health_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      summary: Health Check
+  /v1/admin/benefits:
+    get:
+      description: 'Lista todos os benefícios do sistema com filtros e paginação.
+
+
+        Endpoint específico para administradores com as seguintes características:
+
+        - Lista benefícios de todos os parceiros
+
+        - Inclui partner_id na resposta para filtragem na tela
+
+        - Suporte a filtros por parceiro, categoria e status
+
+        - Paginação para performance
+
+        - Circuit breaker para alta disponibilidade'
+      operationId: list_all_benefits_v1_admin_benefits_get
+      parameters:
+      - description: Filtro por ID do parceiro
+        in: query
+        name: partner_id
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filtro por ID do parceiro
+          title: Partner Id
+      - description: Filtro por categoria
+        in: query
+        name: category
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filtro por categoria
+          title: Category
+      - description: Filtro por status
+        in: query
+        name: status
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filtro por status
+          enum:
+          - active
+          - inactive
+          - expired
+          title: Status
+      - description: Número máximo de itens por página
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 20
+          description: Número máximo de itens por página
+          maximum: 100
+          minimum: 1
+          title: Limit
+          type: integer
+      - description: Offset para paginação
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          description: Offset para paginação
+          minimum: 0
+          title: Offset
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityListResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: List All Benefits
+      tags:
+      - Admin
+      - admin
+    post:
+      description: 'Cria um novo benefício para um parceiro específico.
+
+        Segue a estrutura do Firestore onde benefícios são agrupados por parceiro.'
+      operationId: create_benefit_v1_admin_benefits_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Dados do benefício
+              title: Data
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Create Benefit
+      tags:
+      - Admin
+      - admin
+  /v1/admin/benefits/{partner_id}/{benefit_id}:
+    delete:
+      description: 'Remove um benefício específico de um parceiro.
+
+
+        Endpoint para administradores removerem benefícios de qualquer parceiro.
+
+        Por padrão, realiza hard delete (remoção completa). Use soft_delete=true para
+        manter o benefício marcado como inativo.'
+      operationId: delete_benefit_v1_admin_benefits__partner_id___benefit_id__delete
+      parameters:
+      - description: ID do parceiro
+        in: path
+        name: partner_id
+        required: true
+        schema:
+          description: ID do parceiro
+          title: Partner Id
+          type: string
+      - description: ID do benefício
+        in: path
+        name: benefit_id
+        required: true
+        schema:
+          description: ID do benefício
+          title: Benefit Id
+          type: string
+      - description: 'Usar soft delete (padrão: False - Hard Delete)'
+        in: query
+        name: soft_delete
+        required: false
+        schema:
+          default: false
+          description: 'Usar soft delete (padrão: False - Hard Delete)'
+          title: Soft Delete
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Delete Benefit
+      tags:
+      - Admin
+      - admin
+    get:
+      description: 'Obtém detalhes de um benefício específico.
+
+
+        Endpoint para administradores visualizarem benefícios específicos
+
+        de qualquer parceiro do sistema.'
+      operationId: get_benefit_details_v1_admin_benefits__partner_id___benefit_id__get
+      parameters:
+      - description: ID do parceiro
+        in: path
+        name: partner_id
+        required: true
+        schema:
+          description: ID do parceiro
+          title: Partner Id
+          type: string
+      - description: ID do benefício
+        in: path
+        name: benefit_id
+        required: true
+        schema:
+          description: ID do benefício
+          title: Benefit Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Get Benefit Details
+      tags:
+      - Admin
+      - admin
+    put:
+      description: 'Atualiza um benefício específico de um parceiro.
+
+
+        Endpoint para administradores atualizarem benefícios de qualquer parceiro,
+
+        seguindo a nova estrutura com partner_id e benefit_id na URL.'
+      operationId: update_benefit_v1_admin_benefits__partner_id___benefit_id__put
+      parameters:
+      - description: ID do parceiro
+        in: path
+        name: partner_id
+        required: true
+        schema:
+          description: ID do parceiro
+          title: Partner Id
+          type: string
+      - description: ID do benefício
+        in: path
+        name: benefit_id
+        required: true
+        schema:
+          description: ID do benefício
+          title: Benefit Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenefitRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Update Benefit
+      tags:
+      - Admin
+      - admin
+  /v1/admin/employees:
+    get:
+      description: Lista todos os funcionários.
+      operationId: list_employees_v1_admin_employees_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityListResponse'
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: List Employees
+      tags:
+      - Admin
+      - admin
+    post:
+      description: Cria um novo funcionário.
+      operationId: create_employee_v1_admin_employees_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Dados do funcionário
+              title: Data
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Create Employee
+      tags:
+      - Admin
+      - admin
+  /v1/admin/metrics:
+    get:
+      description: Retorna métricas e KPIs do sistema.
+      operationId: get_metrics_v1_admin_metrics_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsResponse'
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Get Metrics
+      tags:
+      - Admin
+      - admin
+  /v1/admin/notifications:
+    post:
+      description: Envia notificações push/e-mail para alunos ou parceiros.
+      operationId: send_notifications_v1_admin_notifications_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Send Notifications
+      tags:
+      - Admin
+      - admin
+  /v1/admin/partners:
+    get:
+      description: 'Lista parceiros com filtros e paginação.
+
+
+        Endpoint específico para administradores com as seguintes características:
+
+        - Utiliza circuit breaker para alta disponibilidade
+
+        - Ordenação habilitada por padrão
+
+        - Acesso a todos os parceiros (ativos e inativos)'
+      operationId: list_partners_v1_admin_partners_get
+      parameters:
+      - description: Filtro por categoria
+        in: query
+        name: cat
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filtro por categoria
+          title: Cat
+      - description: Ordenação dos resultados
+        in: query
+        name: ord
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Ordenação dos resultados
+          enum:
+          - name_asc
+          - name_desc
+          - category_asc
+          - category_desc
+          title: Ord
+      - description: Número máximo de itens por página
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 20
+          description: Número máximo de itens por página
+          maximum: 100
+          minimum: 1
+          title: Limit
+          type: integer
+      - description: Offset para paginação
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          description: Offset para paginação
+          minimum: 0
+          title: Offset
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerListResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: List Partners
+      tags:
+      - Admin
+      - admin
+    post:
+      description: Cria um novo parceiro.
+      operationId: create_partner_v1_admin_partners_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Dados do parceiro
+              title: Data
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Create Partner
+      tags:
+      - Admin
+      - admin
+  /v1/admin/partners/{id}:
+    get:
+      description: 'Obtém detalhes completos de um parceiro específico.
+
+        Administradores podem ver detalhes de qualquer parceiro.'
+      operationId: get_partner_details_v1_admin_partners__id__get
+      parameters:
+      - description: ID do parceiro
+        in: path
+        name: id
+        required: true
+        schema:
+          description: ID do parceiro
+          title: Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerDetailResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Get Partner Details
+      tags:
+      - Admin
+      - admin
+  /v1/admin/students:
+    get:
+      description: Lista todos os estudantes.
+      operationId: list_students_v1_admin_students_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityListResponse'
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: List Students
+      tags:
+      - Admin
+      - admin
+    post:
+      description: Cria um novo estudante.
+      operationId: create_student_v1_admin_students_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Dados do estudante
+              title: Data
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Create Student
+      tags:
+      - Admin
+      - admin
+  /v1/employee/me/fav:
+    get:
+      description: Gera um código de validação de 6 dígitos para o usuário (funcionário).
+      operationId: list_favorites_v1_employee_me_fav_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesResponse'
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: List Favorites
+      tags:
+      - Employee
+      - employee
+    post:
+      description: 'Adiciona um parceiro à lista de favoritos do funcionário.
+
+
+        Utiliza a nova estrutura de coleções separadas (employees_fav).'
+      operationId: add_employee_favorite_v1_employee_me_fav_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FavoriteRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Add Employee Favorite
+      tags:
+      - Employee
+      - employee
+  /v1/employee/me/fav/{partner_id}:
+    delete:
+      description: 'Remove um parceiro da lista de favoritos do funcionário.
+
+
+        Utiliza a nova estrutura de coleções separadas (employees_fav).'
+      operationId: remove_employee_favorite_v1_employee_me_fav__partner_id__delete
+      parameters:
+      - description: ID do parceiro
+        in: path
+        name: partner_id
+        required: true
+        schema:
+          description: ID do parceiro
+          title: Partner Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Remove Employee Favorite
+      tags:
+      - Employee
+      - employee
+  /v1/employee/me/history:
+    get:
+      description: Retorna o histórico de códigos de validação usados pelo funcionário.
+      operationId: get_employee_validation_history_v1_employee_me_history_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Get Employee Validation History
+      tags:
+      - Employee
+      - employee
+  /v1/employee/partners:
+    get:
+      description: 'Lista parceiros disponíveis para funcionários com filtros e paginação.
+
+
+        Endpoint específico para funcionários com as seguintes características:
+
+        - Utiliza circuit breaker para alta disponibilidade
+
+        - Ordenação habilitada por padrão
+
+        - Acesso apenas a parceiros ativos'
+      operationId: list_partners_v1_employee_partners_get
+      parameters:
+      - description: Filtro por categoria
+        in: query
+        name: cat
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filtro por categoria
+          title: Cat
+      - description: Ordenação (name, category)
+        in: query
+        name: ord
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: name
+          description: Ordenação (name, category)
+          title: Ord
+      - description: Limite de resultados
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 20
+          description: Limite de resultados
+          maximum: 100
+          minimum: 1
+          title: Limit
+          type: integer
+      - description: Offset para paginação
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          description: Offset para paginação
+          minimum: 0
+          title: Offset
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerListResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: List Partners
+      tags:
+      - Employee
+      - employee
+  /v1/employee/partners/{id}:
+    get:
+      description: Retorna detalhes de um parceiro específico com suas promoções ativas
+        para funcionários.
+      operationId: get_partner_details_v1_employee_partners__id__get
+      parameters:
+      - description: ID do parceiro
+        in: path
+        name: id
+        required: true
+        schema:
+          description: ID do parceiro
+          title: Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerDetailResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Get Partner Details
+      tags:
+      - Employee
+      - employee
+  /v1/employee/validation-codes:
+    post:
+      description: Gera um código de validação de 6 dígitos para um parceiro.
+      operationId: create_validation_code_v1_employee_validation_codes_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationCodeCreationRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: Response Create Validation Code V1 Employee Validation Codes
+                  Post
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Create Validation Code
+      tags:
+      - Employee
+      - employee
+  /v1/logos/logos/:
+    get:
+      description: "Lista todos os logos de parceiros disponíveis (apenas administradores).\n\
+        \nEste endpoint retorna uma lista de logos com URLs assinadas para acesso\
+        \ seguro.\nRestrito a usuários com perfil de administrador.\n\nArgs:\n   \
+        \ category: Filtro opcional por categoria de parceiro\n    force_refresh:\
+        \ Se True, força atualização do cache\n    current_user: Dados do usuário\
+        \ administrador autenticado\n\nReturns:\n    Lista de logos com informações\
+        \ detalhadas:\n    [\n        {\n            \"partner_id\": \"PTN_A1E3018_AUT\"\
+        ,\n            \"filename\": \"PTN_A1E3018_AUT.png\",\n            \"url\"\
+        : \"https://...\",\n            \"category\": \"AUT\",\n            \"size\"\
+        : 12345,\n            \"updated_at\": \"2025-01-15T10:30:00Z\"\n        }\n\
+        \    ]\n\nRaises:\n    HTTPException: 401 se não autenticado, 403 se não for\
+        \ admin, 500 se houver erro interno"
+      operationId: list_partner_logos_v1_logos_logos__get
+      parameters:
+      - description: Filtrar por categoria (EDU, AUT, TEC, etc.)
+        in: query
+        name: category
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filtrar por categoria (EDU, AUT, TEC, etc.)
+          title: Category
+      - description: Forçar atualização do cache
+        in: query
+        name: force_refresh
+        required: false
+        schema:
+          default: false
+          description: Forçar atualização do cache
+          title: Force Refresh
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties:
+                    type: string
+                  type: object
+                title: Response List Partner Logos V1 Logos Logos  Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: List Partner Logos
+      tags:
+      - Logos
+      - logos
+  /v1/logos/logos/cache/clear:
+    post:
+      description: "Limpa o cache de logos (apenas administradores).\n\nArgs:\n  \
+        \  current_user: Dados do usuário administrador autenticado\n\nReturns:\n\
+        \    Confirmação da operação\n\nRaises:\n    HTTPException: 401 se não autenticado,\
+        \ 403 se não for admin"
+      operationId: clear_logos_cache_v1_logos_logos_cache_clear_post
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                title: Response Clear Logos Cache V1 Logos Logos Cache Clear Post
+                type: object
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Clear Logos Cache
+      tags:
+      - Logos
+      - logos
+  /v1/logos/logos/categories:
+    get:
+      description: "Lista todas as categorias de logos disponíveis (apenas administradores).\n\
+        \nArgs:\n    current_user: Dados do usuário administrador autenticado\n\n\
+        Returns:\n    Lista de categorias únicas encontradas nos logos\n\nRaises:\n\
+        \    HTTPException: 401 se não autenticado, 403 se não for admin, 500 em caso\
+        \ de erro interno"
+      operationId: list_logo_categories_v1_logos_logos_categories_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                title: Response List Logo Categories V1 Logos Logos Categories Get
+                type: array
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: List Logo Categories
+      tags:
+      - Logos
+      - logos
+  /v1/logos/logos/health:
+    get:
+      description: "Verifica a saúde do serviço de logos (apenas administradores).\n\
+        \nArgs:\n    current_user: Dados do usuário administrador autenticado\n\n\
+        Returns:\n    Status do serviço de logos\n\nRaises:\n    HTTPException: 401\
+        \ se não autenticado, 403 se não for admin"
+      operationId: logos_health_check_v1_logos_logos_health_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: Response Logos Health Check V1 Logos Logos Health Get
+                type: object
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Logos Health Check
+      tags:
+      - Logos
+      - logos
+  /v1/logos/logos/refresh:
+    post:
+      description: "Força a regeneração de todas as URLs de logos (apenas administradores).\n\
+        Útil quando URLs começam a expirar.\n\nArgs:\n    current_user: Dados do usuário\
+        \ administrador autenticado\n\nReturns:\n    Resultado da operação de refresh\n\
+        \nRaises:\n    HTTPException: 401 se não autenticado, 403 se não for admin,\
+        \ 500 em caso de erro interno"
+      operationId: refresh_logo_urls_v1_logos_logos_refresh_post
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: Response Refresh Logo Urls V1 Logos Logos Refresh Post
+                type: object
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Refresh Logo Urls
+      tags:
+      - Logos
+      - logos
+  /v1/logos/logos/{partner_id}:
+    get:
+      description: "Obtém o logo de um parceiro específico (apenas administradores).\n\
+        \nArgs:\n    partner_id: ID do parceiro (ex: \"PTN_A1E3018_AUT\")\n    current_user:\
+        \ Dados do usuário administrador autenticado\n\nReturns:\n    Informações\
+        \ do logo do parceiro:\n    {\n        \"partner_id\": \"PTN_A1E3018_AUT\"\
+        ,\n        \"url\": \"https://...\",\n        \"found\": true\n    }\n\nRaises:\n\
+        \    HTTPException: 401 se não autenticado, 403 se não for admin, 404 se logo\
+        \ não encontrado"
+      operationId: get_partner_logo_v1_logos_logos__partner_id__get
+      parameters:
+      - in: path
+        name: partner_id
+        required: true
+        schema:
+          title: Partner Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                title: Response Get Partner Logo V1 Logos Logos  Partner Id  Get
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Get Partner Logo
+      tags:
+      - Logos
+      - logos
+  /v1/partner/promotions:
+    post:
+      description: Cria uma nova promoção para o parceiro.
+      operationId: create_promotion_v1_partner_promotions_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenefitRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BenefitResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Create Promotion
+      tags:
+      - Partner
+      - partner
+  /v1/partner/promotions/{id}:
+    delete:
+      description: Remove uma promoção existente do parceiro usando hard delete.
+      operationId: delete_promotion_v1_partner_promotions__id__delete
+      parameters:
+      - description: ID da promoção
+        in: path
+        name: id
+        required: true
+        schema:
+          description: ID da promoção
+          title: Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Delete Promotion
+      tags:
+      - Partner
+      - partner
+    put:
+      description: Atualiza uma promoção existente do parceiro.
+      operationId: update_promotion_v1_partner_promotions__id__put
+      parameters:
+      - description: ID da promoção
+        in: path
+        name: id
+        required: true
+        schema:
+          description: ID da promoção
+          title: Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenefitRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BenefitResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Update Promotion
+      tags:
+      - Partner
+      - partner
+  /v1/partner/redeem:
+    post:
+      description: 'Resgata um código de validação gerado por um aluno.
+
+        Limitado a 5 requisições por minuto por IP.'
+      operationId: redeem_code_v1_partner_redeem_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationCodeRedeemRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedeemResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Redeem Code
+      tags:
+      - Partner
+      - partner
+  /v1/partner/reports:
+    get:
+      description: Retorna relatório de uso das promoções do parceiro.
+      operationId: get_partner_reports_v1_partner_reports_get
+      parameters:
+      - description: Período para relatório (formato YYYY-MM)
+        in: query
+        name: range
+        required: true
+        schema:
+          description: Período para relatório (formato YYYY-MM)
+          title: Range
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Get Partner Reports
+      tags:
+      - Partner
+      - partner
+  /v1/student/me/fav:
+    get:
+      description: 'Retorna a lista de parceiros favoritos do aluno.
+
+
+        Utiliza a nova estrutura de coleções separadas (students_fav).'
+      operationId: list_favorites_v1_student_me_fav_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesResponse'
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: List Favorites
+      tags:
+      - Student
+      - student
+    post:
+      description: 'Adiciona um parceiro à lista de favoritos do aluno.
+
+
+        Utiliza a nova estrutura de coleções separadas (students_fav).'
+      operationId: add_student_favorite_v1_student_me_fav_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FavoriteRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Add Student Favorite
+      tags:
+      - Student
+      - student
+  /v1/student/me/fav/{partner_id}:
+    delete:
+      description: 'Remove um parceiro da lista de favoritos do aluno.
+
+
+        Utiliza a nova estrutura de coleções separadas (students_fav).'
+      operationId: remove_student_favorite_v1_student_me_fav__partner_id__delete
+      parameters:
+      - description: ID do parceiro
+        in: path
+        name: partner_id
+        required: true
+        schema:
+          description: ID do parceiro
+          title: Partner Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Remove Student Favorite
+      tags:
+      - Student
+      - student
+  /v1/student/partners:
+    get:
+      description: 'Lista parceiros com filtros e paginação.
+
+
+        Endpoint específico para estudantes com as seguintes características:
+
+        - Utiliza circuit breaker para alta disponibilidade
+
+        - Ordenação desabilitada por padrão (para evitar necessidade de índices)
+
+        - Acesso apenas a parceiros ativos'
+      operationId: list_partners_v1_student_partners_get
+      parameters:
+      - description: Filtro por categoria
+        in: query
+        name: cat
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filtro por categoria
+          title: Cat
+      - description: Ordenação dos resultados
+        in: query
+        name: ord
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Ordenação dos resultados
+          enum:
+          - name_asc
+          - name_desc
+          - category_asc
+          - category_desc
+          title: Ord
+      - description: Número máximo de itens por página
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 20
+          description: Número máximo de itens por página
+          maximum: 100
+          minimum: 1
+          title: Limit
+          type: integer
+      - description: Offset para paginação
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          description: Offset para paginação
+          minimum: 0
+          title: Offset
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerListResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: List Partners
+      tags:
+      - Student
+      - student
+  /v1/student/partners/{id}:
+    get:
+      description: Retorna detalhes do parceiro e suas promoções ativas.
+      operationId: get_partner_details_v1_student_partners__id__get
+      parameters:
+      - description: ID do parceiro
+        in: path
+        name: id
+        required: true
+        schema:
+          description: ID do parceiro
+          title: Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerDetailResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Get Partner Details
+      tags:
+      - Student
+      - student
+  /v1/student/validation-codes:
+    post:
+      description: Gera um código de validação de 6 dígitos para um parceiro.
+      operationId: create_validation_code_v1_student_validation_codes_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationCodeCreationRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Create Validation Code
+      tags:
+      - Student
+      - student
+  /v1/sync/sync/logo/{partner_id}:
+    delete:
+      description: 'Remove logo de um parceiro específico.
+
+
+        **Acesso restrito a administradores.**'
+      operationId: delete_partner_logo_v1_sync_sync_logo__partner_id__delete
+      parameters:
+      - description: ID do parceiro
+        in: path
+        name: partner_id
+        required: true
+        schema:
+          description: ID do parceiro
+          title: Partner Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                title: Response Delete Partner Logo V1 Sync Sync Logo  Partner Id  Delete
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Remover logo de parceiro
+      tags:
+      - Sync
+      - sync
+  /v1/sync/sync/partners/logos:
+    post:
+      description: "Sincroniza as URLs de logos de todos os parceiros (apenas administradores).\n\
+        \nEste endpoint atualiza as URLs de logos na coleção partners,\ngarantindo\
+        \ que apontem para as imagens corretas no Firebase Storage.\n\nArgs:\n   \
+        \ force_update: Se True, atualiza todos os parceiros independente da data\n\
+        \    current_user: Dados do usuário administrador autenticado\n\nReturns:\n\
+        \    Relatório da sincronização:\n    {\n        \"status\": \"completed\"\
+        ,\n        \"total_partners\": 150,\n        \"updated_count\": 45,\n    \
+        \    \"errors\": [],\n        \"duration_seconds\": 12.5,\n        \"timestamp\"\
+        : \"2025-01-15T10:30:00Z\"\n    }\n\nRaises:\n    HTTPException: 401 se não\
+        \ autenticado, 403 se não for admin, 500 em caso de erro"
+      operationId: sync_all_partner_logos_v1_sync_sync_partners_logos_post
+      parameters:
+      - description: Forçar atualização de todos os parceiros
+        in: query
+        name: force_update
+        required: false
+        schema:
+          default: false
+          description: Forçar atualização de todos os parceiros
+          title: Force Update
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: Response Sync All Partner Logos V1 Sync Sync Partners Logos
+                  Post
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Sync All Partner Logos
+      tags:
+      - Sync
+      - sync
+  /v1/sync/sync/partners/logos/outdated:
+    get:
+      description: "Verifica parceiros com logos desatualizados (apenas administradores).\n\
+        \nArgs:\n    max_age_hours: Idade máxima em horas para considerar o logo atualizado\n\
+        \    current_user: Dados do usuário administrador autenticado\n\nReturns:\n\
+        \    Lista de parceiros com logos desatualizados:\n    {\n        \"outdated_partners\"\
+        : [\"PTN_A1E3018_AUT\", \"PTN_B2F4019_EDU\"],\n        \"total_outdated\"\
+        : 2,\n        \"max_age_hours\": 24,\n        \"checked_at\": \"2025-01-15T10:30:00Z\"\
+        \n    }\n\nRaises:\n    HTTPException: 401 se não autenticado, 403 se não\
+        \ for admin, 500 em caso de erro"
+      operationId: check_outdated_logos_v1_sync_sync_partners_logos_outdated_get
+      parameters:
+      - description: Idade máxima em horas para considerar o logo atualizado
+        in: query
+        name: max_age_hours
+        required: false
+        schema:
+          default: 24
+          description: Idade máxima em horas para considerar o logo atualizado
+          title: Max Age Hours
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: Response Check Outdated Logos V1 Sync Sync Partners Logos Outdated
+                  Get
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Check Outdated Logos
+      tags:
+      - Sync
+      - sync
+  /v1/sync/sync/partners/{partner_id}/logo:
+    post:
+      description: "Sincroniza a URL do logo de um parceiro específico (apenas administradores).\n\
+        \nArgs:\n    partner_id: ID do parceiro a ser sincronizado\n    current_user:\
+        \ Dados do usuário administrador autenticado\n\nReturns:\n    Resultado da\
+        \ sincronização:\n    {\n        \"partner_id\": \"PTN_A1E3018_AUT\",\n  \
+        \      \"updated\": true,\n        \"logo_url\": \"https://...\",\n      \
+        \  \"previous_url\": \"https://...\",\n        \"timestamp\": \"2025-01-15T10:30:00Z\"\
+        \n    }\n\nRaises:\n    HTTPException: 401 se não autenticado, 403 se não\
+        \ for admin, 404 se parceiro não encontrado"
+      operationId: sync_partner_logo_v1_sync_sync_partners__partner_id__logo_post
+      parameters:
+      - in: path
+        name: partner_id
+        required: true
+        schema:
+          title: Partner Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: Response Sync Partner Logo V1 Sync Sync Partners  Partner Id  Logo
+                  Post
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Sync Partner Logo
+      tags:
+      - Sync
+      - sync
+  /v1/sync/sync/status:
+    get:
+      description: 'Obtém status atual da sincronização de logos.
+
+
+        **Acesso restrito a administradores.**'
+      operationId: get_sync_status_v1_sync_sync_status_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                title: Response Get Sync Status V1 Sync Sync Status Get
+                type: object
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Status da sincronização
+      tags:
+      - Sync
+      - sync
+  /v1/sync/sync/upload:
+    post:
+      description: 'Faz upload de logo para um parceiro específico.
+
+
+        **Acesso restrito a administradores.**
+
+
+        **Validações aplicadas:**
+
+        - Formato: PNG, JPG, JPEG, WEBP, SVG
+
+        - Tamanho máximo: 5MB
+
+        - Dimensões: 100x100 até 2000x2000 pixels
+
+        - Nomenclatura: PTN_{partner_id}_{category}.{ext}'
+      operationId: upload_partner_logo_v1_sync_sync_upload_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_partner_logo_v1_sync_sync_upload_post'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                title: Response Upload Partner Logo V1 Sync Sync Upload Post
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Upload de logo de parceiro
+      tags:
+      - Sync
+      - sync
+  /v1/users/login:
+    post:
+      description: "Endpoint principal de login com token Firebase.\n\nValida o token\
+        \ Firebase recebido e gera um JWT local com expiração de 30 minutos.\nEste\
+        \ é o método de autenticação recomendado.\n\nArgs:\n    request: Dados contendo\
+        \ o token Firebase\n\nReturns:\n    Token JWT local e informações do usuário\n\
+        \nRaises:\n    HTTPException: Se o token Firebase for inválido"
+      operationId: login_v1_users_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirebaseLoginRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Login
+      tags:
+      - Users
+      - authentication
+  /v1/users/login-legacy:
+    post:
+      description: "Endpoint de login que gera JWT local (método legado).\n\nArgs:\n\
+        \    request: Dados de login\n\nReturns:\n    Token JWT e informações do usuário\n\
+        \nRaises:\n    HTTPException: Se as credenciais forem inválidas"
+      operationId: login_legacy_v1_users_login_legacy_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Login Legacy
+      tags:
+      - Users
+      - authentication
+  /v1/users/me:
+    get:
+      description: "Endpoint para obter informações do usuário atual.\n\nArgs:\n \
+        \   current_user: Usuário autenticado obtido via dependência\n\nReturns:\n\
+        \    Informações do usuário autenticado"
+      operationId: get_me_v1_users_me_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Get Me
+      tags:
+      - Users
+      - authentication
+  /v1/users/refresh:
+    post:
+      description: "Endpoint para renovar um token JWT.\n\nArgs:\n    credentials:\
+        \ Credenciais HTTP Bearer\n\nReturns:\n    Novo token JWT"
+      operationId: refresh_token_v1_users_refresh_post
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Refresh Token
+      tags:
+      - Users
+      - authentication
+  /v1/users/test-firebase-token:
+    post:
+      description: "Endpoint de teste exclusivo para receber e validar tokens Firebase.\n\
+        \nEste endpoint é usado para testar a recepção e validação de tokens Firebase\n\
+        enviados pelo frontend. Retorna uma confirmação de recebimento e o status\n\
+        de validação do token.\n\nArgs:\n    request: Objeto contendo o token Firebase\n\
+        \nReturns:\n    Mensagem de confirmação e informações de validação"
+      operationId: test_firebase_token_v1_users_test_firebase_token_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirebaseTokenRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Test Firebase Token
+      tags:
+      - Users
+      - authentication
+  /v1/users/validate:
+    post:
+      description: "Endpoint para validar um token JWT.\n\nArgs:\n    credentials:\
+        \ Credenciais HTTP Bearer\n\nReturns:\n    Resultado da validação do token"
+      operationId: validate_token_v1_users_validate_post
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenValidationResponse'
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+      summary: Validate Token
+      tags:
+      - Users
+      - authentication
