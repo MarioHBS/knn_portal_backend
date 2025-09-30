@@ -3,7 +3,7 @@ Módulo de modelos Pydantic para códigos de validação.
 """
 
 from datetime import datetime
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator, validator
 
@@ -74,6 +74,7 @@ class ValidationCodeRedeemRequest(BaseModel):
     cnpj: str = Field(..., description="CNPJ do parceiro que está resgatando o código.")
 
     @validator("cnpj")
+    @classmethod
     def validate_cnpj(cls, v):
         """
         Valida o formato do CNPJ.

@@ -227,7 +227,7 @@ class PartnerDTO:
 
         # Verificar campos obrigatórios
         missing_fields = []
-        for firestore_field, model_field in required_mappings.items():
+        for firestore_field, _model_field in required_mappings.items():
             if firestore_field not in doc_data:
                 missing_fields.append(firestore_field)
 
@@ -236,12 +236,12 @@ class PartnerDTO:
 
         # Construir dados base
         partner_data = {}
-        
+
         # ID pode vir do parâmetro doc_id ou do campo 'id' nos dados
         partner_data["id"] = doc_id or doc_data.get("id")
         if not partner_data["id"]:
             raise ValueError("ID do documento é obrigatório")
-        
+
         # Mapear outros campos obrigatórios
         for firestore_field, model_field in required_mappings.items():
             partner_data[model_field] = doc_data[firestore_field]
@@ -269,11 +269,11 @@ class PartnerDTO:
     def _extract_address(doc_data: dict[str, Any]) -> dict[str, str | None] | None:
         """Extrai dados de endereço com valores padrão."""
         address_data = doc_data.get("address")
-        
+
         # Se address for None, retorna None para permitir campo opcional
         if address_data is None:
             return None
-            
+
         # Se address for um dicionário vazio ou com dados, processa normalmente
         if isinstance(address_data, dict):
             return {
@@ -283,7 +283,7 @@ class PartnerDTO:
                 "city": address_data.get("city"),
                 "state": address_data.get("state"),
             }
-        
+
         # Fallback para casos inesperados
         return None
 

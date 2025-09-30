@@ -132,7 +132,7 @@ async def get_partner_details(
                 # Extrair benefícios ativos para estudantes
                 benefits = []
                 benefit_keys = [
-                    key for key in partner_doc.keys() if key.startswith("BNF_")
+                    key for key in partner_doc if key.startswith("BNF_")
                 ]
 
                 for benefit_key in benefit_keys:

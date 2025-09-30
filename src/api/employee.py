@@ -1,6 +1,8 @@
 """Implementação dos endpoints para o perfil de funcionário (employee)."""
 
-from datetime import datetime
+import random
+import string
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
@@ -19,10 +21,6 @@ from src.models import (
 )
 from src.utils import logger
 from src.utils.partners_service import PartnersService
-import random
-import string
-from datetime import timedelta
-
 
 # Criar router
 router = APIRouter(tags=["employee"])

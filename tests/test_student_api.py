@@ -14,7 +14,7 @@ from fastapi.testclient import TestClient
 
 from src.api.student import router
 from src.auth import JWTPayload
-from src.models import ValidationCodeRequest
+from src.models import ValidationCodeCreationRequest
 
 
 @pytest.fixture
@@ -240,7 +240,7 @@ class TestStudentValidationCodeEndpoint:
 
             from src.api.student import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="PTN123456")
+            request_data = ValidationCodeCreationRequest(partner_id="PTN123456")
 
             result = await create_validation_code(request_data, mock_student_user)
 
@@ -261,7 +261,7 @@ class TestStudentValidationCodeEndpoint:
 
             from src.api.student import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="invalid-partner")
+            request_data = ValidationCodeCreationRequest(partner_id="invalid-partner")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_student_user)
@@ -285,7 +285,7 @@ class TestStudentValidationCodeEndpoint:
 
             from src.api.student import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="PTN123456")
+            request_data = ValidationCodeCreationRequest(partner_id="PTN123456")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_student_user)
@@ -307,7 +307,7 @@ class TestStudentValidationCodeEndpoint:
 
             from src.api.student import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="PTN123456")
+            request_data = ValidationCodeCreationRequest(partner_id="PTN123456")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_student_user)
@@ -333,7 +333,7 @@ class TestStudentValidationCodeEndpoint:
 
             from src.api.student import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="PTN123456")
+            request_data = ValidationCodeCreationRequest(partner_id="PTN123456")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_student_user)

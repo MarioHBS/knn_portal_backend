@@ -8,9 +8,8 @@ Este módulo contém testes que validam:
 - Consistência de tipos entre frontend e backend
 """
 
-import json
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -23,7 +22,6 @@ from src.models import (
     BenefitLimits,
     EmployeeFavorites,
     FavoriteRequest,
-    FavoriteResponse,
     Partner,
     PartnerAddress,
     PartnerSocialNetworks,
@@ -173,7 +171,7 @@ class TestPartnerEndpointsValidation:
             "created_at": datetime.now(),
             "updated_at": datetime.now()
         }
-        
+
         mock_firestore.collection.return_value.where.return_value.where.return_value.limit.return_value.stream.return_value = [mock_partner_doc]
 
         with patch("src.api.student.verify_token", return_value=mock_student_user):
@@ -181,19 +179,19 @@ class TestPartnerEndpointsValidation:
 
         assert response.status_code == 200
         data = response.json()
-        
+
         # Validar estrutura da resposta
         assert "partners" in data
         assert "total" in data
         assert "page" in data
         assert "per_page" in data
-        
+
         # Validar estrutura do parceiro
         if data["partners"]:
             partner = data["partners"][0]
             required_fields = [
-                "id", "trade_name", "category", "description", 
-                "address", "contact_phone", "contact_email", 
+                "id", "trade_name", "category", "description",
+                "address", "contact_phone", "contact_email",
                 "logo_url", "active"
             ]
             for field in required_fields:
@@ -213,7 +211,7 @@ class TestPartnerEndpointsValidation:
             "created_at": datetime.now(),
             "updated_at": datetime.now()
         }
-        
+
         mock_firestore.collection.return_value.where.return_value.where.return_value.limit.return_value.stream.return_value = [mock_partner_doc]
 
         with patch("src.api.employee.verify_token", return_value=mock_employee_user):
@@ -221,7 +219,7 @@ class TestPartnerEndpointsValidation:
 
         assert response.status_code == 200
         data = response.json()
-        
+
         # Validar que a resposta tem a mesma estrutura para consistência
         assert "partners" in data
         assert "total" in data
@@ -243,7 +241,7 @@ class TestFavoritesEndpointsValidation:
             "created_at": datetime.now(),
             "updated_at": datetime.now()
         }
-        
+
         mock_firestore.collection.return_value.document.return_value.get.return_value = mock_favorites_doc
 
         with patch("src.api.student.verify_token", return_value=mock_student_user):
@@ -251,7 +249,7 @@ class TestFavoritesEndpointsValidation:
 
         assert response.status_code == 200
         data = response.json()
-        
+
         # Validar estrutura esperada pelo frontend
         required_fields = ["student_id", "partner_ids", "created_at", "updated_at"]
         for field in required_fields:
@@ -319,7 +317,7 @@ class TestBenefitsEndpointsValidation:
             "created_at": datetime.now(),
             "updated_at": datetime.now()
         }
-        
+
         mock_firestore.collection.return_value.where.return_value.where.return_value.stream.return_value = [mock_benefit_doc]
 
         with patch("src.api.student.verify_token", return_value=mock_student_user):
@@ -327,13 +325,13 @@ class TestBenefitsEndpointsValidation:
 
         assert response.status_code == 200
         data = response.json()
-        
+
         # Validar estrutura dos benefícios
         assert "benefits" in data
         if data["benefits"]:
             benefit = data["benefits"][0]
             required_fields = [
-                "id", "title", "description", "discount_percentage", 
+                "id", "title", "description", "discount_percentage",
                 "category", "configuration", "active"
             ]
             for field in required_fields:
@@ -347,14 +345,14 @@ class TestDataConsistencyValidation:
         """Testa se o modelo Partner está consistente com os tipos TypeScript."""
         # Serializar para JSON (simula resposta da API)
         partner_dict = sample_partner.model_dump()
-        
+
         # Campos obrigatórios que o frontend espera
         frontend_required_fields = [
             "id", "trade_name", "category", "description",
-            "address", "contact_phone", "contact_email", 
+            "address", "contact_phone", "contact_email",
             "logo_url", "active"
         ]
-        
+
         for field in frontend_required_fields:
             assert field in partner_dict, f"Campo {field} ausente no modelo Partner"
 
@@ -367,13 +365,13 @@ class TestDataConsistencyValidation:
     def test_benefit_model_consistency(self, sample_benefit):
         """Testa se o modelo Benefit está consistente com os tipos TypeScript."""
         benefit_dict = sample_benefit.model_dump()
-        
+
         # Campos obrigatórios que o frontend espera
         frontend_required_fields = [
             "id", "partner_id", "title", "description",
             "discount_percentage", "category", "configuration", "active"
         ]
-        
+
         for field in frontend_required_fields:
             assert field in benefit_dict, f"Campo {field} ausente no modelo Benefit"
 
@@ -393,10 +391,10 @@ class TestDataConsistencyValidation:
             created_at=datetime.now(),
             updated_at=datetime.now()
         )
-        
+
         favorites_dict = student_favorites.model_dump()
         required_fields = ["student_id", "partner_ids", "created_at", "updated_at"]
-        
+
         for field in required_fields:
             assert field in favorites_dict, f"Campo {field} ausente em StudentFavorites"
 
@@ -408,10 +406,10 @@ class TestDataConsistencyValidation:
             created_at=datetime.now(),
             updated_at=datetime.now()
         )
-        
+
         emp_favorites_dict = employee_favorites.model_dump()
         emp_required_fields = ["employee_id", "partner_ids", "created_at", "updated_at"]
-        
+
         for field in emp_required_fields:
             assert field in emp_favorites_dict, f"Campo {field} ausente em EmployeeFavorites"
 
@@ -462,7 +460,7 @@ class TestPaginationValidation:
 
         assert response.status_code == 200
         data = response.json()
-        
+
         # Validar estrutura de paginação
         pagination_fields = ["total", "page", "per_page", "partners"]
         for field in pagination_fields:

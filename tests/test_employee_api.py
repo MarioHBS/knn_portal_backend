@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 
 from src.api.employee import router
 from src.auth import JWTPayload
-from src.models import ValidationCodeRequest
+from src.models import ValidationCodeCreationRequest
 
 
 @pytest.fixture
@@ -412,7 +412,7 @@ class TestEmployeeValidationCodeEndpoint:
 
             from src.api.employee import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="partner-123")
+            request_data = ValidationCodeCreationRequest(partner_id="partner-123")
 
             result = await create_validation_code(request_data, mock_employee_user)
 
@@ -435,7 +435,7 @@ class TestEmployeeValidationCodeEndpoint:
 
             from src.api.employee import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="invalid-partner")
+            request_data = ValidationCodeCreationRequest(partner_id="invalid-partner")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_employee_user)
@@ -460,7 +460,7 @@ class TestEmployeeValidationCodeEndpoint:
 
             from src.api.employee import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="partner-123")
+            request_data = ValidationCodeCreationRequest(partner_id="partner-123")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_employee_user)
@@ -486,7 +486,7 @@ class TestEmployeeValidationCodeEndpoint:
 
             from src.api.employee import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="partner-123")
+            request_data = ValidationCodeCreationRequest(partner_id="partner-123")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_employee_user)
@@ -518,7 +518,7 @@ class TestEmployeeValidationCodeEndpoint:
 
             from src.api.employee import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="partner-123")
+            request_data = ValidationCodeCreationRequest(partner_id="partner-123")
 
             with pytest.raises(Exception) as exc_info:
                 await create_validation_code(request_data, mock_employee_user)
@@ -564,7 +564,7 @@ class TestEmployeeValidationCodeEndpoint:
 
             from src.api.employee import create_validation_code
 
-            request_data = ValidationCodeRequest(partner_id="partner-123")
+            request_data = ValidationCodeCreationRequest(partner_id="partner-123")
 
             result = await create_validation_code(request_data, mock_employee_user)
 

@@ -133,12 +133,26 @@ firebase-adminsdk-*.json
 # Sensitive databases
 *.db
 
+# Authentication tokens and caches
+access_token.txt
+*token_cache.json
+*_token_cache.json
+
+# Debug and log files
+firestore-debug.log
+*.log
+log.server.json
+
 # ============================================================================
 # PROJECT SPECIFIC
 # ============================================================================
 
 # Data backups
 /data/backup/*
+
+# Debug data files
+/data/debug_*.json
+/data/log.*.json
 
 # Migration and export files
 migration_report.json
@@ -157,6 +171,12 @@ firestore_export.json
 scripts/temp/
 temp_*.py
 *_temp.py
+
+# Complete flow test files (contain sensitive tokens)
+scripts/complete_flow/access_token.txt
+scripts/complete_flow/*token_cache.json
+scripts/complete_flow/partner_reports/
+scripts/complete_flow/reports/
 
 # Technical documentation (non-versioned)
 comands.txt

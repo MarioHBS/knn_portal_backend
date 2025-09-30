@@ -4,20 +4,20 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from src.models import RedeemRequest, ValidationCodeRequest
+from src.models import RedeemRequest, ValidationCodeCreationRequest
 
 
 class TestValidationCodeModels:
     """Testes para modelos de códigos de validação."""
 
     def test_validation_code_request_valid(self):
-        """Testa criação de ValidationCodeRequest válido."""
-        request = ValidationCodeRequest(partner_id="partner123")
+        """Testa criação de ValidationCodeCreationRequest válido."""
+        request = ValidationCodeCreationRequest(partner_id="partner123")
         assert request.partner_id == "partner123"
 
     def test_validation_code_request_empty_partner_id(self):
-        """Testa ValidationCodeRequest com partner_id vazio (ainda válido pelo modelo)."""
-        request = ValidationCodeRequest(partner_id="")
+        """Testa ValidationCodeCreationRequest com partner_id vazio (ainda válido pelo modelo)."""
+        request = ValidationCodeCreationRequest(partner_id="")
         assert request.partner_id == ""
 
     def test_redeem_request_valid(self):

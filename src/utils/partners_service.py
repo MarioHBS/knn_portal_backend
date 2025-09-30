@@ -115,7 +115,7 @@ class PartnersService:
                     )
                     logger.error(f"❌ Dados do parceiro que falhou: {partner_data}")
                     continue
-            
+
             if failed_partners:
                 logger.error(f"❌ RESUMO: {len(failed_partners)} parceiro(s) falharam na conversão:")
                 for failed in failed_partners:

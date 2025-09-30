@@ -16,7 +16,7 @@ from src.models import (
     ReportResponse,
 )
 from src.models.benefit import Benefit, BenefitDTO, BenefitRequest, BenefitResponse
-from src.models.validation_code import ValidationCode, ValidationCodeRedeemRequest
+from src.models.validation_code import ValidationCodeRedeemRequest
 from src.utils import limiter, logger
 from src.utils.id_generators import IDGenerators
 
@@ -285,7 +285,6 @@ async def update_promotion(
     try:
         # Obter entity_id do JWT token (abordagem híbrida)
         partner_id = current_user.entity_id
-        tenant_id = current_user.tenant
 
         # Buscar documento de benefícios do parceiro
         async def get_firestore_benefits():
