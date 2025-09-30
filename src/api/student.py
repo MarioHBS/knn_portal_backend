@@ -2,7 +2,8 @@
 Implementação dos endpoints para o perfil de aluno (student).
 """
 
-import uuid
+import random
+import string
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
@@ -13,13 +14,12 @@ from src.models import (
     FavoriteRequest,
     FavoriteResponse,
     FavoritesResponse,
-    HistoryResponse,
     Partner,
     PartnerDetail,
     PartnerDetailResponse,
     PartnerListResponse,
-    ValidationCodeRequest,
-    ValidationCodeResponse,
+    ValidationCode,
+    ValidationCodeCreationRequest,
 )
 from src.utils import logger
 from src.utils.partners_service import PartnersService
@@ -87,10 +87,14 @@ async def get_partner_details(
     try:
         # Obter parceiro com circuit breaker
         async def get_firestore_partner():
-            return await firestore_client.get_document("partners", id)
+            return await firestore_client.get_document(
+                "partners", id, tenant_id=current_user.tenant
+            )
 
         async def get_postgres_partner():
-            return await postgres_client.get_document("partners", id)
+            return await postgres_client.get_document(
+                "partners", id, tenant_id=current_user.tenant
+            )
 
         partner = await get_firestore_partner()
 
@@ -110,45 +114,106 @@ async def get_partner_details(
                 },
             )
 
-        # Obter promoções ativas do parceiro para alunos
-        now = datetime.now().isoformat()
+        # Obter benefícios ativos do parceiro para alunos
+        async def get_firestore_benefits():
+            """Busca benefícios ativos do parceiro na coleção 'benefits'."""
+            try:
+                # Buscar documento do parceiro na coleção 'benefits'
+                partner_doc = await firestore_client.get_document(
+                    "benefits", id, tenant_id=current_user.tenant
+                )
 
-        async def get_firestore_promotions():
-            return await firestore_client.query_documents(
-                "promotions",
-                filters=[
-                    ("partner_id", "==", id),
-                    ("active", "==", True),
-                    ("valid_from", "<=", now),
-                    ("valid_to", ">=", now),
-                    ("audience", "array_contains_any", ["student"]),
-                ],
-                tenant_id=current_user.tenant,
-            )
+                if not partner_doc:
+                    logger.warning(
+                        f"Documento do parceiro {id} não encontrado na coleção 'benefits'"
+                    )
+                    return []
 
-        async def get_postgres_promotions():
-            return await postgres_client.query_documents(
-                "promotions",
-                filters=[
-                    ("partner_id", "==", id),
-                    ("active", "==", True),
-                    ("valid_from", "<=", now),
-                    ("valid_to", ">=", now),
-                ],
-                tenant_id=current_user.tenant,
-            )
+                # Extrair benefícios ativos para estudantes
+                benefits = []
+                benefit_keys = [
+                    key for key in partner_doc.keys() if key.startswith("BNF_")
+                ]
 
-        promotions_result = await get_firestore_promotions()
+                for benefit_key in benefit_keys:
+                    benefit_data = partner_doc[benefit_key]
+                    system = benefit_data.get("system", {})
+                    status = system.get("status", "")
+                    audience = system.get("audience", "")
 
-        # Construir resposta
+                    # Filtrar apenas benefícios ativos para estudantes
+                    if status == "active":
+                        # Verificar se audience inclui estudantes
+                        audience_includes_students = False
+
+                        # Converter audience para string se necessário para debug
+                        audience_str = str(audience) if audience else ""
+                        logger.debug(
+                            f"Processando audience para benefício {benefit_key}: {audience_str} (tipo: {type(audience)})"
+                        )
+
+                        if (
+                            audience == "all"
+                            or audience == "students"
+                            or audience == "student"
+                        ):
+                            audience_includes_students = True
+                        elif isinstance(audience, list):
+                            try:
+                                audience_includes_students = "student" in audience
+                            except TypeError as e:
+                                logger.error(
+                                    f"Erro ao verificar 'student' em audience {audience}: {e}"
+                                )
+                                audience_includes_students = False
+                        elif isinstance(audience, str) and "student" in audience_str:
+                            audience_includes_students = True
+
+                        if audience_includes_students:
+                            # Converter usando BenefitDTO
+                            from src.models.benefit import BenefitDTO
+
+                            try:
+                                benefit_dto = BenefitDTO(
+                                    key=benefit_key,
+                                    benefit_data=benefit_data,
+                                    partner_id=id,
+                                )
+                                benefit_obj = benefit_dto.to_benefit()
+                                benefits.append(benefit_obj.model_dump())
+                            except Exception as e:
+                                logger.error(
+                                    f"Erro ao converter benefício {benefit_key}: {str(e)}"
+                                )
+
+                return benefits
+
+            except Exception as e:
+                logger.error(f"Erro ao buscar benefícios do parceiro {id}: {str(e)}")
+                return []
+
+        async def get_postgres_benefits():
+            """Busca benefícios no PostgreSQL (implementação futura se necessário)."""
+            # Por enquanto, retorna lista vazia pois os benefícios estão no Firestore
+            return []
+
+        benefits_result = await get_firestore_benefits()
+
+        # Recalcular benefits_count baseado nos benefícios filtrados
+        filtered_benefits_count = len(benefits_result)
+
+        # Construir a resposta final
         partner_detail = PartnerDetail(
-            **partner, promotions=promotions_result.get("items", [])
+            **partner,
+            benefits=benefits_result,
+            benefits_count=filtered_benefits_count,
         )
 
-        return {"data": partner_detail, "msg": "ok"}
+        return PartnerDetailResponse(data=partner_detail)
 
-    except HTTPException:
-        raise
+    except HTTPException as e:
+        # Re-raise HTTP exceptions para que o FastAPI as manipule
+        raise e
     except Exception as e:
         logger.error(f"Erro ao obter detalhes do parceiro {id}: {str(e)}")
         raise HTTPException(
@@ -162,240 +227,58 @@ async def get_partner_details(
         ) from e
 
 
-@router.post("/validation-codes", response_model=ValidationCodeResponse)
+@router.post("/validation-codes", status_code=status.HTTP_201_CREATED)
 async def create_validation_code(
-    request: ValidationCodeRequest,
+    request: ValidationCodeCreationRequest,
     current_user: JWTPayload = Depends(validate_student_role),
 ):
     """
-    Gera um código de validação de 6 dígitos que expira em 3 minutos.
+    Gera um código de validação de 6 dígitos para um parceiro.
     """
     try:
-        # Verificar se o parceiro existe e está ativo
-        async def get_firestore_partner():
-            return await firestore_client.get_document("partners", request.partner_id)
-
-        async def get_postgres_partner():
-            return await postgres_client.get_document("partners", request.partner_id)
-
-        partner = await get_firestore_partner()
-
-        if not partner or not partner.get("active", False):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Parceiro não encontrado"}
-                },
-            )
-
-        # Verificar se o aluno está ativo
-        student_id = current_user.sub
-
-        async def get_firestore_student():
-            return await firestore_client.get_document("students", student_id)
-
-        async def get_postgres_student():
-            return await postgres_client.get_document("students", student_id)
-
-        student = await get_firestore_student()
-
-        if not student:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={"error": {"code": "NOT_FOUND", "msg": "Aluno não encontrado"}},
-            )
-
-        # Verificar se o aluno está com matrícula ativa
-        active_until = student.get("active_until")
-        if active_until:
-            # Converter para datetime se for string
-            if isinstance(active_until, str):
-                active_until = datetime.fromisoformat(
-                    active_until.replace("Z", "+00:00")
-                )
-
-            if active_until < datetime.now().date():
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail={
-                        "error": {
-                            "code": "INACTIVE_STUDENT",
-                            "msg": "Aluno com matrícula inativa",
-                        }
-                    },
-                )
-
         # Gerar código de 6 dígitos
-        import random
+        validation_code = "".join(random.choices(string.digits, k=6))
+        expires_at = datetime.utcnow() + timedelta(minutes=10)
 
-        code = str(random.randint(100000, 999999))
+        # Criar objeto ValidationCode
+        code_data = ValidationCode(
+            tenant_id=current_user.tenant,
+            partner_id=request.partner_id,
+            student_id=current_user.entity_id,  # Usar entity_id
 
-        # Calcular data de expiração (3 minutos)
-        expires = datetime.now() + timedelta(minutes=3)
-
-        # Criar código de validação no Firestore
-        validation_code = {
-            "id": str(uuid.uuid4()),
-            "student_id": student_id,
-            "partner_id": request.partner_id,
-            "code_hash": code,  # Em produção, deve ser hash
-            "expires": expires.isoformat(),
-            "used_at": None,
-        }
-
-        await firestore_client.create_document(
-            "validation_codes", validation_code, validation_code["id"]
+            expires=expires_at,
         )
 
-        # Retornar código e data de expiração
-        return {"data": {"code": code, "expires": expires.isoformat()}, "msg": "ok"}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao gerar código de validação: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": "Erro ao gerar código de validação",
-                }
-            },
-        ) from e
-
-
-@router.get("/me/history", response_model=HistoryResponse)
-async def get_student_history(
-    limit: int = Query(
-        20, ge=1, le=100, description="Número máximo de itens por página"
-    ),
-    offset: int = Query(0, ge=0, description="Offset para paginação"),
-    current_user: JWTPayload = Depends(validate_student_role),
-):
-    """
-    Retorna o histórico de resgates do aluno.
-    """
-    try:
-        student_id = current_user.sub
-
-        # Obter códigos de validação usados pelo aluno
-        async def get_firestore_codes():
-            return await firestore_client.query_documents(
-                "validation_codes",
-                tenant_id=current_user.tenant,
-                filters=[("student_id", "==", student_id), ("used_at", "!=", None)],
-                order_by=[("used_at", "DESCENDING")],
-                limit=limit,
-                offset=offset,
-            )
-
-        async def get_postgres_codes():
-            return await postgres_client.query_documents(
-                "validation_codes",
-                filters=[("student_id", "==", student_id), ("used_at", "!=", None)],
-                order_by=[("used_at", "DESCENDING")],
-                limit=limit,
-                offset=offset,
-                tenant_id=current_user.tenant,
-            )
-
-        codes_result = await get_firestore_codes()
-
-        # Construir histórico com detalhes de parceiros e resgates
-        history_items = []
-
-        for code in codes_result.get("items", []):
-            # Obter parceiro
-            async def get_firestore_partner(current_code=code):
-                return await firestore_client.get_document(
-                    "partners", current_code["partner_id"]
-                )
-
-            async def get_postgres_partner(current_code=code):
-                return await postgres_client.get_document(
-                    "partners", current_code["partner_id"]
-                )
-
-            partner = await get_firestore_partner()
-
-            if not partner:
-                continue
-
-            # Obter resgate
-            async def get_firestore_redemption(current_code=code):
-                redemptions = await firestore_client.query_documents(
-                    "redemptions",
-                    filters=[("validation_code_id", "==", current_code["id"])],
-                    limit=1,
-                )
-                return (
-                    redemptions.get("items", [])[0]
-                    if redemptions.get("items")
-                    else None
-                )
-
-            async def get_postgres_redemption(current_code=code):
-                redemptions = await postgres_client.query_documents(
-                    "redemptions",
-                    filters=[("validation_code_id", "==", current_code["id"])],
-                    limit=1,
-                )
-                return (
-                    redemptions.get("items", [])[0]
-                    if redemptions.get("items")
-                    else None
-                )
-
-            redemption = await get_firestore_redemption()
-
-            if not redemption:
-                continue
-
-            # Obter promoção (opcional)
-            promotion_title = "Promoção"
-
-            # Adicionar ao histórico
-            history_items.append(
-                {
-                    "id": redemption["id"],
-                    "partner": {
-                        "id": partner["id"],
-                        "trade_name": partner["trade_name"],
-                    },
-                    "promotion": {"title": promotion_title},
-                    "value": redemption["value"],
-                    "used_at": code["used_at"],
-                }
-            )
+        # Salvar no Firestore, usando o código como ID do documento
+        await firestore_client.create_document(
+            "validation_codes",
+            code_data.model_dump(mode="json"),
+            doc_id=validation_code,
+        )
 
         return {
-            "data": {
-                "items": history_items,
-                "total": codes_result.get("total", 0),
-                "limit": limit,
-                "offset": offset,
-            },
-            "msg": "ok",
+            "code": validation_code,
+            "expires": expires_at.isoformat(),
         }
 
     except Exception as e:
-        logger.error(f"Erro ao obter histórico do aluno: {str(e)}")
+        logger.error(
+            f"Erro ao criar código de validação para o parceiro {request.partner_id}: {str(e)}",
+            exc_info=True,
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": "Erro ao obter histórico do aluno",
+                    "code": "VALIDATION_CODE_CREATION_FAILED",
+                    "msg": "Não foi possível gerar o código de validação.",
                 }
             },
         ) from e
 
 
 @router.get("/me/fav", response_model=FavoritesResponse)
-async def get_student_favorites(
-    current_user: JWTPayload = Depends(validate_student_role),
-):
+async def list_favorites(current_user: JWTPayload = Depends(validate_student_role)):
     """
     Retorna a lista de parceiros favoritos do aluno.
 
@@ -406,7 +289,9 @@ async def get_student_favorites(
 
         # Obter documento de favoritos do estudante
         async def get_firestore_favorites():
-            return await firestore_client.get_document("students_fav", student_id)
+            return await firestore_client.get_document(
+                "students_fav", student_id, tenant_id=current_user.tenant
+            )
 
         async def get_postgres_favorites():
             return await postgres_client.get_document("students_fav", student_id)
@@ -428,10 +313,14 @@ async def get_student_favorites(
         for partner_id in favorite_partner_ids:
             # Obter parceiro
             async def get_firestore_partner(pid=partner_id):
-                return await firestore_client.get_document("partners", pid)
+                return await firestore_client.get_document(
+                    "partners", pid, tenant_id=current_user.tenant
+                )
 
             async def get_postgres_partner(pid=partner_id):
-                return await postgres_client.get_document("partners", pid)
+                return await postgres_client.get_document(
+                    "partners", pid, tenant_id=current_user.tenant
+                )
 
             partner = await with_circuit_breaker(
                 get_firestore_partner, get_postgres_partner
@@ -470,10 +359,14 @@ async def add_student_favorite(
 
         # Verificar se o parceiro existe e está ativo
         async def get_firestore_partner():
-            return await firestore_client.get_document("partners", partner_id_value)
+            return await firestore_client.get_document(
+                "partners", partner_id_value, tenant_id=current_user.tenant
+            )
 
         async def get_postgres_partner():
-            return await postgres_client.get_document("partners", partner_id_value)
+            return await postgres_client.get_document(
+                "partners", partner_id_value, tenant_id=current_user.tenant
+            )
 
         partner = await with_circuit_breaker(
             get_firestore_partner, get_postgres_partner
@@ -489,7 +382,9 @@ async def add_student_favorite(
 
         # Obter documento atual de favoritos
         async def get_firestore_favorites():
-            return await firestore_client.get_document("students_fav", student_id)
+            return await firestore_client.get_document(
+                "students_fav", student_id, tenant_id=current_user.tenant
+            )
 
         async def get_postgres_favorites():
             return await postgres_client.get_document("students_fav", student_id)
@@ -569,7 +464,9 @@ async def remove_student_favorite(
 
         # Obter documento atual de favoritos
         async def get_firestore_favorites():
-            return await firestore_client.get_document("students_fav", student_id)
+            return await firestore_client.get_document(
+                "students_fav", student_id, tenant_id=current_user.tenant
+            )
 
         async def get_postgres_favorites():
             return await postgres_client.get_document("students_fav", student_id)

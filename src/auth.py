@@ -160,7 +160,12 @@ async def get_current_user(
     - Em produção, valida estritamente com o Firebase.
     - Em desenvolvimento, tenta Firebase e, como fallback, valida JWT local.
     """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
     if TESTING_MODE:
+        logger.info("🔧 Modo de teste ativo - retornando usuário mock")
         return JWTPayload(
             sub="test-user-123",
             role="student",
@@ -170,6 +175,7 @@ async def get_current_user(
         )
 
     if not credentials:
+        logger.warning("❌ Token não fornecido")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
@@ -178,16 +184,30 @@ async def get_current_user(
         )
 
     token = credentials.credentials
+    logger.info(f"🔍 Token recebido: {token[:50]}...")
+    logger.info(f"🌍 Ambiente: {ENVIRONMENT}")
 
     if ENVIRONMENT == "production":
+        logger.info("🏭 Modo produção - validando apenas com Firebase")
         return await verify_firebase_token(token)
 
     # Em desenvolvimento, tentar Firebase primeiro, depois JWT local
+    logger.info("🔧 Modo desenvolvimento - tentando Firebase primeiro")
     try:
-        return await verify_firebase_token(token)
-    except HTTPException:
+        result = await verify_firebase_token(token)
+        logger.info("✅ Token Firebase válido")
+        return result
+    except HTTPException as e:
+        logger.info(f"❌ Firebase falhou: {e.detail}")
+        logger.info("🔄 Tentando JWT local como fallback")
         # Se a verificação do Firebase falhar, tente o JWT local
-        return await verify_local_jwt(token)
+        try:
+            result = await verify_local_jwt(token)
+            logger.info("✅ Token JWT local válido")
+            return result
+        except HTTPException as local_e:
+            logger.error(f"❌ JWT local também falhou: {local_e.detail}")
+            raise local_e
 
 
 async def validate_student_role(

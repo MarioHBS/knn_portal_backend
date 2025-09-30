@@ -111,9 +111,17 @@ class Benefit(BaseModel):
     @classmethod
     def validate_dates(cls, v, info):
         """Valida se a data de término é posterior à data de início."""
-        if hasattr(info, "data") and info.data and "valid_from" in info.data:
-            if v <= info.data["valid_from"]:
+        try:
+            if (
+                hasattr(info, "data")
+                and info.data
+                and hasattr(info.data, "get")
+                and info.data.get("valid_from")
+            ) and v <= info.data.get("valid_from"):
                 raise ValueError("Data de término deve ser posterior à data de início")
+        except (TypeError, AttributeError):
+            # Se info.data não for iterável ou não tiver get, pular a validação
+            pass
         return v
 
     class Config:
@@ -152,7 +160,9 @@ class BenefitDTO(BaseModel):
             title=self.benefit_data.get("title", "") or "",
             tenant_id=system.get("tenant_id", "not found"),
             partner_id=self.partner_id,
-            type=system.get("type", "discount"),
+            type=self.convert_type(
+                system.get("type", "discount")
+            ),  # Usar convert_type para mapear valores
             audience=self.convert_audience(firestore_audience),
             active=self.convert_status(benefit_status),
             value=configuration.get("value", 0),
@@ -166,13 +176,31 @@ class BenefitDTO(BaseModel):
         return the_benefit
 
     @staticmethod
+    def convert_type(firestore_type: str) -> str:
+        """Converte tipo do formato Firestore para o formato da API."""
+        type_mapping = {
+            "percentage": "discount",
+            "fixed": "discount",
+            "discount": "discount",
+            "cashback": "cashback",
+            "freebie": "freebie",
+            "upgrade": "upgrade",
+        }
+        return type_mapping.get(firestore_type, "discount")
+
+    @staticmethod
     def convert_status(benefit_status: str) -> bool:
         """Converte status do formato Firestore para o formato da API."""
         return benefit_status == "active"
 
     @staticmethod
-    def convert_audience(firestore_audience: str) -> list[str]:
-        """Converte audience do formato Firestore (plural) para o formato da API (singular)."""
+    def convert_audience(firestore_audience) -> list[str]:
+        """Converte audience do formato Firestore para o formato da API (singular)."""
+        # Se já é uma lista, retorna diretamente
+        if isinstance(firestore_audience, list):
+            return firestore_audience
+
+        # Se é uma string, usa o mapeamento
         mapping = {
             "students": ["student"],
             "employees": ["employee"],
@@ -185,8 +213,8 @@ class BenefitDTO(BaseModel):
         """Trata o campo valid_to quando é None no Firestore."""
         if valid_until is None:
             # Usar uma data padrão distante no futuro para benefícios sem data de expiração
-            # Usando datetime.timezone.utc para compatibilidade com outros datetimes do sistema
-            return datetime(2099, 12, 31, 23, 59, 59, tzinfo=datetime.timezone.utc)
+            # Usando timezone UTC para compatibilidade
+            return datetime(2099, 12, 31, 23, 59, 59, tzinfo=UTC)
         return _ensure_datetime(valid_until)
 
     @classmethod
@@ -310,13 +338,18 @@ class BenefitRequest(BaseModel):
     @classmethod
     def validate_dates(cls, v, info):
         """Valida se a data de término é posterior à data de início."""
-        if (
-            hasattr(info, "data")
-            and info.data
-            and "valid_from" in info.data
-            and v <= info.data["valid_from"]
-        ):
-            raise ValueError("Data de término deve ser posterior à data de início")
+        try:
+            if (
+                hasattr(info, "data")
+                and info.data
+                and hasattr(info.data, "get")
+                and info.data.get("valid_from")
+                and v <= info.data.get("valid_from")
+            ):
+                raise ValueError("Data de término deve ser posterior à data de início")
+        except (TypeError, AttributeError):
+            # Se info.data não for iterável ou não tiver get, pular a validação
+            pass
         return v
 
 

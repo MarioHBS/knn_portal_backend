@@ -3,7 +3,7 @@
 **Projeto:** KNN Portal Journey Club Backend
 **Data:** Setembro 2025
 **Status:** 100% Concluído
-**Última Atualização:** 21 de Setembro 2025
+**Última Atualização:** Setembro 2025
 
 ---
 
@@ -16,6 +16,38 @@
 ## 🔧 Manutenção e Otimização Contínua
 
 ### ✅ RECENTEMENTE CONCLUÍDO
+
+#### Correção e Validação do Endpoint delete_benefit ✅
+
+- **Status:** ✅ **CONCLUÍDO**
+- **Concluído em:** Janeiro 2025
+- **Duração:** 1 dia
+
+**Checklist:**
+
+- [x] **Correção da lógica de acesso ao Firestore:**
+  - [x] Identificado problema com prefixo de tenant em IDs de documento
+  - [x] Corrigida função de busca de documentos no Firestore
+  - [x] Implementado acesso direto sem prefixo de tenant
+  - [x] Validado funcionamento com documentos existentes
+
+- [x] **Configuração de hard delete como padrão:**
+  - [x] Alterado parâmetro padrão de soft_delete=True para soft_delete=False
+  - [x] Atualizada documentação do endpoint
+  - [x] Mantido suporte a soft delete via parâmetro opcional
+
+- [x] **Testes e validação:**
+  - [x] Criados scripts de teste automatizados
+  - [x] Validado comportamento de hard delete (remoção completa)
+  - [x] Validado comportamento de soft delete (status inactive)
+  - [x] Confirmado funcionamento via acesso direto ao Firestore
+
+**Critério de Sucesso:**
+
+- ✅ Endpoint delete_benefit funcionando corretamente
+- ✅ Hard delete como comportamento padrão implementado
+- ✅ Soft delete disponível via parâmetro opcional
+- ✅ Testes automatizados validando ambos os comportamentos
 
 #### Reorganização de Scripts de Debug ✅
 

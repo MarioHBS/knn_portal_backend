@@ -97,6 +97,7 @@ class PartnersService:
 
             # Converter dados brutos para objetos Partner
             partner_objects = []
+            failed_partners = []
             for i, partner_data in enumerate(partners_data):
                 try:
                     logger.info(f"DEBUG - Convertendo parceiro {i+1}: {partner_data}")
@@ -104,11 +105,21 @@ class PartnersService:
                     partner_objects.append(partner_obj)
                     logger.info(f"DEBUG - Parceiro {i+1} convertido com sucesso")
                 except Exception as e:
-                    logger.warning(
-                        f"Erro ao converter parceiro {partner_data.get('id', 'N/A')}: {e}"
+                    failed_partners.append({
+                        'index': i+1,
+                        'id': partner_data.get('id', 'N/A'),
+                        'error': str(e)
+                    })
+                    logger.error(
+                        f"❌ FALHA na conversão do parceiro {i+1} (ID: {partner_data.get('id', 'N/A')}): {e}"
                     )
-                    logger.info(f"DEBUG - Dados do parceiro que falhou: {partner_data}")
+                    logger.error(f"❌ Dados do parceiro que falhou: {partner_data}")
                     continue
+            
+            if failed_partners:
+                logger.error(f"❌ RESUMO: {len(failed_partners)} parceiro(s) falharam na conversão:")
+                for failed in failed_partners:
+                    logger.error(f"   - Parceiro {failed['index']} (ID: {failed['id']}): {failed['error']}")
 
             logger.info(f"DEBUG - Total de partner_objects criados: {len(partner_objects)}")
             logger.info(

@@ -131,6 +131,29 @@ async def get_partner_details(
         ) from e
 
 
+@router.get("/students", response_model=EntityListResponse)
+async def list_students(
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Lista todos os estudantes.
+    """
+    try:
+        students = await firestore_client.query_documents(
+            "students", tenant_id=current_user.tenant, limit=1000
+        )
+        return {"data": students, "msg": "Estudantes listados com sucesso"}
+
+    except Exception as e:
+        logger.error(f"Erro ao listar estudantes: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {"code": "SERVER_ERROR", "msg": "Erro ao listar estudantes"}
+            },
+        ) from e
+
+
 @router.post("/students", response_model=EntityResponse)
 async def create_student(
     data: dict[str, Any] = Body(..., description="Dados do estudante"),
@@ -181,6 +204,29 @@ async def create_student(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao criar estudante"}
+            },
+        ) from e
+
+
+@router.get("/employees", response_model=EntityListResponse)
+async def list_employees(
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Lista todos os funcionários.
+    """
+    try:
+        employees = await firestore_client.query_documents(
+            "employees", tenant_id=current_user.tenant, limit=1000
+        )
+        return {"data": employees, "msg": "Funcionários listados com sucesso"}
+
+    except Exception as e:
+        logger.error(f"Erro ao listar funcionários: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {"code": "SERVER_ERROR", "msg": "Erro ao listar funcionários"}
             },
         ) from e
 
@@ -470,36 +516,63 @@ async def get_benefit_details(
             f"Admin {current_user.sub} buscando benefício {benefit_id} do parceiro {partner_id}"
         )
 
-        # Usar circuit breaker para operações do Firestore
-        @with_circuit_breaker
-        async def get_benefit():
+        async def get_benefit_from_firestore():
+            logger.info(
+                f"🔍 Iniciando busca do benefício {benefit_id} do parceiro {partner_id}"
+            )
+            logger.info(f"🔍 Tenant do usuário: {current_user.tenant}")
+
+            # 1. Buscar o documento do parceiro na coleção 'benefits'
+            logger.info(
+                f"🔍 Buscando documento na coleção 'benefits' com ID: {partner_id}"
+            )
             partner_doc = await firestore_client.get_document(
                 "benefits", partner_id, current_user.tenant
             )
 
+            logger.info(
+                f"🔍 Resultado da busca do documento: {partner_doc is not None}"
+            )
+            if partner_doc:
+                logger.info(
+                    f"🔍 Chaves do documento encontrado: {list(partner_doc.keys())}"
+                )
+                # Verificar se o benefit_id existe
+                benefit_keys = [k for k in partner_doc.keys() if k.startswith("BNF_")]
+                logger.info(f"🔍 Benefícios encontrados no documento: {benefit_keys}")
+                logger.info(f"🔍 Procurando por benefício: {benefit_id}")
+
             if not partner_doc:
+                logger.warning(f"❌ Documento do parceiro {partner_id} não encontrado")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail={
                         "error": {
                             "code": "PARTNER_NOT_FOUND",
-                            "msg": f"Parceiro {partner_id} não encontrado",
+                            "msg": "Parceiro não encontrado",
                         }
                     },
                 )
 
-            if benefit_id not in partner_doc:
+            # 2. Acessar o benefício diretamente no documento (não há campo 'data')
+            logger.info(f"🔍 Buscando benefício {benefit_id} no documento")
+            benefit_data = partner_doc.get(benefit_id)
+
+            logger.info(f"🔍 Benefício encontrado: {benefit_data is not None}")
+
+            if not benefit_data:
+                logger.warning(
+                    f"❌ Benefício {benefit_id} não encontrado no documento do parceiro {partner_id}"
+                )
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail={
                         "error": {
                             "code": "BENEFIT_NOT_FOUND",
-                            "msg": f"Benefício {benefit_id} não encontrado para o parceiro {partner_id}",
+                            "msg": "Benefício não encontrado",
                         }
                     },
                 )
-
-            benefit_data = partner_doc[benefit_id]
 
             # Adicionar informações do parceiro e benefício
             benefit_with_ids = {
@@ -508,9 +581,12 @@ async def get_benefit_details(
                 "partner_id": partner_id,
             }
 
+            logger.info(
+                f"✅ Benefício {benefit_id} encontrado e processado com sucesso"
+            )
             return benefit_with_ids
 
-        benefit = await get_benefit()
+        benefit = await get_benefit_from_firestore()
 
         logger.info(f"Benefício {benefit_id} encontrado para parceiro {partner_id}")
 
@@ -593,55 +669,6 @@ async def update_benefit(
                     ),
                     "valid_locations": getattr(
                         benefit_data, "valid_locations", ["todas"]
-                    ),
-                },
-            },
-            "limits": {
-                "usage": {
-                    "per_day": getattr(benefit_data, "per_day", -1),
-                    "per_week": getattr(benefit_data, "per_week", -1),
-                    "per_month": getattr(benefit_data, "per_month", 1),
-                    "per_year": getattr(benefit_data, "per_year", -1),
-                    "lifetime": getattr(benefit_data, "lifetime", -1),
-                },
-                "temporal": {
-                    "cooldown_period": {
-                        "days": getattr(benefit_data, "cooldown_days", 0),
-                        "weeks": getattr(benefit_data, "cooldown_weeks", 0),
-                        "months": getattr(benefit_data, "cooldown_months", 0),
-                        "description": getattr(
-                            benefit_data,
-                            "cooldown_description",
-                            "Sem período de carência",
-                        ),
-                    },
-                    "valid_hours": {
-                        "start": getattr(benefit_data, "valid_hours_start", "00:00"),
-                        "end": getattr(benefit_data, "valid_hours_end", "23:59"),
-                    },
-                    "valid_days": getattr(
-                        benefit_data,
-                        "valid_days",
-                        [
-                            "monday",
-                            "tuesday",
-                            "wednesday",
-                            "thursday",
-                            "friday",
-                            "saturday",
-                            "sunday",
-                        ],
-                    ),
-                },
-                "financial": {
-                    "max_discount_amount": getattr(
-                        benefit_data, "max_discount_amount", None
-                    ),
-                    "min_purchase_amount": getattr(
-                        benefit_data, "min_purchase_amount", 0
-                    ),
-                    "max_purchase_amount": getattr(
-                        benefit_data, "max_purchase_amount", None
                     ),
                 },
             },
@@ -817,7 +844,9 @@ async def update_benefit(
 async def delete_benefit(
     partner_id: str = Path(..., description="ID do parceiro"),
     benefit_id: str = Path(..., description="ID do benefício"),
-    soft_delete: bool = Query(False, description="Usar soft delete (padrão: False - Hard Delete)"),
+    soft_delete: bool = Query(
+        False, description="Usar soft delete (padrão: False - Hard Delete)"
+    ),
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
@@ -1017,46 +1046,6 @@ async def create_benefit(
                     "valid_locations": data.get("valid_locations", ["todas"]),
                 },
             },
-            "limits": {
-                "usage": {
-                    "per_day": data.get("per_day", -1),
-                    "per_week": data.get("per_week", -1),
-                    "per_month": data.get("per_month", 1),
-                    "per_year": data.get("per_year", -1),
-                    "lifetime": data.get("lifetime", -1),
-                },
-                "temporal": {
-                    "cooldown_period": {
-                        "days": data.get("cooldown_days", 0),
-                        "weeks": data.get("cooldown_weeks", 0),
-                        "months": data.get("cooldown_months", 0),
-                        "description": data.get(
-                            "cooldown_description", "Sem período de carência"
-                        ),
-                    },
-                    "valid_hours": {
-                        "start": data.get("valid_hours_start", "00:00"),
-                        "end": data.get("valid_hours_end", "23:59"),
-                    },
-                    "valid_days": data.get(
-                        "valid_days",
-                        [
-                            "monday",
-                            "tuesday",
-                            "wednesday",
-                            "thursday",
-                            "friday",
-                            "saturday",
-                            "sunday",
-                        ],
-                    ),
-                },
-                "financial": {
-                    "max_discount_amount": data.get("max_discount_amount"),
-                    "min_purchase_amount": data.get("min_purchase_amount", 0),
-                    "max_purchase_amount": data.get("max_purchase_amount"),
-                },
-            },
             "dates": {
                 "created_at": current_time,
                 "updated_at": current_time,
@@ -1178,7 +1167,10 @@ async def get_metrics(current_user: JWTPayload = Depends(validate_admin_role)):
             today = date.today().isoformat()
 
             result = await firestore_client.query_documents(
-                "students", filters=[("active_until", ">=", today)]
+                "students",
+                tenant_id=current_user.tenant,
+                filters=[("active_until", ">=", today)],
+                limit=1000,
             )
             return result.get("total", 0)
 
@@ -1188,7 +1180,10 @@ async def get_metrics(current_user: JWTPayload = Depends(validate_admin_role)):
             today = date.today().isoformat()
 
             result = await postgres_client.query_documents(
-                "students", filters=[("active_until", ">=", today)]
+                "students",
+                tenant_id=current_user.tenant,
+                filters=[("active_until", ">=", today)],
+                limit=1000,
             )
             return result.get("total", 0)
 
@@ -1198,11 +1193,15 @@ async def get_metrics(current_user: JWTPayload = Depends(validate_admin_role)):
 
         # Contar códigos gerados
         async def count_firestore_codes():
-            result = await firestore_client.query_documents("validation_codes")
+            result = await firestore_client.query_documents(
+                "validation_codes", tenant_id=current_user.tenant
+            )
             return result.get("total", 0)
 
         async def count_postgres_codes():
-            result = await postgres_client.query_documents("validation_codes")
+            result = await postgres_client.query_documents(
+                "validation_codes", tenant_id=current_user.tenant
+            )
             return result.get("total", 0)
 
         codes_generated = await with_circuit_breaker(
@@ -1212,13 +1211,17 @@ async def get_metrics(current_user: JWTPayload = Depends(validate_admin_role)):
         # Contar códigos resgatados
         async def count_firestore_redeemed_codes():
             result = await firestore_client.query_documents(
-                "validation_codes", filters=[("used_at", "!=", None)]
+                "validation_codes",
+                tenant_id=current_user.tenant,
+                filters=[("used_at", "!=", None)],
             )
             return result.get("total", 0)
 
         async def count_postgres_redeemed_codes():
             result = await postgres_client.query_documents(
-                "validation_codes", filters=[("used_at", "!=", None)]
+                "validation_codes",
+                tenant_id=current_user.tenant,
+                filters=[("used_at", "!=", None)],
             )
             return result.get("total", 0)
 
@@ -1232,7 +1235,10 @@ async def get_metrics(current_user: JWTPayload = Depends(validate_admin_role)):
 
         async def get_firestore_partners():
             return await firestore_client.query_documents(
-                "partners", filters=[("active", "==", True)], limit=5
+                "partners",
+                tenant_id=current_user.tenant,
+                filters=[("active", "==", True)],
+                limit=5,
             )
 
         async def get_postgres_partners():

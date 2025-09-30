@@ -174,10 +174,20 @@ class FirestoreClient:
             logger.error("Firestore não inicializado")
             return None
         try:
-            doc_ref = fs_doc(collection, doc_id, tenant_id)
+            doc_ref = db.collection(collection).document(doc_id)
             doc = doc_ref.get()
             if doc.exists:
-                return {**doc.to_dict(), "id": doc.id}
+                # Verificar se o tenant_id do documento corresponde
+                doc_data = doc.to_dict()
+                # Verificar tenant_id em system.tenant_id primeiro, depois em tenant_id direto
+                doc_tenant_id = doc_data.get("system", {}).get("tenant_id") or doc_data.get("tenant_id")
+                if doc_tenant_id == tenant_id:
+                    return {**doc_data, "id": doc.id}
+                else:
+                    logger.warning(
+                        f"Acesso negado: tenant_id do documento ({doc_tenant_id}) não corresponde ao do usuário ({tenant_id}) em {collection}/{doc_id}"
+                    )
+                    return None
             return None
         except Exception as e:
             logger.error(f"Erro ao obter documento {collection}/{doc_id}: {str(e)}")

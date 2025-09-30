@@ -12,7 +12,7 @@ Uso:
     python quick_admin_test.py --benefits               # Testa apenas endpoints de benefícios
 
 Autor: Sistema de Testes KNN
-Data: 2025-01-06
+Data: 2025-09-29
 """
 
 import argparse
@@ -62,6 +62,13 @@ ENDPOINTS = {
         "method": "GET",
         "description": "Lista de benefícios (admin)",
         "category": "benefits",
+    },
+    "get_specific_benefit": {
+        "url": "/admin/benefits/{partner_id}/{benefit_id}",
+        "method": "GET",
+        "description": "Obter detalhes de um benefício específico",
+        "category": "benefits",
+        "url_params": {"partner_id": "PTN_T4L5678_TEC", "benefit_id": "BNF_4A9B21_DC"},
     },
     "admin_metrics": {
         "url": "/admin/metrics",
@@ -115,7 +122,7 @@ ENDPOINTS = {
             "active": True,
             "audience": ["employee", "student"],
         },
-        "url_params": {"partner_id": "PTN_T4L5678_TEC", "benefit_id": "BNF_E67639_DC"},
+        "url_params": {"partner_id": "PTN_T4L5678_TEC", "benefit_id": "BNF_272D2F_DC"},
     },
     "delete_benefit": {
         "url": "/admin/benefits/{partner_id}/{benefit_id}",
@@ -124,9 +131,9 @@ ENDPOINTS = {
         "category": "benefits",
         "data": {
             "partner_id": "PTN_T4L5678_TEC",
-            "benefit_id": "BNF_89A7FE_DC",
+            "benefit_id": "BNF_D80F96_DC",
         },
-        "url_params": {"partner_id": "PTN_T4L5678_TEC", "benefit_id": "BNF_89A7FE_DC"},
+        "url_params": {"partner_id": "PTN_T4L5678_TEC", "benefit_id": "BNF_D80F96_DC"},
     },
 }
 
@@ -346,6 +353,9 @@ class QuickAdminTester:
         self.print_colored(f"🔍 Testando: {endpoint_config['description']}", "blue")
         self.print_colored(f"   {method} {url}", "white")
 
+        # Debug: Mostrar URL final construída
+        self.print_colored(f"   🔧 URL final: {url}", "magenta")
+
         try:
             if method == "GET":
                 response = self.session.get(url, headers=headers, timeout=30)
@@ -394,6 +404,22 @@ class QuickAdminTester:
                             elif isinstance(data_content, dict):
                                 result["data_keys_nested"] = list(data_content.keys())
 
+                                # Tratamento especial para endpoint admin_benefits
+                                if (
+                                    endpoint_key == "admin_benefits"
+                                    and "items" in data_content
+                                ):
+                                    benefits_count = len(data_content["items"])
+                                    total_benefits = data_content.get(
+                                        "total", benefits_count
+                                    )
+                                    result["benefits_count"] = benefits_count
+                                    result["total_benefits"] = total_benefits
+                                    self.print_colored(
+                                        f"   📊 Benefícios encontrados: {benefits_count} (total: {total_benefits})",
+                                        "cyan",
+                                    )
+
                 except json.JSONDecodeError:
                     result["response_text"] = response.text[:200]  # Primeiros 200 chars
 
@@ -402,6 +428,19 @@ class QuickAdminTester:
                     f"   ⚠️  Endpoint não encontrado: {response.status_code}", "yellow"
                 )
                 result["error"] = "Endpoint não encontrado"
+            elif response.status_code == 401:
+                # Tratar especificamente erro 401 (Unauthorized)
+                self.print_colored(
+                    f"   🔐 Token inválido ou expirado: {response.status_code}",
+                    "yellow",
+                )
+                result["token_expired"] = True
+                result["error"] = "Token inválido ou expirado"
+                try:
+                    error_data = response.json()
+                    self.print_colored(f"   🔍 Detalhes 401: {error_data}", "yellow")
+                except json.JSONDecodeError:
+                    self.print_colored(f"   🔍 Resposta 401: {response.text}", "yellow")
             else:
                 # Verifica se é erro de token expirado
                 if self._is_token_expired_error(response):

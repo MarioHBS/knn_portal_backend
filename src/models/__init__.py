@@ -23,10 +23,15 @@ from .partner import (
     PartnerGeolocation,
     PartnerSocialNetworks,
 )
+from .validation_code import (
+    ValidationCode,
+    ValidationCodeCreationRequest,
+    ValidationCodeRedeemRequest,
+)
 
 __all__ = [
     "Benefit",
-    "BenefitListResponse", 
+    "BenefitListResponse",
     "BenefitRequest",
     "BenefitResponse",
     "EmployeeFavorites",
@@ -39,6 +44,9 @@ __all__ = [
     "PartnerSocialNetworks",
     "FavoriteRequest",
     "FavoriteResponse",
+    "ValidationCode",
+    "ValidationCodeCreationRequest",
+    "ValidationCodeRedeemRequest",
     "BaseResponse",
     "ErrorResponse",
     "COURSES_MAP",
@@ -148,21 +156,6 @@ class Employee(BaseModel):
         orm_mode = True
 
 
-class ValidationCode(BaseModel):
-    """Modelo para códigos de validação."""
-
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    tenant_id: str
-    student_id: str
-    partner_id: str
-    code_hash: str
-    expires: datetime
-    used_at: datetime | None = None
-
-    class Config:
-        orm_mode = True
-
-
 class Redemption(BaseModel):
     """Modelo para resgates."""
 
@@ -173,13 +166,6 @@ class Redemption(BaseModel):
 
     class Config:
         orm_mode = True
-
-
-# Modelos para requisições
-class ValidationCodeRequest(BaseModel):
-    """Modelo para requisição de código de validação."""
-
-    partner_id: str
 
 
 class RedeemRequest(BaseModel):
@@ -257,10 +243,20 @@ class Promotion(BaseModel):
 
     @field_validator("valid_to")
     @classmethod
-    def validate_dates(cls, v, values):
+    def validate_dates(cls, v, info):
         """Valida se a data de término é posterior à data de início."""
-        if "valid_from" in values and v <= values["valid_from"]:
-            raise ValueError("Data de término deve ser posterior à data de início")
+        try:
+            if (
+                hasattr(info, "data")
+                and info.data
+                and hasattr(info.data, "get")
+                and info.data.get("valid_from")
+                and v <= info.data.get("valid_from")
+            ):
+                raise ValueError("Data de término deve ser posterior à data de início")
+        except (TypeError, AttributeError):
+            # Se info.data não for iterável ou não tiver get, pular a validação
+            pass
         return v
 
     class Config:
@@ -305,10 +301,20 @@ class PromotionRequest(BaseModel):
 
     @field_validator("valid_to")
     @classmethod
-    def validate_dates(cls, v, values):
+    def validate_dates(cls, v, info):
         """Valida se a data de término é posterior à data de início."""
-        if "valid_from" in values and v <= values["valid_from"]:
-            raise ValueError("Data de término deve ser posterior à data de início")
+        try:
+            if (
+                hasattr(info, "data")
+                and info.data
+                and hasattr(info.data, "get")
+                and info.data.get("valid_from")
+                and v <= info.data.get("valid_from")
+            ):
+                raise ValueError("Data de término deve ser posterior à data de início")
+        except (TypeError, AttributeError):
+            # Se info.data não for iterável ou não tiver get, pular a validação
+            pass
         return v
 
 
@@ -422,16 +428,12 @@ __all__ = [
     "PartnerCategory",
     "Benefit",
     "BenefitConfiguration",
-    "BenefitLimits",
     "BenefitDates",
     "BenefitSystem",
     "BenefitMetadata",
     "BenefitRestrictions",
-    "BenefitUsageLimits",
     "BenefitCooldownPeriod",
     "BenefitValidHours",
-    "BenefitTemporalLimits",
-    "BenefitFinancialLimits",
     "FirestoreTimestamp",
     "BenefitValueType",
     "BenefitCalculationMethod",
@@ -448,6 +450,7 @@ __all__ = [
     "Student",
     "Employee",
     "ValidationCode",
+    "ValidationCodeRedeemRequest",
     "Redemption",
     "Promotion",
     "PromotionRequest",
@@ -457,6 +460,7 @@ __all__ = [
     "PartnerDetailResponse",
     "ValidationCodeResponse",
     "RedeemResponse",
+    "ValidationCodeRedeemRequest",
     "BenefitResponse",
     "BenefitListResponse",
     "ReportResponse",

@@ -34,6 +34,9 @@ except ImportError:
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 
+# Diretório para relatórios
+REPORTS_DIR = os.path.join(SCRIPT_DIR, "reports")
+
 # URLs e configurações
 FIREBASE_AUTH_URL = (
     "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
@@ -63,14 +66,14 @@ TEST_USERS = {
         "description": "Felipe de Oliveira",
     },
     "estudante_teste": {
-        "email": "estudante.teste@journeyclub.com.br",
+        "email": "aluno.teste@journeyclub.com.br",
         "password": "Tp654321",
         "role": "student",
         "description": "Estudante de Teste",
     },
     "funcionario_teste": {
         "email": "funcionario.teste@journeyclub.com.br",
-        "password": "Tp54321",
+        "password": "Tp654321",
         "role": "employee",
         "description": "Funcionário de Teste",
     },
@@ -138,7 +141,9 @@ class BaseAuthenticationTester:
 
         # Testar conectividade com o backend
         try:
-            response = self.session.get(f"{BACKEND_BASE_URL}/health", timeout=10)
+            # O endpoint /health está na raiz, não em /v1
+            health_url = BACKEND_BASE_URL.replace("/v1", "") + "/health"
+            response = self.session.get(health_url, timeout=10)
             if response.status_code == 200:
                 self.print_step("Backend está acessível", "SUCCESS")
                 return True
@@ -485,9 +490,12 @@ class BaseAuthenticationTester:
         Returns:
             Caminho do arquivo salvo
         """
+        # Criar diretório de relatórios se não existir
+        os.makedirs(REPORTS_DIR, exist_ok=True)
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"{entity_type}_auth_test_report_{timestamp}.json"
-        filepath = os.path.join(SCRIPT_DIR, filename)
+        filepath = os.path.join(REPORTS_DIR, filename)
 
         report_data = {
             "timestamp": timestamp,

@@ -2,23 +2,22 @@
 Implementação dos endpoints para o perfil de parceiro (partner).
 """
 
-import uuid
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
 
 from src.auth import JWTPayload, validate_partner_role
-from src.config import CNPJ_HASH_SALT, RATE_LIMIT_REDEEM
+from src.config import RATE_LIMIT_REDEEM
 from src.db import firestore_client, postgres_client, with_circuit_breaker
+from src.db.unified_client import UnifiedDatabaseClient
 from src.models import (
     BaseResponse,
-    BenefitListResponse,
-    RedeemRequest,
     RedeemResponse,
     ReportResponse,
 )
 from src.models.benefit import Benefit, BenefitDTO, BenefitRequest, BenefitResponse
-from src.utils import hash_cnpj, limiter, logger, validate_cnpj
+from src.models.validation_code import ValidationCode, ValidationCodeRedeemRequest
+from src.utils import limiter, logger
 from src.utils.id_generators import IDGenerators
 
 # Criar router
@@ -28,347 +27,123 @@ router = APIRouter(tags=["partner"])
 @router.post("/redeem", response_model=RedeemResponse)
 @limiter.limit(RATE_LIMIT_REDEEM)
 async def redeem_code(
-    request: RedeemRequest, current_user: JWTPayload = Depends(validate_partner_role)
+    request: Request,
+    redeem_request: ValidationCodeRedeemRequest,
+    current_user: JWTPayload = Depends(validate_partner_role),
 ):
     """
     Resgata um código de validação gerado por um aluno.
     Limitado a 5 requisições por minuto por IP.
     """
     try:
-        partner_id = current_user.sub
+        db = UnifiedDatabaseClient()
+        partner_id = current_user.entity_id
+        logger.info(f"Partner ID from token: {partner_id}")
+        logger.info(f"Tenant from token: {current_user.tenant}")
 
-        # Validar CNPJ
-        if not validate_cnpj(request.cnpj):
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={"error": {"code": "INVALID_CNPJ", "msg": "CNPJ inválido"}},
+        # 1. Buscar o parceiro para verificar o CNPJ
+        partner_doc = await db.get_document("partners", partner_id, tenant_id=current_user.tenant)
+        if not partner_doc or partner_doc.get("cnpj") != redeem_request.cnpj:
+            logger.warning(
+                f"Tentativa de resgate com CNPJ incorreto. "
+                f"Parceiro: {partner_id}, CNPJ enviado: {redeem_request.cnpj}"
             )
-
-        # Buscar código de validação no Firestore e PostgreSQL
-        async def get_firestore_code():
-            return await firestore_client.get_document(
-                "validation_codes", request.code, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_code():
-            return await postgres_client.get_document(
-                "validation_codes", request.code, tenant_id=current_user.tenant
-            )
-
-        code_result = await with_circuit_breaker(get_firestore_code, get_postgres_code)
-        code_data = code_result.get("data")
-
-        if not code_data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={"error": {"code": "NOT_FOUND", "msg": "Código não encontrado"}},
-            )
-
-        # Verificar se o código já foi usado
-        if code_data.get("used_at"):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail={
-                    "error": {"code": "CODE_USED", "msg": "Código já foi utilizado"}
-                },
-            )
-
-        # Verificar se o código pertence ao parceiro correto
-        if code_data.get("partner_id") != partner_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail={
-                    "error": {
-                        "code": "INVALID_PARTNER",
-                        "msg": "Código não pertence a este parceiro",
-                    }
-                },
+                detail="CNPJ não corresponde ao parceiro autenticado.",
             )
 
-        code = code_data
-
-        # Verificar se o código expirou
-        expires = code.get("expires")
-        if expires:
-            # Converter para datetime se for string
-            if isinstance(expires, str):
-                expires = datetime.fromisoformat(expires.replace("Z", "+00:00"))
-
-            if expires < datetime.now():
-                raise HTTPException(
-                    status_code=status.HTTP_410_GONE,
-                    detail={"error": {"code": "EXPIRED", "msg": "Código expirado"}},
-                )
-
-        # Determinar tipo de usuário e buscar dados
-        user_type = code.get("user_type", "student")  # Default para compatibilidade
-        user_id = (
-            code.get("student_id")
-            if user_type == "student"
-            else code.get("employee_id")
+        # 2. Buscar código de validação pelo ID do documento
+        code_data = await db.get_document(
+            "validation_codes", redeem_request.code, tenant_id=current_user.tenant
         )
-        collection_name = "students" if user_type == "student" else "employees"
 
-        if not user_id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail={
-                    "error": {
-                        "code": "INVALID_CODE",
-                        "msg": "Código inválido - usuário não identificado",
-                    }
-                },
-            )
-
-        async def get_firestore_user():
-            return await firestore_client.get_document(
-                collection_name, user_id, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_user():
-            return await postgres_client.get_document(
-                collection_name, user_id, tenant_id=current_user.tenant
-            )
-
-        user_result = await with_circuit_breaker(get_firestore_user, get_postgres_user)
-        user = user_result.get("data")
-
-        if not user:
-            user_label = "Aluno" if user_type == "student" else "Funcionário"
+        if not code_data:
+            logger.warning(f"Código de validação '{redeem_request.code}' não encontrado.")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {
-                        "code": "USER_NOT_FOUND",
-                        "msg": f"{user_label} não encontrado",
-                    }
-                },
+                detail=f"Código '{redeem_request.code}' não encontrado.",
             )
 
-        # Verificar se o CNPJ corresponde ao parceiro
-        cnpj_hash = hash_cnpj(request.cnpj, CNPJ_HASH_SALT)
+        # O ID do documento é o próprio código
+        code_id = redeem_request.code
+        code_data["id"] = code_id
 
-        if user.get("cnpj_hash") != cnpj_hash:
+        # 3. Validar o código
+        # Validar se o código pertence ao parceiro correto
+        if code_data.get("partner_id") != partner_id:
+            logger.warning(
+                f"Código '{redeem_request.code}' não pertence ao parceiro autenticado. "
+                f"Parceiro no token: {partner_id}, "
+                f"Parceiro no código: {code_data.get('partner_id')}"
+            )
+            # Retorna 404 para não vazar a informação de que o código existe.
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={
-                    "error": {
-                        "code": "INVALID_CNPJ",
-                        "msg": "CNPJ não corresponde ao parceiro",
-                    }
-                },
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Código '{redeem_request.code}' não encontrado.",
             )
 
-        # Verificar se o usuário está com cadastro ativo
-        active_until = user.get("active_until")
-        if active_until:
-            # Converter para datetime se for string
-            if isinstance(active_until, str):
-                active_until = datetime.fromisoformat(
-                    active_until.replace("Z", "+00:00")
-                )
+        if code_data.get("used_at"):
+            logger.warning(f"Código '{redeem_request.code}' já foi resgatado.")
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Código '{redeem_request.code}' já foi resgatado.",
+            )
 
-            if active_until < datetime.now().date():
-                user_label = "Aluno" if user_type == "student" else "Funcionário"
-                error_code = (
-                    "INACTIVE_STUDENT"
-                    if user_type == "student"
-                    else "INACTIVE_EMPLOYEE"
-                )
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail={
-                        "error": {
-                            "code": error_code,
-                            "msg": f"{user_label} com cadastro inativo",
-                        }
-                    },
-                )
+        expires_at = code_data.get("expires_at")
+        if expires_at and datetime.now(UTC) > expires_at:
+            logger.warning(f"Código '{redeem_request.code}' está expirado.")
+            raise HTTPException(
+                status_code=status.HTTP_410_GONE, detail=f"Código '{redeem_request.code}' expirado."
+            )
 
-        # Marcar código como usado
-        now = datetime.now()
-
-        await firestore_client.update_document(
-            "validation_codes", code["id"], {"used_at": now.isoformat()}
-        )
-
-        # Registrar resgate
-        redemption = {
-            "id": str(uuid.uuid4()),
-            "user_id": user_id,
-            "user_type": user_type,
-            "partner_id": partner_id,
-            "validation_code_id": code["id"],
-            "code": request.code,
-            "redeemed_at": now.isoformat(),
-            "tenant_id": current_user.tenant,
-        }
-
-        # Manter compatibilidade com campo student_id para códigos antigos
-        if user_type == "student":
-            redemption["student_id"] = user_id
-
-        await firestore_client.create_document(
-            "redemptions", redemption, redemption["id"]
-        )
-
-        # Retornar informações do usuário e promoção
-        user_data = {
-            "name": user.get("name", ""),
-        }
-
-        # Adicionar campos específicos por tipo de usuário
-        if user_type == "student":
-            user_data["course"] = user.get("course", "")
-        else:  # employee
-            user_data["department"] = user.get("department", "")
-            user_data["position"] = user.get("position", "")
-
-        return {
-            "data": {
-                "user": user_data,
-                "user_type": user_type,
-                "promotion": {
-                    "title": "Promoção"  # Simplificado, poderia buscar a promoção específica
-                },
+        # 4. Atualizar o código como resgatado
+        redeemed_time = datetime.now(UTC)
+        await db.update_document(
+            collection="validation_codes",
+            doc_id=code_id,
+            data={
+                "used_at": redeemed_time,
+                "redeemed_by_partner_id": partner_id,
             },
-            "msg": "ok",
-        }
+            tenant_id=current_user.tenant,
+        )
+
+        # 5. Buscar nome do aluno para a resposta
+        student_id = code_data.get("student_id")
+        user_name = "Aluno não encontrado"
+        if student_id:
+            student_doc = await db.get_document("students", student_id, tenant_id=current_user.tenant)
+            if student_doc:
+                user_name = student_doc.get("name", "Nome não disponível")
+
+        logger.info(
+            f"Código {redeem_request.code} resgatado com sucesso pelo parceiro {partner_id}"
+        )
+
+        return RedeemResponse(
+            data={
+                "user_name": user_name,
+                "redeemed_at": redeemed_time.isoformat(),
+            }
+        )
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Erro ao resgatar código: {str(e)}")
+        logger.error(f"Erro ao resgatar código: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao resgatar código"}
+                "error": {
+                    "code": "INTERNAL_ERROR",
+                    "msg": "Ocorreu um erro inesperado ao resgatar o código",
+                }
             },
         ) from e
 
 
-@router.get("/promotions", response_model=BenefitListResponse)
-async def list_partner_promotions(
-    limit: int = Query(
-        20, ge=1, le=100, description="Número máximo de itens por página"
-    ),
-    offset: int = Query(0, ge=0, description="Offset para paginação"),
-    current_user: JWTPayload = Depends(validate_partner_role),
-):
-    """
-    Lista promoções do parceiro.
-    """
-    try:
-        # Obter entity_id do JWT token (abordagem híbrida)
-        partner_id = current_user.entity_id
-        tenant_id = current_user.tenant
-        logger.info(f"DEBUG - ID do Parceiro: {partner_id} - Tenant ID: {tenant_id}")
-
-        # Buscar documento de benefícios do parceiro
-        # Solução 1: Busca direta sem prefixo tenant_id no documento ID
-        async def get_firestore_benefits():
-            # Buscar diretamente pelo partner_id sem usar tenant_id no documento ID
-            from src.db.firestore import get_database
-
-            db = get_database()
-            doc_ref = db.collection("benefits").document(partner_id)
-            doc = doc_ref.get()
-
-            if doc.exists:
-                logger.info(
-                    f"DEBUG - Beneficio encontrado diretamente para partner_id: {partner_id}"
-                )
-                return {"data": doc.to_dict()}
-            else:
-                logger.info(
-                    f"DEBUG - Nenhum benefício encontrado para partner_id: {partner_id}"
-                )
-                return {"data": {}}
-
-        async def get_postgres_benefits():
-            return await postgres_client.get_document("benefits", partner_id)
-
-        benefits_doc = await with_circuit_breaker(
-            get_firestore_benefits, get_postgres_benefits
-        )
-
-        # Extrair benefícios do documento
-        logger.info(f"DEBUG - Resultado da consulta Firestore: {benefits_doc}")
-        benefits_data = benefits_doc.get("data", {}) if benefits_doc else {}
-
-        # Debug: verificar tipo e estrutura dos dados
-        logger.info(f"DEBUG - Tipo de benefits_data: {type(benefits_data)}")
-        logger.info(f"DEBUG - Conteúdo de benefits_data: {benefits_data}")
-
-        # Verificar se benefits_data é um dicionário
-        if not isinstance(benefits_data, dict):
-            logger.warning(
-                f"DEBUG - benefits_data não é um dicionário, é: {type(benefits_data)}"
-            )
-            benefits_data = {}
-
-        # Obter partner_id dos dados
-        # partner_id = benefits_data.get("_partner_info", {}).get("partner_id", partner_id) # desnecessário
-
-        # Função auxiliar para converter dados do Firestore
-        def convert_firestore_data(data):
-            """Converte dados do Firestore para formato compatível com Pydantic."""
-            if isinstance(data, dict):
-                converted = {k: convert_firestore_data(v) for k, v in data.items()}
-                # Normalizar campo audience para string se for lista
-                if "system" in converted and "audience" in converted["system"]:
-                    audience = converted["system"]["audience"]
-                    if isinstance(audience, list):
-                        # Converter lista para string separada por vírgula
-                        converted["system"]["audience"] = ",".join(audience)
-                return converted
-            elif hasattr(data, "timestamp"):  # DatetimeWithNanoseconds
-                return data.timestamp()
-            elif isinstance(data, list):
-                return [convert_firestore_data(item) for item in data]
-            else:
-                return data
-
-        # Filtrar apenas os campos que são benefícios (começam com BNF_)
-        benefits_list = []
-        for key, value in benefits_data.items():
-            if key.startswith("BNF_") and isinstance(value, dict):
-                try:
-                    # Converter dados do Firestore para formato compatível
-                    converted_value = convert_firestore_data(value)
-                    benefit = BenefitDTO(
-                        key=key, benefit_data=converted_value, partner_id=partner_id
-                    ).to_benefit()
-                    benefits_list.append(benefit)
-                except Exception as e:
-                    logger.warning(f"Erro ao processar benefício {key}: {str(e)}")
-                    # Pular este benefício e continuar com os outros
-                    continue
-
-        # Ordenar por valid_to (mais recente primeiro)
-        benefits_list.sort(
-            key=lambda x: x.valid_to if x.valid_to else datetime.min, reverse=True
-        )
-
-        # Aplicar paginação
-        paginated_benefits = benefits_list[offset : offset + limit]
-
-        # Estrutura de resposta compatível com o formato esperado
-        result = paginated_benefits
-
-        return {"data": result, "msg": "ok"}
-
-    except Exception as e:
-        logger.error(f"Erro ao listar promoções: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao listar promoções"}
-            },
-        ) from None
-
-
-@router.post("/promotions", response_model=BenefitResponse)
+@router.post("/promotions", response_model=BenefitResponse, status_code=201)
 async def create_promotion(
     promotion_data: BenefitRequest,
     current_user: JWTPayload = Depends(validate_partner_role),

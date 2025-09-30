@@ -9,6 +9,15 @@
 - [x] Estruturação de documentação em `docs/`
 - [x] Limpeza da raiz do projeto
 
+### Correções de Endpoints
+
+- [x] **Endpoint delete_benefit corrigido e validado** (Setembro 2025)
+  - [x] Corrigida lógica de acesso ao Firestore (remoção de prefixo tenant)
+  - [x] Implementado hard delete como comportamento padrão
+  - [x] Mantido suporte a soft delete via parâmetro opcional
+  - [x] Testes automatizados validando ambos os comportamentos
+  - [x] Documentação do endpoint atualizada
+
 ## 🔄 Em Andamento
 
 ### Desenvolvimento de Funcionalidades
@@ -81,4 +90,4 @@
 - **Guias de Configuração:** `docs/`
 
 ---
-*Última atualização: Setembro 2025*
+*Última atualização: Janeiro 2025*

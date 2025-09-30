@@ -11,6 +11,7 @@ Este módulo define os modelos de dados para parceiros, incluindo:
 
 from datetime import datetime
 from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -49,6 +50,7 @@ class PartnerAddress(BaseModel):
     def validate_zip(cls, v):
         """Valida formato do CEP."""
         import re
+
         if v and not re.match(r"^\d{5}-\d{3}$", v):
             raise ValueError("CEP deve estar no formato XXXXX-XXX")
         return v
@@ -118,7 +120,7 @@ class Partner(BaseModel):
     logo_url: str | None = Field(
         None, description="URL do logo do parceiro no Firebase Storage"
     )
-    address: PartnerAddress = Field(..., description="Endereço do parceiro")
+    address: PartnerAddress | None = Field(None, description="Endereço do parceiro")
     social_networks: PartnerSocialNetworks = Field(
         ..., description="Redes sociais do parceiro"
     )
@@ -188,4 +190,180 @@ class Partner(BaseModel):
                 },
                 "active": True,
             }
+        }
+
+
+class PartnerDTO:
+    """
+    Data Transfer Object para conversão de dados entre Firestore e modelo Partner.
+
+    Responsável por padronizar a conversão de dados, lidar com campos opcionais
+    e facilitar futuras migrações de dados.
+    """
+
+    @staticmethod
+    def from_firestore(doc_data: dict[str, Any], doc_id: str = None) -> dict[str, Any]:
+        """
+        Converte dados do Firestore para formato compatível com modelo Partner.
+
+        Args:
+            doc_data: Dados brutos do documento Firestore
+            doc_id: ID do documento (opcional, pode estar em doc_data['id'])
+
+        Returns:
+            dict: Dados formatados para criação do modelo Partner
+
+        Raises:
+            ValueError: Se campos obrigatórios estiverem ausentes
+        """
+        # Campos obrigatórios com mapeamento (exceto id que vem separado)
+        required_mappings = {
+            "trade_name": "trade_name",
+            "tenant_id": "tenant_id",
+            "cnpj": "cnpj",
+            "category": "category",
+            "active": "active",
+        }
+
+        # Verificar campos obrigatórios
+        missing_fields = []
+        for firestore_field, model_field in required_mappings.items():
+            if firestore_field not in doc_data:
+                missing_fields.append(firestore_field)
+
+        if missing_fields:
+            raise ValueError(f"Campos obrigatórios ausentes: {missing_fields}")
+
+        # Construir dados base
+        partner_data = {}
+        
+        # ID pode vir do parâmetro doc_id ou do campo 'id' nos dados
+        partner_data["id"] = doc_id or doc_data.get("id")
+        if not partner_data["id"]:
+            raise ValueError("ID do documento é obrigatório")
+        
+        # Mapear outros campos obrigatórios
+        for firestore_field, model_field in required_mappings.items():
+            partner_data[model_field] = doc_data[firestore_field]
+
+        # Campos opcionais com valores padrão
+        partner_data.update(
+            {
+                "benefits_count": doc_data.get("benefits_count", 0),
+                "has_active_benefits": doc_data.get("has_active_benefits", False),
+                "logo_url": doc_data.get("logo_url"),
+                "created_at": doc_data.get("created_at"),
+                "updated_at": doc_data.get("updated_at"),
+            }
+        )
+
+        # Campos complexos com estruturas padrão
+        partner_data["address"] = PartnerDTO._extract_address(doc_data)
+        partner_data["social_networks"] = PartnerDTO._extract_social_networks(doc_data)
+        partner_data["geolocation"] = PartnerDTO._extract_geolocation(doc_data)
+        partner_data["contact"] = PartnerDTO._extract_contact(doc_data)
+
+        return partner_data
+
+    @staticmethod
+    def _extract_address(doc_data: dict[str, Any]) -> dict[str, str | None] | None:
+        """Extrai dados de endereço com valores padrão."""
+        address_data = doc_data.get("address")
+        
+        # Se address for None, retorna None para permitir campo opcional
+        if address_data is None:
+            return None
+            
+        # Se address for um dicionário vazio ou com dados, processa normalmente
+        if isinstance(address_data, dict):
+            return {
+                "zip": address_data.get("zip"),
+                "street": address_data.get("street"),
+                "neighborhood": address_data.get("neighborhood"),
+                "city": address_data.get("city"),
+                "state": address_data.get("state"),
+            }
+        
+        # Fallback para casos inesperados
+        return None
+
+    @staticmethod
+    def _extract_social_networks(doc_data: dict[str, Any]) -> dict[str, str | None]:
+        """Extrai dados de redes sociais com valores padrão."""
+        social_data = doc_data.get("social_networks") or {}
+        return {
+            "instagram": social_data.get("instagram"),
+            "facebook": social_data.get("facebook"),
+            "website": social_data.get("website"),
+        }
+
+    @staticmethod
+    def _extract_geolocation(doc_data: dict[str, Any]) -> dict[str, str | None]:
+        """Extrai dados de geolocalização com valores padrão."""
+        geo_data = doc_data.get("geolocation") or {}
+        # Compatibilidade com campo 'maps' antigo
+        maps_data = doc_data.get("maps") or {}
+        return {
+            "google": geo_data.get("google") or maps_data.get("google"),
+            "waze": geo_data.get("waze") or maps_data.get("waze"),
+        }
+
+    @staticmethod
+    def _extract_contact(doc_data: dict[str, Any]) -> dict[str, str | None]:
+        """Extrai dados de contato com valores padrão."""
+        contact_data = doc_data.get("contact") or {}
+        return {
+            "phone": contact_data.get("phone"),
+            "whatsapp": contact_data.get("whatsapp"),
+            "email": contact_data.get("email"),
+        }
+
+    @staticmethod
+    def to_firestore(partner: Partner) -> dict[str, Any]:
+        """
+        Converte modelo Partner para formato Firestore.
+
+        Args:
+            partner: Instância do modelo Partner
+
+        Returns:
+            dict: Dados formatados para armazenamento no Firestore
+        """
+        return {
+            "id": partner.id,
+            "trade_name": partner.trade_name,
+            "tenant_id": partner.tenant_id,
+            "benefits_count": partner.benefits_count,
+            "has_active_benefits": partner.has_active_benefits,
+            "cnpj": partner.cnpj,
+            "logo_url": partner.logo_url,
+            "address": {
+                "zip": partner.address.zip,
+                "street": partner.address.street,
+                "neighborhood": partner.address.neighborhood,
+                "city": partner.address.city,
+                "state": partner.address.state,
+            },
+            "social_networks": {
+                "instagram": partner.social_networks.instagram,
+                "facebook": partner.social_networks.facebook,
+                "website": partner.social_networks.website,
+            },
+            "geolocation": {
+                "google": partner.geolocation.google,
+                "waze": partner.geolocation.waze,
+            },
+            "contact": {
+                "phone": partner.contact.phone,
+                "whatsapp": partner.contact.whatsapp,
+                "email": partner.contact.email,
+            },
+            "category": partner.category,
+            "active": partner.active,
+            "created_at": partner.created_at.isoformat()
+            if partner.created_at
+            else None,
+            "updated_at": partner.updated_at.isoformat()
+            if partner.updated_at
+            else None,
         }

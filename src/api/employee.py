@@ -14,12 +14,15 @@ from src.models import (
     PartnerDetail,
     PartnerDetailResponse,
     PartnerListResponse,
-    ValidationCodeRequest,
-    ValidationCodeResponse,
+    ValidationCode,
+    ValidationCodeCreationRequest,
 )
 from src.utils import logger
-from src.utils.business_rules import business_rules
 from src.utils.partners_service import PartnersService
+import random
+import string
+from datetime import timedelta
+
 
 # Criar router
 router = APIRouter(tags=["employee"])
@@ -207,8 +210,8 @@ async def add_employee_favorite(
             )
         else:
             # Criar novo documento
-            await firestore_client.create_document(
-                "employees_fav", favorites_data, employee_id
+            await firestore_client.set_document(
+                "employees_fav", employee_id, favorites_data
             )
 
         return FavoriteResponse(
@@ -217,16 +220,96 @@ async def add_employee_favorite(
             favorites_count=len(current_favorites),
         )
 
-    except HTTPException:
-        raise
+    except HTTPException as http_exc:
+        raise http_exc
     except Exception as e:
-        logger.error(f"Erro ao adicionar favorito: {str(e)}")
+        logger.error(f"Erro ao adicionar favorito para o funcionário: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao adicionar favorito"}
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": "Erro ao adicionar favorito",
+                }
             },
         ) from e
+
+
+@router.post("/validation-codes", response_model=dict)
+async def create_validation_code(
+    request: ValidationCodeCreationRequest,
+    current_user: JWTPayload = Depends(validate_employee_role),
+):
+    """
+    Gera um código de validação de 6 dígitos para um parceiro.
+    """
+    try:
+        # Gerar código de 6 dígitos
+        validation_code = "".join(random.choices(string.digits, k=6))
+        expires_at = datetime.utcnow() + timedelta(minutes=10)
+
+        # Criar objeto ValidationCode
+        code_data = ValidationCode(
+            tenant_id=current_user.tenant,
+            partner_id=request.partner_id,
+            employee_id=current_user.entity_id,  # Usar entity_id
+
+            expires=expires_at,
+        )
+
+        # Salvar no Firestore, usando o código como ID do documento
+        await firestore_client.create_document(
+            "validation_codes",
+            code_data.model_dump(mode="json"),
+            doc_id=validation_code,
+        )
+
+        return {
+            "code": validation_code,
+            "expires": expires_at.isoformat(),
+        }
+
+    except Exception as e:
+        logger.error(
+            f"Erro ao criar código de validação para o parceiro {request.partner_id}: {str(e)}",
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "VALIDATION_CODE_CREATION_FAILED",
+                    "msg": "Não foi possível gerar o código de validação.",
+                }
+            },
+        ) from e
+
+
+@router.get("/me/fav", response_model=FavoritesResponse)
+async def list_favorites(current_user: JWTPayload = Depends(validate_employee_role)):
+    """
+    Gera um código de validação de 6 dígitos para o usuário (funcionário).
+    """
+    try:
+        # Lógica para gerar um código de 6 dígitos
+        import random
+        import string
+
+        code = "".join(random.choices(string.digits, k=6))
+
+        return {"code": code, "expires_in": "5 minutes"}
+
+    except Exception as e:
+        logger.error(f"Erro ao gerar código de validação para o funcionário: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": "Erro ao gerar código de validação",
+                }
+            },
+        )
 
 
 @router.delete("/me/fav/{partner_id}", response_model=FavoriteResponse)
@@ -485,134 +568,3 @@ async def get_partner_details(
                 }
             },
         ) from None
-
-
-@router.post("/validation-codes", response_model=ValidationCodeResponse)
-async def create_validation_code(
-    request: ValidationCodeRequest,
-    current_user: JWTPayload = employee_dependency,
-):
-    """
-    Gera um código de validação de 6 dígitos que expira em 3 minutos para funcionários.
-    """
-    try:
-        # Verificar se o parceiro existe e está ativo
-        async def get_firestore_partner():
-            return await firestore_client.get_document(
-                "partners", request.partner_id, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_partner():
-            return await postgres_client.get_document(
-                "partners", request.partner_id, tenant_id=current_user.tenant
-            )
-
-        partner_result = await with_circuit_breaker(
-            get_firestore_partner, get_postgres_partner
-        )
-        partner = partner_result.get("data")
-
-        if not partner or not partner.get("active", False):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Parceiro não encontrado"}
-                },
-            )
-
-        # Verificar se o funcionário existe e está ativo
-        employee_id = current_user.sub
-
-        async def get_firestore_employee():
-            return await firestore_client.get_document(
-                "employees", employee_id, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_employee():
-            return await postgres_client.get_document(
-                "employees", employee_id, tenant_id=current_user.tenant
-            )
-
-        employee_result = await with_circuit_breaker(
-            get_firestore_employee, get_postgres_employee
-        )
-        employee = employee_result.get("data")
-
-        if not employee:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Funcionário não encontrado"}
-                },
-            )
-
-        # Verificar se o funcionário está ativo
-        if not business_rules.validate_student_active(employee.get("active_until")):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail={
-                    "error": {
-                        "code": "INACTIVE_EMPLOYEE",
-                        "msg": "Funcionário com cadastro inativo",
-                    }
-                },
-            )
-
-        # Gerar código único de 6 dígitos
-        code = business_rules.generate_validation_code()
-        expires = business_rules.calculate_code_expiration()
-
-        # Usar o código como chave do documento para evitar duplicatas
-        validation_code = {
-            "id": code,  # Usar código como ID do documento
-            "employee_id": employee_id,
-            "partner_id": request.partner_id,
-            "code_hash": code,
-            "expires": expires.isoformat(),
-            "used_at": None,
-            "user_type": "employee",
-            "tenant_id": current_user.tenant,
-            "created_at": datetime.now().isoformat(),
-        }
-
-        # Tentar criar documento com código como ID
-        try:
-            await firestore_client.create_document(
-                "validation_codes", validation_code, code
-            )
-        except Exception as e:
-            # Se falhar (código duplicado), gerar novo código
-            if "already exists" in str(e).lower():
-                # Gerar novo código e tentar novamente
-                code = business_rules.generate_validation_code()
-                validation_code["id"] = code
-                validation_code["code_hash"] = code
-
-                await firestore_client.create_document(
-                    "validation_codes", validation_code, code
-                )
-            else:
-                raise
-
-        return {
-            "data": {
-                "code": code,
-                "expires": expires.isoformat(),
-                "ttl_seconds": 180,  # 3 minutos
-            },
-            "msg": "ok",
-        }
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao gerar código de validação para funcionário: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": "Erro ao gerar código de validação",
-                }
-            },
-        ) from e
