@@ -31,6 +31,9 @@ JWT_TOKEN_FALLBACK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZWxpcGVkZ
 # Arquivo de cache do token
 TOKEN_CACHE_FILE = os.path.join(os.path.dirname(__file__), "token_cache.json")
 
+# Diretório para relatórios
+REPORTS_DIR = os.path.join(os.path.dirname(__file__), "reports")
+
 # Mapeamento de endpoints disponíveis
 ENDPOINTS = {
     "users_me": {
@@ -94,7 +97,7 @@ ENDPOINTS = {
         "description": "Criar novo benefício",
         "category": "benefits",
         "data": {
-            "partner_id": "PTN_T4L5678_TEC",
+            "partner_id": "PTN_A7E6314_EDU",
             "title": "Benefício de Teste Rápido",
             "description": "Descrição do benefício de teste criado pelo quick test",
             "value": 15,
@@ -544,9 +547,9 @@ class QuickAdminTester:
             self.print_colored(f"\n📁 {category.upper()}:", "cyan")
             for key, config in endpoints:
                 method_color = "green" if config["method"] == "GET" else "yellow"
-                self.print_colored(f"   {key:<20} ", "white", end="")
-                self.print_colored(f"{config['method']:<6}", method_color, end="")
-                self.print_colored(f" {config['url']:<25}", "white", end="")
+                print(f"   {key:<20} ", end="")
+                print(f"{config['method']:<6}", end="")
+                print(f" {config['url']:<25}", end="")
                 self.print_colored(f" - {config['description']}", "white")
 
     def save_results(
@@ -562,13 +565,16 @@ class QuickAdminTester:
         Returns:
             Caminho do arquivo salvo
         """
+        # Criar diretório de relatórios se não existir
+        os.makedirs(REPORTS_DIR, exist_ok=True)
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"quick_admin_test_report_{timestamp}"
         if filename_suffix:
             filename += f"_{filename_suffix}"
         filename += ".json"
 
-        filepath = f"P:/ProjectsWEB/PRODUCAO/KNN PROJECT/knn_portal_journey_club_backend/scripts/complete_flow/{filename}"
+        filepath = os.path.join(REPORTS_DIR, filename)
 
         report_data = {
             "test_type": "quick_admin_test",

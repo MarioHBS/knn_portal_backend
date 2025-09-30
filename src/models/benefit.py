@@ -262,11 +262,6 @@ class BenefitDTO(BaseModel):
                 "applicable_services": [],
                 "excluded_services": [],
                 "additional_benefits": [],
-                "restrictions": {
-                    "minimum_purchase": 0,
-                    "maximum_discount_amount": None,
-                    "valid_locations": ["todas"],
-                },
             },
             "metadata": {
                 "tags": benefit.tags if benefit.tags else [benefit.type, "parceiro"]

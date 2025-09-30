@@ -179,16 +179,27 @@ class UnifiedDatabaseClient:
             ["collection", "tenant_id"],
         )
 
-        return await with_circuit_breaker(
-            firestore_client.query_documents,
-            postgres_client.query_documents,
-            collection,
-            tenant_id,
-            filters,
-            order_by,
-            limit,
-            offset,
-        )
+        async def firestore_query():
+            return await firestore_client.query_documents(
+                collection=collection,
+                tenant_id=tenant_id,
+                filters=filters,
+                order_by=order_by,
+                limit=limit,
+                offset=offset,
+            )
+
+        async def postgres_query():
+            return await postgres_client.query_documents(
+                collection=collection,
+                tenant_id=tenant_id,
+                filters=filters,
+                order_by=order_by,
+                limit=limit,
+                offset=offset,
+            )
+
+        return await with_circuit_breaker(firestore_query, postgres_query)
 
     @staticmethod
     @with_error_handling(DEFAULT_RETRY_CONFIG, "batch_operation")

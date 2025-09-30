@@ -538,7 +538,7 @@ async def get_benefit_details(
                     f"🔍 Chaves do documento encontrado: {list(partner_doc.keys())}"
                 )
                 # Verificar se o benefit_id existe
-                benefit_keys = [k for k in partner_doc.keys() if k.startswith("BNF_")]
+                benefit_keys = [k for k in partner_doc if k.startswith("BNF_")]
                 logger.info(f"🔍 Benefícios encontrados no documento: {benefit_keys}")
                 logger.info(f"🔍 Procurando por benefício: {benefit_id}")
 
@@ -637,59 +637,6 @@ async def update_benefit(
             )
 
         current_time = datetime.now(UTC).isoformat()
-
-        benefit_structure = {
-            "metadata": {
-                "tags": getattr(
-                    benefit_data,
-                    "tags",
-                    [getattr(benefit_data, "category", "").lower(), "desconto"],
-                )
-            },
-            "title": benefit_data.title,
-            "description": getattr(benefit_data, "description", ""),
-            "configuration": {
-                "value": getattr(benefit_data, "value", 0),
-                "value_type": getattr(benefit_data, "value_type", "percentage"),
-                "calculation_method": getattr(
-                    benefit_data, "calculation_method", "final_amount"
-                ),
-                "description": getattr(benefit_data, "description", ""),
-                "terms_conditions": getattr(benefit_data, "terms_conditions", ""),
-                "requirements": getattr(
-                    benefit_data, "requirements", ["comprovante_vinculo_knn"]
-                ),
-                "applicable_services": getattr(benefit_data, "applicable_services", []),
-                "excluded_services": getattr(benefit_data, "excluded_services", []),
-                "additional_benefits": getattr(benefit_data, "additional_benefits", []),
-                "restrictions": {
-                    "minimum_purchase": getattr(benefit_data, "minimum_purchase", 0),
-                    "maximum_discount_amount": getattr(
-                        benefit_data, "maximum_discount_amount", None
-                    ),
-                    "valid_locations": getattr(
-                        benefit_data, "valid_locations", ["todas"]
-                    ),
-                },
-            },
-            "dates": {
-                "created_at": getattr(benefit_data, "created_at", current_time),
-                "updated_at": current_time,
-                "valid_from": benefit_data.valid_from.isoformat()
-                if hasattr(benefit_data, "valid_from") and benefit_data.valid_from
-                else current_time,
-                "valid_until": benefit_data.valid_to.isoformat()
-                if hasattr(benefit_data, "valid_to") and benefit_data.valid_to
-                else None,
-            },
-            "system": {
-                "tenant_id": current_user.tenant,
-                "status": getattr(benefit_data, "status", "active"),
-                "type": benefit_data.type,
-                "audience": benefit_data.audience,
-                "category": getattr(benefit_data, "category", "desconto"),
-            },
-        }
 
         # Função para atualizar no Firestore
         async def update_benefit_firestore():
@@ -1040,11 +987,6 @@ async def create_benefit(
                 "applicable_services": data.get("applicable_services", []),
                 "excluded_services": data.get("excluded_services", []),
                 "additional_benefits": data.get("additional_benefits", []),
-                "restrictions": {
-                    "minimum_purchase": data.get("minimum_purchase", 0),
-                    "maximum_discount_amount": data.get("maximum_discount_amount"),
-                    "valid_locations": data.get("valid_locations", ["todas"]),
-                },
             },
             "dates": {
                 "created_at": current_time,

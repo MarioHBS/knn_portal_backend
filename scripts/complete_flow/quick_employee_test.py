@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Teste Rápido de Endpoints Student - Portal KNN
+Teste Rápido de Endpoints Employee - Portal KNN
 
-Este script permite testar endpoints de estudante individualmente ou em conjunto,
+Este script permite testar endpoints de funcionário individualmente ou em conjunto,
 utilizando um JWT token com renovação automática quando expirar.
 
 Uso:
-    python quick_student_test.py --all                    # Testa todos os endpoints
-    python quick_student_test.py --endpoint partners      # Testa endpoint específico
-    python quick_student_test.py --list                   # Lista endpoints disponíveis
-    python quick_student_test.py --favorites              # Testa apenas endpoints de favoritos
+    python quick_employee_test.py --all                    # Testa todos os endpoints
+    python quick_employee_test.py --endpoint partners      # Testa endpoint específico
+    python quick_employee_test.py --list                   # Lista endpoints disponíveis
+    python quick_employee_test.py --favorites              # Testa apenas endpoints de favoritos
 
 Autor: Sistema de Testes KNN
 Data: 2025-01-15
@@ -24,74 +24,78 @@ from typing import Any
 
 import requests
 
-# Adicionar o diretório raiz do projeto ao sys.path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, project_root)
-
-from scripts.complete_flow.base_auth_test import (  # noqa: E402
+# Adiciona o diretório raiz do projeto ao sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from scripts.complete_flow.base_auth_test import (
     BACKEND_BASE_URL,
     TEST_USERS,
     BaseAuthenticationTester,
 )
 
 # Configurações
-JWT_TOKEN_FALLBACK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlc3R1ZGFudGUudGVzdGVAam91cm5leWNsdWIuY29tLmJyIiwicm9sZSI6InN0dWRlbnQiLCJ0ZW5hbnQiOiJrbm4tZGV2LXRlbmFudCIsImV4cCI6MTc1OTE1MDE3MiwiaWF0IjoxNzU5MTQ4MzcyLCJpc3MiOiJrbm4tcG9ydGFsLWxvY2FsIiwiYXVkIjoia25uLXBvcnRhbCIsIm5hbWUiOiJFc3R1ZGFudGUgZGUgVGVzdGUiLCJlbnRpdHlfaWQiOiJTVFVfRTBTMFQwNjlfQ0MifQ.example_token_hash"
+JWT_TOKEN_FALLBACK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmdW5jaW9uYXJpby50ZXN0ZUBqb3VybmV5Y2x1Yi5jb20uYnIiLCJyb2xlIjoiZW1wbG95ZWUiLCJ0ZW5hbnQiOiJrbm4tZGV2LXRlbmFudCIsImV4cCI6MTc1OTE1MDE3MiwiaWF0IjoxNzU5MTQ4MzcyLCJpc3MiOiJrbm4tcG9ydGFsLWxvY2FsIiwiYXVkIjoia25uLXBvcnRhbCIsIm5hbWUiOiJGdW5jaW9uYXJpbyBkZSBUZXN0ZSIsImVudGl0eV9pZCI6IkVNUF8xMjM0NTZfQ0MifQ.example_token_hash"
 
 # Arquivo de cache do token
-TOKEN_CACHE_FILE = os.path.join(os.path.dirname(__file__), "student_token_cache.json")
+TOKEN_CACHE_FILE = os.path.join(os.path.dirname(__file__), "employee_token_cache.json")
 
 # Diretório para relatórios
 REPORTS_DIR = os.path.join(os.path.dirname(__file__), "reports")
 
-# Mapeamento de endpoints disponíveis para estudantes
+# Mapeamento de endpoints disponíveis para funcionários
 ENDPOINTS = {
     "partners": {
-        "url": "/student/partners",
+        "url": "/employee/partners",
         "method": "GET",
         "description": "Lista de parceiros disponíveis",
         "category": "partners",
         "params": {"limit": 10, "offset": 0},
     },
     "partners_filtered": {
-        "url": "/student/partners",
+        "url": "/employee/partners",
         "method": "GET",
         "description": "Lista de parceiros filtrados por categoria",
         "category": "partners",
         "params": {"cat": "alimentacao", "limit": 5},
     },
     "partner_details": {
-        "url": "/student/partners/{partner_id}",
+        "url": "/employee/partners/{partner_id}",
         "method": "GET",
         "description": "Detalhes de um parceiro específico",
         "category": "partners",
         "url_params": {"partner_id": "PTN_A7E6314_EDU"},
     },
-    "student_favorites": {
-        "url": "/student/me/fav",
+    "create_validation_code": {
+        "url": "/employee/validation-codes",
+        "method": "POST",
+        "description": "Gerar código de validação para parceiro",
+        "category": "validation",
+        "data": {"partner_id": "PTN_T4L5678_TEC"},
+    },
+    "employee_favorites": {
+        "url": "/employee/me/fav",
         "method": "GET",
         "description": "Lista de parceiros favoritos",
         "category": "favorites",
     },
     "add_favorite": {
-        "url": "/student/me/fav",
+        "url": "/employee/me/fav",
         "method": "POST",
         "description": "Adicionar parceiro aos favoritos",
         "category": "favorites",
         "data": {"partner_id": "PTN_T4L5678_TEC"},
     },
     "remove_favorite": {
-        "url": "/student/me/fav/{partner_id}",
+        "url": "/employee/me/fav/{partner_id}",
         "method": "DELETE",
         "description": "Remover parceiro dos favoritos",
         "category": "favorites",
         "url_params": {"partner_id": "PTN_T4L5678_TEC"},
     },
-    "create_validation_code": {
-        "url": "/student/validation-codes",
-        "method": "POST",
-        "description": "Gerar código de validação para parceiro",
-        "category": "validation",
-        "data": {"partner_id": "PTN_T4L5678_TEC"},
+    "employee_history": {
+        "url": "/employee/me/history",
+        "method": "GET",
+        "description": "Histórico de códigos de validação",
+        "category": "history",
     },
     "users_me": {
         "url": "/users/me",
@@ -102,8 +106,8 @@ ENDPOINTS = {
 }
 
 
-class QuickStudentTester:
-    """Classe para testes rápidos de endpoints de estudante com renovação automática de JWT."""
+class QuickEmployeeTester:
+    """Classe para testes rápidos de endpoints de funcionário com renovação automática de JWT."""
 
     def __init__(self):
         """Inicializa o testador com configurações básicas."""
@@ -168,12 +172,12 @@ class QuickStudentTester:
             if not self.auth_tester:
                 self.auth_tester = BaseAuthenticationTester()
 
-            # Usa credenciais de estudante para renovar o token
-            student_credentials = TEST_USERS["estudante_teste"]
+            # Usa credenciais de funcionário para renovar o token
+            employee_credentials = TEST_USERS["funcionario_teste"]
 
             # Autentica no Firebase
             firebase_success, firebase_token = self.auth_tester.authenticate_firebase(
-                student_credentials["email"], student_credentials["password"]
+                employee_credentials["email"], employee_credentials["password"]
             )
 
             if not firebase_success or not firebase_token:
@@ -182,7 +186,7 @@ class QuickStudentTester:
 
             # Faz login no backend
             backend_success, jwt_token = self.auth_tester.login_backend(
-                firebase_token, student_credentials.get("role")
+                firebase_token, employee_credentials.get("role")
             )
 
             if not backend_success or not jwt_token:
@@ -232,17 +236,17 @@ class QuickStudentTester:
             color: Cor da mensagem (green, red, yellow, blue, white)
         """
         colors = {
-            "green": "\033[92m",
-            "red": "\033[91m",
-            "yellow": "\033[93m",
-            "blue": "\033[94m",
-            "white": "\033[0m",
-            "cyan": "\033[96m",
-            "magenta": "\033[95m",
+            "green": "[92m",
+            "red": "[91m",
+            "yellow": "[93m",
+            "blue": "[94m",
+            "white": "[0m",
+            "cyan": "[96m",
+            "magenta": "[95m",
         }
 
         color_code = colors.get(color, colors["white"])
-        reset_code = "\033[0m"
+        reset_code = "[0m"
         print(f"{color_code}{message}{reset_code}")
 
     def print_header(self, title: str) -> None:
@@ -393,7 +397,7 @@ class QuickStudentTester:
                                         "cyan",
                                     )
                                 elif (
-                                    endpoint_key == "student_history"
+                                    endpoint_key == "employee_history"
                                     and "items" in data_content
                                 ):
                                     history_count = len(data_content["items"])
@@ -402,7 +406,7 @@ class QuickStudentTester:
                                         f"   📊 Histórico de resgates: {history_count}",
                                         "cyan",
                                     )
-                                elif endpoint_key == "student_favorites":
+                                elif endpoint_key == "employee_favorites":
                                     favorites_count = (
                                         len(data_content)
                                         if isinstance(data_content, list)
@@ -501,7 +505,7 @@ class QuickStudentTester:
         """
         results = []
 
-        self.print_header(f"TESTANDO {len(endpoint_keys)} ENDPOINTS DE ESTUDANTE")
+        self.print_header(f"TESTANDO {len(endpoint_keys)} ENDPOINTS DE FUNCIONÁRIO")
 
         for i, endpoint_key in enumerate(endpoint_keys, 1):
             self.print_colored(f"\n[{i}/{len(endpoint_keys)}]", "cyan")
@@ -515,7 +519,7 @@ class QuickStudentTester:
         Testa endpoints por categoria.
 
         Args:
-            category: Categoria dos endpoints (partners, favorites, profile, validation)
+            category: Categoria dos endpoints (partners, favorites, profile, validation, history)
 
         Returns:
             Lista com resultados dos testes
@@ -528,263 +532,84 @@ class QuickStudentTester:
 
         if not category_endpoints:
             self.print_colored(
-                f"❌ Nenhum endpoint encontrado para categoria: {category}", "red"
+                f"Nenhum endpoint encontrado para a categoria: {category}", "yellow"
             )
             return []
 
-        self.print_colored(f"🎯 Testando categoria: {category.upper()}", "blue")
         return self.test_multiple_endpoints(category_endpoints)
 
-    def list_endpoints(self) -> None:
-        """Lista todos os endpoints disponíveis."""
-        self.print_header("ENDPOINTS DISPONÍVEIS PARA ESTUDANTES")
-
-        categories = {}
-        for key, config in ENDPOINTS.items():
-            category = config.get("category", "other")
-            if category not in categories:
-                categories[category] = []
-            categories[category].append((key, config))
-
-        for category, endpoints in categories.items():
-            self.print_colored(f"\n📂 {category.upper()}", "cyan")
-            for key, config in endpoints:
-                method_color = {
-                    "GET": "green",
-                    "POST": "blue",
-                    "PUT": "yellow",
-                    "DELETE": "red",
-                }.get(config["method"], "white")
-
-                self.print_colored(
-                    f"  • {key:<25} [{config['method']}] {config['description']}",
-                    method_color,
-                )
-
-    def print_summary(self, results: list[dict[str, Any]]) -> None:
+    def save_report(self, results: list[dict[str, Any]], report_name: str) -> None:
         """
-        Imprime resumo dos resultados dos testes.
+        Salva os resultados dos testes em um arquivo JSON.
 
         Args:
-            results: Lista com resultados dos testes
+            results: Lista de resultados dos testes
+            report_name: Nome do arquivo de relatório
         """
-        if not results:
-            return
+        if not os.path.exists(REPORTS_DIR):
+            os.makedirs(REPORTS_DIR)
 
-        self.print_header("RESUMO DOS TESTES")
+        report_path = os.path.join(REPORTS_DIR, report_name)
 
-        successful = [r for r in results if r["success"]]
-        failed = [r for r in results if not r["success"]]
-        token_renewed = [r for r in results if r.get("token_renewed", False)]
-
-        self.print_colored(f"✅ Sucessos: {len(successful)}", "green")
-        self.print_colored(f"❌ Falhas: {len(failed)}", "red")
-        self.print_colored(f"🔄 Tokens renovados: {len(token_renewed)}", "blue")
-
-        if failed:
-            self.print_colored("\n❌ ENDPOINTS COM FALHA:", "red")
-            for result in failed:
-                error_msg = result.get("error", "Erro desconhecido")
-                self.print_colored(f"  • {result['endpoint_key']}: {error_msg}", "red")
-
-        # Estatísticas por categoria
-        categories = {}
-        for result in results:
-            endpoint_key = result["endpoint_key"]
-            if endpoint_key in ENDPOINTS:
-                category = ENDPOINTS[endpoint_key].get("category", "other")
-                if category not in categories:
-                    categories[category] = {"success": 0, "total": 0}
-                categories[category]["total"] += 1
-                if result["success"]:
-                    categories[category]["success"] += 1
-
-        if categories:
-            self.print_colored("\n📊 ESTATÍSTICAS POR CATEGORIA:", "cyan")
-            for category, stats in categories.items():
-                success_rate = (stats["success"] / stats["total"]) * 100
-                self.print_colored(
-                    f"  • {category}: {stats['success']}/{stats['total']} ({success_rate:.1f}%)",
-                    "cyan",
-                )
-
-    def run_validation_flow(self) -> None:
-        """Executa um fluxo completo de validação de código."""
-        self.print_header("FLUXO COMPLETO DE VALIDAÇÃO")
-
-        # 1. Listar parceiros
-        self.print_colored("1️⃣ Listando parceiros disponíveis...", "blue")
-        partners_result = self.test_endpoint("partners")
-
-        if not partners_result.get("success"):
-            self.print_colored("❌ Falha ao listar parceiros. Abortando fluxo.", "red")
-            return
-
-        # Extrair ID do primeiro parceiro da lista
-        partner_id = None
         try:
-            # A resposta da API é {"data": [...]}
-            partners_list = partners_result.get("response_data", {}).get("data")
+            with open(report_path, "w", encoding="utf-8") as f:
+                json.dump(results, f, indent=2, ensure_ascii=False)
+            self.print_colored(f"\n📄 Relatório salvo em: {report_path}", "green")
+        except Exception as e:
+            self.print_colored(f"❌ Erro ao salvar relatório: {e}", "red")
 
-            if partners_list and isinstance(partners_list, list) and partners_list:
-                # Filtrar parceiros com benefícios ativos
-                active_partners = [
-                    p for p in partners_list if p.get("has_active_benefits")
-                ]
-
-                if active_partners:
-                    partner_id = active_partners[0].get("id")
-                    self.print_colored(
-                        f"✅ ID do parceiro com benefícios ativos extraído: {partner_id}",
-                        "green",
-                    )
-                else:
-                    self.print_colored(
-                        "⚠️ Nenhum parceiro com benefícios ativos encontrado na lista.",
-                        "yellow",
-                    )
-                    return
-            else:
-                self.print_colored("⚠️ Nenhum parceiro encontrado na lista.", "yellow")
-                self.print_colored(
-                    f"   🔍 Resposta recebida: {partners_result.get('response_data')}",
-                    "yellow",
-                )
-                return
-
-        except (AttributeError, IndexError, TypeError) as e:
-            self.print_colored(f"❌ Erro ao extrair ID do parceiro: {e}", "red")
-            return
-
-        # Atualizar dinamicamente o ID do parceiro para os próximos testes
-        if partner_id:
-            ENDPOINTS["partner_details"]["url_params"]["partner_id"] = partner_id
-            ENDPOINTS["create_validation_code"]["data"]["partner_id"] = partner_id
+    def list_endpoints(self) -> None:
+        """Lista os endpoints disponíveis."""
+        self.print_header("ENDPOINTS DE FUNCIONÁRIO DISPONÍVEIS")
+        for key, config in ENDPOINTS.items():
+            self.print_colored(f"- {key}:", "cyan")
+            self.print_colored(f"  Descrição: {config['description']}", "white")
             self.print_colored(
-                "🔧 Endpoints 'partner_details' e 'create_validation_code' atualizados com o novo ID.",
-                "magenta",
+                f"  Endpoint: {config['method']} {config['url']}", "white"
             )
-
-        # 2. Ver detalhes de um parceiro
-        self.print_colored("2️⃣ Obtendo detalhes do parceiro...", "blue")
-        partner_details_result = self.test_endpoint("partner_details")
-        self.print_colored(
-            f"🔍 Detalhes do parceiro: {partner_details_result}", "yellow"
-        )
-
-        # 3. Gerar código de validação
-        self.print_colored("3️⃣ Gerando código de validação...", "blue")
-        validation_result = self.test_endpoint("create_validation_code")
-
-        if validation_result.get("success"):
-            response_data = validation_result.get("response_data", {}).get("data", {})
-            code = response_data.get("code")
-            expires = response_data.get("expires")
-
-            self.print_colored("✅ Código gerado com sucesso!", "green")
-            self.print_colored(f"   🎫 Código: {code}", "cyan")
-            self.print_colored(f"   ⏰ Expira em: {expires}", "cyan")
-
-            # Simular que o código seria usado pelo parceiro
-            self.print_colored("4️⃣ Código pronto para uso pelo parceiro!", "green")
-        else:
-            self.print_colored("❌ Falha ao gerar código de validação", "red")
-
-        # 4. Verificar histórico
-        self.print_colored("5️⃣ Verificando histórico de resgates...", "blue")
-        self.test_endpoint("student_history")
+            self.print_colored(f"  Categoria: {config['category']}", "white")
 
 
 def main():
-    """Função principal do script."""
+    """Função principal para executar os testes."""
     parser = argparse.ArgumentParser(
-        description="Teste rápido de endpoints de estudante do Portal KNN"
+        description="Teste rápido de endpoints de funcionário do Portal KNN."
     )
-    parser.add_argument("--all", action="store_true", help="Testa todos os endpoints")
-    parser.add_argument("--endpoint", type=str, help="Testa um endpoint específico")
+    parser.add_argument("--all", action="store_true", help="Testar todos os endpoints.")
     parser.add_argument(
-        "--category", type=str, help="Testa endpoints de uma categoria específica"
-    )
-    parser.add_argument(
-        "--list", action="store_true", help="Lista todos os endpoints disponíveis"
+        "--endpoint", type=str, help="Testar um endpoint específico pelo nome."
     )
     parser.add_argument(
-        "--flow", action="store_true", help="Executa fluxo completo de validação"
+        "--category", type=str, help="Testar todos os endpoints de uma categoria."
     )
     parser.add_argument(
-        "--favorites", action="store_true", help="Testa apenas endpoints de favoritos"
-    )
-    parser.add_argument(
-        "--partners", action="store_true", help="Testa apenas endpoints de parceiros"
-    )
-    parser.add_argument(
-        "--profile", action="store_true", help="Testa apenas endpoints de perfil"
+        "--list", action="store_true", help="Listar todos os endpoints disponíveis."
     )
 
     args = parser.parse_args()
+    tester = QuickEmployeeTester()
 
-    # Criar instância do testador
-    tester = QuickStudentTester()
-
-    # Processar argumentos
     if args.list:
         tester.list_endpoints()
         return
 
-    if args.flow:
-        tester.run_validation_flow()
-        return
-
     results = []
+    report_name = (
+        f"employee_test_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    )
 
     if args.all:
         results = tester.test_multiple_endpoints(list(ENDPOINTS.keys()))
     elif args.endpoint:
-        if args.endpoint in ENDPOINTS:
-            result = tester.test_endpoint(args.endpoint)
-            results = [result]
-        else:
-            tester.print_colored(f"❌ Endpoint '{args.endpoint}' não encontrado", "red")
-            tester.print_colored("Use --list para ver endpoints disponíveis", "yellow")
-            return
+        results = [tester.test_endpoint(args.endpoint)]
     elif args.category:
         results = tester.test_by_category(args.category)
-    elif args.favorites:
-        results = tester.test_by_category("favorites")
-    elif args.partners:
-        results = tester.test_by_category("partners")
-    elif args.profile:
-        results = tester.test_by_category("profile")
     else:
-        # Comportamento padrão: testar endpoints principais
-        main_endpoints = [
-            "users_me",
-            "partners",
-            "student_favorites",
-            "student_history",
-        ]
-        results = tester.test_multiple_endpoints(main_endpoints)
+        parser.print_help()
+        return
 
-    # Imprimir resumo
     if results:
-        tester.print_summary(results)
-
-    # Salvar resultados em arquivo JSON
-    if results:
-        # Criar diretório de relatórios se não existir
-        os.makedirs(REPORTS_DIR, exist_ok=True)
-
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        results_file = os.path.join(
-            REPORTS_DIR, f"student_test_results_{timestamp}.json"
-        )
-
-        try:
-            with open(results_file, "w", encoding="utf-8") as f:
-                json.dump(results, f, indent=2, ensure_ascii=False)
-            tester.print_colored(f"📄 Resultados salvos em: {results_file}", "green")
-        except Exception as e:
-            tester.print_colored(f"⚠️ Erro ao salvar resultados: {e}", "yellow")
+        tester.save_report(results, report_name)
 
 
 if __name__ == "__main__":

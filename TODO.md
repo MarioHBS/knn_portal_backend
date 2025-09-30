@@ -22,6 +22,8 @@
 
 ### Desenvolvimento de Funcionalidades
 
+- [ ] Construir um seed para o PostgreSQL
+
 - [ ] Implementação de novos endpoints da API
 - [ ] Melhorias na autenticação e autorização
 - [ ] Otimização de performance do backend
@@ -46,6 +48,13 @@
 
 - [ ] Implementar cache distribuído (Redis)
 - [ ] Otimizar queries do banco de dados
+- [ ] **Sistema de Limites/Restrições para Benefícios** (Funcionalidade removida temporariamente)
+  - [ ] Implementar campo `minimum_purchase` (valor mínimo de compra)
+  - [ ] Implementar campo `maximum_discount_amount` (valor máximo de desconto)
+  - [ ] Implementar campo `valid_locations` (locais válidos para o benefício)
+  - [ ] Adicionar validações para os campos de restrições
+  - [ ] Integrar com a lógica de aplicação de benefícios
+  - [ ] Documentar as regras de negócio para restrições
 - [ ] Implementar circuit breaker pattern
 - [ ] Adicionar métricas de monitoramento
 
