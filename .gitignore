@@ -185,6 +185,15 @@ error.ci.txt
 error.console.txt
 relatorio_tecnico.md
 lista_tarefas_implementacao.md
+guide_config_token.txt
+
+# Test scripts in root (should be in scripts/testing/)
+test_*.py
+!tests/test_*.py
+
+# Token files (contain sensitive data)
+access_token.txt
+**/access_token.txt
 
 # ============================================================================
 # OPERATING SYSTEM
