@@ -206,13 +206,12 @@ def main():
 
     # Testar regras (opcional)
     test_choice = input("\nDeseja executar testes das regras antes do deploy? (s/N): ")
-    if test_choice.lower() in ["s", "sim", "y", "yes"]:
-        if not test_rules():
-            print("\n⚠️ Testes falharam. Deseja continuar mesmo assim?")
-            continue_choice = input("Continuar? (s/N): ")
-            if continue_choice.lower() not in ["s", "sim", "y", "yes"]:
-                print("\n❌ Deploy cancelado devido a falhas nos testes.")
-                sys.exit(1)
+    if test_choice.lower() in ["s", "sim", "y", "yes"] and not test_rules():
+        print("\n⚠️ Testes falharam. Deseja continuar mesmo assim?")
+        continue_choice = input("Continuar? (s/N): ")
+        if continue_choice.lower() not in ["s", "sim", "y", "yes"]:
+            print("\n❌ Deploy cancelado devido a falhas nos testes.")
+            sys.exit(1)
 
     # Deploy das regras
     if not deploy_rules():

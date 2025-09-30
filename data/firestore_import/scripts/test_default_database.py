@@ -107,13 +107,12 @@ def test_students_data(client):
 
         # Verifica se menor de idade tem responsável
         age = calculate_age(data.get('data_nascimento'))
-        if age and age < 18:
-            if not data.get('nome_responsavel'):
-                minors_without_guardian.append({
-                    'id': student_id,
-                    'nome': data.get('nome', 'N/A'),
-                    'idade': age
-                })
+        if age and age < 18 and not data.get('nome_responsavel'):
+            minors_without_guardian.append({
+                'id': student_id,
+                'nome': data.get('nome', 'N/A'),
+                'idade': age
+            })
 
         # Valida email
         email = data.get('email')

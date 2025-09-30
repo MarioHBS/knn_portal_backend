@@ -73,7 +73,7 @@ def test_knn_benefits_database():
             # Contar documentos na coleção (limitado a 5 para teste)
             docs = collection.limit(5).stream()
             doc_count = 0
-            for doc in docs:
+            for _doc in docs:
                 doc_count += 1
 
             if doc_count > 0:

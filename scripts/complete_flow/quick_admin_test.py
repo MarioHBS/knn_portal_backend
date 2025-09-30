@@ -546,7 +546,7 @@ class QuickAdminTester:
         for category, endpoints in categories.items():
             self.print_colored(f"\n📁 {category.upper()}:", "cyan")
             for key, config in endpoints:
-                method_color = "green" if config["method"] == "GET" else "yellow"
+                "green" if config["method"] == "GET" else "yellow"
                 print(f"   {key:<20} ", end="")
                 print(f"{config['method']:<6}", end="")
                 print(f" {config['url']:<25}", end="")

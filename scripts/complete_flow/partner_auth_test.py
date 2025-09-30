@@ -134,7 +134,7 @@ class PartnerAuthenticationTester(BaseAuthenticationTester):
             )
             business_logic_result["profile_fields_present"] = profile_fields_present
             business_logic_result["total_expected_fields"] = len(expected_fields)
-            
+
             self.print_step(
                 f"✅ Campos do perfil encontrados: {profile_fields_present}/{len(expected_fields)}",
                 "SUCCESS"
@@ -336,7 +336,7 @@ class PartnerAuthenticationTester(BaseAuthenticationTester):
                     update_response = response.json()
                     updated_title = update_response.get("data", {}).get("title", "N/A")
                     self.print_step(
-                        f"✅ Segunda promoção atualizada com sucesso", "SUCCESS"
+                        "✅ Segunda promoção atualizada com sucesso", "SUCCESS"
                     )
                     self.print_step(
                         f"   Novo título: {updated_title}",
@@ -369,7 +369,7 @@ class PartnerAuthenticationTester(BaseAuthenticationTester):
                 if op["operation"] == "POST_PROMOTION_1" and op["success"]:
                     promotion_1_id = op["promotion_id"]
                     break
-            
+
             if promotion_1_id:
                 self.print_step(f"5. Excluindo primeira promoção (ID: {promotion_1_id})")
                 response = self.session.delete(
@@ -380,7 +380,7 @@ class PartnerAuthenticationTester(BaseAuthenticationTester):
 
                 if response.status_code in [200, 204]:
                     self.print_step(
-                        f"✅ Primeira promoção excluída com sucesso", "SUCCESS"
+                        "✅ Primeira promoção excluída com sucesso", "SUCCESS"
                     )
                     operations.append({
                         "operation": "DELETE_PROMOTION_1",
@@ -418,7 +418,7 @@ class PartnerAuthenticationTester(BaseAuthenticationTester):
                 final_promotions_data = response.json()
                 final_count = len(final_promotions_data.get("data", []))
                 expected_count = initial_count + 1  # Criamos 2, excluímos 1
-                
+
                 self.print_step(
                     f"✅ Contagem final: {final_count} promoções (esperado: {expected_count})",
                     "SUCCESS",
@@ -483,7 +483,7 @@ class PartnerAuthenticationTester(BaseAuthenticationTester):
 
         except Exception as e:
             self.print_step(f"❌ Erro inesperado no teste de promoções: {str(e)}", "ERROR")
-            
+
             # Cleanup em caso de erro
             for promotion_id in created_promotion_ids:
                 with suppress(Exception):

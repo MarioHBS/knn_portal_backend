@@ -140,7 +140,7 @@ def generate_entity_id(role: str) -> str:
     role_prefixes = {
         "student": "STD_TEST",
         "employee": "EMP_TEST",
-        "partner": "PTR_TEST"
+        "partner": "PTR_TEST",
     }
     prefix = role_prefixes.get(role, "USR_TEST")
     return f"{prefix}_{timestamp}"
@@ -246,7 +246,7 @@ def create_test_entities():
         # Verifica se pode conectar ao Firebase
         firebase_available = False
         try:
-            app = initialize_firebase()
+            initialize_firebase()
             firebase_available = True
         except Exception as firebase_error:
             print(f"⚠️  Firebase não disponível: {str(firebase_error)}")

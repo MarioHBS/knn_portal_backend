@@ -28,7 +28,7 @@ def clear_cache_and_get_fresh_data():
     # 2. Reinicializar cliente Firestore
     print("2. Reinicializando cliente Firestore...")
     initialize_firestore_databases()
-    firestore_client = FirestoreClient()
+    FirestoreClient()
 
     # 3. Fazer login real
     print("3. Fazendo login real...")

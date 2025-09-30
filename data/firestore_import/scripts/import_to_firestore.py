@@ -29,13 +29,13 @@ def import_data_to_firestore(project_id: str, data_file: str, use_emulator: bool
                 # Para emulador, usar credenciais mock
                 import google.auth.credentials
                 mock_credentials = google.auth.credentials.AnonymousCredentials()
-                app = firebase_admin.initialize_app(
+                firebase_admin.initialize_app(
                     credential=mock_credentials,
                     options={"projectId": project_id}
                 )
             else:
                 cred = credentials.ApplicationDefault()
-                app = firebase_admin.initialize_app(cred, {"projectId": project_id})
+                firebase_admin.initialize_app(cred, {"projectId": project_id})
         except Exception as e:
             print(f"⚠️  Erro ao inicializar Firebase: {e}")
             print("💡 Tentando usar modo de teste local...")
@@ -43,12 +43,12 @@ def import_data_to_firestore(project_id: str, data_file: str, use_emulator: bool
             try:
                 import google.auth.credentials
                 mock_credentials = google.auth.credentials.AnonymousCredentials()
-                app = firebase_admin.initialize_app(
+                firebase_admin.initialize_app(
                     credential=mock_credentials,
                     options={"projectId": project_id}
                 )
             except:
-                app = firebase_admin.initialize_app(options={"projectId": project_id})
+                firebase_admin.initialize_app(options={"projectId": project_id})
 
     db = firestore.client()
 

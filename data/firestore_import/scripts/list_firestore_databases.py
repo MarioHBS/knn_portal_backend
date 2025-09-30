@@ -14,11 +14,11 @@ from google.oauth2 import service_account
 def test_firestore_connection(project_id, service_account_path):
     """
     Testa a conexão com o Firestore e verifica se consegue acessar o banco
-    
+
     Args:
         project_id (str): ID do projeto Firebase/GCP
         service_account_path (str): Caminho para o arquivo de chave da conta de serviço
-    
+
     Returns:
         dict: Informações sobre a conexão e banco de dados
     """

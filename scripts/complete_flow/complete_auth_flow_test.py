@@ -853,7 +853,7 @@ class AuthenticationTester:
         print("\nUsuários disponíveis para teste:")
         print("-" * 50)
 
-        for i, (key, user_data) in enumerate(TEST_USERS.items(), 1):
+        for i, (_key, user_data) in enumerate(TEST_USERS.items(), 1):
             print(f"{i}. {user_data['description']}")
             print(f"   Email: {user_data['email']}")
             print(f"   Role: {user_data['role']}")

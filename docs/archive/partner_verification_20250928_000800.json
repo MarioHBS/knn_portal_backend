@@ -1,0 +1,23 @@
+{
+  "timestamp": "20250928_000800",
+  "target_partner_id": "PTN_T4L5678_TEC",
+  "target_email": "parceiro.teste@journeyclub.com.br",
+  "specific_document_found": true,
+  "specific_document_data": {
+    "expected_id": null,
+    "email_as_id": null
+  },
+  "email_search_results": [],
+  "all_partner_ids": [
+    "PTN_A1E8958_AUT",
+    "PTN_A7E6314_EDU",
+    "PTN_C0B2202_SAU",
+    "PTN_C2C8555_TEC",
+    "PTN_C9P9927_PAP",
+    "PTN_E7E5750_ESP",
+    "PTN_E7P0A85_TUR",
+    "PTN_G3M3186_GER",
+    "PTN_P2B4124_ALI"
+  ],
+  "total_documents": 9
+}

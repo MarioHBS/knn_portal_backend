@@ -218,7 +218,7 @@ class AudienceImplementationTest:
 
             # Testar serialização
             json_data = promotion.model_dump()
-            json_str = json.dumps(json_data, default=str)
+            json.dumps(json_data, default=str)
 
             # Verificar se audience está presente
             if "audience" in json_data and json_data["audience"] == [
