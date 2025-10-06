@@ -45,8 +45,8 @@ Pipfile.lock
 # Python version management
 .python-version
 
-# Type checkers
-.pyre/
+# Environment variables
+.env
 
 # ============================================================================
 # TESTING & COVERAGE
