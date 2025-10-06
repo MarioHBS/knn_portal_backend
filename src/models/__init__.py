@@ -5,7 +5,11 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, Field, field_validator
 
-from src.models.favorites import FavoriteRequest, FavoriteResponse
+from src.models.favorites import (
+    FavoriteRequest,
+    FavoriteResponse,
+    StudentPartnerFavorite,
+)
 from src.utils.id_generators import IDGenerators
 
 from .benefit import (
@@ -14,7 +18,6 @@ from .benefit import (
     BenefitRequest,
     BenefitResponse,
 )
-from .favorites import EmployeeFavorites, StudentFavorites
 from .partner import (
     Partner,
     PartnerAddress,
@@ -34,8 +37,6 @@ __all__ = [
     "BenefitListResponse",
     "BenefitRequest",
     "BenefitResponse",
-    "EmployeeFavorites",
-    "StudentFavorites",
     "Partner",
     "PartnerAddress",
     "PartnerCategory",
@@ -44,6 +45,7 @@ __all__ = [
     "PartnerSocialNetworks",
     "FavoriteRequest",
     "FavoriteResponse",
+    "StudentPartnerFavorite",
     "ValidationCode",
     "ValidationCodeCreationRequest",
     "ValidationCodeRedeemRequest",
@@ -126,6 +128,58 @@ class Student(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+# DTOs de Aluno para Firestore
+class StudentContactDTO(BaseModel):
+    """Subdocumento de contato do aluno (Firestore)."""
+
+    email: str | None = None
+    phone: str | None = None
+
+
+class StudentAddressDTO(BaseModel):
+    """Subdocumento de endereço do aluno (Firestore)."""
+
+    zip: str | None = None
+    complement: str | None = None
+    neighborhood: str | None = None
+
+
+class StudentGuardianDTO(BaseModel):
+    """Subdocumento de responsável do aluno (Firestore)."""
+
+    email: str | None = None
+    name: str | None = None
+
+
+class StudentDTO(BaseModel):
+    """
+    DTO do Aluno para leitura/escrita no Firestore.
+
+    Esta estrutura espelha os documentos exportados em
+    data/firestore_export/firestore_students.json.
+    O ID do documento (ex.: "STD_I0L0M0O9_S1") é gerenciado externamente
+    como doc_id no Firestore.
+    """
+
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    occupation: str | None = None
+    tenant_id: str
+    contact: StudentContactDTO | None = None
+    address: StudentAddressDTO | None = None
+    guardian: StudentGuardianDTO | None = None
+    active_until: date
+    book: str | None = None
+    name: str
+
+    class Config:
+        orm_mode = True
+        json_encoders = {
+            datetime: lambda v: v.isoformat(),
+            date: lambda v: v.isoformat(),
+        }
 
 
 class Employee(BaseModel):
@@ -443,11 +497,14 @@ __all__ = [
     "BenefitAudience",
     "BenefitCategory",
     "WeekDay",
-    "StudentFavorites",
-    "EmployeeFavorites",
     "FavoriteRequest",
     "FavoriteResponse",
+    "StudentPartnerFavorite",
     "Student",
+    "StudentDTO",
+    "StudentContactDTO",
+    "StudentAddressDTO",
+    "StudentGuardianDTO",
     "Employee",
     "ValidationCode",
     "ValidationCodeRedeemRequest",

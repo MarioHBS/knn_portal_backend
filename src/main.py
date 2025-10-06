@@ -15,7 +15,7 @@ from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from src.api import admin, employee, logos, partner, student, sync, users
+from src.api import admin, admin_metrics, employee, logos, partner, student, sync, users
 from src.config import (
     API_DESCRIPTION,
     API_TITLE,
@@ -64,6 +64,9 @@ app = FastAPI(
     description=API_DESCRIPTION,
     version=API_VERSION,
     lifespan=lifespan,
+    docs_url=f"/{API_VERSION}/docs",
+    redoc_url=f"/{API_VERSION}/redoc",
+    openapi_url=f"/{API_VERSION}/openapi.json",
 )
 
 # Middleware de CORS
@@ -81,6 +84,9 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Incluir routers
 app.include_router(admin.router, prefix=f"/{API_VERSION}/admin", tags=["Admin"])
+app.include_router(
+    admin_metrics.router, prefix=f"/{API_VERSION}", tags=["Admin Metrics"]
+)
 app.include_router(
     employee.router, prefix=f"/{API_VERSION}/employee", tags=["Employee"]
 )
@@ -102,7 +108,7 @@ async def root():
     }
 
 
-@app.get("/health")
+@app.get(f"/{API_VERSION}/health")
 async def health_check():
     """Endpoint de verificação de saúde da API."""
     return {"status": "healthy", "environment": ENVIRONMENT}

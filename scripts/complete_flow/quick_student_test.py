@@ -59,6 +59,20 @@ ENDPOINTS = {
         "category": "partners",
         "params": {"cat": "alimentacao", "limit": 5},
     },
+    "benefits": {
+        "url": "/student/benefits",
+        "method": "GET",
+        "description": "Lista de benefícios disponíveis",
+        "category": "benefits",
+        "params": {"limit": 10, "offset": 0},
+    },
+    "benefits_filtered": {
+        "url": "/student/benefits",
+        "method": "GET",
+        "description": "Lista de benefícios filtrados por categoria",
+        "category": "benefits",
+        "params": {"cat": "alimentacao", "limit": 5},
+    },
     "partner_details": {
         "url": "/student/partners/{partner_id}",
         "method": "GET",
@@ -67,20 +81,20 @@ ENDPOINTS = {
         "url_params": {"partner_id": "PTN_A7E6314_EDU"},
     },
     "student_favorites": {
-        "url": "/student/me/fav",
+        "url": "/student/fav",
         "method": "GET",
         "description": "Lista de parceiros favoritos",
         "category": "favorites",
     },
     "add_favorite": {
-        "url": "/student/me/fav",
+        "url": "/student/fav",
         "method": "POST",
         "description": "Adicionar parceiro aos favoritos",
         "category": "favorites",
         "data": {"partner_id": "PTN_T4L5678_TEC"},
     },
     "remove_favorite": {
-        "url": "/student/me/fav/{partner_id}",
+        "url": "/student/fav/{partner_id}",
         "method": "DELETE",
         "description": "Remover parceiro dos favoritos",
         "category": "favorites",
@@ -320,6 +334,15 @@ class QuickStudentTester:
         # Debug: Mostrar URL final construída
         if params:
             self.print_colored(f"   🔧 Parâmetros: {params}", "magenta")
+        # Debug: Mostrar corpo da requisição quando aplicável
+        if method in ["POST", "PUT", "DELETE"] and data is not None:
+            try:
+                self.print_colored(
+                    f"   📦 Payload: {json.dumps(data, ensure_ascii=False)}",
+                    "magenta",
+                )
+            except Exception:
+                self.print_colored(f"   📦 Payload (raw): {data}", "magenta")
 
         try:
             if method == "GET":
@@ -430,10 +453,37 @@ class QuickStudentTester:
                     result["response_text"] = response.text[:200]  # Primeiros 200 chars
 
             elif response.status_code == 404:
-                self.print_colored(
-                    f"   ⚠️  Endpoint não encontrado: {response.status_code}", "yellow"
-                )
-                result["error"] = "Endpoint não encontrado"
+                # Tentar identificar se é 404 por recurso/dado não encontrado
+                try:
+                    error_data = response.json()
+                    detail = error_data.get("detail", error_data)
+                    if isinstance(detail, dict):
+                        msg = detail.get("msg") or detail.get("message") or str(detail)
+                        code = detail.get("code")
+                        if code:
+                            self.print_colored(
+                                f"   ⚠️  Recurso não encontrado: {msg} (code: {code})",
+                                "yellow",
+                            )
+                        else:
+                            self.print_colored(
+                                f"   ⚠️  Recurso não encontrado: {msg}", "yellow"
+                            )
+                        result["error"] = msg
+                        result["resource_not_found"] = True
+                    else:
+                        # Mensagem simples
+                        self.print_colored(
+                            f"   ⚠️  Recurso não encontrado: {detail}", "yellow"
+                        )
+                        result["error"] = str(detail)
+                        result["resource_not_found"] = True
+                except json.JSONDecodeError:
+                    # Se não houver JSON, manter mensagem padrão
+                    self.print_colored(
+                        f"   ⚠️  Endpoint não encontrado: {response.status_code}", "yellow"
+                    )
+                    result["error"] = "Endpoint não encontrado"
             elif response.status_code == 401:
                 # Tratar especificamente erro 401 (Unauthorized)
                 self.print_colored(

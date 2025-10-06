@@ -17,6 +17,7 @@ from src.config import (
     FIRESTORE_PROJECT,
     FIRESTORE_SERVICE_ACCOUNT_KEY,
     GOOGLE_APPLICATION_CREDENTIALS,
+    TESTING_MODE,
 )
 from src.utils.logging import logger
 
@@ -112,8 +113,9 @@ def get_bucket():
     return client.bucket(bucket_name)
 
 
-# Inicializar automaticamente quando o módulo for importado
-if os.environ.get("KNN_USE_TEST_DATABASE", "false").lower() != "true":
+# Inicializar automaticamente quando o módulo for importado,
+# evitando inicialização em modo de teste para não depender de serviços externos.
+if not TESTING_MODE:
     try:
         initialize_storage_client()
     except Exception as e:

@@ -16,6 +16,12 @@ from datetime import datetime
 import requests
 from base_auth_test import BACKEND_BASE_URL, BaseAuthenticationTester
 
+# Mapear ENDPOINTS do quick_admin_test para alinhar cobertura de testes
+try:
+    from quick_admin_test import ENDPOINTS as QUICK_ENDPOINTS
+except Exception:
+    QUICK_ENDPOINTS = {}
+
 
 class AdminAuthenticationTester(BaseAuthenticationTester):
     """Testador específico para autenticação de Admin."""
@@ -122,14 +128,34 @@ class AdminAuthenticationTester(BaseAuthenticationTester):
         """
         self.print_header("TESTANDO ENDPOINTS ESPECÍFICOS DE ADMIN")
 
-        admin_endpoints = [
-            "/users/me",
-            "/admin/partners",
-            "/admin/students",
-            "/admin/employees",
-            "/admin/benefits",
-            "/admin/metrics",
-        ]
+        # Construir lista de endpoints dinamicamente a partir do quick_admin_test
+        admin_endpoints: list[str] = ["/users/me"]
+        if QUICK_ENDPOINTS:
+            admin_endpoints.extend(
+                sorted(
+                    {
+                        cfg.get("url")
+                        for _, cfg in QUICK_ENDPOINTS.items()
+                        if cfg.get("category") == "admin"
+                        and cfg.get("method", "GET").upper() == "GET"
+                    }
+                )
+            )
+        else:
+            # Fallback estático caso não seja possível importar o mapeamento
+            admin_endpoints.extend(
+                [
+                    "/admin/benefits",
+                    "/admin/employees",
+                    "/admin/metrics",
+                    "/admin/metrics/counters",
+                    "/admin/partners",
+                    "/admin/students",
+                ]
+            )
+
+        # Remover duplicatas preservando a ordem
+        admin_endpoints = list(dict.fromkeys(admin_endpoints))
 
         endpoint_results = []
 
@@ -144,43 +170,32 @@ class AdminAuthenticationTester(BaseAuthenticationTester):
             }
 
             if success and data:
-                # Para endpoints de listagem, mostrar amostra e salvar dados completos
-                if endpoint in ["/admin/students", "/admin/employees"]:
-                    if isinstance(data, list):
-                        data_list = data
-                        result["data"] = data_list  # Salvar lista completa no relatório
-                        result["data_count"] = len(data_list)
+                # Exibir amostra para respostas em lista; para dict, registrar chaves
+                if isinstance(data, list):
+                    data_list = data
+                    result["data"] = data_list  # Salvar lista completa no relatório
+                    result["data_count"] = len(data_list)
 
-                        # Mostrar uma amostra nos logs
-                        sample_size = 3
-                        if data_list:
-                            self.print_step(
-                                f"  -> Amostra de dados ({len(data_list)} registros):",
-                                "INFO",
-                            )
-                            for item in data_list[:sample_size]:
-                                if isinstance(item, dict):
-                                    item_info = {
-                                        k: v
-                                        for k, v in item.items()
-                                        if k in ["id", "name", "email"]
-                                    }
-                                    print(f"    - {item_info}")
-                                else:
-                                    print(f"    - {item}")
-                            if len(data_list) > sample_size:
-                                print(
-                                    f"    ... e mais {len(data_list) - sample_size} outros."
-                                )
-                    else:
+                    sample_size = 3
+                    if data_list:
                         self.print_step(
-                            f"  -> Resposta para {endpoint} não é uma lista: {type(data)}",
-                            "WARNING",
+                            f"  -> Amostra de dados ({len(data_list)} registros):",
+                            "INFO",
                         )
-                        result["data"] = str(data)
-                        result["data_keys"] = (
-                            list(data.keys()) if isinstance(data, dict) else "non-dict"
-                        )
+                        for item in data_list[:sample_size]:
+                            if isinstance(item, dict):
+                                item_info = {
+                                    k: v
+                                    for k, v in item.items()
+                                    if k in ["id", "name", "email"]
+                                }
+                                print(f"    - {item_info}")
+                            else:
+                                print(f"    - {item}")
+                        if len(data_list) > sample_size:
+                            print(
+                                f"    ... e mais {len(data_list) - sample_size} outros."
+                            )
                 else:
                     result["data_keys"] = (
                         list(data.keys()) if isinstance(data, dict) else "non-dict"
@@ -198,6 +213,33 @@ class AdminAuthenticationTester(BaseAuthenticationTester):
         )
 
         return endpoint_results
+
+    def list_mapped_endpoints(self) -> None:
+        """Imprime o mapeamento de endpoints definidos em quick_admin_test.py."""
+        self.print_header("MAPEAMENTO DE ENDPOINTS (quick_admin_test)")
+        if not QUICK_ENDPOINTS:
+            self.print_step(
+                "Não foi possível carregar ENDPOINTS de quick_admin_test.py",
+                "WARNING",
+            )
+            return
+
+        # Agrupar por categoria para visualização
+        categories: dict[str, list[tuple[str, dict]]] = {}
+        for key, cfg in QUICK_ENDPOINTS.items():
+            cat = cfg.get("category", "unknown")
+            categories.setdefault(cat, []).append((key, cfg))
+
+        for cat, items in categories.items():
+            self.print_step(f"Categoria: {cat} ({len(items)} endpoints)", "INFO")
+            for key, cfg in items:
+                method = cfg.get("method", "GET")
+                url = cfg.get("url", "")
+                desc = cfg.get("description", "")
+                self.print_step(
+                    f" - {method} {url} [{key}] - {desc}",
+                    "INFO",
+                )
 
     def test_benefits_management_endpoints(self) -> dict:
         """
@@ -467,6 +509,9 @@ class AdminAuthenticationTester(BaseAuthenticationTester):
             Dicionário com resultado completo do teste
         """
         self.print_header("TESTE COMPLETO DE AUTENTICAÇÃO - ADMIN")
+
+        # Mostrar mapeamento de endpoints do quick_admin_test para alinhamento
+        self.list_mapped_endpoints()
 
         # Executar fluxo básico de autenticação
         basic_result = self.run_basic_auth_flow("admin_teste")

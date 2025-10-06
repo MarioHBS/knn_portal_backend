@@ -19,6 +19,7 @@ import argparse
 import json
 import os
 import sys
+from contextlib import suppress
 from datetime import datetime
 from typing import Any
 
@@ -79,6 +80,12 @@ ENDPOINTS = {
         "description": "Métricas administrativas",
         "category": "admin",
     },
+    "admin_metrics_counters": {
+        "url": "/admin/metrics/counters",
+        "method": "GET",
+        "description": "Contadores agregados (admin)",
+        "category": "admin",
+    },
     "admin_notifications": {
         "url": "/admin/notifications",
         "method": "POST",
@@ -91,13 +98,47 @@ ENDPOINTS = {
             "message": "Esta é uma notificação de teste do admin",
         },
     },
+    "create_employee": {
+        "url": "/admin/employees",
+        "method": "POST",
+        "description": "Criar novo funcionário",
+        "category": "admin",
+        "data": {
+            "name": "Funcionário Teste Rápido",
+            "email": "funcionario.teste.rapido@example.com",
+            # Campos opcionais usados para geração de ID padronizado
+            # O endpoint /admin/employees irá gerar o ID via IDGenerators.gerar_id_funcionario
+            # com base em name, cargo/role, cep e telefone.
+            "cargo": "Analista",
+            "cep": "88000000",
+            "telefone": "+55 (48) 99999-0000",
+        },
+    },
+    "delete_employee": {
+        "url": "/admin/employees/{id}",
+        "method": "DELETE",
+        "description": "Deletar funcionário por ID",
+        "category": "admin",
+        "url_params": {"id": "EMP_F0T0R000_XX"},
+    },
+    "create_partner": {
+        "url": "/admin/partners",
+        "method": "POST",
+        "description": "Criar novo parceiro",
+        "category": "admin",
+        "data": {
+            "name": "Parceiro Teste Rápido",
+            "category": "education",
+            "active": True,
+        },
+    },
     "create_benefit": {
         "url": "/admin/benefits",
         "method": "POST",
         "description": "Criar novo benefício",
         "category": "benefits",
         "data": {
-            "partner_id": "PTN_A7E6314_EDU",
+            "partner_id": "PTN_T4L5678_TEC",
             "title": "Benefício de Teste Rápido",
             "description": "Descrição do benefício de teste criado pelo quick test",
             "value": 15,
@@ -360,6 +401,405 @@ class QuickAdminTester:
         self.print_colored(f"   🔧 URL final: {url}", "magenta")
 
         try:
+            # Fluxo especial para criação de funcionário com verificação de contadores antes/depois
+            if endpoint_key == "create_employee":
+                counters_url = f"{BACKEND_BASE_URL}/admin/metrics/counters"
+                headers = {
+                    "Authorization": f"Bearer {self.jwt_token}",
+                    "Content-Type": "application/json",
+                }
+
+                # Obter contadores antes
+                counters_before = None
+                try:
+                    cb_resp = self.session.get(
+                        counters_url, headers=headers, timeout=20
+                    )
+                    if cb_resp.status_code in [200, 201]:
+                        counters_before = cb_resp.json()
+                        self.print_colored(
+                            "   📊 Counters BEFORE obtidos com sucesso", "cyan"
+                        )
+                        # Logs adicionais com timestamps formatados
+                        with suppress(Exception):
+                            _data = (
+                                counters_before.get("data", {})
+                                if isinstance(counters_before, dict)
+                                else {}
+                            )
+                            _agg_lu = self._format_timestamp(_data.get("last_updated"))
+                            _emp = _data.get("employees", {})
+                            _emp_lu = (
+                                self._format_timestamp(_emp.get("last_updated"))
+                                if isinstance(_emp, dict)
+                                else None
+                            )
+                            if _agg_lu:
+                                self.print_colored(
+                                    f"   • last_updated (agregado BEFORE): {_agg_lu}",
+                                    "white",
+                                )
+                            if _emp_lu:
+                                self.print_colored(
+                                    f"   • employees.last_updated BEFORE: {_emp_lu}",
+                                    "white",
+                                )
+                    elif cb_resp.status_code == 401:
+                        return {
+                            "endpoint_key": endpoint_key,
+                            "endpoint_url": endpoint_config["url"],
+                            "method": method,
+                            "description": endpoint_config["description"],
+                            "status_code": cb_resp.status_code,
+                            "success": False,
+                            "timestamp": datetime.now().isoformat(),
+                            "token_expired": True,
+                            "error": "Token inválido ou expirado (counters BEFORE)",
+                        }
+                    else:
+                        self.print_colored(
+                            f"   ⚠️  Falha ao obter counters BEFORE: {cb_resp.status_code}",
+                            "yellow",
+                        )
+                except requests.exceptions.RequestException as e:
+                    self.print_colored(
+                        f"   ⚠️  Erro ao obter counters BEFORE: {e}", "yellow"
+                    )
+
+                # Executar criação de funcionário
+                create_resp = self.session.post(
+                    url, json=data, headers=headers, timeout=30
+                )
+                result = {
+                    "endpoint_key": endpoint_key,
+                    "endpoint_url": endpoint_config["url"],
+                    "method": method,
+                    "description": endpoint_config["description"],
+                    "status_code": create_resp.status_code,
+                    "success": create_resp.status_code in [200, 201],
+                    "timestamp": datetime.now().isoformat(),
+                    "token_expired": False,
+                }
+
+                if create_resp.status_code == 401:
+                    result["token_expired"] = True
+                    result["error"] = "Token inválido ou expirado"
+                    try:
+                        result["response_data"] = create_resp.json()
+                    except:
+                        result["response_text"] = create_resp.text[:200]
+                    return result
+
+                # Obter contadores depois
+                counters_after = None
+                try:
+                    ca_resp = self.session.get(
+                        counters_url, headers=headers, timeout=20
+                    )
+                    if ca_resp.status_code in [200, 201]:
+                        counters_after = ca_resp.json()
+                        self.print_colored(
+                            "   📊 Counters AFTER obtidos com sucesso", "cyan"
+                        )
+                        # Logs adicionais com timestamps formatados
+                        with suppress(Exception):
+                            _data = (
+                                counters_after.get("data", {})
+                                if isinstance(counters_after, dict)
+                                else {}
+                            )
+                            _agg_lu = self._format_timestamp(_data.get("last_updated"))
+                            _emp = _data.get("employees", {})
+                            _emp_lu = (
+                                self._format_timestamp(_emp.get("last_updated"))
+                                if isinstance(_emp, dict)
+                                else None
+                            )
+                            if _agg_lu:
+                                self.print_colored(
+                                    f"   • last_updated (agregado AFTER): {_agg_lu}",
+                                    "white",
+                                )
+                            if _emp_lu:
+                                self.print_colored(
+                                    f"   • employees.last_updated AFTER: {_emp_lu}",
+                                    "white",
+                                )
+                    else:
+                        self.print_colored(
+                            f"   ⚠️  Falha ao obter counters AFTER: {ca_resp.status_code}",
+                            "yellow",
+                        )
+                except requests.exceptions.RequestException as e:
+                    self.print_colored(
+                        f"   ⚠️  Erro ao obter counters AFTER: {e}", "yellow"
+                    )
+
+                # Anexar dados da resposta de criação
+                try:
+                    resp_json = create_resp.json()
+                    result["response_data"] = resp_json
+                except json.JSONDecodeError:
+                    result["response_text"] = create_resp.text[:200]
+
+                # Adicionar counters before/after ao resultado
+                if counters_before:
+                    result["counters_before"] = counters_before
+                if counters_after:
+                    result["counters_after"] = counters_after
+
+                # Se possível, calcular delta de employees
+                try:
+                    before_emp = (
+                        counters_before.get("data", {})
+                        .get("employees", {})
+                        .get("total")
+                        if isinstance(counters_before, dict)
+                        else None
+                    )
+                    after_emp = (
+                        counters_after.get("data", {}).get("employees", {}).get("total")
+                        if isinstance(counters_after, dict)
+                        else None
+                    )
+                    if before_emp is not None and after_emp is not None:
+                        delta = after_emp - before_emp
+                        result["employees_delta"] = delta
+                        self.print_colored(
+                            f"   📈 Employees delta: {delta} (before={before_emp}, after={after_emp})",
+                            "cyan",
+                        )
+                except Exception as e:
+                    self.print_colored(
+                        f"   ⚠️  Não foi possível calcular delta: {e}", "yellow"
+                    )
+
+                # Retornar resultado consolidado
+                return result
+
+            # Fluxo especial para deleção de funcionário com verificação de contadores antes/depois
+            if endpoint_key == "delete_employee":
+                counters_url = f"{BACKEND_BASE_URL}/admin/metrics/counters"
+                headers = {
+                    "Authorization": f"Bearer {self.jwt_token}",
+                    "Content-Type": "application/json",
+                }
+
+                # Obter contadores antes
+                counters_before = None
+                try:
+                    cb_resp = self.session.get(
+                        counters_url, headers=headers, timeout=20
+                    )
+                    if cb_resp.status_code in [200, 201]:
+                        counters_before = cb_resp.json()
+                        self.print_colored(
+                            "   📊 Counters BEFORE obtidos com sucesso", "cyan"
+                        )
+                        # Logs adicionais com timestamps formatados
+                        with suppress(Exception):
+                            _data = (
+                                counters_before.get("data", {})
+                                if isinstance(counters_before, dict)
+                                else {}
+                            )
+                            _agg_lu = self._format_timestamp(_data.get("last_updated"))
+                            _emp = _data.get("employees", {})
+                            _emp_lu = (
+                                self._format_timestamp(_emp.get("last_updated"))
+                                if isinstance(_emp, dict)
+                                else None
+                            )
+                            if _agg_lu:
+                                self.print_colored(
+                                    f"   • last_updated (agregado BEFORE): {_agg_lu}",
+                                    "white",
+                                )
+                            if _emp_lu:
+                                self.print_colored(
+                                    f"   • employees.last_updated BEFORE: {_emp_lu}",
+                                    "white",
+                                )
+                    elif cb_resp.status_code == 401:
+                        return {
+                            "endpoint_key": endpoint_key,
+                            "endpoint_url": endpoint_config["url"],
+                            "method": method,
+                            "description": endpoint_config["description"],
+                            "status_code": cb_resp.status_code,
+                            "success": False,
+                            "timestamp": datetime.now().isoformat(),
+                            "token_expired": True,
+                            "error": "Token inválido ou expirado (counters BEFORE)",
+                        }
+                    else:
+                        self.print_colored(
+                            f"   ⚠️  Falha ao obter counters BEFORE: {cb_resp.status_code}",
+                            "yellow",
+                        )
+                except requests.exceptions.RequestException as e:
+                    self.print_colored(
+                        f"   ⚠️  Erro ao obter counters BEFORE: {e}", "yellow"
+                    )
+
+                # Executar deleção de funcionário
+                delete_resp = self.session.delete(url, headers=headers, timeout=30)
+                result = {
+                    "endpoint_key": endpoint_key,
+                    "endpoint_url": endpoint_config["url"],
+                    "method": method,
+                    "description": endpoint_config["description"],
+                    "status_code": delete_resp.status_code,
+                    "success": delete_resp.status_code in [200, 201],
+                    "timestamp": datetime.now().isoformat(),
+                    "token_expired": False,
+                }
+
+                if delete_resp.status_code == 401:
+                    result["token_expired"] = True
+                    result["error"] = "Token inválido ou expirado"
+                    try:
+                        result["response_data"] = delete_resp.json()
+                    except:
+                        result["response_text"] = delete_resp.text[:200]
+                    return result
+
+                # Obter contadores depois
+                counters_after = None
+                try:
+                    ca_resp = self.session.get(
+                        counters_url, headers=headers, timeout=20
+                    )
+                    if ca_resp.status_code in [200, 201]:
+                        counters_after = ca_resp.json()
+                        self.print_colored(
+                            "   📊 Counters AFTER obtidos com sucesso", "cyan"
+                        )
+                        # Logs adicionais com timestamps formatados
+                        with suppress(Exception):
+                            _data = (
+                                counters_after.get("data", {})
+                                if isinstance(counters_after, dict)
+                                else {}
+                            )
+                            _agg_lu = self._format_timestamp(_data.get("last_updated"))
+                            _emp = _data.get("employees", {})
+                            _emp_lu = (
+                                self._format_timestamp(_emp.get("last_updated"))
+                                if isinstance(_emp, dict)
+                                else None
+                            )
+                            if _agg_lu:
+                                self.print_colored(
+                                    f"   • last_updated (agregado AFTER): {_agg_lu}",
+                                    "white",
+                                )
+                            if _emp_lu:
+                                self.print_colored(
+                                    f"   • employees.last_updated AFTER: {_emp_lu}",
+                                    "white",
+                                )
+                    else:
+                        self.print_colored(
+                            f"   ⚠️  Falha ao obter counters AFTER: {ca_resp.status_code}",
+                            "yellow",
+                        )
+                except requests.exceptions.RequestException as e:
+                    self.print_colored(
+                        f"   ⚠️  Erro ao obter counters AFTER: {e}", "yellow"
+                    )
+
+                # Adicionar counters before/after ao resultado
+                if counters_before:
+                    result["counters_before"] = counters_before
+                if counters_after:
+                    result["counters_after"] = counters_after
+
+                # Se possível, calcular delta de employees
+                try:
+                    before_emp = (
+                        counters_before.get("data", {})
+                        .get("employees", {})
+                        .get("total")
+                        if isinstance(counters_before, dict)
+                        else None
+                    )
+                    after_emp = (
+                        counters_after.get("data", {}).get("employees", {}).get("total")
+                        if isinstance(counters_after, dict)
+                        else None
+                    )
+                    if before_emp is not None and after_emp is not None:
+                        delta = after_emp - before_emp
+                        result["employees_delta"] = delta
+                        self.print_colored(
+                            f"   📉 Employees delta: {delta} (before={before_emp}, after={after_emp})",
+                            "cyan",
+                        )
+                except Exception as e:
+                    self.print_colored(
+                        f"   ⚠️  Não foi possível calcular delta: {e}", "yellow"
+                    )
+
+                # Retornar resultado consolidado
+                return result
+
+            # Fluxo especial para exibir counters normalizados
+            if endpoint_key == "admin_metrics_counters":
+                resp = self.session.get(url, headers=headers, timeout=20)
+                result = {
+                    "endpoint_key": endpoint_key,
+                    "endpoint_url": endpoint_config["url"],
+                    "method": method,
+                    "description": endpoint_config["description"],
+                    "status_code": resp.status_code,
+                    "success": resp.status_code in [200, 201],
+                    "timestamp": datetime.now().isoformat(),
+                    "token_expired": False,
+                }
+
+                if resp.status_code == 401:
+                    result["token_expired"] = True
+                    result["error"] = "Token inválido ou expirado"
+                    try:
+                        result["response_data"] = resp.json()
+                    except Exception:
+                        result["response_text"] = resp.text[:200]
+                    return result
+
+                # Parse da resposta e normalização
+                try:
+                    resp_json = resp.json()
+                    result["response_data"] = resp_json
+                except json.JSONDecodeError:
+                    result["response_text"] = resp.text[:500]
+                    return result
+
+                normalized = self._normalize_counters_response(result["response_data"])
+                result["normalized_counters"] = normalized
+
+                # Log amigável dos counters
+                self.print_colored("   ✅ Contadores normalizados:", "green")
+                # Última atualização agregada
+                agg_lu = normalized.get("last_updated")
+                agg_lu_fmt = self._format_timestamp(agg_lu)
+                if agg_lu_fmt:
+                    self.print_colored(
+                        f"   • last_updated (agregado): {agg_lu_fmt}", "white"
+                    )
+
+                for entity in ["students", "employees", "partners", "benefits"]:
+                    ent = normalized.get(entity, {})
+                    total = ent.get("total")
+                    lu = ent.get("last_updated")
+                    lu_fmt = self._format_timestamp(lu)
+                    self.print_colored(
+                        f"   • {entity}: total={total} | last_updated={lu_fmt}",
+                        "cyan",
+                    )
+
+                return result
+
             if method == "GET":
                 response = self.session.get(url, headers=headers, timeout=30)
             elif method == "POST":
@@ -393,8 +833,11 @@ class QuickAdminTester:
 
             if response.status_code in [200, 201]:
                 self.print_colored(f"   ✅ Sucesso: {response.status_code}", "green")
-                try:
+                response_text = response.text
+                response_data = None
+                with suppress(Exception):
                     response_data = response.json()
+                if response_data is not None:
                     result["response_data"] = response_data
 
                     # Informações adicionais sobre a resposta
@@ -422,9 +865,8 @@ class QuickAdminTester:
                                         f"   📊 Benefícios encontrados: {benefits_count} (total: {total_benefits})",
                                         "cyan",
                                     )
-
-                except json.JSONDecodeError:
-                    result["response_text"] = response.text[:200]  # Primeiros 200 chars
+                else:
+                    result["response_text"] = response_text[:200]  # Primeiros 200 chars
 
             elif response.status_code == 404:
                 self.print_colored(
@@ -439,10 +881,12 @@ class QuickAdminTester:
                 )
                 result["token_expired"] = True
                 result["error"] = "Token inválido ou expirado"
-                try:
+                error_data = None
+                with suppress(Exception):
                     error_data = response.json()
+                if error_data is not None:
                     self.print_colored(f"   🔍 Detalhes 401: {error_data}", "yellow")
-                except json.JSONDecodeError:
+                else:
                     self.print_colored(f"   🔍 Resposta 401: {response.text}", "yellow")
             else:
                 # Verifica se é erro de token expirado
@@ -454,37 +898,104 @@ class QuickAdminTester:
                 else:
                     self.print_colored(f"   ❌ Erro: {response.status_code}", "red")
 
-                try:
-                    error_data = response.json()
-                    result["error"] = error_data.get("detail", response.text)
-                    # Imprimir detalhes do erro para debug
-                    print(f"   🔍 Detalhes do erro: {error_data}")
-                except json.JSONDecodeError:
+                # Tentar obter detalhes do erro, sem estruturas complexas
+                error_detail = None
+                with suppress(Exception):
+                    error_detail = response.json()
+                if isinstance(error_detail, dict) and "detail" in error_detail:
+                    result["error"] = error_detail["detail"]
+                    print(f"   🔍 Detalhes do erro: {error_detail}")
+                else:
                     result["error"] = response.text[:200]
                     print(f"   🔍 Resposta bruta: {response.text[:500]}")
 
-            return result
-
-        except requests.exceptions.RequestException as e:
-            error_msg = f"Erro de rede: {str(e)}"
-            self.print_colored(f"   ❌ {error_msg}", "red")
-            return {
-                "endpoint_key": endpoint_key,
-                "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat(),
-                "token_expired": False,
-            }
         except Exception as e:
-            error_msg = f"Erro inesperado: {str(e)}"
-            self.print_colored(f"   ❌ {error_msg}", "red")
+            # Captura erro não tratado na execução deste endpoint
+            self.print_colored(
+                f"   💥 Erro inesperado durante a requisição: {e}", "red"
+            )
             return {
                 "endpoint_key": endpoint_key,
+                "endpoint_url": endpoint_config["url"],
+                "method": method,
+                "description": endpoint_config["description"],
+                "status_code": -1,
                 "success": False,
-                "error": error_msg,
                 "timestamp": datetime.now().isoformat(),
                 "token_expired": False,
+                "error": str(e),
             }
+
+        return result
+
+    def _format_timestamp(self, ts: Any) -> str | None:
+        """
+        Formata timestamps para o padrão "yyyy-MM-dd HH:mm:ss".
+
+        Aceita:
+        - ISO 8601 com sufixo 'Z' (UTC)
+        - ISO 8601 com offset (+00:00)
+        - epoch (segundos) como int/float
+        - strings já formatadas retornam como estão se parsing falhar
+        """
+        if ts is None:
+            return None
+        try:
+            # Epoch em segundos
+            if isinstance(ts, (int, float)):
+                dt = datetime.utcfromtimestamp(ts)
+                return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+            s = str(ts).strip()
+            # Converter 'Z' para offset compatível com fromisoformat
+            if s.endswith("Z"):
+                s = s[:-1] + "+00:00"
+            dt = datetime.fromisoformat(s)
+            return dt.strftime("%Y-%m-%d %H:%M:%S")
+        except Exception:
+            # Fallback: retorna string original
+            try:
+                return str(ts)
+            except Exception:
+                return None
+
+    def _normalize_counters_response(self, resp_json: dict[str, Any]) -> dict[str, Any]:
+        """
+        Normaliza o payload do endpoint /admin/metrics/counters para um formato simples:
+
+        {
+          last_updated: <agregado>,
+          students: { total, last_updated },
+          employees: { total, last_updated },
+          partners: { total, last_updated },
+          benefits: { total, last_updated }
+        }
+        """
+        try:
+            data = resp_json.get("data", resp_json)
+            normalized: dict[str, Any] = {}
+
+            # last_updated agregado (se existir)
+            normalized["last_updated"] = data.get("last_updated")
+
+            def _extract(ent: dict[str, Any]) -> dict[str, Any]:
+                total = ent.get("total")
+                if total is None:
+                    # fallback para estrutura antiga
+                    total = ent.get("totals", {}).get("quantity")
+                return {
+                    "total": total,
+                    "last_updated": ent.get("last_updated"),
+                }
+
+            for entity in ["students", "employees", "partners", "benefits"]:
+                normalized[entity] = _extract(data.get(entity, {}))
+
+            return normalized
+        except Exception as e:
+            # Retorna um formato de erro simples; erros de rede não devem ocorrer aqui
+            self.print_colored(f"   ⚠️ Falha ao normalizar counters: {e}", "yellow")
+            return {"error": "failed_to_normalize"}
 
     def test_multiple_endpoints(self, endpoint_keys: list[str]) -> list[dict[str, Any]]:
         """

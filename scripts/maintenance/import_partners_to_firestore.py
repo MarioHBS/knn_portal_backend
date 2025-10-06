@@ -1,0 +1,66 @@
+"""
+Script para importar dados de parceiros de um arquivo JSON para a coleção 'partners' no Firestore.
+"""
+
+import json
+import os
+import sys
+from typing import Any
+
+# Adiciona o diretório raiz do projeto ao sys.path para permitir importações de módulos internos
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+from src.db.firestore import db  # type: ignore
+
+
+def import_partners_to_firestore(json_file_path: str) -> None:
+    """
+    Importa dados de parceiros de um arquivo JSON para a coleção 'partners' no Firestore.
+
+    Args:
+        json_file_path (str): O caminho para o arquivo JSON contendo os dados dos parceiros.
+    """
+    if not os.path.exists(json_file_path):
+        print(f"Erro: Arquivo não encontrado em {json_file_path}")
+        return
+
+    try:
+        with open(json_file_path, 'r', encoding='utf-8') as f:
+            data: dict[str, Any] = json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"Erro ao decodificar JSON: {e}")
+        return
+    except IOError as e:
+        print(f"Erro de E/S ao ler o arquivo: {e}")
+        return
+
+    partners_collection = db.collection('partners')
+    imported_count = 0
+
+    print("Iniciando importação de parceiros para o Firestore...")
+
+    for key, value in data.items():
+        if key.startswith('__collection__/partners/'):
+            partner_id = key.split('/')[-1]
+            partner_data = value.get('data')
+
+            if partner_id and partner_data:
+                try:
+                    partners_collection.document(partner_id).set(partner_data)
+                    print(f"Parceiro {partner_id} importado com sucesso.")
+                    imported_count += 1
+                except Exception as e:
+                    print(f"Erro ao importar parceiro {partner_id}: {e}")
+            else:
+                print(f"Aviso: Dados inválidos para a chave {key}. Ignorando.")
+
+    print(f"Importação concluída. Total de parceiros importados: {imported_count}")
+
+
+if __name__ == "__main__":
+    # Define o caminho para o arquivo JSON de parceiros
+    partners_json_path = (
+        "p:/ProjectsWEB/PRODUCAO/KNN PROJECT/knn_portal_journey_club_backend/"
+        "data/firestore_export/firestore_partners.json"
+    )
+    import_partners_to_firestore(partners_json_path)

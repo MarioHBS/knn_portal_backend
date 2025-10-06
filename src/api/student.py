@@ -6,11 +6,20 @@ import random
 import string
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Path,
+    Query,
+    status,
+)
 
 from src.auth import JWTPayload, validate_student_role
-from src.db import firestore_client, postgres_client, with_circuit_breaker
+from src.db import firestore_client, postgres_client
 from src.models import (
+    Benefit,
+    BenefitListResponse,
     FavoriteRequest,
     FavoriteResponse,
     FavoritesResponse,
@@ -18,6 +27,7 @@ from src.models import (
     PartnerDetail,
     PartnerDetailResponse,
     PartnerListResponse,
+    StudentDTO,
     ValidationCode,
     ValidationCodeCreationRequest,
 )
@@ -71,6 +81,165 @@ async def list_partners(
                 "error": {
                     "code": "SERVER_ERROR",
                     "msg": f"Erro ao listar parceiros: {str(e)}",
+                }
+            },
+        ) from e
+
+
+@router.get("/benefits", response_model=BenefitListResponse)
+async def list_benefits(
+    cat: str | None = Query(None, description="Filtro por categoria do benefício"),
+    limit: int = Query(50, ge=1, le=200, description="Número máximo de benefícios"),
+    offset: int = Query(0, ge=0, description="Offset para paginação"),
+    current_user: JWTPayload = Depends(validate_student_role),
+):
+    """
+    Lista benefícios disponíveis para estudantes no tenant atual.
+
+    Regras:
+    - Considera apenas parceiros ativos
+    - Considera apenas benefícios com status "active"
+    - Considera apenas benefícios cujo público inclui estudantes ("student" ou "all")
+    - Opcionalmente filtra por categoria via parâmetro `cat`
+    - Paginação por `limit` e `offset`
+    """
+    try:
+        # Logs iniciais para diagnóstico
+        logger.info(
+            f"[student/benefits] Início | tenant={current_user.tenant} | student_id={current_user.entity_id} | cat={cat} | limit={limit} | offset={offset}"
+        )
+
+        # 1) Buscar parceiros ativos do tenant
+        partners_result = await firestore_client.query_documents(
+            "partners",
+            tenant_id=current_user.tenant,
+            filters=[("active", "==", True)],
+            limit=500,
+            offset=0,
+        )
+        active_partner_ids = {
+            p.get("id") for p in partners_result.get("items", []) if p.get("id")
+        }
+
+        logger.info(
+            f"[student/benefits] Parceiros ativos encontrados: {len(active_partner_ids)}"
+        )
+        if not active_partner_ids:
+            logger.warning(
+                "[student/benefits] Nenhum parceiro ativo encontrado para o tenant atual"
+            )
+
+        # 2) Buscar documentos de benefícios do tenant
+        benefits_docs = await firestore_client.query_documents(
+            "benefits",
+            tenant_id=current_user.tenant,
+            limit=1000,
+            offset=0,
+        )
+
+        doc_ids = [d.get("id") for d in benefits_docs.get("items", []) if d.get("id")]
+        logger.info(
+            f"[student/benefits] Documentos de benefícios consultados: {len(doc_ids)} | ids={doc_ids[:10]}"
+        )
+
+        # 3) Extrair benefícios válidos para estudantes
+        from src.models.benefit import BenefitDTO
+
+        collected: list[Benefit] = []
+
+        for doc in benefits_docs.get("items", []):
+            partner_id = doc.get("id")
+            if not partner_id or partner_id not in active_partner_ids:
+                continue
+
+            # Cada documento possui múltiplos benefícios com chaves BNF_*
+            benefit_keys = [k for k in doc.keys() if isinstance(k, str) and k.startswith("BNF_")]
+            logger.debug(
+                f"[student/benefits] Documento {partner_id} possui {len(benefit_keys)} benefícios (BNF_*)"
+            )
+
+            for key, benefit_data in doc.items():
+                if not isinstance(key, str) or not key.startswith("BNF_"):
+                    continue
+
+                system = (
+                    benefit_data.get("system", {})
+                    if isinstance(benefit_data, dict)
+                    else {}
+                )
+                status_value = system.get("status", "")
+                audience = system.get("audience", "")
+
+                # Filtrar apenas ativos
+                if status_value != "active":
+                    continue
+
+                # Verificar se o público inclui estudantes
+                audience_includes_students = False
+                if audience in ("all", "students", "student"):
+                    audience_includes_students = True
+                elif isinstance(audience, list):
+                    audience_includes_students = (
+                        "student" in audience
+                        or "students" in audience
+                        or "all" in audience
+                    )
+                elif isinstance(audience, str):
+                    audience_includes_students = (
+                        "student" in audience or audience == "all"
+                    )
+
+                if not audience_includes_students:
+                    continue
+
+                # Converter para modelo Benefit
+                try:
+                    dto = BenefitDTO(
+                        key=key, benefit_data=benefit_data, partner_id=partner_id
+                    )
+                    benefit_obj = dto.to_benefit()
+
+                    # Filtro por categoria, se fornecido
+                    if cat:
+                        try:
+                            if str(benefit_obj.category).lower() != str(cat).lower():
+                                continue
+                        except Exception:
+                            # Se category não for comparável diretamente, pular filtro
+                            pass
+
+                    collected.append(benefit_obj)
+                except Exception as e:
+                    logger.error(
+                        f"Erro ao converter benefício {key} do parceiro {partner_id}: {str(e)}"
+                    )
+
+        # 4) Paginação em memória dos benefícios coletados
+        total = len(collected)
+        paginated = collected[offset : offset + limit]
+
+        # Logs finais do processamento
+        sample = [b.model_dump() for b in paginated[:3]] if paginated else []
+        logger.info(
+            f"[student/benefits] Total coletado={total} | retornando={len(paginated)} | amostra={len(sample)}"
+        )
+        if not paginated:
+            logger.warning(
+                "[student/benefits] Nenhum benefício retornado após filtros (status/audience/categoria/parceiro ativo)."
+            )
+
+        return BenefitListResponse(msg="ok", data=paginated)
+
+    except Exception as e:
+        logger.error(
+            f"Erro ao listar benefícios para estudantes: {str(e)}", exc_info=True
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": "Erro ao listar benefícios disponíveis",
                 }
             },
         ) from e
@@ -131,9 +300,7 @@ async def get_partner_details(
 
                 # Extrair benefícios ativos para estudantes
                 benefits = []
-                benefit_keys = [
-                    key for key in partner_doc if key.startswith("BNF_")
-                ]
+                benefit_keys = [key for key in partner_doc if key.startswith("BNF_")]
 
                 for benefit_key in benefit_keys:
                     benefit_data = partner_doc[benefit_key]
@@ -245,7 +412,6 @@ async def create_validation_code(
             tenant_id=current_user.tenant,
             partner_id=request.partner_id,
             student_id=current_user.entity_id,  # Usar entity_id
-
             expires=expires_at,
         )
 
@@ -277,101 +443,136 @@ async def create_validation_code(
         ) from e
 
 
-@router.get("/me/fav", response_model=FavoritesResponse)
-async def list_favorites(current_user: JWTPayload = Depends(validate_student_role)):
+# Endpoint de Perfil do Estudante
+@router.get("/me", response_model=StudentDTO)
+async def get_student_profile(
+    current_user: JWTPayload = Depends(validate_student_role),
+):
     """
-    Retorna a lista de parceiros favoritos do aluno.
+    Retorna os dados completos do estudante a partir da coleção 'students'.
 
-    Utiliza a nova estrutura de coleções separadas (students_fav).
+    O estudante somente pode acessar seu próprio documento, identificado por
+    current_user.entity_id, e restrito ao tenant atual.
     """
     try:
-        student_id = current_user.sub
+        student_id = current_user.entity_id
 
-        # Obter documento de favoritos do estudante
-        async def get_firestore_favorites():
-            return await firestore_client.get_document(
-                "students_fav", student_id, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_favorites():
-            return await postgres_client.get_document("students_fav", student_id)
-
-        favorites_doc = await with_circuit_breaker(
-            get_firestore_favorites, get_postgres_favorites
+        # Buscar documento do estudante no Firestore, restrito ao tenant
+        student_doc = await firestore_client.get_document(
+            "students", student_id, tenant_id=current_user.tenant
         )
 
-        # Se não existe documento de favoritos, retornar lista vazia
-        if not favorites_doc:
-            return {"data": [], "msg": "ok"}
-
-        # Obter lista de IDs dos parceiros favoritos
-        favorite_partner_ids = favorites_doc.get("favorites", [])
-
-        # Obter detalhes dos parceiros favoritos
-        favorite_partners = []
-
-        for partner_id in favorite_partner_ids:
-            # Obter parceiro
-            async def get_firestore_partner(pid=partner_id):
-                return await firestore_client.get_document(
-                    "partners", pid, tenant_id=current_user.tenant
-                )
-
-            async def get_postgres_partner(pid=partner_id):
-                return await postgres_client.get_document(
-                    "partners", pid, tenant_id=current_user.tenant
-                )
-
-            partner = await with_circuit_breaker(
-                get_firestore_partner, get_postgres_partner
+        if not student_doc:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "msg": "Estudante não encontrado",
+                    }
+                },
             )
 
+        # Validar/normalizar usando StudentDTO
+        try:
+            student = StudentDTO(**student_doc)
+        except Exception as e:
+            logger.error(
+                f"Erro ao validar dados do estudante {student_id} com StudentDTO: {str(e)}"
+            )
+            # Em caso de falha de validação, retornar documento bruto para debug controlado
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail={
+                    "error": {
+                        "code": "STUDENT_DTO_VALIDATION_ERROR",
+                        "msg": "Falha ao validar dados do estudante",
+                    }
+                },
+            ) from e
+
+        return student
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao obter perfil do estudante: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": "Erro ao obter perfil do estudante",
+                }
+            },
+        ) from e
+
+
+# Endpoints de Favoritos
+@router.get("/fav", response_model=FavoritesResponse)
+async def list_student_favorites(
+    current_user: JWTPayload = Depends(validate_student_role),
+):
+    """
+    Lista os parceiros favoritados pelo estudante.
+
+    Coleção utilizada: students_fav (um documento por favorito).
+    """
+    try:
+        # Buscar favoritos do estudante
+        fav_result = await firestore_client.query_documents(
+            "students_fav",
+            tenant_id=current_user.tenant,
+            filters=[("student_id", "==", current_user.entity_id)],
+            limit=100,
+        )
+
+        favorite_partner_ids = [
+            item.get("partner_id") for item in fav_result.get("items", [])
+        ]
+
+        favorite_partners: list[Partner] = []
+        for pid in favorite_partner_ids:
+            if not pid:
+                continue
+            partner = await firestore_client.get_document(
+                "partners", pid, tenant_id=current_user.tenant
+            )
             if partner and partner.get("active", False):
                 favorite_partners.append(Partner(**partner))
 
         return {"data": favorite_partners, "msg": "ok"}
 
     except Exception as e:
-        logger.error(f"Erro ao obter favoritos do aluno: {str(e)}")
+        logger.error(f"Erro ao listar favoritos do estudante: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "error": {
                     "code": "SERVER_ERROR",
-                    "msg": "Erro ao obter favoritos do aluno",
+                    "msg": "Erro ao listar favoritos do estudante",
                 }
             },
         ) from e
 
 
-@router.post("/me/fav", response_model=FavoriteResponse)
+@router.post("/fav", response_model=FavoriteResponse)
 async def add_student_favorite(
     request: FavoriteRequest, current_user: JWTPayload = Depends(validate_student_role)
 ):
     """
-    Adiciona um parceiro à lista de favoritos do aluno.
+    Adiciona um parceiro aos favoritos do estudante.
 
-    Utiliza a nova estrutura de coleções separadas (students_fav).
+    Estrutura: um documento por favorito na coleção students_fav.
     """
     try:
-        student_id = current_user.sub
+        student_id = current_user.entity_id
         partner_id_value = request.partner_id
 
         # Verificar se o parceiro existe e está ativo
-        async def get_firestore_partner():
-            return await firestore_client.get_document(
-                "partners", partner_id_value, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_partner():
-            return await postgres_client.get_document(
-                "partners", partner_id_value, tenant_id=current_user.tenant
-            )
-
-        partner = await with_circuit_breaker(
-            get_firestore_partner, get_postgres_partner
+        partner = await firestore_client.get_document(
+            "partners", partner_id_value, tenant_id=current_user.tenant
         )
-
         if not partner or not partner.get("active", False):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -380,102 +581,88 @@ async def add_student_favorite(
                 },
             )
 
-        # Obter documento atual de favoritos
-        async def get_firestore_favorites():
-            return await firestore_client.get_document(
-                "students_fav", student_id, tenant_id=current_user.tenant
-            )
+        # ID composto para o documento de favorito
+        favorite_doc_id = f"{student_id}_{partner_id_value}"
 
-        async def get_postgres_favorites():
-            return await postgres_client.get_document("students_fav", student_id)
-
-        favorites_doc = await with_circuit_breaker(
-            get_firestore_favorites, get_postgres_favorites
+        # Verificar se já existe
+        existing = await firestore_client.get_document(
+            "students_fav", favorite_doc_id, tenant_id=current_user.tenant
         )
+        # Calcular contagem atual de favoritos
+        fav_count_result = await firestore_client.query_documents(
+            "students_fav",
+            tenant_id=current_user.tenant,
+            filters=[("student_id", "==", student_id)],
+            limit=1,
+        )
+        current_count = fav_count_result.get("total", 0)
 
-        current_favorites = []
-        if favorites_doc:
-            current_favorites = favorites_doc.get("favorites", [])
-
-        # Verificar se já é favorito
-        if partner_id_value in current_favorites:
+        if existing:
             return FavoriteResponse(
                 success=True,
                 message="Parceiro já está nos favoritos",
-                favorites_count=len(current_favorites),
+                favorites_count=current_count,
             )
 
-        # Adicionar aos favoritos
-        current_favorites.append(partner_id_value)
+        # Criar documento
+        from src.models.favorites import StudentPartnerFavorite
 
-        # Criar ou atualizar documento de favoritos
-        favorites_data = {
-            "id": student_id,
-            "favorites": current_favorites,
-            "updated_at": datetime.now().isoformat(),
-        }
+        favorite_data = StudentPartnerFavorite(
+            student_id=student_id, partner_id=partner_id_value
+        ).model_dump(mode="json")
+        favorite_data["tenant_id"] = current_user.tenant
 
-        if favorites_doc:
-            # Atualizar documento existente
-            await firestore_client.update_document(
-                "students_fav",
-                student_id,
-                {
-                    "favorites": current_favorites,
-                    "updated_at": datetime.now().isoformat(),
-                },
-            )
-        else:
-            # Criar novo documento
-            await firestore_client.create_document(
-                "students_fav", favorites_data, student_id
-            )
+        await firestore_client.create_document(
+            "students_fav", favorite_data, doc_id=favorite_doc_id
+        )
+
+        # Nova contagem após criação
+        new_count_result = await firestore_client.query_documents(
+            "students_fav",
+            tenant_id=current_user.tenant,
+            filters=[("student_id", "==", student_id)],
+            limit=1,
+        )
+        new_count = new_count_result.get("total", current_count + 1)
 
         return FavoriteResponse(
             success=True,
             message="Parceiro adicionado aos favoritos com sucesso",
-            favorites_count=len(current_favorites),
+            favorites_count=new_count,
         )
 
-    except HTTPException:
-        raise
+    except HTTPException as http_exc:
+        raise http_exc
     except Exception as e:
-        logger.error(f"Erro ao adicionar favorito: {str(e)}")
+        logger.error(f"Erro ao adicionar favorito para o estudante: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao adicionar favorito"}
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": "Erro ao adicionar favorito",
+                }
             },
         ) from e
 
 
-@router.delete("/me/fav/{partner_id}", response_model=FavoriteResponse)
+@router.delete("/fav/{partner_id}", response_model=FavoriteResponse)
 async def remove_student_favorite(
     partner_id: str = Path(..., description="ID do parceiro"),
     current_user: JWTPayload = Depends(validate_student_role),
 ):
     """
-    Remove um parceiro da lista de favoritos do aluno.
-
-    Utiliza a nova estrutura de coleções separadas (students_fav).
+    Remove um parceiro dos favoritos do estudante.
     """
     try:
-        student_id = current_user.sub
+        student_id = current_user.entity_id
+        favorite_doc_id = f"{student_id}_{partner_id}"
 
-        # Obter documento atual de favoritos
-        async def get_firestore_favorites():
-            return await firestore_client.get_document(
-                "students_fav", student_id, tenant_id=current_user.tenant
-            )
-
-        async def get_postgres_favorites():
-            return await postgres_client.get_document("students_fav", student_id)
-
-        favorites_doc = await with_circuit_breaker(
-            get_firestore_favorites, get_postgres_favorites
+        # Verificar existência do favorito
+        existing = await firestore_client.get_document(
+            "students_fav", favorite_doc_id, tenant_id=current_user.tenant
         )
-
-        if not favorites_doc:
+        if not existing:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={
@@ -483,40 +670,28 @@ async def remove_student_favorite(
                 },
             )
 
-        current_favorites = favorites_doc.get("favorites", [])
+        # Remover documento
+        await firestore_client.delete_document("students_fav", favorite_doc_id)
 
-        # Verificar se o parceiro está nos favoritos
-        if partner_id not in current_favorites:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Favorito não encontrado"}
-                },
-            )
-
-        # Remover dos favoritos
-        current_favorites.remove(partner_id)
-
-        # Atualizar documento
-        await firestore_client.update_document(
+        # Contagem atualizada
+        fav_count_result = await firestore_client.query_documents(
             "students_fav",
-            student_id,
-            {
-                "favorites": current_favorites,
-                "updated_at": datetime.now().isoformat(),
-            },
+            tenant_id=current_user.tenant,
+            filters=[("student_id", "==", student_id)],
+            limit=1,
         )
+        new_count = fav_count_result.get("total", 0)
 
         return FavoriteResponse(
             success=True,
             message="Parceiro removido dos favoritos com sucesso",
-            favorites_count=len(current_favorites),
+            favorites_count=new_count,
         )
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Erro ao remover favorito: {str(e)}")
+        logger.error(f"Erro ao remover favorito do estudante: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={

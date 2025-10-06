@@ -23,6 +23,8 @@ from src.models import (
 )
 from src.models.benefit import BenefitRequest
 from src.utils import logger
+from src.utils.id_generators import IDGenerators
+from src.utils.metrics_service import metrics_service
 from src.utils.partners_service import PartnersService
 
 # Criar router
@@ -194,6 +196,10 @@ async def create_student(
 
         # Criar estudante
         result = await firestore_client.create_document("students", data, data["id"])
+        # Atualiza contadores agregados na coleção 'metadata'
+        await metrics_service.update_metadata_on_crud(
+            "students", current_user.tenant, operation="add", delta=1
+        )
         return {"data": result, "msg": "Estudante criado com sucesso"}
 
     except HTTPException:
@@ -254,9 +260,17 @@ async def create_employee(
                     },
                 )
 
-        # Gerar ID se não fornecido
-        if "id" not in data:
-            data["id"] = str(uuid.uuid4())
+        # Gerar ID padronizado utilizando gerador específico
+        cargo = str(data.get("cargo") or data.get("role") or "").strip()
+        cep = str(data.get("cep") or data.get("zip") or "").strip()
+        telefone = str(data.get("phone") or data.get("telefone") or "").strip()
+        generated_id = IDGenerators.gerar_id_funcionario(
+            data["name"], cargo, cep, telefone
+        )
+
+        # Não armazenar campo 'id' dentro do documento
+        # O ID do documento no Firestore será a chave 'generated_id'
+        data.pop("id", None)
 
         # Adicionar metadados
         current_time = datetime.now(UTC).isoformat()
@@ -270,7 +284,13 @@ async def create_employee(
         )
 
         # Criar funcionário
-        result = await firestore_client.create_document("employees", data, data["id"])
+        result = await firestore_client.create_document(
+            "employees", data, generated_id
+        )
+        # Atualiza contadores agregados na coleção 'metadata'
+        await metrics_service.update_metadata_on_crud(
+            "employees", current_user.tenant, operation="add", delta=1
+        )
         return {"data": result, "msg": "Funcionário criado com sucesso"}
 
     except HTTPException:
@@ -281,6 +301,52 @@ async def create_employee(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao criar funcionário"}
+            },
+        ) from e
+
+@router.delete("/employees/{id}", response_model=BaseResponse)
+async def delete_employee(
+    id: str = Path(..., description="ID do funcionário"),
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Remove um funcionário existente.
+    """
+    try:
+        # Remover funcionário
+        success = await firestore_client.delete_document(
+            "employees", id
+        )
+
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "msg": "Funcionário não encontrado",
+                    }
+                },
+            )
+
+        # Atualiza contadores agregados na coleção 'metadata'
+        await metrics_service.update_metadata_on_crud(
+            "employees", current_user.tenant, operation="sub", delta=1
+        )
+
+        return {"msg": "Funcionário removido com sucesso"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao remover funcionário {id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": "Erro ao remover funcionário",
+                }
             },
         ) from e
 
@@ -329,6 +395,10 @@ async def create_partner(
 
         # Criar parceiro
         result = await firestore_client.create_document("partners", data, data["id"])
+        # Atualiza contadores agregados na coleção 'metadata'
+        await metrics_service.update_metadata_on_crud(
+            "partners", current_user.tenant, operation="add", delta=1
+        )
         return {"data": result, "msg": "Parceiro criado com sucesso"}
 
     except HTTPException:
@@ -906,6 +976,11 @@ async def delete_benefit(
         logger.info(
             f"Benefício {benefit_id} {action_msg} com sucesso para parceiro {partner_id}"
         )
+        # Atualiza contadores agregados na coleção 'metadata' (benefits)
+        if delete_type == "hard_deleted":
+            await metrics_service.update_metadata_on_crud(
+                "benefits", current_user.tenant, operation="sub", delta=1
+            )
 
         return {"msg": f"Benefício {action_msg} com sucesso"}
 
@@ -1060,6 +1135,11 @@ async def create_benefit(
                 logger.info(
                     f"✅ Novo documento criado com ID {partner_id} e benefício {benefit_id}"
                 )
+
+            # Atualiza contadores agregados na coleção 'metadata' (benefits)
+            await metrics_service.update_metadata_on_crud(
+                "benefits", current_user.tenant, operation="add", delta=1
+            )
 
             return {
                 "data": {

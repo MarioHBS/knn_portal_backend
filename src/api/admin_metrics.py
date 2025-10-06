@@ -11,10 +11,10 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from src.auth.jwt_handler import JWTPayload, validate_admin_role
+from src.auth import JWTPayload, validate_admin_role
 from src.models import BaseResponse
+from src.utils import logger
 from src.utils.firebase_analytics import analytics_client
-from src.utils.logger import logger
 from src.utils.metrics_service import metrics_service
 
 router = APIRouter(prefix="/admin/metrics", tags=["Admin Metrics"])
@@ -65,6 +65,34 @@ class DashboardResponse(BaseResponse):
     """Resposta do endpoint de dashboard."""
 
     data: DashboardData
+
+
+class CounterItem(BaseModel):
+    """Item de contador agregado."""
+
+    total: int = Field(0, description="Quantidade total")
+    last_updated: datetime | None = Field(
+        default=None, description="Última atualização do contador"
+    )
+    windows: dict[str, Any] | None = Field(
+        default=None, description="Contagem por janelas (24h, 7d, 30d)"
+    )
+
+
+class AdminCountersData(BaseModel):
+    """Contadores agregados para entidades do sistema."""
+
+    students: CounterItem
+    employees: CounterItem
+    partners: CounterItem
+    benefits: CounterItem
+    last_updated: datetime | None
+
+
+class AdminCountersResponse(BaseResponse):
+    """Resposta do endpoint de contadores agregados."""
+
+    data: AdminCountersData
 
 
 class HistoricalMetricsResponse(BaseResponse):
@@ -230,6 +258,38 @@ async def get_historical_metrics(
                 }
             },
         )
+
+
+@router.get("/counters", response_model=AdminCountersResponse)
+async def get_admin_counters(
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Retorna contadores agregados (students, employees, partners, benefits)
+    a partir da coleção 'metadata'.
+
+    Ideal para reduzir múltiplas chamadas no Front, disponibilizando uma única
+    resposta com todos os totais e último update.
+    """
+    try:
+        aggregated = await metrics_service.get_aggregated_counters(current_user.tenant)
+
+        return AdminCountersResponse(
+            data=AdminCountersData(**aggregated),
+            msg="Contadores agregados obtidos com sucesso",
+        )
+
+    except Exception as e:
+        logger.error(f"Erro ao obter contadores agregados: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "COUNTERS_ERROR",
+                    "msg": "Erro ao obter contadores agregados",
+                }
+            },
+        ) from e
 
 
 @router.get("/realtime", response_model=BaseResponse)

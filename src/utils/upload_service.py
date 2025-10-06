@@ -11,7 +11,7 @@ from io import BytesIO
 from fastapi import HTTPException, UploadFile
 from PIL import Image
 
-from src.db import storage_client
+from src.db.storage import get_bucket
 from src.utils.logging import logger
 
 
@@ -20,9 +20,20 @@ class UploadService:
 
     def __init__(self):
         """Inicializa o serviço de upload."""
-        from src.config import FIREBASE_STORAGE_BUCKET
-
-        self.bucket = storage_client.bucket(FIREBASE_STORAGE_BUCKET)
+        try:
+            # Obtém o bucket do Storage com inicialização preguiçosa
+            self.bucket = get_bucket()
+        except Exception as e:
+            logger.error(f"Falha ao inicializar bucket do Storage: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "error": {
+                        "code": "STORAGE_INIT_ERROR",
+                        "msg": "Falha ao inicializar o Firebase Storage. Verifique FIREBASE_STORAGE_BUCKET e credenciais.",
+                    }
+                },
+            ) from e
         self.allowed_formats = {"png", "jpg", "jpeg", "webp", "svg"}
         self.max_file_size = 5 * 1024 * 1024  # 5MB
         self.min_dimensions = (100, 100)  # Mínimo 100x100 pixels

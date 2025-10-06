@@ -197,6 +197,175 @@ class MetricsService:
             logger.error(f"Erro ao criar métrica customizada: {str(e)}")
             return False
 
+    async def get_aggregated_counters(self, tenant_id: str) -> dict[str, Any]:
+        """
+        Lê documentos da coleção 'metadata' e retorna contadores agregados
+        para students, employees, partners e benefits.
+
+        Estrutura esperada dos docs de metadata (por documento, ex.: student_info):
+        {
+          tenant_id?: string,
+          last_updated: iso-string,
+          total: number
+          // windows não são armazenadas; o backend pode retorná-las como None
+        }
+        """
+        try:
+            meta_collection = self.db.collection("metadata")
+
+            def _safe_doc_data(
+                doc: firestore.DocumentSnapshot | None,
+            ) -> dict[str, Any]:
+                if doc and doc.exists:
+                    return doc.to_dict() or {}
+                return {}
+
+            async def _read_meta(doc_name: str) -> dict[str, Any]:
+                # Preferência por documento por-tenant: <tenant_id>_<doc_name>
+                tenant_doc_ref = meta_collection.document(f"{tenant_id}_{doc_name}")
+                tenant_doc = await tenant_doc_ref.get()
+                data = _safe_doc_data(tenant_doc)
+                if data:
+                    return data
+                # Fallback para documento global sem prefixo
+                global_doc_ref = meta_collection.document(doc_name)
+                global_doc = await global_doc_ref.get()
+                return _safe_doc_data(global_doc)
+
+            mapping = {
+                "students": "student_info",
+                "employees": "employee_info",
+                "partners": "partner_info",
+                "benefits": "benefit_info",
+            }
+
+            counters: dict[str, Any] = {}
+            latest_updates: list[str] = []
+
+            for key, doc_name in mapping.items():
+                doc_data = await _read_meta(doc_name)
+                # Estrutura suportada: campo simples "total"
+                total = doc_data.get("total")
+                last_updated = doc_data.get("last_updated")
+                if last_updated:
+                    latest_updates.append(last_updated)
+
+                counters[key] = {
+                    "total": int(total) if isinstance(total, (int, float)) else 0,
+                    "last_updated": last_updated,
+                }
+
+            agg_last_updated = max(latest_updates) if latest_updates else None
+
+            return {
+                "students": counters.get("students", {}),
+                "employees": counters.get("employees", {}),
+                "partners": counters.get("partners", {}),
+                "benefits": counters.get("benefits", {}),
+                "last_updated": agg_last_updated,
+            }
+
+        except Exception as e:
+            logger.error(
+                f"Erro ao obter contadores agregados para tenant {tenant_id}: {str(e)}"
+            )
+            return {
+                "students": {"total": 0, "last_updated": None},
+                "employees": {"total": 0, "last_updated": None},
+                "partners": {"total": 0, "last_updated": None},
+                "benefits": {"total": 0, "last_updated": None},
+                "last_updated": None,
+            }
+
+    async def update_metadata_on_crud(
+        self,
+        collection_name: str,
+        tenant_id: str,
+        operation: str = "add",
+        delta: int = 1,
+        set_total: int | None = None,
+    ) -> None:
+        """
+        Atualiza os campos 'last_updated' e 'total' do documento correspondente
+        em 'metadata' após operações CRUD nas coleções informadas.
+
+        Agora suporta atualizações eficientes via operação incremental:
+        - operation: "add" (incrementa), "sub" (decrementa) ou "set" (define valor);
+        - delta: quantidade a incrementar/decrementar (default: 1);
+        - set_total: quando informado, força o total explicitamente.
+
+        Suporta: students, employees, partners, benefits.
+        """
+        try:
+            names_map = {
+                "students": "student_info",
+                "employees": "employee_info",
+                "partners": "partner_info",
+                "benefits": "benefit_info",
+            }
+
+            doc_name = names_map.get(collection_name)
+            if not doc_name:
+                logger.warning(
+                    f"Coleção '{collection_name}' não suportada para atualização de metadata"
+                )
+                return
+
+            # Normalizar operação
+            op = (operation or "add").lower()
+            if op not in {"add", "sub", "set"}:
+                logger.warning(
+                    f"Operação '{operation}' inválida para update_metadata_on_crud; usando 'add'"
+                )
+                op = "add"
+
+            now_iso = datetime.utcnow().isoformat()
+
+            # Preferência por documento por-tenant
+            doc_id = f"{tenant_id}_{doc_name}"
+            doc_ref = self.db.collection("metadata").document(doc_id)
+
+            # Se for 'set' ou set_total fornecido, definir valor explicitamente
+            if op == "set" or set_total is not None:
+                total_val = set_total if set_total is not None else int(delta)
+                await doc_ref.set(
+                    {
+                        "tenant_id": tenant_id,
+                        "last_updated": now_iso,
+                        "total": int(total_val),
+                    },
+                    merge=True,
+                )
+                logger.info(
+                    f"Metadata '{doc_id}' atualizada via SET: total={total_val}, last_updated={now_iso}"
+                )
+                return
+
+            # Operação incremental: add/sub
+            increment_value = abs(int(delta)) if op == "add" else -abs(int(delta))
+
+            # Garantir existência do documento para permitir update com Increment
+            doc_snapshot = await doc_ref.get()
+            if not doc_snapshot.exists:
+                # Inicializa com 0
+                await doc_ref.set({"tenant_id": tenant_id, "total": 0}, merge=True)
+
+            await doc_ref.update(
+                {
+                    "last_updated": now_iso,
+                    "total": firestore.Increment(increment_value),
+                }
+            )
+
+            logger.info(
+                f"Metadata '{doc_id}' atualizada via {op.upper()} delta={delta}, last_updated={now_iso}"
+            )
+
+        except Exception as e:
+            logger.error(
+                f"Erro ao atualizar metadata para coleção '{collection_name}' (tenant {tenant_id}): {str(e)}"
+            )
+
     async def _get_user_metrics(self, tenant_id: str) -> dict[str, Any]:
         """Obtém métricas de usuários."""
         try:

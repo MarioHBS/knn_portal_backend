@@ -1,0 +1,348 @@
+{
+    "__collection__/partners": {},
+    "__collection__/partners_to_fix": {},
+    "__collection__/partners/PTN_A7E6314_EDU": {
+        "data": {
+            "trade_name": "Albert Eistein",
+            "cnpj": "11.276.314/0001-38",
+            "category": "Educação",
+            "address": {
+                "zip": "65051-210",
+                "street": null,
+                "neighborhood": "Cruzeiro do Anil",
+                "city": "São Luís",
+                "state": null
+            },
+            "social_networks": {
+                "instagram": null,
+                "facebook": null,
+                "website": null
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": null,
+                "whatsapp": null,
+                "email": null
+            },
+            "benefits_count": 2,
+            "has_active_benefits": true,
+            "tenant_id": "knn-dev-tenant"
+        }
+    },
+    "__collection__/partners/PTN_A1E8958_AUT": {
+        "data": {
+            "trade_name": "Autoescola Escórcio",
+            "cnpj": "13.018.958/0001-51",
+            "category": "Automotivo",
+            "address": {
+                "zip": "65040-003",
+                "street": null,
+                "neighborhood": "Outeiro da Cruz",
+                "city": "São Luís",
+                "state": null
+            },
+            "social_networks": {
+                "instagram": null,
+                "facebook": null,
+                "website": null
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": "98848-4642",
+                "whatsapp": null,
+                "email": null
+            },
+            "logo_url": "https://firebasestorage.googleapis.com/v0/b/knn-benefits.firebasestorage.app/o/partners%2Flogos%2FPTN_A1E8958_AUT.png?alt=media",
+            "benefits_count": 1,
+            "has_active_benefits": true,
+            "tenant_id": "knn-dev-tenant"
+        }
+    },
+    "__collection__/partners/PTN_C2C8555_TEC": {
+        "data": {
+            "trade_name": "Cadin Celulares",
+            "cnpj": "57.628.555/0001-08",
+            "category": "Tecnologia",
+            "address": {
+                "zip": "65110-000",
+                "street": null,
+                "neighborhood": "Maiobrado",
+                "city": "São José de Ribamar",
+                "state": null
+            },
+            "social_networks": {
+                "instagram": null,
+                "facebook": null,
+                "website": null
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": "99175-2911",
+                "whatsapp": null,
+                "email": null
+            },
+            "logo_url": "https://firebasestorage.googleapis.com/v0/b/knn-benefits.firebasestorage.app/o/partners%2Flogos%2FPTN_C2C8555_TEC.png?alt=media",
+            "benefits_count": 1,
+            "has_active_benefits": true,
+            "tenant_id": "knn-dev-tenant"
+        }
+    },
+    "__collection__/partners/PTN_C0B2202_SAU": {
+        "data": {
+            "trade_name": "Clube da Beleza",
+            "cnpj": "34.002.202/0001-94",
+            "category": "Saúde e Bem-estar",
+            "address": {
+                "zip": "65054-380",
+                "street": null,
+                "neighborhood": "Cohatrac I",
+                "city": "São Luís",
+                "state": null
+            },
+            "social_networks": {
+                "instagram": null,
+                "facebook": null,
+                "website": null
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": "98908-5280",
+                "whatsapp": null,
+                "email": null
+            },
+            "benefits_count": 1,
+            "has_active_benefits": true,
+            "tenant_id": "knn-dev-tenant"
+        }
+    },
+    "__collection__/partners/PTN_C9P9927_PAP": {
+        "data": {
+            "trade_name": "Clube do Papel",
+            "cnpj": "04.799.927/0001-94",
+            "category": "Papelaria",
+            "address": {
+                "zip": "65050-000",
+                "street": null,
+                "neighborhood": "Planalto Anil I",
+                "city": "São Luís",
+                "state": null
+            },
+            "social_networks": {
+                "instagram": null,
+                "facebook": null,
+                "website": null
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": "98421-7380",
+                "whatsapp": null,
+                "email": null
+            },
+            "logo_url": "https://firebasestorage.googleapis.com/v0/b/knn-benefits.firebasestorage.app/o/partners%2Flogos%2FPTN_C9P9927_PAP.png?alt=media",
+            "benefits_count": 1,
+            "has_active_benefits": true,
+            "tenant_id": "knn-dev-tenant"
+        }
+    },
+    "__collection__/partners/PTN_E7P0A85_TUR": {
+        "data": {
+            "trade_name": "Easy Passagens Aéreas",
+            "cnpj": "38.037.085/0001-55",
+            "category": "Turismo e Viagem",
+            "address": {
+                "zip": null,
+                "street": null,
+                "neighborhood": null,
+                "city": null,
+                "state": null
+            },
+            "social_networks": {
+                "instagram": null,
+                "facebook": null,
+                "website": "https://easy-passagens-aereas.ueniweb.com/"
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": "98869-7668",
+                "whatsapp": null,
+                "email": null
+            },
+            "benefits_count": 1,
+            "has_active_benefits": true,
+            "tenant_id": "knn-dev-tenant"
+        }
+    },
+    "__collection__/partners/PTN_E7E5750_ESP": {
+        "data": {
+            "trade_name": "Escolinha Eurofoot",
+            "cnpj": "36.075.750/0001-70",
+            "category": "Esporte",
+            "address": {
+                "zip": "65066-620",
+                "street": null,
+                "neighborhood": "Parque Shalon",
+                "city": "São Luís",
+                "state": null
+            },
+            "social_networks": {
+                "instagram": null,
+                "facebook": null,
+                "website": null
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": "99973-0706",
+                "whatsapp": null,
+                "email": null
+            },
+            "benefits_count": 1,
+            "has_active_benefits": true,
+            "tenant_id": "knn-dev-tenant"
+        }
+    },
+    "__collection__/partners/PTN_G3M3186_GER": {
+        "data": {
+            "trade_name": "Gráfica Maximus",
+            "cnpj": "25.333.186/0001-21",
+            "category": "Serviços Gerais",
+            "address": {
+                "zip": "65110-000",
+                "street": null,
+                "neighborhood": "Cohatrac V",
+                "city": "São Luís",
+                "state": null
+            },
+            "social_networks": {
+                "instagram": null,
+                "facebook": null,
+                "website": null
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": "99603-8110",
+                "whatsapp": null,
+                "email": null
+            },
+            "benefits_count": 1,
+            "has_active_benefits": true,
+            "tenant_id": "knn-dev-tenant"
+        }
+    },
+    "__collection__/partners/PTN_A3G1614_ESP": {
+        "data": {
+            "trade_name": "Academia G7",
+            "cnpj": "12.631.614/0001-50",
+            "category": "Esporte",
+            "address": {
+                "zip": "65053-590",
+                "street": null,
+                "neighborhood": "25",
+                "city": "São Luís",
+                "state": null
+            },
+            "social_networks": {
+                "instagram": null,
+                "facebook": null,
+                "website": null
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": null,
+                "whatsapp": null,
+                "email": null
+            },
+            "benefits_count": 0,
+            "has_active_benefits": false,
+            "tenant_id": "knn-dev-tenant"
+        }
+    },
+    "__collection__/partners/PTN_P2B4124_ALI": {
+        "data": {
+            "trade_name": "Pepê Burguer",
+            "cnpj": "35.824.124/0001-76",
+            "category": "Alimentação",
+            "address": {
+                "zip": "65052-050",
+                "street": null,
+                "neighborhood": "Cohatrac I",
+                "city": "São Luís",
+                "state": null
+            },
+            "social_networks": {
+                "instagram": null,
+                "facebook": null,
+                "website": "https://meupedido.delivery/pepeburger"
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": "99167-6070",
+                "whatsapp": null,
+                "email": null
+            },
+            "benefits_count": 1,
+            "has_active_benefits": true,
+            "tenant_id": "knn-dev-tenant"
+        }
+    },
+    "__collection__/partners/PTN_T4L5678_TEC": {
+        "data": {
+            "trade_name": "TechSolutions Ltda",
+            "cnpj": "12.345.678/0001-90",
+            "category": "Tecnologia",
+            "address": {
+                "zip": "65051-210",
+                "street": "Rua da Paz, 100",
+                "neighborhood": "Centro",
+                "city": "São Luís",
+                "state": "MA"
+            },
+            "social_networks": {
+                "instagram": "https://www.instagram.com/techsolutions",
+                "facebook": null,
+                "website": "https://techsolutions.com.br"
+            },
+            "geolocation": {
+                "google": null,
+                "waze": null
+            },
+            "contact": {
+                "phone": "(98) 99999-3333",
+                "whatsapp": null,
+                "email": "parceiro.teste@journeyclub.com.br"
+            },
+            "benefits_count": 1,
+            "has_active_benefits": true,
+            "tenant_id": "knn-dev-tenant"
+        }
+    }
+}
