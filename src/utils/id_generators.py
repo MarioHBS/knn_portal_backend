@@ -382,7 +382,7 @@ class IDGenerators:
         return f"PTN_{secao_central}_{codigo_categoria}"
 
     @classmethod
-    def extrair_iniciais_parceiro(cls, nome: str) -> str:
+    def extract_partner_initials(cls, nome: str) -> str:
         """Extrai iniciais do nome do parceiro ignorando preposições.
 
         Método específico para benefícios que retorna string ao invés de lista.
@@ -403,6 +403,23 @@ class IDGenerators:
                 iniciais += palavra[0].upper()
 
         return iniciais
+
+    @classmethod
+    def extract_partner_initials_from_id(cls, partner_id: str) -> str:
+        """Extrai iniciais do ID do parceiro.
+
+        Exemplo: 'PTN_A2B9C547_DC' -> 'ABC'
+
+        Args:
+            partner_id: ID do parceiro no formato PTN_XXXXXXX_XXX
+
+        Returns:
+            String com iniciais extraídas do ID
+        """
+        parts = partner_id.split("_")
+        if len(parts) != 3:
+            raise ValueError(f"ID do parceiro inválido: {partner_id}")
+        return "".join(ch for ch in parts[1] if ch.isalpha())
 
     @classmethod
     def gerar_id_beneficio(
@@ -446,7 +463,7 @@ class IDGenerators:
     ) -> str:
         """Gera ID único para benefício baseado em timestamp + hash.
 
-        Formato: BNF_[INICIAIS]_[TIMESTAMP_BASE36]_[TIPO]
+        Formato: BNF_[INICIAIS]_[ID5]_[TIPO]
 
         Vantagens:
         - Não depende de contagem sequencial
@@ -460,13 +477,13 @@ class IDGenerators:
             tipo_beneficio: Tipo do benefício (DESCONTO, CASHBACK, etc.)
 
         Returns:
-            ID único do benefício no formato BNF_[INICIAIS]_[TIMESTAMP]_[TIPO]
+            ID único do benefício no formato BNF_[INICIAIS]_[ID5]_[TIPO]
 
         Examples:
             >>> cls.gerar_id_beneficio_timestamp("TL", "DESCONTO")
-            'BNF_TL_1A2B3C_DC'
+            'BNF_TL_1A2B3_DC'
             >>> cls.gerar_id_beneficio_timestamp("AE", "CASHBACK")
-            'BNF_AE_1A2B3D_CB'
+            'BNF_AE_0Z9Q1_CB'
         """
         import hashlib
         import time
@@ -490,7 +507,9 @@ class IDGenerators:
         hash_short = hashlib.md5(hash_input.encode()).hexdigest()[:2].upper()
 
         # Timestamp em base36 (mais compacto)
-        timestamp_b36 = to_base36(timestamp_ms)[-6:]  # Últimos 6 caracteres
+        # Para atender ao formato solicitado de 5 caracteres no código central,
+        # utilizamos 3 caracteres do timestamp em base36 + 2 caracteres do hash.
+        timestamp_b36 = to_base36(timestamp_ms)[-3:]  # Últimos 3 caracteres
 
         # Combinar timestamp + hash para garantir unicidade
         identificador = f"{timestamp_b36}{hash_short}"
@@ -504,7 +523,7 @@ class IDGenerators:
         return id_beneficio
 
     @classmethod
-    def validar_id_formato(cls, id_str: str, tipo: str) -> bool:
+    def validate_id_format(cls, id_str: str, tipo: str) -> bool:
         """Valida se um ID está no formato correto.
 
         Args:
@@ -535,9 +554,9 @@ class IDGenerators:
         elif tipo == "benefit":
             # Suporte a ambos os formatos:
             # Formato antigo (sequencial): BNF_[INICIAIS]_[00-99]_[TIPO]
-            # Formato novo (timestamp): BNF_[INICIAIS]_[TIMESTAMP+HASH]_[TIPO]
+            # Formato novo (timestamp): BNF_[INICIAIS]_[ID5]_[TIPO]
             formato_antigo = bool(re.match(r"^BNF_[A-Z]+_\d{2}_[A-Z]{2}$", id_str))
-            formato_novo = bool(re.match(r"^BNF_[A-Z]+_[A-Z0-9]{8}_[A-Z]{2}$", id_str))
+            formato_novo = bool(re.match(r"^BNF_[A-Z]+_[A-Z0-9]{5}_[A-Z]{2}$", id_str))
             return formato_antigo or formato_novo
 
         return False

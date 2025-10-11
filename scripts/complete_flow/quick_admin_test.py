@@ -24,7 +24,7 @@ from datetime import datetime
 from typing import Any
 
 import requests
-from base_auth_test import BACKEND_BASE_URL, TEST_USERS, BaseAuthenticationTester
+from .base_auth_test import BACKEND_BASE_URL, TEST_USERS, BaseAuthenticationTester
 
 # Configurações
 JWT_TOKEN_FALLBACK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZWxpcGVkZWZvbGl2ZUBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJ0ZW5hbnQiOiJrbm4tZGV2LXRlbmFudCIsImV4cCI6MTc1OTE1MDE3MiwiaWF0IjoxNzU5MTQ4MzcyLCJpc3MiOiJrbm4tcG9ydGFsLWxvY2FsIiwiYXVkIjoia25uLXBvcnRhbCIsIm5hbWUiOiJGZWxpcGUgRmVycmVpcmEgZGUgT2xpdmVpcmEiLCJlbnRpdHlfaWQiOiJFTVBfRjBGME8wNjlfQ0MifQ.tLYMSPwaNi9Rs65SpYZpX_YcuLh9LJSKm8Eqq-dg4Hc"
@@ -139,15 +139,17 @@ ENDPOINTS = {
         "category": "benefits",
         "data": {
             "partner_id": "PTN_T4L5678_TEC",
+            "tenant_id": "knn-dev-tenant",
             "title": "Benefício de Teste Rápido",
             "description": "Descrição do benefício de teste criado pelo quick test",
             "value": 15,
-            "category": "desconto",
-            "type": "percentage",
+            "value_type": "percentage",
+            "type": "discount",
             "valid_from": "2025-01-01T00:00:00Z",
             "valid_to": "2025-12-31T23:59:59Z",
             "active": True,
             "audience": ["employee"],
+            "tags": ["teste", "quick"],
         },
     },
     "update_benefit": {

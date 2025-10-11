@@ -27,10 +27,10 @@ from src.models import (
     PartnerDetail,
     PartnerDetailResponse,
     PartnerListResponse,
-    StudentDTO,
     ValidationCode,
     ValidationCodeCreationRequest,
 )
+from src.models.student import Student, StudentDTO
 from src.utils import logger
 from src.utils.partners_service import PartnersService
 
@@ -153,7 +153,9 @@ async def list_benefits(
                 continue
 
             # Cada documento possui múltiplos benefícios com chaves BNF_*
-            benefit_keys = [k for k in doc.keys() if isinstance(k, str) and k.startswith("BNF_")]
+            benefit_keys = [
+                k for k in doc.keys() if isinstance(k, str) and k.startswith("BNF_")
+            ]
             logger.debug(
                 f"[student/benefits] Documento {partner_id} possui {len(benefit_keys)} benefícios (BNF_*)"
             )
@@ -447,7 +449,7 @@ async def create_validation_code(
 @router.get("/me", response_model=StudentDTO)
 async def get_student_profile(
     current_user: JWTPayload = Depends(validate_student_role),
-):
+) -> Student:
     """
     Retorna os dados completos do estudante a partir da coleção 'students'.
 
@@ -475,7 +477,9 @@ async def get_student_profile(
 
         # Validar/normalizar usando StudentDTO
         try:
-            student = StudentDTO(**student_doc)
+            student_dto = StudentDTO(**student_doc)
+            student_obj = student_dto.to_student()
+            # student_dto = StudentDTO.from_student(student_obj)  # Depois para StudentDTO
         except Exception as e:
             logger.error(
                 f"Erro ao validar dados do estudante {student_id} com StudentDTO: {str(e)}"
@@ -491,7 +495,7 @@ async def get_student_profile(
                 },
             ) from e
 
-        return student
+        return student_obj
 
     except HTTPException:
         raise

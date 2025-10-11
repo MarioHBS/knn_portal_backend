@@ -1,891 +1,729 @@
 {
   "__collection__/benefits": {},
-  "__collection__/benefits/PTN_A7E6314_EDU": {
+  "__collection__/benefits/BNF_AE_7PU38_DC": {
     "data": {
-      "BNF_AE_00_DC": {
-        "metadata": {
-          "tags": [
-            "educação",
-            "desconto",
-            "funcionário"
-          ]
-        },
-        "description": "funcionários tem 100% de descontos no curso preparatório(exeto material didatico)",
-        "title": "Desconto Especial - Albert Eistein",
-        "configuration": {
-          "value": 100,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "funcionários tem 100% de descontos no curso preparatório(exeto material didatico)",
-          "terms_conditions": "Válido mediante apresentação de comprovante de vínculo com KNN",
-          "requirements": [
-            "comprovante_vinculo_knn"
-          ],
-          "applicable_services": [
-            "cursos preparatórios"
-          ],
-          "excluded_services": [
-            "material didático"
-          ],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 0,
-            "maximum_discount_amount": null
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 1,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "00:00",
-              "end": "23:59"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": null,
-            "min_purchase_amount": 0,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-21 21:13:20.177145+00:00",
-          "updated_at": "2025-09-21 21:13:20.000000+00:00",
-          "valid_from": "2025-09-21 21:13:20.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "employees",
-          "category": "Educação"
-        }
-      },
-      "BNF_AE_01_DC": {
-        "metadata": {
-          "tags": [
-            "educação",
-            "desconto",
-            "funcionário"
-          ]
-        },
-        "description": "alunos tem 10% no valor total do curso!",
-        "title": "Desconto Especial - Albert Eistein",
-        "configuration": {
-          "value": 10,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "alunos tem 10% no valor total do curso!",
-          "terms_conditions": "",
-          "applicable_services": [],
-          "excluded_services": [],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 0,
-            "maximum_discount_amount": null
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 1,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "00:00",
-              "end": "23:59"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": null,
-            "min_purchase_amount": 0,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-21 21:13:20.177145+00:00",
-          "updated_at": "2025-09-21 21:13:20.000000+00:00",
-          "valid_from": "2025-09-21 21:13:20.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "students",
-          "category": "Educação"
-        }
+      "partner_id": "PTN_A7E6314_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Albert Eistein",
+      "description": "alunos tem 10% no valor total do curso!",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "funcionario"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": null,
+      "created_at": "2025-09-21T21:13:20.177145Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
       }
     }
   },
-  "__collection__/benefits/PTN_A1E8958_AUT": {
+  "__collection__/benefits/BNF_CC_7PVA7_DC": {
     "data": {
-      "BNF_AE_00_DC": {
-        "metadata": {
-          "tags": [
-            "automotivo",
-            "desconto",
-            "estudante"
-          ]
-        },
-        "description": "Desconto de 10% - alunos têm 10% de desconto em cima do valor final",
-        "title": "Desconto 10% - Autoescola Escórcio",
-        "configuration": {
-          "value": 10,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "Desconto de 10% - alunos têm 10% de desconto em cima do valor final",
-          "terms_conditions": "alunos têm 10% de desconto em cima do valor final",
-          "requirements": [
-            "comprovante_vinculo_knn"
-          ],
-          "applicable_services": [],
-          "excluded_services": [],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 0,
-            "maximum_discount_amount": null,
-            "valid_locations": [
-              "todas"
-            ]
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 1,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "00:00",
-              "end": "23:59"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": null,
-            "min_purchase_amount": 0,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-17 22:24:00.332124+00:00",
-          "updated_at": "2025-09-17 22:24:00.000000+00:00",
-          "valid_from": "2025-09-17 22:24:00.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "students",
-          "category": "Automotivo"
-        }
+      "partner_id": "PTN_C2C8555_TEC",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Cadin Celulares",
+      "description": "alunos e funcionários têm 5% de descontos nas compras até R$3.000,00 e ganha um acessorio na loja.",
+      "category": "tecnologia",
+      "tags": [
+        "tecnologia",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.177145Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
       }
     }
   },
-  "__collection__/benefits/PTN_C2C8555_TEC": {
+  "__collection__/benefits/BNF_CB_7PV4E_DC": {
     "data": {
-      "BNF_CC_00_DC": {
-        "metadata": {
-          "tags": [
-            "tecnologia",
-            "desconto",
-            "estudante"
-          ]
-        },
-        "description": "alunos e funcionários têm 5% de descontos nas compras até R$3.000,00 e ganha um acessorio na loja.",
-        "title": "Desconto Especial - Cadin Celulares",
-        "configuration": {
-          "value": 10,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "alunos e funcionários têm 5% de descontos nas compras até R$3.000,00 e ganha um acessorio na loja.",
-          "terms_conditions": "Válido mediante apresentação de comprovante de vínculo com KNN",
-          "requirements": [
-            "comprovante_vinculo_knn"
-          ],
-          "applicable_services": [],
-          "excluded_services": [],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 0,
-            "maximum_discount_amount": null,
-            "valid_locations": [
-              "todas"
-            ]
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 1,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "00:00",
-              "end": "23:59"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": null,
-            "min_purchase_amount": 0,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-21 21:13:20.177145+00:00",
-          "updated_at": "2025-09-21 21:13:20.000000+00:00",
-          "valid_from": "2025-09-21 21:13:20.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "all",
-          "category": "Tecnologia"
-        }
+      "partner_id": "PTN_C0B2202_SAU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Clube da Beleza",
+      "description": "alunos e funcionários têm 10% de desconto no salão.",
+      "category": "saude e bem estar",
+      "tags": [
+        "saude e bem estar",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.178158Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
       }
     }
   },
-  "__collection__/benefits/PTN_C0B2202_SAU": {
+  "__collection__/benefits/BNF_CP_7PV11_DC": {
     "data": {
-      "BNF_CB_00_DC": {
-        "metadata": {
-          "tags": [
-            "saúde e bem-estar",
-            "desconto",
-            "estudante"
-          ]
-        },
-        "description": "alunos e funcionários têm 10% de desconto no salão.",
-        "title": "Desconto Especial - Clube da Beleza",
-        "configuration": {
-          "value": 10,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "alunos e funcionários têm 10% de desconto no salão.",
-          "terms_conditions": "Válido mediante apresentação de comprovante de vínculo com KNN",
-          "requirements": [
-            "comprovante_vinculo_knn"
-          ],
-          "applicable_services": [],
-          "excluded_services": [],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 0,
-            "maximum_discount_amount": null,
-            "valid_locations": [
-              "todas"
-            ]
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 1,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "00:00",
-              "end": "23:59"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": null,
-            "min_purchase_amount": 0,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-21 21:13:20.178158+00:00",
-          "updated_at": "2025-09-21 21:13:20.000000+00:00",
-          "valid_from": "2025-09-21 21:13:20.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "all",
-          "category": "Saúde e Bem-estar"
-        }
+      "partner_id": "PTN_C9P9927_PAP",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Clube do Papel",
+      "description": "alunos têm desconto de 5% nas compras.",
+      "category": "papelaria",
+      "tags": [
+        "papelaria",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.178158Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
       }
     }
   },
-  "__collection__/benefits/PTN_C9P9927_PAP": {
+  "__collection__/benefits/BNF_CO_7PWE9_DC": {
     "data": {
-      "BNF_CP_00_DC": {
-        "metadata": {
-          "tags": [
-            "papelaria",
-            "desconto",
-            "estudante"
-          ]
-        },
-        "description": "alunos têm desconto de 5% nas compras.",
-        "title": "Desconto Especial - Clube do Papel",
-        "configuration": {
-          "value": 10,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "alunos têm desconto de 5% nas compras.",
-          "terms_conditions": "Válido mediante apresentação de comprovante de vínculo com KNN",
-          "requirements": [
-            "comprovante_vinculo_knn"
-          ],
-          "applicable_services": [],
-          "excluded_services": [],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 0,
-            "maximum_discount_amount": null
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 1,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "00:00",
-              "end": "23:59"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": null,
-            "min_purchase_amount": 0,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-21 21:13:20.178158+00:00",
-          "updated_at": "2025-09-21 21:13:20.000000+00:00",
-          "valid_from": "2025-09-21 21:13:20.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "students",
-          "category": "Papelaria"
-        }
+      "partner_id": "PTN_C3O6538_SAU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Coife Odonto",
+      "description": "alunos e funcionários têm 10% de descontos em qualquer procedimento",
+      "category": "saude e bem estar",
+      "tags": [
+        "saude e bem estar",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.178158Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
       }
     }
   },
-  "__collection__/benefits/PTN_E7P0A85_TUR": {
+  "__collection__/benefits/BNF_CAC_L0B91_DC": {
     "data": {
-      "BNF_EPA_00_DC": {
-        "metadata": {
-          "tags": [
-            "turismo e viagem",
-            "desconto",
-            "estudante"
-          ]
-        },
-        "description": "alunos têm cotação nas companhias aérias 100% gratuitas, e até 50% em voos nacionais ou internacionais. E/ou até 50% de desconto no seguro viagem.",
-        "title": "Desconto Especial - Easy passagens Aéreas",
-        "configuration": {
-          "value": 10,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "alunos têm cotação nas companhias aérias 100% gratuitas, e até 50% em voos nacionais ou internacionais. E/ou até 50% de desconto no seguro viagem.",
-          "terms_conditions": "Válido mediante apresentação de comprovante de vínculo com KNN",
-          "requirements": [
-            "comprovante_vinculo_knn"
-          ],
-          "applicable_services": [],
-          "excluded_services": [],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 0,
-            "maximum_discount_amount": null
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 1,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "00:00",
-              "end": "23:59"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": null,
-            "min_purchase_amount": 0,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-21 21:13:20.182164+00:00",
-          "updated_at": "2025-09-21 21:13:20.000000+00:00",
-          "valid_from": "2025-09-21 21:13:20.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "students",
-          "category": "Turismo e Viagem"
-        }
+      "partner_id": "PTN_C7A3C26_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Colégio Adventista (Cohab)",
+      "description": "alunos têm 15% de descontos para estudar na escola.",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.180163Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
       }
     }
   },
-  "__collection__/benefits/PTN_E7E5750_ESP": {
+  "__collection__/benefits/BNF_CDA_L0B57_DC": {
     "data": {
-      "BNF_EE_00_DC": {
-        "metadata": {
-          "tags": [
-            "esporte",
-            "desconto",
-            "estudante"
-          ]
-        },
-        "description": "alunos têm 5% de desconto para ser aluno da eurofoot.",
-        "title": "Desconto Especial - Escolinha Eurofoot",
-        "configuration": {
-          "value": 10,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "alunos têm 5% de desconto para ser aluno da eurofoot.",
-          "terms_conditions": "Válido mediante apresentação de comprovante de vínculo com KNN",
-          "requirements": [
-            "comprovante_vinculo_knn"
-          ],
-          "applicable_services": [],
-          "excluded_services": [],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 0,
-            "maximum_discount_amount": null
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 1,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "00:00",
-              "end": "23:59"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": null,
-            "min_purchase_amount": 0,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-21 21:13:20.183161+00:00",
-          "updated_at": "2025-09-21 21:13:20.000000+00:00",
-          "valid_from": "2025-09-21 21:13:20.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "students",
-          "category": "Esporte"
-        }
+      "partner_id": "PTN_C1D3A20_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Colégio Diante do Aprender",
+      "description": "-",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.180163Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
       }
     }
   },
-  "__collection__/benefits/PTN_G3M3186_GER": {
+  "__collection__/benefits/BNF_CS_7PW27_DC": {
     "data": {
-      "BNF_GM_00_DC": {
-        "metadata": {
-          "tags": [
-            "serviços gerais",
-            "desconto",
-            "estudante"
-          ]
-        },
-        "description": "alunos têm 10% de descontos em qualquer trabalho na gráfica.",
-        "title": "Desconto Especial - Gráfica Maximus",
-        "configuration": {
-          "value": 10,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "alunos têm 10% de descontos em qualquer trabalho na gráfica.",
-          "terms_conditions": "Válido mediante apresentação de comprovante de vínculo com KNN",
-          "requirements": [
-            "comprovante_vinculo_knn"
-          ],
-          "applicable_services": [],
-          "excluded_services": [],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 0,
-            "maximum_discount_amount": null
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 1,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "00:00",
-              "end": "23:59"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": null,
-            "min_purchase_amount": 0,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-21 21:13:20.184160+00:00",
-          "updated_at": "2025-09-21 21:13:20.000000+00:00",
-          "valid_from": "2025-09-21 21:13:20.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "students",
-          "category": "Serviços Gerais"
-        }
+      "partner_id": "PTN_C1S4941_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Colégio Shalom",
+      "description": "alunos têm 10% de desconto na escola Shalom.",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.180163Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
       }
     }
   },
-  "__collection__/benefits/PTN_P2B4124_ALI": {
+  "__collection__/benefits/BNF_EPA_L0B27_DC": {
     "data": {
-      "BNF_PB_00_DC": {
-        "metadata": {
-          "tags": [
-            "alimentação",
-            "desconto",
-            "estudante"
-          ]
-        },
-        "description": "alunos têm 10% de descontos na compra de quaisquer lanche.",
-        "title": "Desconto Especial - Pepê burguer",
-        "configuration": {
-          "value": 10,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "alunos têm 10% de descontos na compra de quaisquer lanche.",
-          "terms_conditions": "Válido mediante apresentação de comprovante de vínculo com KNN",
-          "requirements": [
-            "comprovante_vinculo_knn"
-          ],
-          "applicable_services": [],
-          "excluded_services": [],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 0,
-            "maximum_discount_amount": null
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 1,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "00:00",
-              "end": "23:59"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": null,
-            "min_purchase_amount": 0,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-21 21:13:20.187159+00:00",
-          "updated_at": "2025-09-21 21:13:20.000000+00:00",
-          "valid_from": "2025-09-21 21:13:20.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "students",
-          "category": "Alimentação"
-        }
+      "partner_id": "PTN_E7P0A85_TUR",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Easy passagens Aéreas",
+      "description": "alunos têm cotação nas companhias aérias 100% gratuitas, e até 50% em voos nacionais ou internacionais. E/ou até 50% de desconto no seguro viagem.",
+      "category": "turismo e viagem",
+      "tags": [
+        "turismo e viagem",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.182164Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
       }
     }
   },
-  "__collection__/benefits/PTR_TEST_20250907191053": {
+  "__collection__/benefits/BNF_EE_7PW07_DC": {
     "data": {
-      "BNF_TS_00_DC": {
-        "metadata": {
-          "tags": [
-            "tecnologia",
-            "desconto",
-            "estudante"
-          ]
-        },
-        "description": "Desconto especial de 15% em soluções tecnológicas para educação",
-        "title": "Desconto Especial - TechSolutions",
-        "configuration": {
-          "value": 15,
-          "value_type": "percentage",
-          "calculation_method": "final_amount",
-          "description": "Desconto especial de 15% em soluções tecnológicas para educação",
-          "terms_conditions": "Válido mediante apresentação de comprovante de vínculo com KNN",
-          "requirements": [
-            "comprovante_vinculo_knn"
-          ],
-          "applicable_services": [
-            "soluções tecnológicas",
-            "consultoria em TI",
-            "desenvolvimento de software"
-          ],
-          "excluded_services": [],
-          "additional_benefits": [],
-          "restrictions": {
-            "minimum_purchase": 100,
-            "maximum_discount_amount": 500
-          }
-        },
-        "limits": {
-          "usage": {
-            "per_day": -1,
-            "per_week": -1,
-            "per_month": 2,
-            "per_year": -1,
-            "lifetime": -1
-          },
-          "temporal": {
-            "cooldown_period": {
-              "days": 0,
-              "weeks": 0,
-              "months": 0,
-              "description": "Sem período de carência"
-            },
-            "valid_hours": {
-              "start": "08:00",
-              "end": "18:00"
-            },
-            "valid_days": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday"
-            ]
-          },
-          "financial": {
-            "max_discount_amount": 500,
-            "min_purchase_amount": 100,
-            "max_purchase_amount": null
-          }
-        },
-        "dates": {
-          "created_at": "2025-09-07 22:10:56.626168+00:00",
-          "updated_at": "2025-09-21 21:13:20.000000+00:00",
-          "valid_from": "2025-09-21 21:13:20.000000+00:00",
-          "valid_until": null
-        },
-        "system": {
-          "tenant_id": "knn-dev-tenant",
-          "status": "active",
-          "type": "discount",
-          "audience": "students",
-          "category": "Tecnologia"
-        }
+      "partner_id": "PTN_E8E6311_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Escola Educando",
+      "description": "-",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.182164Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
       }
     }
-  }
+  },
+  "__collection__/benefits/BNF_EI_7PX44_DC": {
+    "data": {
+      "partner_id": "PTN_E0I8631_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Escola Imperador",
+      "description": "Apoio financeiro para estudar (Pé de Meia).",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.183161Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_EE_7PXF1_DC": {
+    "data": {
+      "partner_id": "PTN_E7E5750_ESP",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Escolinha Eurofoot",
+      "description": "alunos têm 5% de desconto para ser aluno da eurofoot.",
+      "category": "esporte",
+      "tags": [
+        "esporte",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.183161Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_EC_7PXCB_DC": {
+    "data": {
+      "partner_id": "PTN_E0C2417_TEC",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Espaço Dos Celulares",
+      "description": "alunos têm desconto de 10% em qualquer item da loja.",
+      "category": "tecnologia",
+      "tags": [
+        "tecnologia",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.183161Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_FE_7PX3B_DC": {
+    "data": {
+      "partner_id": "PTN_F0E3399_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Faculdade Edufor",
+      "description": "alunos têm 70% de descontos nos cursos, exeto medicina.",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.184160Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_GM_7PX20_DC": {
+    "data": {
+      "partner_id": "PTN_G3M3186_GER",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Gráfica Maximus",
+      "description": "alunos têm 10% de descontos em qualquer trabalho na gráfica.",
+      "category": "servicos gerais",
+      "tags": [
+        "servicos gerais",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.184160Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_IR_7PX6D_DC": {
+    "data": {
+      "partner_id": "PTN_I8R7176_SAU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Instituto Roma",
+      "description": "alunos têm desconto de 15% em qualquer procedimento na clínica.",
+      "category": "saude e bem estar",
+      "tags": [
+        "saude e bem estar",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.184160Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_KA_7PYA2_DC": {
+    "data": {
+      "partner_id": "PTN_K5A8773_ESP",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Kgb Academia",
+      "description": "-",
+      "category": "esporte",
+      "tags": [
+        "esporte",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.185161Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_IM_7PYA2_DC": {
+    "data": {
+      "partner_id": "PTN_I2M5086_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Instituto Magnólia",
+      "description": "-",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.186160Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_MS_7PY9B_DC": {
+    "data": {
+      "partner_id": "PTN_M8S7659_VAR",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Mercadinho Sb",
+      "description": "alunos e funcionários têm 5% de descontos na compra de qualquer produto.",
+      "category": "varejo",
+      "tags": [
+        "varejo",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.186160Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_M_98TP3_DC": {
+    "data": {
+      "partner_id": "PTN_M561122_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Microlins",
+      "description": "alunos têm 26% de descontos em todos os cursos da instituição.",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.187159Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_PB_7PYE1_DC": {
+    "data": {
+      "partner_id": "PTN_P2B4124_ALI",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Pepê burguer",
+      "description": "alunos têm 10% de descontos na compra de quaisquer lanche.",
+      "category": "alimentacao",
+      "tags": [
+        "alimentacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.187159Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_PL_7PZC5_DC": {
+    "data": {
+      "partner_id": "PTN_P7L8666_PAP",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Ponta Do Lapis",
+      "description": "alunos têm até 15% de descontos na compra de matériais escolares.",
+      "category": "papelaria",
+      "tags": [
+        "papelaria",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.187159Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_RSC_L0E21_DC": {
+    "data": {
+      "partner_id": "PTN_R5S7C95_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Rosa de Saron Filial (C. Operária)",
+      "description": "-",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.188157Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_SG_7PZ45_DC": {
+    "data": {
+      "partner_id": "PTN_S0G4375_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Studio Games",
+      "description": "alunos têm 71% de desconto nos cursos / alunos têm 20% nos passaporte.",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.189157Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_TFC_L0F3C_DC": {
+    "data": {
+      "partner_id": "PTN_T0F9C66_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Tudo facil cursos",
+      "description": "alunso têm 5% de desconto em qualquer curso da instituição.",
+      "category": "educacao",
+      "tags": [
+        "educacao",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.189157Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_V_MI4Q7_DC": {
+    "data": {
+      "partner_id": "PTN_V553463_ENT",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Valparaíso",
+      "description": "funcionários têm acesso livre ao parque; alunos têm descontos nos ingressos.",
+      "category": "entretenimento",
+      "tags": [
+        "entretenimento",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.189157Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_AG_7PZ4D_DC": {
+    "data": {
+      "partner_id": "PTN_A3G1614_ESP",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Academia G7",
+      "description": "-",
+      "category": "outros",
+      "tags": [
+        "geral",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.176218Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_K_D89Q0_DC": {
+    "data": {
+      "partner_id": "PTN_K723652_ESP",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Kaizen",
+      "description": "-",
+      "category": "outros",
+      "tags": [
+        "geral",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.185161Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__collection__/benefits/BNF_S_12O89_DC": {
+    "data": {
+      "partner_id": "PTN_S044456_EDU",
+      "tenant_id": "knn_ma_sjr_cohatrac",
+      "title": "Desconto Especial - Shalom",
+      "description": "-",
+      "category": "outros",
+      "tags": [
+        "geral",
+        "desconto",
+        "estudante"
+      ],
+      "audience": "student",
+      "type": "discount",
+      "status": "active",
+      "valid_from": "2025-09-22T00:13:20Z",
+      "valid_until": "2026-09-22T00:13:20Z",
+      "created_at": "2025-09-21T21:13:20.188157Z",
+      "updated_at": "2025-09-21T21:13:20Z",
+      "configuration": {
+        "value": 10,
+        "value_type": "percentage"
+      }
+    }
+  },
+  "__converted_count__": 30
 }

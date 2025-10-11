@@ -126,17 +126,17 @@ class TestIDGenerators(unittest.TestCase):
     def test_validar_id_formato_valido(self):
         """Testa validação de formato de ID válido."""
         # IDs válidos
-        self.assertTrue(IDGenerators.validar_id_formato("STD_J1S23456_K1", "student"))
-        self.assertTrue(IDGenerators.validar_id_formato("EMP_M1O23456_PR", "employee"))
-        self.assertTrue(IDGenerators.validar_id_formato("PTN_E1A2L34_TEC", "partner"))
+        self.assertTrue(IDGenerators.validate_id_format("STD_J1S23456_K1", "student"))
+        self.assertTrue(IDGenerators.validate_id_format("EMP_M1O23456_PR", "employee"))
+        self.assertTrue(IDGenerators.validate_id_format("PTN_E1A2L34_TEC", "partner"))
 
     def test_validar_id_formato_invalido(self):
         """Testa validação de formato de ID inválido."""
         # IDs inválidos
-        self.assertFalse(IDGenerators.validar_id_formato("INVALID_FORMAT", "student"))
-        self.assertFalse(IDGenerators.validar_id_formato("STD_ONLY_PREFIX", "student"))
-        self.assertFalse(IDGenerators.validar_id_formato("_MISSING_PREFIX", "student"))
-        self.assertFalse(IDGenerators.validar_id_formato("", "student"))
+        self.assertFalse(IDGenerators.validate_id_format("INVALID_FORMAT", "student"))
+        self.assertFalse(IDGenerators.validate_id_format("STD_ONLY_PREFIX", "student"))
+        self.assertFalse(IDGenerators.validate_id_format("_MISSING_PREFIX", "student"))
+        self.assertFalse(IDGenerators.validate_id_format("", "student"))
 
     def test_casos_extremos_nome_com_acentos(self):
         """Testa casos extremos com nomes acentuados."""

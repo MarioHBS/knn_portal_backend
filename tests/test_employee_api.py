@@ -55,17 +55,17 @@ def mock_employee():
 
 
 @pytest.fixture
-def mock_promotion():
-    """Fixture para promoção mock."""
+def mock_benefit():
+    """Fixture para benefício mock."""
     return {
-        "id": "promotion-123",
+        "id": "benefit-123",
         "partner_id": "partner-123",
         "title": "Desconto 15%",
-        "type": "discount",
-        "valid_from": datetime.now().isoformat(),
-        "valid_to": (datetime.now() + timedelta(days=30)).isoformat(),
-        "active": True,
-        "audience": ["employee"],
+        "benefit_type": "discount",
+        "start_date": datetime.now().isoformat(),
+        "end_date": (datetime.now() + timedelta(days=30)).isoformat(),
+        "status": "active",
+        "audience": "employee",
     }
 
 
@@ -210,7 +210,7 @@ class TestEmployeePartnersEndpoints:
 
     @pytest.mark.asyncio
     async def test_get_partner_details_success(
-        self, mock_employee_user, mock_partner, mock_promotion
+        self, mock_employee_user, mock_partner, mock_benefit
     ):
         """Testa obtenção de detalhes do parceiro com sucesso."""
         with (
@@ -223,7 +223,7 @@ class TestEmployeePartnersEndpoints:
             # Mock para busca do parceiro
             mock_circuit_breaker.side_effect = [
                 {"data": mock_partner},  # Primeira chamada: buscar parceiro
-                {"items": [mock_promotion]},  # Segunda chamada: buscar promoções
+                {"items": [mock_benefit]},  # Segunda chamada: buscar benefícios
             ]
 
             from src.api.employee import get_partner_details
@@ -232,7 +232,7 @@ class TestEmployeePartnersEndpoints:
 
             assert result["msg"] == "ok"
             assert result["data"]["trade_name"] == "Parceiro Teste"
-            assert len(result["data"]["promotions"]) == 1
+            assert len(result["data"]["benefits"]) == 1
 
     @pytest.mark.asyncio
     async def test_get_partner_details_not_found(self, mock_employee_user):

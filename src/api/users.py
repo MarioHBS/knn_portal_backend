@@ -80,7 +80,12 @@ TEST_USERS = {
 
 
 def create_jwt_token(user_data: dict, expires_minutes: int = 30) -> str:
-    """Cria um token JWT válido.
+    """Cria um token JWT válido (HS256) padronizando o identificador (sub).
+
+    Regras:
+    - Usa 'sub' diretamente se fornecido.
+    - Caso contrário, tenta 'username' e por fim 'email' para compatibilidade legada.
+    - Não inclui 'name' no payload; esse dado pode ser obtido em endpoints específicos.
 
     Args:
         user_data: Dados do usuário
@@ -90,16 +95,18 @@ def create_jwt_token(user_data: dict, expires_minutes: int = 30) -> str:
         Token JWT assinado
     """
     now = datetime.utcnow()
+    sub_value = user_data.get("sub") or user_data.get("username") or user_data.get("email")
+
     payload = {
-        "sub": user_data["username"],
+        "sub": sub_value,
         "role": user_data["role"],
         "tenant": user_data["tenant"],
         "exp": now + timedelta(minutes=expires_minutes),
         "iat": now,
         "iss": "knn-portal-local",
         "aud": "knn-portal",
-        "name": user_data.get("name", user_data["username"]),
-        "entity_id": user_data.get("entity_id"),  # Incluir entity_id na abordagem híbrida
+        # 'name' intencionalmente omitido; será consultado em endpoints próprios
+        "entity_id": user_data.get("entity_id"),
     }
 
     return jwt.encode(payload, JWT_SECRET_KEY, algorithm="HS256")
@@ -273,10 +280,12 @@ async def login(request: FirebaseLoginRequest):
 
     try:
         # Importar a função de verificação do Firebase
-        from src.auth import verify_firebase_token
+        from src.auth import extract_data_from_firebase_token
 
         # Validar o token Firebase
-        firebase_payload = await verify_firebase_token(request.firebase_token)
+        firebase_payload = await extract_data_from_firebase_token(
+            request.firebase_token
+        )
 
         # Extrair informações do usuário do token Firebase
         try:
@@ -300,6 +309,7 @@ async def login(request: FirebaseLoginRequest):
         entity_id = None
         try:
             from src.db.firestore import get_database
+
             db = get_database()
             user_doc = db.collection("users").document(firebase_payload.sub).get()
             if user_doc.exists:
@@ -307,17 +317,18 @@ async def login(request: FirebaseLoginRequest):
                 entity_id = user_data_firestore.get("entity_id")
                 print(f"DEBUG - Entity ID encontrado no Firestore: {entity_id}")
             else:
-                print(f"DEBUG - Documento do usuário não encontrado no Firestore para UID: {firebase_payload.sub}")
+                print(
+                    f"DEBUG - Documento do usuário não encontrado no Firestore para UID: {firebase_payload.sub}"
+                )
         except Exception as e:
             # Log do erro mas não falhar o login se não conseguir buscar entity_id
             print(f"Aviso: Não foi possível buscar entity_id do Firestore: {e}")
 
-        # Preparar dados do usuário
+        # Preparar dados do usuário (usar UID do Firebase como 'sub')
         user_data = {
-            "username": user_email,
+            "sub": firebase_payload.sub,
             "role": token_role,
             "tenant": firebase_payload.tenant,
-            "name": user_name,
             "entity_id": entity_id,  # Incluir entity_id obtido do Firestore
         }
 
@@ -375,12 +386,31 @@ async def get_me(
     Returns:
         Informações do usuário autenticado
     """
+    # Buscar informações complementares do usuário no Firestore (first_access, entity_id)
+    first_access = True
+    entity_id = current_user.entity_id
+    try:
+        from src.db.firestore import get_database
+
+        db = get_database()
+        user_doc = db.collection("users").document(current_user.sub).get()
+        if user_doc.exists:
+            user_data_firestore = user_doc.to_dict()
+            first_access = bool(user_data_firestore.get("first_access", True))
+            # Preferir entity_id do Firestore se disponível
+            entity_id = user_data_firestore.get("entity_id", entity_id)
+    except Exception as e:
+        # Não falhar se não conseguir buscar dados complementares
+        print(f"Aviso: Não foi possível buscar dados do usuário no Firestore: {e}")
+
     return {
-        "username": current_user.sub,
+        "uid": current_user.sub,
         "role": current_user.role,
         "tenant": current_user.tenant,
-        "name": current_user.name or current_user.sub,
         "expires_at": current_user.exp,
+        "expires_at_iso": current_user.expires_iso(),
+        "first_access": first_access,
+        "entity_id": entity_id,
     }
 
 
@@ -399,10 +429,9 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Depends(secu
 
     # Gerar novo token
     user_data = {
-        "username": payload.sub,
+        "sub": payload.sub,
         "role": payload.role,
         "tenant": payload.tenant,
-        "name": getattr(payload, "name", payload.sub),
     }
 
     new_token = create_jwt_token(user_data, expires_minutes=30)
@@ -449,10 +478,10 @@ async def test_firebase_token(request: FirebaseTokenRequest):
     """
     try:
         # Importar a função de verificação do Firebase
-        from src.auth import verify_firebase_token
+        from src.auth import extract_data_from_firebase_token
 
         # Tentar validar o token Firebase
-        payload = await verify_firebase_token(request.token)
+        payload = await extract_data_from_firebase_token(request.token)
 
         return FirebaseTokenResponse(
             message="OK, token recebido e validado com sucesso",

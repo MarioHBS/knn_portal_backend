@@ -53,14 +53,14 @@ def mock_student_data():
 
 
 @pytest.fixture
-def mock_promotion_data():
-    """Fixture com dados de promoção para testes."""
+def mock_benefit_data():
+    """Fixture com dados de benefício para testes."""
     return {
-        "id": "promotion_123",
-        "title": "Promoção Teste",
-        "description": "Descrição da promoção",
+        "id": "benefit_123",
+        "title": "Benefício Teste",
+        "description": "Descrição do benefício",
         "partner_id": "partner_123",
-        "active": True,
+        "status": "active",
         "created_at": "2024-01-01T00:00:00Z",
     }
 
@@ -361,7 +361,7 @@ class TestGetMetrics:
         assert "data" in data
         assert "total_partners" in data["data"]
         assert "total_students" in data["data"]
-        assert "total_promotions" in data["data"]
+        assert "total_benefits" in data["data"]
         assert "total_validations" in data["data"]
 
     @pytest.mark.asyncio

@@ -26,7 +26,7 @@ class TestPartnersService:
             sub="user123",
             role="student",
             tenant="knn",
-            exp=1234567890,
+            exp=1234567891,
             iat=1234567890,
             iss="test",
             aud="test",

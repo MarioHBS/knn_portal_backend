@@ -6,29 +6,30 @@
 4. Update TODO.md
 5. Do not use types Dict, List or Optional in Python scripts
 6. Get dates from the system, do not use dates from the language model database
+7. Do not use Optional, List, and Dict types in Python scripts
 
 ## Organization Rules
 
-7. **Credentials Management**:
+8. **Credentials Management**:
    - All credential files must be stored in `/credentials/` folder
    - Credential files must be added to `.gitignore`
    - Use environment variables in production
    - Document credential usage in `/credentials/README.md`
 
-8. **Script Organization**:
+9. **Script Organization**:
    - Temporary scripts must be placed in `/scripts/temp/`
    - Use prefixes `temp_` or `*_temp.py` for truly temporary files
    - Organize scripts by category: development, maintenance, migration, testing
    - Document script purpose in file headers
 
-9. **File Structure**:
+10. **File Structure**:
    - Keep project root clean - avoid scattered utility files
    - Use appropriate folders: `/scripts/`, `/docs/`, `/src/`, `/tests/`
    - Configuration files can remain in root if they're framework-specific
 
 ## Operations Rules
 
-10. **Bulk Operations**:
+11. **Bulk Operations**:
 
 - Bulk operations (operações em massa) must NOT be executed automatically
 - Bulk operations require explicit and specific user request

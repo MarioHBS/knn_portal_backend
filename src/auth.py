@@ -3,12 +3,15 @@ Módulo de autenticação e autorização para o Portal de Benefícios KNN.
 Implementa verificação de JWT com JWKS e validação de roles.
 """
 
-# Importações Firebase
+# Importações Firebaseimport time
+from datetime import datetime
+from typing import Any, Literal
+
 import firebase_admin
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from firebase_admin import auth
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 from src.config import (
     ENVIRONMENT,
@@ -94,17 +97,33 @@ class JWTPayload(BaseModel):
     """
 
     sub: str
-    role: str
+    role: Literal["admin", "employee", "student", "partner"]
     tenant: str
+    entity_id: str | None = None
     exp: int
     iat: int
     iss: str | None = None
     aud: str | list[str] | None = None
     name: str | None = None
-    entity_id: str | None = None
+
+    @model_validator(mode="before")
+    def exp_must_be_after_iat(cls, data: Any) -> Any:
+        """Valida se o tempo de expiração (exp) é maior que o tempo de emissão (iat)."""
+        if isinstance(data, dict):
+            iat = data.get("iat")
+            exp = data.get("exp")
+
+            if iat is not None and exp is not None and exp <= iat:
+                raise ValueError(
+                    "O tempo de expiração (exp) deve ser maior que o tempo de emissão (iat)"
+                )
+        return data
+
+    def expires_iso(self) -> str:
+        return datetime.utcfromtimestamp(self.exp).isoformat() + "Z"
 
 
-async def verify_firebase_token(token: str) -> JWTPayload:
+async def extract_data_from_firebase_token(token: str) -> JWTPayload:
     """
     Verifica o token de ID do Firebase e retorna o payload padronizado.
     """
@@ -119,6 +138,8 @@ async def verify_firebase_token(token: str) -> JWTPayload:
             iat=decoded_token.get("iat", 0),
             iss=decoded_token.get("iss"),
             aud=decoded_token.get("aud"),
+            name=decoded_token.get("name"),
+            entity_id=decoded_token.get("entity_id"),
         )
     except Exception as e:
         raise HTTPException(
@@ -151,7 +172,7 @@ async def verify_local_jwt(token: str) -> JWTPayload:
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Security(security),
+    authorization: HTTPAuthorizationCredentials | None = Security(security),
 ) -> JWTPayload:
     """
     Dependência FastAPI para obter o usuário atual.
@@ -174,7 +195,7 @@ async def get_current_user(
             iat=1000000000,
         )
 
-    if not credentials:
+    if not authorization:
         logger.warning("❌ Token não fornecido")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -183,18 +204,18 @@ async def get_current_user(
             },
         )
 
-    token = credentials.credentials
+    token = authorization.credentials
     logger.info(f"🔍 Token recebido: {token[:50]}...")
     logger.info(f"🌍 Ambiente: {ENVIRONMENT}")
 
     if ENVIRONMENT == "production":
-        logger.info("🏭 Modo produção - validando apenas com Firebase")
-        return await verify_firebase_token(token)
+        logger.info("🏭 Modo produção - validando com JWT local")
+        return await verify_local_jwt(token)
 
     # Em desenvolvimento, tentar Firebase primeiro, depois JWT local
     logger.info("🔧 Modo desenvolvimento - tentando Firebase primeiro")
     try:
-        result = await verify_firebase_token(token)
+        result = await extract_data_from_firebase_token(token)
         logger.info("✅ Token Firebase válido")
         return result
     except HTTPException as e:

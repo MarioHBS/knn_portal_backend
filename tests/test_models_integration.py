@@ -1,7 +1,8 @@
 import unittest
 from datetime import date
 
-from src.models import Employee, Partner, Student
+from src.models import Employee, Partner
+from src.models.student import Student
 
 
 class TestModelsIntegration(unittest.TestCase):
@@ -12,13 +13,13 @@ class TestModelsIntegration(unittest.TestCase):
         student = Student(
             tenant_id="tenant_123",
             cpf_hash="hash_123",
-            nome_aluno="João Silva Santos",
-            curso="KIDS 1",
-            ocupacao_aluno="Estudante",
-            email_aluno="joao@email.com",
-            celular_aluno="(11) 99999-9999",
-            cep_aluno="12345-678",
-            bairro="Centro",
+            student_name="João Silva Santos",
+            book="KIDS 1",
+            student_occupation="Estudante",
+            student_email="joao@email.com",
+            student_phone="(11) 99999-9999",
+            zip="12345-678",
+            add_neighbor="Centro",
             active_until=date(2024, 12, 31),
         )
 
@@ -35,8 +36,8 @@ class TestModelsIntegration(unittest.TestCase):
             id=existing_id,
             tenant_id="tenant_123",
             cpf_hash="hash_123",
-            nome_aluno="João Silva Santos",
-            curso="KIDS 1",
+            student_name="João Silva Santos",
+            book="KIDS 1",
             active_until=date(2024, 12, 31),
         )
 
@@ -137,8 +138,8 @@ class TestModelsIntegration(unittest.TestCase):
             student = Student(
                 tenant_id="tenant_123",
                 cpf_hash="hash_123",
-                nome_aluno="Aluno Teste",
-                curso=curso,
+                student_name="Aluno Teste",
+                book=curso,
                 active_until=date(2024, 12, 31),
             )
 

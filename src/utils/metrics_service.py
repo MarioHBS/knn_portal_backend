@@ -8,6 +8,7 @@ de métricas de negócio e performance do sistema.
 import logging
 from datetime import datetime, timedelta
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from google.cloud import firestore
 
@@ -319,7 +320,8 @@ class MetricsService:
                 )
                 op = "add"
 
-            now_iso = datetime.utcnow().isoformat()
+            # Usar horário de Brasília (America/Sao_Paulo) para o campo last_updated
+            brt_now_iso = datetime.now(ZoneInfo("America/Sao_Paulo")).isoformat()
 
             # Preferência por documento por-tenant
             doc_id = f"{tenant_id}_{doc_name}"
@@ -331,13 +333,13 @@ class MetricsService:
                 await doc_ref.set(
                     {
                         "tenant_id": tenant_id,
-                        "last_updated": now_iso,
+                        "last_updated": brt_now_iso,
                         "total": int(total_val),
                     },
                     merge=True,
                 )
                 logger.info(
-                    f"Metadata '{doc_id}' atualizada via SET: total={total_val}, last_updated={now_iso}"
+                    f"Metadata '{doc_id}' atualizada via SET: total={total_val}, last_updated={brt_now_iso}"
                 )
                 return
 
@@ -352,13 +354,13 @@ class MetricsService:
 
             await doc_ref.update(
                 {
-                    "last_updated": now_iso,
+                    "last_updated": brt_now_iso,
                     "total": firestore.Increment(increment_value),
                 }
             )
 
             logger.info(
-                f"Metadata '{doc_id}' atualizada via {op.upper()} delta={delta}, last_updated={now_iso}"
+                f"Metadata '{doc_id}' atualizada via {op.upper()} delta={delta}, last_updated={brt_now_iso}"
             )
 
         except Exception as e:

@@ -3,6 +3,7 @@ Implementação dos endpoints para o perfil de administrador (admin).
 """
 
 import uuid
+from copy import deepcopy
 from datetime import UTC, datetime
 from typing import Any
 
@@ -21,7 +22,18 @@ from src.models import (
     PartnerDetailResponse,
     PartnerListResponse,
 )
-from src.models.benefit import BenefitRequest
+from src.models.benefit import (
+    Benefit,
+    BenefitConfigurationDTO,
+    BenefitCreationDTO,
+    BenefitFirestoreDTO,
+)
+from src.models.student import (
+    Student,
+    StudentCreationDTO,
+    StudentDTO,
+    StudentGuardian,
+)
 from src.utils import logger
 from src.utils.id_generators import IDGenerators
 from src.utils.metrics_service import metrics_service
@@ -158,52 +170,62 @@ async def list_students(
 
 @router.post("/students", response_model=EntityResponse)
 async def create_student(
-    data: dict[str, Any] = Body(..., description="Dados do estudante"),
+    student_data: StudentCreationDTO,
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
     Cria um novo estudante.
     """
     try:
-        # Validar dados obrigatórios
-        required_fields = ["name", "email"]
-        for field in required_fields:
-            if field not in data:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail={
-                        "error": {
-                            "code": "VALIDATION_ERROR",
-                            "msg": f"Campo obrigatório: {field}",
-                        }
-                    },
-                )
+        # O Pydantic já validou os dados de entrada ao converter para StudentCreationDTO
+        # Agora, convertemos o DTO de criação para o modelo de domínio Student
+        guardian = None
+        if student_data.guardian_name and student_data.guardian_email:
+            guardian = StudentGuardian(
+                name=student_data.guardian_name,
+                email=student_data.guardian_email,
+                phone=student_data.guardian_phone or "",
+            )
 
-        # Gerar ID se não fornecido
-        if "id" not in data:
-            data["id"] = str(uuid.uuid4())
-
-        # Adicionar metadados
-        current_time = datetime.now(UTC).isoformat()
-        data.update(
-            {
-                "tenant_id": current_user.tenant,
-                "created_at": current_time,
-                "updated_at": current_time,
-                "type": "student",
-            }
+        the_student = Student(
+            tenant_id=current_user.tenant,
+            student_name=student_data.name,
+            book=student_data.book,
+            student_occupation=student_data.student_occupation,
+            student_email=student_data.email,
+            student_phone=student_data.student_phone,
+            zip=student_data.zip,
+            add_neighbor=student_data.add_neighbor,
+            add_complement=student_data.add_complement,
+            guardian=guardian,
+            active_until=student_data.active_until,
         )
 
-        # Criar estudante
-        result = await firestore_client.create_document("students", data, data["id"])
+        # O ID do estudante é gerado no construtor de Student
+        # Agora, convertemos o modelo de domínio para o DTO do Firestore
+        dto = StudentDTO.from_student(the_student)
+
+        # Adicionar metadados de tempo
+        current_time = datetime.now(UTC)
+        dto.created_at = current_time
+        dto.updated_at = current_time
+
+        # Criar estudante no Firestore
+        result = await firestore_client.create_document(
+            "students", dto.model_dump(exclude_none=True), the_student.id
+        )
+
         # Atualiza contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
             "students", current_user.tenant, operation="add", delta=1
         )
         return {"data": result, "msg": "Estudante criado com sucesso"}
 
-    except HTTPException:
-        raise
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={"error": {"code": "VALIDATION_ERROR", "msg": str(e)}},
+        ) from e
     except Exception as e:
         logger.error(f"Erro ao criar estudante: {str(e)}")
         raise HTTPException(
@@ -284,9 +306,7 @@ async def create_employee(
         )
 
         # Criar funcionário
-        result = await firestore_client.create_document(
-            "employees", data, generated_id
-        )
+        result = await firestore_client.create_document("employees", data, generated_id)
         # Atualiza contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
             "employees", current_user.tenant, operation="add", delta=1
@@ -304,6 +324,7 @@ async def create_employee(
             },
         ) from e
 
+
 @router.delete("/employees/{id}", response_model=BaseResponse)
 async def delete_employee(
     id: str = Path(..., description="ID do funcionário"),
@@ -314,9 +335,7 @@ async def delete_employee(
     """
     try:
         # Remover funcionário
-        success = await firestore_client.delete_document(
-            "employees", id
-        )
+        success = await firestore_client.delete_document("employees", id)
 
         if not success:
             raise HTTPException(
@@ -415,7 +434,7 @@ async def create_partner(
 async def list_all_benefits(
     partner_id: str | None = Query(None, description="Filtro por ID do parceiro"),
     category: str | None = Query(None, description="Filtro por categoria"),
-    status: str | None = Query(
+    benefit_status: str | None = Query(
         None, description="Filtro por status", enum=["active", "inactive", "expired"]
     ),
     limit: int = Query(
@@ -439,107 +458,49 @@ async def list_all_benefits(
         tenant_id = current_user.tenant
         admin_id = current_user.sub
         logger.info(
-            f"Admin {admin_id} listando benefícios - Tenant: {tenant_id} - Filtros: partner_id={partner_id}, category={category}, status={status}"
+            f"Admin {admin_id} listando benefícios - Tenant: {tenant_id} - Filtros: partner_id={partner_id}, category={category}, status={benefit_status}"
         )
 
-        # Função auxiliar para converter dados do Firestore
-        def convert_firestore_data(data):
-            """Converte dados do Firestore para formato compatível com Pydantic."""
-            if isinstance(data, dict):
-                converted = {k: convert_firestore_data(v) for k, v in data.items()}
-                # Normalizar campo audience para string se for lista
-                if "system" in converted and "audience" in converted["system"]:
-                    audience = converted["system"]["audience"]
-                    if isinstance(audience, list):
-                        # Converter lista para string separada por vírgula
-                        converted["system"]["audience"] = ",".join(audience)
-                return converted
-            elif hasattr(data, "timestamp"):  # DatetimeWithNanoseconds
-                return data.timestamp()
-            elif isinstance(data, list):
-                return [convert_firestore_data(item) for item in data]
-            else:
-                return data
-
         # Buscar todos os documentos da coleção benefits usando a mesma abordagem do partner
-        async def get_firestore_all_benefits():
-            from src.db.firestore import get_database
+        async def get_firestore_all_benefits() -> list[Benefit]:
+            composed_filters = []
+            if partner_id:
+                composed_filters.append(("partner_id", "==", partner_id))
+            if category:
+                composed_filters.append(("category", "==", category))
+            if benefit_status:
+                composed_filters.append(("status", "==", benefit_status))
 
-            db = get_database()
-            all_benefits = []
+            result = await firestore_client.query_documents(
+                collection="benefits",
+                tenant_id=tenant_id,
+                filters=composed_filters,
+                limit=limit,
+                offset=offset,
+                order_by=[("created_at", "DESCENDING")],
+            )
 
-            # Buscar todos os documentos da coleção benefits
-            benefits_collection = db.collection("benefits")
-            docs = benefits_collection.stream()
+            all_benefits = [
+                BenefitFirestoreDTO(**doc).to_benefit(doc["id"])
+                for doc in result["items"]
+            ]
+            # for doc in result["items"]:
+            #     logger.info(f"Listando benefício - {doc}")
+            #     all_benefits.append(BenefitFirestoreDTO(**doc).to_benefit(doc["id"]))
 
-            for doc in docs:
-                partner_doc_id = doc.id
-                partner_data = doc.to_dict()
+            return all_benefits
 
-                if not isinstance(partner_data, dict):
-                    continue
-
-                # Processar benefícios do parceiro
-                for benefit_key, benefit_data in partner_data.items():
-                    if benefit_key.startswith("BNF_") and isinstance(
-                        benefit_data, dict
-                    ):
-                        try:
-                            # Converter dados do Firestore para formato compatível
-                            converted_benefit_data = convert_firestore_data(
-                                benefit_data
-                            )
-
-                            # Adicionar partner_id ao benefício
-                            benefit_with_partner = {
-                                **converted_benefit_data,
-                                "benefit_id": benefit_key,
-                                "partner_id": partner_doc_id,
-                            }
-
-                            # Aplicar filtros
-                            if partner_id and partner_doc_id != partner_id:
-                                continue
-
-                            if (
-                                category
-                                and benefit_data.get("system", {}).get("category")
-                                != category
-                            ):
-                                continue
-
-                            if (
-                                status
-                                and benefit_data.get("system", {}).get("status")
-                                != status
-                            ):
-                                continue
-
-                            all_benefits.append(benefit_with_partner)
-
-                        except Exception as e:
-                            logger.warning(
-                                f"Erro ao processar benefício {benefit_key} do parceiro {partner_doc_id}: {str(e)}"
-                            )
-                            continue
-
-            return {"data": all_benefits}
-
-        async def get_postgres_all_benefits():
+        async def get_postgres_all_benefits() -> list[Benefit]:
             # Fallback para PostgreSQL se necessário
-            return {"data": []}
+            return []
 
         # Usar circuit breaker para operações do Firestore
-        benefits_result = await with_circuit_breaker(
+        benefits_list = await with_circuit_breaker(
             get_firestore_all_benefits, get_postgres_all_benefits
         )
 
-        benefits_list = benefits_result.get("data", [])
-
         # Ordenar por data de criação (mais recente primeiro)
-        benefits_list.sort(
-            key=lambda x: x.get("dates", {}).get("created_at", ""), reverse=True
-        )
+        benefits_list.sort(key=lambda x: x.created_at, reverse=True)
 
         # Aplicar paginação
         total_count = len(benefits_list)
@@ -680,7 +641,7 @@ async def get_benefit_details(
 async def update_benefit(
     partner_id: str = Path(..., description="ID do parceiro"),
     benefit_id: str = Path(..., description="ID do benefício"),
-    benefit_data: BenefitRequest = None,
+    benefit_data: BenefitCreationDTO = None,
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
@@ -775,13 +736,13 @@ async def update_benefit(
             existing_benefit["dates"]["updated_at"] = current_time
 
             if hasattr(benefit_data, "valid_from") and benefit_data.valid_from:
-                existing_benefit["dates"]["valid_from"] = (
-                    benefit_data.valid_from.isoformat()
-                )
+                existing_benefit["dates"][
+                    "valid_from"
+                ] = benefit_data.valid_from.isoformat()
             if hasattr(benefit_data, "valid_to") and benefit_data.valid_to:
-                existing_benefit["dates"]["valid_until"] = (
-                    benefit_data.valid_to.isoformat()
-                )
+                existing_benefit["dates"][
+                    "valid_until"
+                ] = benefit_data.valid_to.isoformat()
 
             # Atualizar configuração se fornecida
             if "configuration" not in existing_benefit:
@@ -790,9 +751,9 @@ async def update_benefit(
             if hasattr(benefit_data, "value"):
                 existing_benefit["configuration"]["value"] = benefit_data.value
             if hasattr(benefit_data, "value_type"):
-                existing_benefit["configuration"]["value_type"] = (
-                    benefit_data.value_type
-                )
+                existing_benefit["configuration"][
+                    "value_type"
+                ] = benefit_data.value_type
 
             # Atualizar o documento com o benefício modificado
             update_data = {benefit_id: existing_benefit}
@@ -882,7 +843,7 @@ async def delete_benefit(
             # Acesso direto ao documento sem prefixo de tenant
             from src.db.firestore import db
 
-            doc_ref = db.collection("benefits").document(partner_id)
+            doc_ref = db.collection("benefits").document(benefit_id)
             doc = doc_ref.get()
 
             if not doc.exists:
@@ -890,37 +851,26 @@ async def delete_benefit(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail={
                         "error": {
-                            "code": "PARTNER_NOT_FOUND",
-                            "msg": f"Parceiro {partner_id} não encontrado",
-                        }
-                    },
-                )
-
-            partner_doc = doc.to_dict()
-
-            if benefit_id not in partner_doc:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail={
-                        "error": {
                             "code": "BENEFIT_NOT_FOUND",
-                            "msg": f"Benefício {benefit_id} não encontrado para o parceiro {partner_id}",
+                            "msg": f"Benefício {benefit_id} não encontrado",
                         }
                     },
                 )
+
+            benefit_doc = doc.to_dict()
 
             if soft_delete:
                 # Soft delete: marcar como inativo
-                benefit_data = partner_doc[benefit_id]
+                benefit_data = benefit_doc[benefit_id]
                 if isinstance(benefit_data, dict):
-                    benefit_data["system"]["status"] = "inactive"
-                    benefit_data["dates"]["updated_at"] = datetime.now(UTC).isoformat()
-                    benefit_data["dates"]["deleted_at"] = datetime.now(UTC).isoformat()
+                    benefit_data["status"] = "inactive"
+                    benefit_data["updated_at"] = datetime.now(UTC).isoformat()
+                    benefit_data["deleted_at"] = datetime.now(UTC).isoformat()
 
-                    partner_doc[benefit_id] = benefit_data
+                    benefit_doc[benefit_id] = benefit_data
 
                     # Atualizar documento diretamente
-                    doc_ref.set(partner_doc)
+                    doc_ref.set(benefit_doc)
 
                     logger.info(f"Soft delete realizado para benefício {benefit_id}")
                     return "soft_deleted"
@@ -936,10 +886,10 @@ async def delete_benefit(
                     )
             else:
                 # Hard delete: remover completamente
-                del partner_doc[benefit_id]
+                del benefit_doc[benefit_id]
 
                 # Atualizar documento diretamente
-                doc_ref.set(partner_doc)
+                # doc_ref.set(benefit_doc)
 
                 logger.info(f"Hard delete realizado para benefício {benefit_id}")
                 return "hard_deleted"
@@ -1000,169 +950,66 @@ async def delete_benefit(
 
 @router.post("/benefits", response_model=EntityResponse)
 async def create_benefit(
-    data: dict[str, Any] = Body(..., description="Dados do benefício"),
+    data: BenefitCreationDTO = Body(..., description="Dados do benefício"),
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
-    Cria um novo benefício para um parceiro específico.
-    Segue a estrutura do Firestore onde benefícios são agrupados por parceiro.
+    Cria um novo benefício seguindo o novo formato da coleção 'benefits' no Firestore.
     """
     try:
-        # Validar se partner_id está presente
-        if "partner_id" not in data:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={
-                    "error": {
-                        "code": "VALIDATION_ERROR",
-                        "msg": "partner_id é obrigatório para benefícios",
-                    }
-                },
-            )
+        partner_id = data.partner_id
+        tenant_id = current_user.tenant
 
-        # Validar campos obrigatórios do benefício
-        required_fields = ["title", "description", "value", "category"]
-        for field in required_fields:
-            if field not in data:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail={
-                        "error": {
-                            "code": "VALIDATION_ERROR",
-                            "msg": f"Campo obrigatório: {field}",
-                        }
-                    },
-                )
-
-        partner_id = data["partner_id"]
-
-        # Gerar ID único para o benefício
-        benefit_id = f"BNF_{str(uuid.uuid4()).replace('-', '')[:6].upper()}_DC"
-
-        logger.info(
-            f"🆔 Gerando novo benefício com ID: {benefit_id} para parceiro: {partner_id}"
+        # Gerar ID do benefício baseado em timestamp + iniciais do parceiro
+        iniciais = IDGenerators.extract_partner_initials_from_id(partner_id) or "XX"
+        benefit_id = IDGenerators.gerar_id_beneficio_timestamp(
+            iniciais_parceiro=iniciais, tipo_beneficio=data.type
         )
 
-        # Criar estrutura do benefício baseada no schema do JSON
-        current_time = datetime.now(UTC).isoformat()
+        now = datetime.now(UTC)
 
-        benefit_structure = {
-            "metadata": {
-                "tags": data.get("tags", [data.get("category", "").lower(), "desconto"])
+        firestore_benefit = BenefitFirestoreDTO(
+            partner_id=partner_id,
+            tenant_id=tenant_id,
+            title=data.title,
+            description=data.description,
+            configuration=BenefitConfigurationDTO(
+                value=data.value, value_type=data.value_type
+            ),
+            tags=data.tags,
+            type=data.type,
+            valid_from=data.valid_from,
+            valid_until=data.valid_to,
+            created_at=now,
+            updated_at=now,
+            audience=data.audience,
+        )
+
+        # Persistir no Firestore sob o documento do parceiro
+        # Atenção: create_document muta o dicionário recebido (ex.: created_at = SERVER_TIMESTAMP)
+        # Para evitar enviar objetos Sentinels na resposta (quebrando a serialização Pydantic),
+        # passamos uma cópia para o Firestore e mantemos o original para retorno.
+        the_benefit = firestore_benefit.model_dump(exclude_none=True)
+
+        # Usar deepcopy para garantir que nenhuma mutação do cliente Firestore
+        # afete o dicionário que retornaremos na resposta.
+        await firestore_client.create_document(
+            "benefits", deepcopy(the_benefit), benefit_id
+        )
+
+        # Atualiza contadores agregados na coleção 'metadata' (benefits)
+        await metrics_service.update_metadata_on_crud(
+            "benefits", tenant_id, operation="add", delta=1
+        )
+
+        return {
+            "data": {
+                "benefit_id": benefit_id,
+                "partner_id": partner_id,
+                "benefit": the_benefit,
             },
-            "title": data["title"],
-            "description": data["description"],
-            "configuration": {
-                "value": data["value"],
-                "value_type": data.get("value_type", "percentage"),
-                "calculation_method": data.get("calculation_method", "final_amount"),
-                "description": data["description"],
-                "terms_conditions": data.get("terms_conditions", ""),
-                "requirements": data.get("requirements", ["comprovante_vinculo_knn"]),
-                "applicable_services": data.get("applicable_services", []),
-                "excluded_services": data.get("excluded_services", []),
-                "additional_benefits": data.get("additional_benefits", []),
-            },
-            "dates": {
-                "created_at": current_time,
-                "updated_at": current_time,
-                "valid_from": data.get("valid_from", current_time),
-                "valid_until": data.get("valid_until"),
-            },
-            "system": {
-                "tenant_id": current_user.tenant,
-                "status": data.get("status", "active"),
-                "type": data.get("type", "discount"),
-                "audience": data.get("audience", "students"),
-                "category": data["category"],
-            },
+            "msg": "Benefício criado com sucesso",
         }
-
-        # Verificar se já existe documento do parceiro na coleção benefits
-        try:
-            # Buscar documento diretamente pelo partner_id (sem tenant prefix)
-            # O tenant está armazenado dentro dos dados do benefício em system.tenant_id
-            doc_ref = db.collection("benefits").document(partner_id)
-            doc = doc_ref.get()
-            partner_doc = {**doc.to_dict(), "id": doc.id} if doc.exists else None
-
-            logger.info(
-                f"📄 Documento do parceiro {partner_id} {'encontrado' if partner_doc else 'não encontrado'}"
-            )
-
-            if partner_doc:
-                logger.info(
-                    f"📊 Benefícios existentes no documento: {list(partner_doc.keys()) if isinstance(partner_doc, dict) else 'N/A'}"
-                )
-
-                # Documento existe, adicionar apenas o novo benefício
-                update_data = {
-                    benefit_id: benefit_structure,
-                    "updated_at": current_time,
-                }
-
-                logger.info(
-                    f"🔄 Atualizando documento existente com novo benefício {benefit_id}"
-                )
-
-                # Atualizar documento usando o firestore_client
-                await firestore_client.update_document(
-                    "benefits", partner_id, update_data
-                )
-
-                logger.info(
-                    f"✅ Benefício {benefit_id} adicionado ao documento existente"
-                )
-            else:
-                # Documento não existe, criar novo com benefício diretamente
-                new_doc = {
-                    benefit_id: benefit_structure,
-                    "created_at": current_time,
-                    "updated_at": current_time,
-                }
-
-                logger.info(
-                    f"🆕 Criando novo documento para parceiro {partner_id} com benefício {benefit_id}"
-                )
-
-                # Usar apenas o partner_id como ID do documento (sem tenant prefix)
-                # A informação do tenant está dentro dos dados do benefício em system.tenant_id
-
-                await firestore_client.create_document(
-                    "benefits", new_doc, doc_id=partner_id
-                )
-
-                logger.info(
-                    f"✅ Novo documento criado com ID {partner_id} e benefício {benefit_id}"
-                )
-
-            # Atualiza contadores agregados na coleção 'metadata' (benefits)
-            await metrics_service.update_metadata_on_crud(
-                "benefits", current_user.tenant, operation="add", delta=1
-            )
-
-            return {
-                "data": {
-                    "benefit_id": benefit_id,
-                    "partner_id": partner_id,
-                    "structure": benefit_structure,
-                },
-                "msg": "Benefício criado com sucesso",
-            }
-
-        except Exception as e:
-            logger.error(
-                f"Erro ao criar benefício para parceiro {partner_id}: {str(e)}"
-            )
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail={
-                    "error": {
-                        "code": "SERVER_ERROR",
-                        "msg": f"Erro ao criar benefício para parceiro {partner_id}",
-                    }
-                },
-            ) from e
 
     except HTTPException:
         raise
@@ -1171,7 +1018,10 @@ async def create_benefit(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao criar benefício"}
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": "Erro ao criar benefício",
+                }
             },
         ) from e
 

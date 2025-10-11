@@ -14,7 +14,12 @@ from fastapi.testclient import TestClient
 from src.api.partner import router
 from src.auth import JWTPayload
 from src.models import (
-    PromotionRequest,
+    Benefit,
+    BenefitAudience,
+    BenefitCreationDTO,
+    BenefitStatus,
+    BenefitType,
+    BenefitValueType,
     RedeemRequest,
 )
 
@@ -62,18 +67,23 @@ def mock_student():
 
 
 @pytest.fixture
-def mock_promotion():
-    """Fixture para promoção mock."""
-    return {
-        "id": "promotion-123",
-        "partner_id": "partner-123",
-        "title": "Desconto 20%",
-        "type": "discount",
-        "valid_from": datetime.now().isoformat(),
-        "valid_to": (datetime.now() + timedelta(days=30)).isoformat(),
-        "active": True,
-        "audience": ["student"],
-    }
+def mock_benefit():
+    """Fixture para benefício mock."""
+    now = datetime.now()
+    return Benefit(
+        id="benefit-123",
+        partner_id="partner-123",
+        tenant_id="knn",
+        title="Desconto 20%",
+        description="20% de desconto em todos os produtos.",
+        benefit_type=BenefitType.DISCOUNT,
+        value=20.0,
+        value_type=BenefitValueType.PERCENTAGE,
+        status=BenefitStatus.ACTIVE,
+        audience=BenefitAudience.STUDENT,
+        start_date=now,
+        end_date=now + timedelta(days=30),
+    ).model_dump(mode="json")
 
 
 class TestPartnerRedeemEndpoint:
@@ -234,32 +244,32 @@ class TestPartnerRedeemEndpoint:
             assert "EXPIRED" in str(exc_info.value)
 
 
-class TestPartnerPromotionsEndpoints:
-    """Testes para os endpoints de promoções do parceiro."""
+class TestPartnerBenefitsEndpoints:
+    """Testes para os endpoints de benefícios do parceiro."""
 
     @pytest.mark.asyncio
-    async def test_list_promotions_success(self, mock_partner_user, mock_promotion):
-        """Testa listagem de promoções com sucesso."""
+    async def test_list_benefits_success(self, mock_partner_user, mock_benefit):
+        """Testa listagem de benefícios com sucesso."""
         with (
             patch(
                 "src.api.partner.validate_partner_role", return_value=mock_partner_user
             ),
             patch(
                 "src.api.partner.with_circuit_breaker",
-                return_value={"items": [mock_promotion]},
+                return_value={"items": [mock_benefit]},
             ),
         ):
-            from src.api.partner import list_partner_promotions
+            from src.api.partner import list_partner_benefits
 
-            result = await list_partner_promotions(current_user=mock_partner_user)
+            result = await list_partner_benefits(current_user=mock_partner_user)
 
             assert result["msg"] == "ok"
             assert len(result["data"]["items"]) == 1
             assert result["data"]["items"][0]["title"] == "Desconto 20%"
 
     @pytest.mark.asyncio
-    async def test_create_promotion_success(self, mock_partner_user):
-        """Testa criação de promoção com sucesso."""
+    async def test_create_benefit_success(self, mock_partner_user):
+        """Testa criação de benefício com sucesso."""
         with (
             patch(
                 "src.api.partner.validate_partner_role", return_value=mock_partner_user
@@ -267,151 +277,182 @@ class TestPartnerPromotionsEndpoints:
             patch("src.api.partner.firestore_client") as mock_firestore,
         ):
             mock_firestore.create_document = AsyncMock(
-                return_value={"id": "new-promotion"}
+                return_value={"id": "new-benefit"}
             )
 
-            from src.api.partner import create_promotion
+            from src.api.partner import create_benefit
 
-            request_data = PromotionRequest(
-                title="Nova Promoção",
-                type="discount",
-                valid_from=datetime.now(),
-                valid_to=datetime.now() + timedelta(days=30),
-                active=True,
-                audience=["student"],
+            request_data = BenefitCreationDTO(
+                title="Novo Benefício",
+                description="Descrição do novo benefício.",
+                benefit_type=BenefitType.DISCOUNT,
+                value=10.0,
+                value_type=BenefitValueType.PERCENTAGE,
+                status=BenefitStatus.ACTIVE,
+                audience=BenefitAudience.ALL,
+                start_date=datetime.now(),
+                end_date=datetime.now() + timedelta(days=30),
             )
 
-            result = await create_promotion(request_data, mock_partner_user)
+            result = await create_benefit(request_data, mock_partner_user)
 
             assert result["msg"] == "ok"
-            assert result["data"]["id"] == "new-promotion"
+            assert result["data"]["id"] == "new-benefit"
 
     @pytest.mark.asyncio
-    async def test_create_promotion_invalid_dates(self, mock_partner_user):
-        """Testa criação de promoção com datas inválidas."""
+    async def test_create_benefit_invalid_dates(self, mock_partner_user):
+        """Testa criação de benefício com datas inválidas."""
         with patch(
             "src.api.partner.validate_partner_role", return_value=mock_partner_user
         ):
-            from src.api.partner import create_promotion
+            from src.api.partner import create_benefit
 
-            request_data = PromotionRequest(
-                title="Promoção Inválida",
-                type="discount",
-                valid_from=datetime.now() + timedelta(days=30),  # Data futura
-                valid_to=datetime.now(),  # Data passada
-                active=True,
-                audience=["student"],
+            request_data = BenefitCreationDTO(
+                title="Benefício Inválido",
+                description="Descrição.",
+                benefit_type=BenefitType.DISCOUNT,
+                value=10.0,
+                value_type=BenefitValueType.PERCENTAGE,
+                status=BenefitStatus.ACTIVE,
+                audience=BenefitAudience.ALL,
+                start_date=datetime.now() + timedelta(days=30),  # Data futura
+                end_date=datetime.now(),  # Data passada
             )
 
             with pytest.raises(Exception) as exc_info:
-                await create_promotion(request_data, mock_partner_user)
+                await create_benefit(request_data, mock_partner_user)
 
             assert "INVALID_DATES" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_update_promotion_success(self, mock_partner_user, mock_promotion):
-        """Testa atualização de promoção com sucesso."""
+    async def test_update_benefit_success(self, mock_partner_user, mock_benefit):
+        """Testa atualização de benefício com sucesso."""
         with (
             patch(
                 "src.api.partner.validate_partner_role", return_value=mock_partner_user
             ),
-            patch("src.api.partner.with_circuit_breaker", return_value=mock_promotion),
+            patch("src.api.partner.with_circuit_breaker", return_value=mock_benefit),
             patch("src.api.partner.firestore_client") as mock_firestore,
         ):
             mock_firestore.update_document = AsyncMock(
-                return_value={"id": "promotion-123"}
+                return_value={"id": "benefit-123"}
             )
 
-            from src.api.partner import update_promotion
+            from src.api.partner import update_benefit
 
-            request_data = PromotionRequest(
-                title="Promoção Atualizada",
-                type="discount",
-                valid_from=datetime.now(),
-                valid_to=datetime.now() + timedelta(days=30),
-                active=True,
-                audience=["student"],
+            request_data = BenefitCreationDTO(
+                title="Benefício Atualizado",
+                description="Descrição atualizada.",
+                benefit_type=BenefitType.DISCOUNT,
+                value=15.0,
+                value_type=BenefitValueType.PERCENTAGE,
+                status=BenefitStatus.ACTIVE,
+                audience=BenefitAudience.STUDENT,
+                start_date=datetime.now(),
+                end_date=datetime.now() + timedelta(days=60),
             )
 
-            result = await update_promotion(
-                "promotion-123", request_data, mock_partner_user
+            result = await update_benefit(
+                "benefit-123", request_data, mock_partner_user
             )
 
             assert result["msg"] == "ok"
 
     @pytest.mark.asyncio
-    async def test_update_promotion_not_found(self, mock_partner_user):
-        """Testa atualização de promoção não encontrada."""
+    async def test_update_benefit_not_found(self, mock_partner_user):
+        """Testa atualização de benefício não encontrado."""
         with (
             patch(
                 "src.api.partner.validate_partner_role", return_value=mock_partner_user
             ),
             patch("src.api.partner.with_circuit_breaker", return_value=None),
         ):
-            from src.api.partner import update_promotion
+            from src.api.partner import update_benefit
 
-            request_data = PromotionRequest(
-                title="Promoção",
-                type="discount",
-                valid_from=datetime.now(),
-                valid_to=datetime.now() + timedelta(days=30),
-                active=True,
-                audience=["student"],
+            request_data = BenefitCreationDTO(
+                title="Benefício",
+                description="Descrição.",
+                benefit_type=BenefitType.DISCOUNT,
+                value=10.0,
+                value_type=BenefitValueType.PERCENTAGE,
+                status=BenefitStatus.ACTIVE,
+                audience=BenefitAudience.ALL,
+                start_date=datetime.now(),
+                end_date=datetime.now() + timedelta(days=30),
             )
 
             with pytest.raises(Exception) as exc_info:
-                await update_promotion("invalid-id", request_data, mock_partner_user)
+                await update_benefit("invalid-id", request_data, mock_partner_user)
 
             assert "NOT_FOUND" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_update_promotion_forbidden(self, mock_partner_user, mock_promotion):
-        """Testa atualização de promoção de outro parceiro."""
-        # Alterar partner_id da promoção
-        mock_promotion["partner_id"] = "other-partner"
+    async def test_update_benefit_forbidden(self, mock_partner_user, mock_benefit):
+        """Testa atualização de benefício de outro parceiro."""
+        # Alterar partner_id do benefício
+        mock_benefit["partner_id"] = "other-partner"
 
         with (
             patch(
                 "src.api.partner.validate_partner_role", return_value=mock_partner_user
             ),
-            patch("src.api.partner.with_circuit_breaker", return_value=mock_promotion),
+            patch("src.api.partner.with_circuit_breaker", return_value=mock_benefit),
         ):
-            from src.api.partner import update_promotion
+            from src.api.partner import update_benefit
 
-            request_data = PromotionRequest(
-                title="Promoção",
-                type="discount",
-                valid_from=datetime.now(),
-                valid_to=datetime.now() + timedelta(days=30),
-                active=True,
-                audience=["student"],
+            request_data = BenefitCreationDTO(
+                title="Benefício",
+                description="Descrição.",
+                benefit_type=BenefitType.DISCOUNT,
+                value=10.0,
+                value_type=BenefitValueType.PERCENTAGE,
+                status=BenefitStatus.ACTIVE,
+                audience=BenefitAudience.ALL,
+                start_date=datetime.now(),
+                end_date=datetime.now() + timedelta(days=30),
             )
 
             with pytest.raises(Exception) as exc_info:
-                await update_promotion("promotion-123", request_data, mock_partner_user)
+                await update_benefit("benefit-123", request_data, mock_partner_user)
 
             assert "FORBIDDEN" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_delete_promotion_success(self, mock_partner_user, mock_promotion):
-        """Testa desativação de promoção com sucesso."""
+    async def test_delete_benefit_success(self, mock_partner_user, mock_benefit):
+        """Testa desativação de benefício com sucesso."""
         with (
             patch(
                 "src.api.partner.validate_partner_role", return_value=mock_partner_user
             ),
-            patch("src.api.partner.with_circuit_breaker", return_value=mock_promotion),
+            patch("src.api.partner.with_circuit_breaker", return_value=mock_benefit),
             patch("src.api.partner.firestore_client") as mock_firestore,
         ):
             mock_firestore.update_document = AsyncMock()
 
-            from src.api.partner import delete_promotion
+            from src.api.partner import delete_benefit
 
-            result = await delete_promotion("promotion-123", mock_partner_user)
+            result = await delete_benefit("benefit-123", mock_partner_user)
 
             assert result["msg"] == "ok"
             mock_firestore.update_document.assert_called_once_with(
-                "promotions", "promotion-123", {"active": False}
+                "benefits", "benefit-123", {"status": BenefitStatus.ARCHIVED}
             )
+
+    @pytest.mark.asyncio
+    async def test_delete_benefit_not_found(self, mock_partner_user):
+        """Testa desativação de benefício inexistente."""
+        with (
+            patch(
+                "src.api.partner.validate_partner_role", return_value=mock_partner_user
+            ),
+            patch("src.api.partner.with_circuit_breaker", return_value=None),
+        ):
+            from src.api.partner import delete_benefit
+
+            with pytest.raises(Exception) as exc_info:
+                await delete_benefit("benefit-not-found", mock_partner_user)
+
+            assert "NOT_FOUND" in str(exc_info.value)
 
 
 class TestPartnerReportsEndpoint:

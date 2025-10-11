@@ -5,6 +5,8 @@ Este módulo contém a lógica comum compartilhada entre os endpoints
 de listagem de parceiros para estudantes e funcionários.
 """
 
+import json
+import os
 from typing import Any
 
 from src.auth import JWTPayload
@@ -91,37 +93,17 @@ class PartnersService:
                 )
 
             # Extrair dados dos parceiros
-            logger.info(f"DEBUG COMMON - Resultado da consulta Firestore: {result}")
             partners_data = result.get("items", [])
-            logger.info(f"DEBUG COMMON - Quantidade de partners_data extraídos: {len(partners_data)}")
 
             # Converter dados brutos para objetos Partner
             partner_objects = []
-            failed_partners = []
-            for i, partner_data in enumerate(partners_data):
+            for partner_data in partners_data:
                 try:
-                    logger.info(f"DEBUG - Convertendo parceiro {i+1}: {partner_data}")
                     partner_obj = Partner(**partner_data)
                     partner_objects.append(partner_obj)
-                    logger.info(f"DEBUG - Parceiro {i+1} convertido com sucesso")
                 except Exception as e:
-                    failed_partners.append({
-                        'index': i+1,
-                        'id': partner_data.get('id', 'N/A'),
-                        'error': str(e)
-                    })
-                    logger.error(
-                        f"❌ FALHA na conversão do parceiro {i+1} (ID: {partner_data.get('id', 'N/A')}): {e}"
-                    )
-                    logger.error(f"❌ Dados do parceiro que falhou: {partner_data}")
-                    continue
+                    raise ValueError(f"Failed to parse partner data: {json.dumps(partner_data, indent=2)}. Error: {e}") from e
 
-            if failed_partners:
-                logger.error(f"❌ RESUMO: {len(failed_partners)} parceiro(s) falharam na conversão:")
-                for failed in failed_partners:
-                    logger.error(f"   - Parceiro {failed['index']} (ID: {failed['id']}): {failed['error']}")
-
-            logger.info(f"DEBUG - Total de partner_objects criados: {len(partner_objects)}")
             logger.info(
                 f"Retornando {len(partner_objects)} parceiros para usuário "
                 f"{current_user.role} (tenant: {current_user.tenant})"

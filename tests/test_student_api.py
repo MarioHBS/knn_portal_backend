@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from src.api.student import router
@@ -56,17 +55,17 @@ def mock_student():
 
 
 @pytest.fixture
-def mock_promotion():
-    """Fixture para promoção mock."""
+def mock_benefit():
+    """Fixture para benefício mock."""
     return {
-        "id": "promotion-123",
+        "id": "benefit-123",
         "partner_id": "PTN123456",
         "title": "Desconto 20%",
-        "type": "discount",
-        "valid_from": datetime.now().isoformat(),
-        "valid_to": (datetime.now() + timedelta(days=30)).isoformat(),
-        "active": True,
-        "audience": ["student"],
+        "benefit_type": "discount",
+        "start_date": datetime.now().isoformat(),
+        "end_date": (datetime.now() + timedelta(days=30)).isoformat(),
+        "status": "active",
+        "audience": "student",
     }
 
 
@@ -161,7 +160,7 @@ class TestStudentPartnersEndpoints:
 
     @pytest.mark.asyncio
     async def test_get_partner_details_success(
-        self, mock_student_user, mock_partner, mock_promotion
+        self, mock_student_user, mock_partner, mock_benefit
     ):
         """Testa obtenção de detalhes do parceiro com sucesso."""
         with (
@@ -171,7 +170,7 @@ class TestStudentPartnersEndpoints:
             patch("src.api.student.firestore_client") as mock_firestore,
         ):
             mock_firestore.get_document.return_value = mock_partner
-            mock_firestore.query_documents.return_value = {"items": [mock_promotion]}
+            mock_firestore.query_documents.return_value = {"items": [mock_benefit]}
 
             from src.api.student import get_partner_details
 
@@ -179,7 +178,7 @@ class TestStudentPartnersEndpoints:
 
             assert result["msg"] == "ok"
             assert result["data"]["trade_name"] == "Parceiro Teste"
-            assert len(result["data"]["promotions"]) == 1
+            assert len(result["data"]["benefits"]) == 1
 
     @pytest.mark.asyncio
     async def test_get_partner_details_not_found(self, mock_student_user):
@@ -341,16 +340,18 @@ class TestStudentValidationCodeEndpoint:
             assert "INACTIVE_STUDENT" in str(exc_info.value)
 
 
-
 class TestStudentFavoritesEndpoints:
     """Testes para os endpoints de favoritos do estudante."""
 
     @pytest.mark.asyncio
     async def test_get_student_favorites_success(self, mock_student_user, mock_partner):
         """Testa a listagem de parceiros favoritos com sucesso."""
-        with patch(
-            "src.api.student.validate_student_role", return_value=mock_student_user
-        ), patch("src.api.student.firestore_client") as mock_firestore:
+        with (
+            patch(
+                "src.api.student.validate_student_role", return_value=mock_student_user
+            ),
+            patch("src.api.student.firestore_client") as mock_firestore,
+        ):
             # Mock para a consulta de favoritos
             mock_firestore.query_documents.side_effect = [
                 {
@@ -376,9 +377,12 @@ class TestStudentFavoritesEndpoints:
     @pytest.mark.asyncio
     async def test_get_student_favorites_empty(self, mock_student_user):
         """Testa a listagem de favoritos quando o estudante não possui nenhum."""
-        with patch(
-            "src.api.student.validate_student_role", return_value=mock_student_user
-        ), patch("src.api.student.firestore_client") as mock_firestore:
+        with (
+            patch(
+                "src.api.student.validate_student_role", return_value=mock_student_user
+            ),
+            patch("src.api.student.firestore_client") as mock_firestore,
+        ):
             mock_firestore.query_documents.return_value = {"items": []}
 
             client = TestClient(router)
@@ -392,9 +396,12 @@ class TestStudentFavoritesEndpoints:
     @pytest.mark.asyncio
     async def test_add_student_favorite_success(self, mock_student_user, mock_partner):
         """Testa adicionar um parceiro aos favoritos com sucesso."""
-        with patch(
-            "src.api.student.validate_student_role", return_value=mock_student_user
-        ), patch("src.api.student.firestore_client") as mock_firestore:
+        with (
+            patch(
+                "src.api.student.validate_student_role", return_value=mock_student_user
+            ),
+            patch("src.api.student.firestore_client") as mock_firestore,
+        ):
             # Mock para get_document (parceiro existe) e query_documents (favorito não existe)
             mock_firestore.get_document.return_value = mock_partner
             mock_firestore.query_documents.return_value = {"items": []}
@@ -414,9 +421,12 @@ class TestStudentFavoritesEndpoints:
         self, mock_student_user, mock_partner
     ):
         """Testa adicionar um parceiro que já está nos favoritos."""
-        with patch(
-            "src.api.student.validate_student_role", return_value=mock_student_user
-        ), patch("src.api.student.firestore_client") as mock_firestore:
+        with (
+            patch(
+                "src.api.student.validate_student_role", return_value=mock_student_user
+            ),
+            patch("src.api.student.firestore_client") as mock_firestore,
+        ):
             mock_firestore.get_document.return_value = mock_partner
             mock_firestore.query_documents.return_value = {"items": [{"id": "fav-1"}]}
 
@@ -431,9 +441,12 @@ class TestStudentFavoritesEndpoints:
     @pytest.mark.asyncio
     async def test_add_student_favorite_partner_not_found(self, mock_student_user):
         """Testa adicionar um parceiro que não existe."""
-        with patch(
-            "src.api.student.validate_student_role", return_value=mock_student_user
-        ), patch("src.api.student.firestore_client") as mock_firestore:
+        with (
+            patch(
+                "src.api.student.validate_student_role", return_value=mock_student_user
+            ),
+            patch("src.api.student.firestore_client") as mock_firestore,
+        ):
             mock_firestore.get_document.return_value = None
 
             client = TestClient(router)
@@ -443,11 +456,16 @@ class TestStudentFavoritesEndpoints:
             assert response.json()["detail"]["error"]["code"] == "PARTNER_NOT_FOUND"
 
     @pytest.mark.asyncio
-    async def test_remove_student_favorite_success(self, mock_student_user, mock_partner):
+    async def test_remove_student_favorite_success(
+        self, mock_student_user, mock_partner
+    ):
         """Testa remover um parceiro dos favoritos com sucesso."""
-        with patch(
-            "src.api.student.validate_student_role", return_value=mock_student_user
-        ), patch("src.api.student.firestore_client") as mock_firestore:
+        with (
+            patch(
+                "src.api.student.validate_student_role", return_value=mock_student_user
+            ),
+            patch("src.api.student.firestore_client") as mock_firestore,
+        ):
             mock_firestore.query_documents.return_value = {
                 "items": [
                     {
@@ -473,9 +491,12 @@ class TestStudentFavoritesEndpoints:
     @pytest.mark.asyncio
     async def test_remove_student_favorite_not_found(self, mock_student_user):
         """Testa remover um favorito que não existe."""
-        with patch(
-            "src.api.student.validate_student_role", return_value=mock_student_user
-        ), patch("src.api.student.firestore_client") as mock_firestore:
+        with (
+            patch(
+                "src.api.student.validate_student_role", return_value=mock_student_user
+            ),
+            patch("src.api.student.firestore_client") as mock_firestore,
+        ):
             mock_firestore.query_documents.return_value = {"items": []}
 
             client = TestClient(router)
