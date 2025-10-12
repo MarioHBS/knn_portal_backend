@@ -21,7 +21,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from src.db.firestore import db
 from src.models.benefit import (
-    Benefit,
+    BenefitModel,
 )
 from src.utils import logger
 
@@ -115,7 +115,7 @@ class BenefitsComparisonTester:
         for doc_data in self.results["firestore_data"]:
             try:
                 benefit_data = self._map_to_benefit(doc_data)
-                benefit = Benefit(**benefit_data)
+                benefit = BenefitModel(**benefit_data)
                 success_count += 1
 
                 # Log do primeiro exemplo

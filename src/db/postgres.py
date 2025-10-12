@@ -33,7 +33,7 @@ class PostgresClient:
                 logger.info("Pool de conexões PostgreSQL criado com sucesso")
             except Exception as e:
                 logger.error(f"Erro ao criar pool PostgreSQL: {str(e)}", exc_info=True)
-                raise
+                raise Exception(f"Erro ao criar pool PostgreSQL") from e
         return cls._pool
 
     @staticmethod
@@ -47,7 +47,7 @@ class PostgresClient:
             return conn
         except Exception as e:
             logger.error(f"Erro ao conectar ao PostgreSQL: {str(e)}", exc_info=True)
-            raise
+            raise Exception(f"Erro ao conectar ao PostgreSQL") from e
 
     @staticmethod
     async def release_connection(conn):
@@ -78,7 +78,7 @@ class PostgresClient:
                 await conn.close()
         except Exception as e:
             logger.error(f"Erro ao obter documento {table}/{doc_id}: {str(e)}")
-            raise
+            raise Exception(f"Erro ao obter documento {table}/{doc_id}") from e
 
     @staticmethod
     async def query_documents(
@@ -131,7 +131,7 @@ class PostgresClient:
             logger.error(
                 f"Erro ao consultar documentos {table}: {str(e)}", exc_info=True
             )
-            raise
+            raise Exception(f"Erro ao consultar documentos {table}") from e
         finally:
             if conn:
                 try:
@@ -170,7 +170,7 @@ class PostgresClient:
                 await conn.close()
         except Exception as e:
             logger.error(f"Erro ao criar documento em {table}: {str(e)}")
-            raise
+            raise Exception(f"Erro ao criar documento em {table}") from e
 
     @staticmethod
     async def update_document(
@@ -206,7 +206,7 @@ class PostgresClient:
                 await conn.close()
         except Exception as e:
             logger.error(f"Erro ao atualizar documento {table}/{doc_id}: {str(e)}")
-            raise
+            raise Exception(f"Erro ao atualizar documento {table}/{doc_id}") from e
 
     @staticmethod
     async def delete_document(table: str, doc_id: str) -> bool:
@@ -227,7 +227,7 @@ class PostgresClient:
                 await conn.close()
         except Exception as e:
             logger.error(f"Erro ao remover documento {table}/{doc_id}: {str(e)}")
-            raise
+            raise Exception(f"Erro ao remover documento {table}/{doc_id}") from e
 
     @staticmethod
     async def execute_transaction(queries: list[dict[str, Any]]) -> bool:
@@ -256,7 +256,7 @@ class PostgresClient:
                 await conn.close()
         except Exception as e:
             logger.error(f"Erro ao executar transação: {str(e)}")
-            raise
+            raise Exception(f"Erro ao executar transação") from e
 
 
 # Instância do cliente PostgreSQL

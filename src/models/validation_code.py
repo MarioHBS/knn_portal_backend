@@ -54,7 +54,7 @@ class ValidationCode(BaseModel):
         Configurações do modelo Pydantic.
         """
 
-        orm_mode = True
+        from_attributes = True
         json_encoders = {UUID: str, datetime: lambda dt: dt.isoformat()}
 
 

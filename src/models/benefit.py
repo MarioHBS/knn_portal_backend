@@ -49,7 +49,7 @@ class BenefitConfigurationDTO(BaseModel):
     value_type: BenefitValueType = Field(default=BenefitValueType.PERCENTAGE)
 
 
-class Benefit(BaseModel):
+class BenefitModel(BaseModel):
     """Modelo principal do Benefício."""
 
     id: str
@@ -71,7 +71,7 @@ class Benefit(BaseModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     @model_validator(mode="after")
-    def validate_dates(self) -> "Benefit":
+    def validate_dates(self) -> "BenefitModel":
         """Valida se a data de término é posterior à data de início."""
         if self.valid_from and self.valid_to and self.valid_to <= self.valid_from:
             raise ValueError("Data de término deve ser posterior à data de início")
@@ -79,7 +79,7 @@ class Benefit(BaseModel):
 
     class Config:
         use_enum_values = True
-        orm_mode = True
+        from_attributes = True
 
 
 # DTOs para Firestore
@@ -155,14 +155,14 @@ class BenefitResponse(BaseModel):
     """Modelo para respostas da API contendo dados de um benefício."""
 
     msg: str = "ok"
-    data: Benefit
+    data: BenefitModel
 
 
 class BenefitListResponse(BaseModel):
     """Modelo para respostas da API contendo listas de benefícios."""
 
     msg: str = "ok"
-    data: list[Benefit]
+    data: list[BenefitModel]
 
 
 class BenefitFirestoreDTO(BaseModel):
@@ -193,7 +193,7 @@ class BenefitFirestoreDTO(BaseModel):
             raise ValueError("Data de término deve ser posterior à data de início")
         return self
 
-    def to_benefit(self, id: str) -> "Benefit":
+    def to_benefit(self, id: str) -> "BenefitModel":
         """
         Converte o DTO do Firestore para o modelo de domínio Benefit.
 
@@ -204,7 +204,7 @@ class BenefitFirestoreDTO(BaseModel):
         Returns:
             Uma instância do modelo Benefit.
         """
-        return Benefit(
+        return BenefitModel(
             id=id,
             tenant_id=self.tenant_id,
             partner_id=self.partner_id,

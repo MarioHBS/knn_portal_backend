@@ -12,10 +12,10 @@ from src.models import (
     FavoriteRequest,
     FavoriteResponse,
     FavoritesResponse,
-    Partner,
     PartnerDetail,
     PartnerDetailResponse,
     PartnerListResponse,
+    PartnerModel,
     ValidationCode,
     ValidationCodeCreationRequest,
 )
@@ -114,7 +114,7 @@ async def get_employee_favorites(
             )
 
             if partner and partner.get("active", False):
-                favorite_partners.append(Partner(**partner))
+                favorite_partners.append(PartnerModel(**partner))
 
         return {"data": favorite_partners, "msg": "ok"}
 
@@ -251,7 +251,6 @@ async def create_validation_code(
             tenant_id=current_user.tenant,
             partner_id=request.partner_id,
             employee_id=current_user.entity_id,  # Usar entity_id
-
             expires=expires_at,
         )
 
@@ -307,7 +306,7 @@ async def list_favorites(current_user: JWTPayload = Depends(validate_employee_ro
                     "msg": "Erro ao gerar código de validação",
                 }
             },
-        )
+        ) from e
 
 
 @router.delete("/me/fav/{partner_id}", response_model=FavoriteResponse)
@@ -565,4 +564,4 @@ async def get_partner_details(
                     "msg": "Erro ao obter detalhes do parceiro",
                 }
             },
-        ) from None
+        ) from e

@@ -6,7 +6,6 @@ usando as mesmas credenciais configuradas para o Firestore.
 """
 
 import json
-import os
 
 from google.auth import default
 from google.cloud import storage

@@ -50,7 +50,8 @@ class NotificationRequest(BaseModel):
     priority: str = Field("normal", description="Prioridade da notificação")
 
     @field_validator("priority")
-    def validate_priority(self, cls, v):
+    @classmethod
+    def validate_priority(cls, v):
         """Valida a prioridade da notificação."""
         allowed_priorities = ["low", "normal", "high", "urgent"]
         if v not in allowed_priorities:

@@ -95,7 +95,7 @@ class PartnerContact(BaseModel):
         return v
 
 
-class Partner(BaseModel):
+class PartnerModel(BaseModel):
     """
     Modelo principal do Parceiro.
 
@@ -189,6 +189,148 @@ class Partner(BaseModel):
                     "email": "contato@autoescolaescorcio.com.br",
                 },
                 "active": True,
+            }
+        }
+
+
+class PartnerCreateDTO(BaseModel):
+    """
+    Data Transfer Object para criação de um novo parceiro.
+
+    Este DTO é utilizado para validar e transformar dados de entrada ao
+    criar um novo parceiro no sistema.
+    """
+
+    trade_name: str = Field(
+        ..., min_length=1, max_length=50, description="Nome comercial do parceiro"
+    )
+    tenant_id: str = Field(
+        ..., min_length=1, max_length=30, description="ID do tenant do parceiro"
+    )
+    benefits_count: int | None = Field(
+        0, ge=0, description="Número total de benefícios oferecidos"
+    )
+    has_active_benefits: bool = Field(
+        False, description="Indica se o parceiro possui benefícios ativos"
+    )
+    cnpj: str = Field(..., description="CNPJ do parceiro no formato XX.XXX.XXX/XXXX-XX")
+    logo_url: str | None = Field(
+        None, description="URL do logo do parceiro no Firebase Storage"
+    )
+    address: PartnerAddress | None = Field(None, description="Endereço do parceiro")
+    social_networks: PartnerSocialNetworks = Field(
+        ..., description="Redes sociais do parceiro"
+    )
+    geolocation: PartnerGeolocation = Field(..., description="Links de geolocalização")
+    category: PartnerCategory = Field(..., description="Categoria do parceiro")
+    contact: PartnerContact = Field(
+        ..., description="Informações de contato do parceiro"
+    )
+    active: bool = Field(True, description="Status ativo/inativo do parceiro")
+
+    @field_validator("cnpj")
+    @classmethod
+    def validate_cnpj(cls, v):
+        """Valida formato do CNPJ."""
+        import re
+
+        if not re.match(r"^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$", v):
+            raise ValueError("CNPJ deve estar no formato XX.XXX.XXX/XXXX-XX")
+        return v
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "trade_name": "Nome Fantasia do Parceiro",
+                "tenant_id": "tenant_exemplo",
+                "benefits_count": 0,
+                "has_active_benefits": True,
+                "cnpj": "11.222.333/0001-44",
+                "logo_url": "https://example.com/logo.png",
+                "address": {
+                    "street": "Rua Exemplo",
+                    "number": "123",
+                    "complement": "Apto 101",
+                    "neighborhood": "Bairro Exemplo",
+                    "city": "Cidade Exemplo",
+                    "state": "UF",
+                    "zip_code": "12345-678",
+                },
+                "social_networks": {
+                    "instagram": "https://instagram.com/parceiro",
+                    "facebook": "https://facebook.com/parceiro",
+                    "website": "https://parceiro.com.br",
+                },
+                "geolocation": {
+                    "latitude": -23.55052,
+                    "longitude": -46.633307,
+                    "plus_code": "ABCD+EFG",
+                },
+                "category": "TECNOLOGIA",
+                "contact": {
+                    "email": "contato@parceiro.com.br",
+                    "phone": "+5511987654321",
+                    "responsible_name": "Nome do Responsável",
+                },
+                "active": True,
+            }
+        }
+
+
+class PartnerUpdateDTO(BaseModel):
+    """
+    Data Transfer Object para atualização de um parceiro existente.
+
+    Todos os campos são opcionais, permitindo atualizações parciais.
+    """
+
+    trade_name: str | None = Field(
+        None, min_length=1, max_length=50, description="Nome comercial do parceiro"
+    )
+    tenant_id: str | None = Field(
+        None, min_length=1, max_length=30, description="ID do tenant do parceiro"
+    )
+    benefits_count: int | None = Field(
+        None, ge=0, description="Número total de benefícios oferecidos"
+    )
+    has_active_benefits: bool | None = Field(
+        None, description="Indica se o parceiro possui benefícios ativos"
+    )
+    cnpj: str | None = Field(
+        None, description="CNPJ do parceiro no formato XX.XXX.XXX/XXXX-XX"
+    )
+    logo_url: str | None = Field(
+        None, description="URL do logo do parceiro no Firebase Storage"
+    )
+    address: PartnerAddress | None = Field(None, description="Endereço do parceiro")
+    social_networks: PartnerSocialNetworks | None = Field(
+        None, description="Redes sociais do parceiro"
+    )
+    geolocation: PartnerGeolocation | None = Field(
+        None, description="Links de geolocalização"
+    )
+    category: PartnerCategory | None = Field(None, description="Categoria do parceiro")
+    contact: PartnerContact | None = Field(
+        None, description="Informações de contato do parceiro"
+    )
+    active: bool | None = Field(None, description="Status ativo/inativo do parceiro")
+
+    @field_validator("cnpj")
+    @classmethod
+    def validate_cnpj(cls, v):
+        """Valida formato do CNPJ."""
+        import re
+
+        if v is not None and not re.match(r"^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$", v):
+            raise ValueError("CNPJ deve estar no formato XX.XXX.XXX/XXXX-XX")
+        return v
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "trade_name": "Nome Fantasia Atualizado",
+                "cnpj": "99.888.777/0001-66",
+                "active": False,
             }
         }
 
@@ -319,7 +461,7 @@ class PartnerDTO:
         }
 
     @staticmethod
-    def to_firestore(partner: Partner) -> dict[str, Any]:
+    def to_firestore(partner: PartnerModel) -> dict[str, Any]:
         """
         Converte modelo Partner para formato Firestore.
 

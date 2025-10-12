@@ -167,7 +167,7 @@ async def get_dashboard_metrics(
                     "msg": "Erro ao carregar dashboard de métricas",
                 }
             },
-        )
+        ) from e
 
 
 @router.get("/historical", response_model=HistoricalMetricsResponse)
@@ -257,7 +257,7 @@ async def get_historical_metrics(
                     "msg": "Erro ao obter métricas históricas",
                 }
             },
-        )
+        ) from e
 
 
 @router.get("/counters", response_model=AdminCountersResponse)
@@ -339,7 +339,7 @@ async def get_realtime_metrics(current_user: JWTPayload = Depends(validate_admin
                     "msg": "Erro ao obter métricas em tempo real",
                 }
             },
-        )
+        ) from e
 
 
 @router.post("/custom", response_model=BaseResponse)

@@ -6,12 +6,11 @@ de listagem de parceiros para estudantes e funcionários.
 """
 
 import json
-import os
 from typing import Any
 
 from src.auth import JWTPayload
 from src.db import firestore_client, postgres_client, with_circuit_breaker
-from src.models import Partner, PartnerListResponse
+from src.models import PartnerModel
 from src.utils import logger
 
 
@@ -27,7 +26,7 @@ class PartnersService:
         offset: int = 0,
         use_circuit_breaker: bool = True,
         enable_ordering: bool = True,
-    ) -> PartnerListResponse:
+    ) -> tuple[list[PartnerModel], int]:
         """
         Lista parceiros com filtros e paginação.
 
@@ -43,7 +42,7 @@ class PartnersService:
             enable_ordering: Se deve aplicar ordenação (padrão: True)
 
         Returns:
-            PartnerListResponse: Lista de parceiros formatada
+            tuple[list[PartnerModel], int]: Tupla com a lista de parceiros e o total de itens.
 
         Raises:
             HTTPException: Em caso de erro na consulta
@@ -92,24 +91,27 @@ class PartnersService:
                     offset=offset,
                 )
 
-            # Extrair dados dos parceiros
+            # Extrair dados dos parceiros e total
             partners_data = result.get("items", [])
+            total = result.get("total", 0)
 
             # Converter dados brutos para objetos Partner
             partner_objects = []
             for partner_data in partners_data:
                 try:
-                    partner_obj = Partner(**partner_data)
+                    partner_obj = PartnerModel(**partner_data)
                     partner_objects.append(partner_obj)
                 except Exception as e:
-                    raise ValueError(f"Failed to parse partner data: {json.dumps(partner_data, indent=2)}. Error: {e}") from e
+                    raise ValueError(
+                        f"Failed to parse partner data: {json.dumps(partner_data, indent=2)}. Error: {e}"
+                    ) from e
 
             logger.info(
-                f"Retornando {len(partner_objects)} parceiros para usuário "
+                f"Retornando {len(partner_objects)} de {total} parceiros para usuário "
                 f"{current_user.role} (tenant: {current_user.tenant})"
             )
 
-            return PartnerListResponse(data=partner_objects)
+            return partner_objects, total
 
         except Exception as e:
             logger.error(

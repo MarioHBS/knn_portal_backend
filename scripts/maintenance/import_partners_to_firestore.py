@@ -25,12 +25,12 @@ def import_partners_to_firestore(json_file_path: str) -> None:
         return
 
     try:
-        with open(json_file_path, 'r', encoding='utf-8') as f:
+        with open(json_file_path, encoding='utf-8') as f:
             data: dict[str, Any] = json.load(f)
     except json.JSONDecodeError as e:
         print(f"Erro ao decodificar JSON: {e}")
         return
-    except IOError as e:
+    except OSError as e:
         print(f"Erro de E/S ao ler o arquivo: {e}")
         return
 

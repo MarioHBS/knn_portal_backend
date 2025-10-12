@@ -107,7 +107,7 @@ class JWTPayload(BaseModel):
     name: str | None = None
 
     @model_validator(mode="before")
-    def exp_must_be_after_iat(cls, data: Any) -> Any:
+    def exp_must_be_after_iat(cls, data: Any) -> Any:  # noqa: N805
         """Valida se o tempo de expiração (exp) é maior que o tempo de emissão (iat)."""
         if isinstance(data, dict):
             iat = data.get("iat")

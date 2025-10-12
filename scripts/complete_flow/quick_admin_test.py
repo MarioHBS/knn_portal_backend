@@ -24,7 +24,18 @@ from datetime import datetime
 from typing import Any
 
 import requests
-from .base_auth_test import BACKEND_BASE_URL, TEST_USERS, BaseAuthenticationTester
+from base_auth_test import BACKEND_BASE_URL, TEST_USERS, BaseAuthenticationTester
+
+# Garantir que o diretório raiz do projeto esteja no PYTHONPATH para importar 'src.*'
+try:
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+    PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+    if PROJECT_ROOT not in sys.path:
+        sys.path.insert(0, PROJECT_ROOT)
+except Exception:
+    pass
+
+from src.utils.id_generators import IDGenerators
 
 # Configurações
 JWT_TOKEN_FALLBACK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZWxpcGVkZWZvbGl2ZUBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJ0ZW5hbnQiOiJrbm4tZGV2LXRlbmFudCIsImV4cCI6MTc1OTE1MDE3MiwiaWF0IjoxNzU5MTQ4MzcyLCJpc3MiOiJrbm4tcG9ydGFsLWxvY2FsIiwiYXVkIjoia25uLXBvcnRhbCIsIm5hbWUiOiJGZWxpcGUgRmVycmVpcmEgZGUgT2xpdmVpcmEiLCJlbnRpdHlfaWQiOiJFTVBfRjBGME8wNjlfQ0MifQ.tLYMSPwaNi9Rs65SpYZpX_YcuLh9LJSKm8Eqq-dg4Hc"
@@ -49,6 +60,13 @@ ENDPOINTS = {
         "description": "Lista de parceiros (admin)",
         "category": "admin",
     },
+    "get_specific_partner": {
+        "url": "/admin/partners/{partner_id}",
+        "method": "GET",
+        "description": "Obter detalhes de um parceiro específico",
+        "category": "admin",
+        "url_params": {"partner_id": "PTN_T4L5678_TEC"},
+    },
     "admin_students": {
         "url": "/admin/students",
         "method": "GET",
@@ -67,12 +85,19 @@ ENDPOINTS = {
         "description": "Lista de benefícios (admin)",
         "category": "benefits",
     },
-    "get_specific_benefit": {
-        "url": "/admin/benefits/{partner_id}/{benefit_id}",
+    "get_benefit_individual": {
+        "url": "/admin/benefits/{benefit_id}",
         "method": "GET",
-        "description": "Obter detalhes de um benefício específico",
+        "description": "Obter detalhes de um benefício específico (admin)",
         "category": "benefits",
-        "url_params": {"partner_id": "PTN_T4L5678_TEC", "benefit_id": "BNF_4A9B21_DC"},
+        "url_params": {"benefit_id": "BNF_4A9B21_DC"},
+    },
+    "get_partner_benefits": {
+        "url": "/admin/benefits?partner_id={partner_id}",
+        "method": "GET",
+        "description": "Lista de benefícios de um parceiro específico",
+        "category": "benefits",
+        "url_params": {"partner_id": "PTN_T4L5678_TEC"},
     },
     "admin_metrics": {
         "url": "/admin/metrics",
@@ -120,6 +145,30 @@ ENDPOINTS = {
         "description": "Deletar funcionário por ID",
         "category": "admin",
         "url_params": {"id": "EMP_F0T0R000_XX"},
+    },
+    "update_partner": {
+        "url": "/admin/partners/{partner_id}",
+        "method": "PUT",
+        "description": "Atualizar dados de um parceiro",
+        "category": "admin",
+        "url_params": {"partner_id": "PTN_P5T6R78_OUT"},
+        "data": {
+            "contact": {"phone": "(98) 98877-6655"},
+            "address": {
+                "street": "Av. dos Holandeses",
+                "neighborhood": "Cohatrac",
+                "city": "São Luís",
+                "state": "MA",
+                "zip": "65054-000",
+            },
+        },
+    },
+    "delete_partner": {
+        "url": "/admin/partners/{partner_id}",
+        "method": "DELETE",
+        "description": "Excluir um parceiro",
+        "category": "admin",
+        "url_params": {"partner_id": "PTN_P5T6R78_OUT"},
     },
     "create_partner": {
         "url": "/admin/partners",
@@ -802,6 +851,99 @@ class QuickAdminTester:
 
                 return result
 
+            # Fluxo especial para criação de parceiro: montar payload completo exigido pelo PartnerModel
+            if endpoint_key == "create_partner":
+                # Construir payload completo
+                base_data = endpoint_config.get("data", {}) or {}
+                trade_name = base_data.get("name") or "Parceiro Teste Rápido"
+                category_pt = (
+                    "Tecnologia"  # Deve ser um valor válido de PartnerCategory
+                )
+                cnpj = "12.345.678/0001-90"  # Formato válido XX.XXX.XXX/XXXX-XX
+
+                generated_id = IDGenerators.gerar_id_parceiro(
+                    trade_name=trade_name, category=category_pt, cnpj=cnpj
+                )
+
+                payload = {
+                    "id": generated_id,
+                    "name": trade_name,
+                    "trade_name": trade_name,
+                    "tenant_id": "knn-dev-tenant",
+                    "cnpj": cnpj,
+                    "category": category_pt,
+                    "social_networks": {
+                        "instagram": "@parceiro_teste_rapido",
+                        "facebook": None,
+                        "website": "https://www.exemplo.com",
+                    },
+                    "geolocation": {
+                        "google": "https://maps.google.com/?q=Parceiro+Teste+Rapido",
+                        "waze": None,
+                    },
+                    "contact": {
+                        "phone": "(48) 99999-0000",
+                        "whatsapp": "+55 (48) 99999-0000",
+                        "email": "parceiro.teste.rapido@example.com",
+                    },
+                    "active": True,
+                }
+
+                response = self.session.post(
+                    url, json=payload, headers=headers, timeout=30
+                )
+                result = {
+                    "endpoint_key": endpoint_key,
+                    "endpoint_url": endpoint_config["url"],
+                    "method": method,
+                    "description": endpoint_config["description"],
+                    "status_code": response.status_code,
+                    "success": response.status_code in [200, 201],
+                    "timestamp": datetime.now().isoformat(),
+                    "token_expired": False,
+                }
+
+                if response.status_code in [200, 201]:
+                    resp_json = None
+                    with suppress(Exception):
+                        resp_json = response.json()
+                    if isinstance(resp_json, dict):
+                        result["response_data"] = resp_json
+                        created_id = (
+                            resp_json.get("data", {}).get("id")
+                            if isinstance(resp_json.get("data", {}), dict)
+                            else None
+                        )
+                        if created_id:
+                            result["created_partner_id"] = created_id
+                            self.print_colored(
+                                f"   🆕 Código do parceiro criado: {created_id}",
+                                "cyan",
+                            )
+                    self.print_colored(
+                        f"   ✅ Sucesso: {response.status_code}", "green"
+                    )
+                elif response.status_code == 401:
+                    result["token_expired"] = True
+                    result["error"] = "Token inválido ou expirado"
+                    with suppress(Exception):
+                        result["response_data"] = response.json()
+                elif response.status_code == 404:
+                    result["error"] = "Endpoint não encontrado"
+                    self.print_colored(
+                        f"   ⚠️  Endpoint não encontrado: {response.status_code}",
+                        "yellow",
+                    )
+                else:
+                    # Outros erros
+                    err = None
+                    with suppress(Exception):
+                        err = response.json()
+                    result["error"] = err or response.text[:200]
+                    self.print_colored(f"   ❌ Erro: {response.status_code}", "red")
+
+                return result
+
             if method == "GET":
                 response = self.session.get(url, headers=headers, timeout=30)
             elif method == "POST":
@@ -834,11 +976,46 @@ class QuickAdminTester:
             }
 
             if response.status_code in [200, 201]:
-                self.print_colored(f"   ✅ Sucesso: {response.status_code}", "green")
-                response_text = response.text
+                success_message = f"   ✅ Sucesso: {response.status_code}"
                 response_data = None
-                with suppress(Exception):
+                try:
                     response_data = response.json()
+                    if endpoint_key == "get_specific_partner":
+                        partner_data = response_data.get("data", {})
+                        trade_name = partner_data.get("trade_name")
+                        if trade_name:
+                            success_message += f" - {trade_name}"
+                    # Log específico para criação de parceiro: garantir que o código/id apareça
+                    if endpoint_key == "create_partner":
+                        partner_data = (
+                            response_data.get("data", {})
+                            if isinstance(response_data, dict)
+                            else {}
+                        )
+                        created_id = partner_data.get("id")
+                        if created_id:
+                            self.print_colored(
+                                f"   🆕 Código do parceiro criado: {created_id}",
+                                "cyan",
+                            )
+                        else:
+                            # Fallback: tenta encontrar um possível campo de id em outras chaves
+                            possible_id = None
+                            if isinstance(partner_data, dict):
+                                for key in ["partner_id", "code", "codigo", "id"]:
+                                    if key in partner_data:
+                                        possible_id = partner_data.get(key)
+                                        break
+                            if possible_id:
+                                self.print_colored(
+                                    f"   🆕 Código do parceiro criado (fallback): {possible_id}",
+                                    "cyan",
+                                )
+                except json.JSONDecodeError:
+                    pass  # Mantém a mensagem de sucesso padrão se o JSON falhar
+
+                self.print_colored(success_message, "green")
+                response_text = response.text
                 if response_data is not None:
                     result["response_data"] = response_data
 
@@ -851,6 +1028,12 @@ class QuickAdminTester:
                                 result["data_count"] = len(data_content)
                             elif isinstance(data_content, dict):
                                 result["data_keys_nested"] = list(data_content.keys())
+
+                                # Captura o ID do parceiro criado para salvar no resultado
+                                if endpoint_key == "create_partner":
+                                    created_id = data_content.get("id")
+                                    if created_id:
+                                        result["created_partner_id"] = created_id
 
                                 # Tratamento especial para endpoint admin_benefits
                                 if (

@@ -316,7 +316,7 @@ async def safe_execute(func: Callable, *args, **kwargs) -> Any:
             return func(*args, **kwargs)
     except Exception as e:
         ErrorHandler.log_error(e, {"function": func.__name__})
-        return None
+        raise Exception(f"Erro ao executar função {func.__name__}") from e
 
 
 def with_error_handling(retry_config: RetryConfig = None, operation_name: str = None):
@@ -357,7 +357,7 @@ def with_error_handling(retry_config: RetryConfig = None, operation_name: str = 
                 ErrorHandler.log_error(
                     e, {"operation": op_name, "args": str(args), "kwargs": str(kwargs)}
                 )
-                raise
+                raise Exception(f"Erro na operação {op_name}") from e
 
         return wrapper
 

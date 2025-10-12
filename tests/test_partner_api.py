@@ -14,9 +14,9 @@ from fastapi.testclient import TestClient
 from src.api.partner import router
 from src.auth import JWTPayload
 from src.models import (
-    Benefit,
     BenefitAudience,
     BenefitCreationDTO,
+    BenefitModel,
     BenefitStatus,
     BenefitType,
     BenefitValueType,
@@ -70,7 +70,7 @@ def mock_student():
 def mock_benefit():
     """Fixture para benefício mock."""
     now = datetime.now()
-    return Benefit(
+    return BenefitModel(
         id="benefit-123",
         partner_id="partner-123",
         tenant_id="knn",

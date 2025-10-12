@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, field_validator
 from src.utils.id_generators import IDGenerators
 
 __all__ = [
-    "Student",
+    "StudentModel",
     "StudentAddressDTO",
     "StudentContactDTO",
     "StudentCreationDTO",
@@ -19,12 +19,12 @@ __all__ = [
 class StudentGuardian(BaseModel):
     """Modelo do Responsável do aluno, quando necessário"""
 
-    phone: str
-    email: str
-    name: str
+    phone: str | None = None
+    email: str | None = None
+    name: str | None = None
 
 
-class Student(BaseModel):
+class StudentModel(BaseModel):
     """Modelo para alunos."""
 
     id: str = Field(default="")
@@ -56,7 +56,7 @@ class Student(BaseModel):
             )
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # DTOs de Aluno para Firestore
@@ -97,17 +97,17 @@ class StudentDTO(BaseModel):
     name: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             date: lambda v: v.isoformat(),
         }
 
-    def to_student(self) -> "Student":
+    def to_student(self) -> "StudentModel":
         """
         Converte o DTO do aluno para o modelo Student.
         """
-        return Student(
+        return StudentModel(
             id="",  # Será gerado automaticamente pelo construtor de Student
             tenant_id=self.tenant_id,
             student_name=self.name,
@@ -129,7 +129,7 @@ class StudentDTO(BaseModel):
         )
 
     @classmethod
-    def from_student(cls, student: "Student") -> "StudentDTO":
+    def from_student(cls, student: "StudentModel") -> "StudentDTO":
         """
         Converte um objeto Student para um StudentDTO.
         """
@@ -183,7 +183,7 @@ class StudentCreationDTO(BaseModel):
     active_until: date
 
     @field_validator("email")
-    def email_must_be_valid(cls, v):
+    def email_must_be_valid(cls, v):  # noqa: N805
         if v and "@" not in v:
             raise ValueError("Email inválido")
         return v

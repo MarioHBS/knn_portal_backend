@@ -252,7 +252,7 @@ class MetricsService:
                     latest_updates.append(last_updated)
 
                 counters[key] = {
-                    "total": int(total) if isinstance(total, (int, float)) else 0,
+                    "total": int(total) if isinstance(total, int | float) else 0,
                     "last_updated": last_updated,
                 }
 

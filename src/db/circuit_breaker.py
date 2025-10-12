@@ -124,4 +124,4 @@ async def with_circuit_breaker(
         return await postgres_func(*args, **kwargs)
     except Exception as e:
         logger.error(f"Erro no fallback para PostgreSQL: {str(e)}")
-        raise
+        raise Exception(f"Erro no fallback para PostgreSQL") from e

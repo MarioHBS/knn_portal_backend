@@ -48,19 +48,6 @@ def initialize_firestore_databases():
             except json.JSONDecodeError as e:
                 logger.error(f"Erro ao decodificar FIRESTORE_SERVICE_ACCOUNT_KEY: {e}")
                 credentials, project_id = default()
-        elif GOOGLE_APPLICATION_CREDENTIALS:
-            # Usar arquivo de service account key
-            try:
-                credentials = service_account.Credentials.from_service_account_file(
-                    GOOGLE_APPLICATION_CREDENTIALS
-                )
-                with open(GOOGLE_APPLICATION_CREDENTIALS) as f:
-                    service_account_info = json.load(f)
-                    if not project_id:
-                        project_id = service_account_info.get("project_id")
-                logger.info(
-                    f"Usando service account key do arquivo: {GOOGLE_APPLICATION_CREDENTIALS}"
-                )
             except Exception as e:
                 logger.error(f"Erro ao carregar service account key: {e}")
                 credentials, project_id = default()
@@ -106,6 +93,7 @@ def initialize_firestore_databases():
     except Exception as e:
         logger.error(f"Erro geral ao inicializar Firestore: {str(e)}")
         db = None
+        raise
 
 
 # Inicializar os bancos
@@ -191,7 +179,7 @@ class FirestoreClient:
             return None
         except Exception as e:
             logger.error(f"Erro ao obter documento {collection}/{doc_id}: {str(e)}")
-            raise
+            raise Exception(f"Erro ao obter documento {collection}/{doc_id}") from e
 
     @staticmethod
     async def query_documents(
@@ -259,7 +247,7 @@ class FirestoreClient:
             }
         except Exception as e:
             logger.error(f"Erro ao consultar documentos em {collection}: {str(e)}")
-            raise
+            raise Exception(f"Erro ao consultar documentos em {collection}") from e
 
     @staticmethod
     async def create_document(
@@ -289,20 +277,27 @@ class FirestoreClient:
             return {**doc.to_dict(), "id": doc.id}
         except Exception as e:
             logger.error(f"Erro ao criar documento em {collection}: {str(e)}")
-            raise
+            raise Exception(f"Erro ao criar documento em {collection}") from e
 
     @staticmethod
     async def update_document(
-        collection: str, doc_id: str, data: dict[str, Any]
+        collection: str, doc_id: str, data: dict[str, Any], tenant_id: str
     ) -> dict[str, Any]:
         """
-        Atualiza um documento no Firestore.
+        Atualiza um documento no Firestore, verificando o tenant_id.
         """
         if not db:
             logger.error("Firestore não inicializado")
             return None
 
         try:
+            # Primeiro, verificar se o documento pertence ao tenant correto
+            existing_doc = await FirestoreClient.get_document(
+                collection=collection, doc_id=doc_id, tenant_id=tenant_id
+            )
+            if not existing_doc:
+                raise Exception(f"Documento {collection}/{doc_id} não encontrado ou acesso negado.")
+
             # Adicionar timestamp de atualização
             data["updated_at"] = firestore.SERVER_TIMESTAMP
 
@@ -315,7 +310,7 @@ class FirestoreClient:
             return {**doc.to_dict(), "id": doc.id}
         except Exception as e:
             logger.error(f"Erro ao atualizar documento {collection}/{doc_id}: {str(e)}")
-            raise
+            raise Exception(f"Erro ao atualizar documento {collection}/{doc_id}") from e
 
     @staticmethod
     async def delete_document(collection: str, doc_id: str) -> bool:
@@ -331,7 +326,7 @@ class FirestoreClient:
             return True
         except Exception as e:
             logger.error(f"Erro ao remover documento {collection}/{doc_id}: {str(e)}")
-            raise
+            raise Exception(f"Erro ao remover documento {collection}/{doc_id}") from e
 
     @staticmethod
     async def delete_field(collection: str, doc_id: str, field_name: str) -> bool:
@@ -358,7 +353,7 @@ class FirestoreClient:
             logger.error(
                 f"Erro ao remover campo {field_name} do documento {collection}/{doc_id}: {str(e)}"
             )
-            raise
+            raise Exception(f"Erro ao remover campo {field_name} do documento {collection}/{doc_id}") from e
 
     @staticmethod
     async def batch_operation(operations: list[dict[str, Any]]) -> bool:
@@ -402,7 +397,7 @@ class FirestoreClient:
             return True
         except Exception as e:
             logger.error(f"Erro ao executar operações em lote: {str(e)}")
-            raise
+            raise Exception(f"Erro ao executar operações em lote") from e
 
 
 # Instância do cliente Firestore

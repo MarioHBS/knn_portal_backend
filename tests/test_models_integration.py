@@ -1,8 +1,8 @@
 import unittest
 from datetime import date
 
-from src.models import Employee, Partner
-from src.models.student import Student
+from src.models import EmployeeModel, PartnerModel
+from src.models.student import StudentModel
 
 
 class TestModelsIntegration(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestModelsIntegration(unittest.TestCase):
 
     def test_student_id_generation(self):
         """Testa geração automática de ID para aluno."""
-        student = Student(
+        student = StudentModel(
             tenant_id="tenant_123",
             cpf_hash="hash_123",
             student_name="João Silva Santos",
@@ -32,7 +32,7 @@ class TestModelsIntegration(unittest.TestCase):
     def test_student_with_existing_id(self):
         """Testa que ID existente não é sobrescrito."""
         existing_id = "STD_CUSTOM123_K1"
-        student = Student(
+        student = StudentModel(
             id=existing_id,
             tenant_id="tenant_123",
             cpf_hash="hash_123",
@@ -46,7 +46,7 @@ class TestModelsIntegration(unittest.TestCase):
 
     def test_employee_id_generation(self):
         """Testa geração automática de ID para funcionário."""
-        employee = Employee(
+        employee = EmployeeModel(
             tenant_id="tenant_123",
             cpf_hash="hash_456",
             name="Maria Oliveira",
@@ -66,7 +66,7 @@ class TestModelsIntegration(unittest.TestCase):
     def test_employee_with_existing_id(self):
         """Testa que ID existente não é sobrescrito para funcionário."""
         existing_id = "EMP_CUSTOM123_PR"
-        employee = Employee(
+        employee = EmployeeModel(
             id=existing_id,
             tenant_id="tenant_123",
             cpf_hash="hash_456",
@@ -80,7 +80,7 @@ class TestModelsIntegration(unittest.TestCase):
 
     def test_partner_id_generation(self):
         """Testa geração automática de ID para parceiro."""
-        partner = Partner(
+        partner = PartnerModel(
             tenant_id="tenant_123",
             cnpj_hash="hash_789",
             cnpj="12.345.678/0001-90",
@@ -98,7 +98,7 @@ class TestModelsIntegration(unittest.TestCase):
 
     def test_partner_without_cnpj_fallback(self):
         """Testa fallback para UUID quando não há CNPJ."""
-        partner = Partner(
+        partner = PartnerModel(
             tenant_id="tenant_123",
             cnpj_hash="hash_789",
             trade_name="Empresa ABC Ltda",
@@ -116,7 +116,7 @@ class TestModelsIntegration(unittest.TestCase):
     def test_partner_with_existing_id(self):
         """Testa que ID existente não é sobrescrito para parceiro."""
         existing_id = "PTN_CUSTOM1_TEC"
-        partner = Partner(
+        partner = PartnerModel(
             id=existing_id,
             tenant_id="tenant_123",
             cnpj_hash="hash_789",
@@ -135,7 +135,7 @@ class TestModelsIntegration(unittest.TestCase):
         expected_suffixes = ["_K1", "_T2", "_A1"]
 
         for curso, suffix in zip(courses, expected_suffixes, strict=False):
-            student = Student(
+            student = StudentModel(
                 tenant_id="tenant_123",
                 cpf_hash="hash_123",
                 student_name="Aluno Teste",
@@ -151,7 +151,7 @@ class TestModelsIntegration(unittest.TestCase):
         expected_suffixes = ["_PR", "_CDA", "_AF"]
 
         for dept, suffix in zip(departments, expected_suffixes, strict=False):
-            employee = Employee(
+            employee = EmployeeModel(
                 tenant_id="tenant_123",
                 cpf_hash="hash_456",
                 name="Funcionario Teste",
@@ -167,7 +167,7 @@ class TestModelsIntegration(unittest.TestCase):
         expected_suffixes = ["_TEC", "_SAU", "_EDU"]
 
         for category, suffix in zip(categories, expected_suffixes, strict=False):
-            partner = Partner(
+            partner = PartnerModel(
                 tenant_id="tenant_123",
                 cnpj_hash="hash_789",
                 cnpj="12.345.678/0001-90",

@@ -18,19 +18,19 @@ from fastapi import (
 from src.auth import JWTPayload, validate_student_role
 from src.db import firestore_client, postgres_client
 from src.models import (
-    Benefit,
-    BenefitListResponse,
+    BenefitModel,
     FavoriteRequest,
     FavoriteResponse,
     FavoritesResponse,
-    Partner,
     PartnerDetail,
     PartnerDetailResponse,
     PartnerListResponse,
+    PartnerModel,
     ValidationCode,
     ValidationCodeCreationRequest,
 )
-from src.models.student import Student, StudentDTO
+from src.models.benefit import BenefitListResponse
+from src.models.student import StudentDTO, StudentModel
 from src.utils import logger
 from src.utils.partners_service import PartnersService
 
@@ -145,7 +145,7 @@ async def list_benefits(
         # 3) Extrair benefícios válidos para estudantes
         from src.models.benefit import BenefitDTO
 
-        collected: list[Benefit] = []
+        collected: list[BenefitModel] = []
 
         for doc in benefits_docs.get("items", []):
             partner_id = doc.get("id")
@@ -154,7 +154,7 @@ async def list_benefits(
 
             # Cada documento possui múltiplos benefícios com chaves BNF_*
             benefit_keys = [
-                k for k in doc.keys() if isinstance(k, str) and k.startswith("BNF_")
+                k for k in doc if isinstance(k, str) and k.startswith("BNF_")
             ]
             logger.debug(
                 f"[student/benefits] Documento {partner_id} possui {len(benefit_keys)} benefícios (BNF_*)"
@@ -449,7 +449,7 @@ async def create_validation_code(
 @router.get("/me", response_model=StudentDTO)
 async def get_student_profile(
     current_user: JWTPayload = Depends(validate_student_role),
-) -> Student:
+) -> StudentModel:
     """
     Retorna os dados completos do estudante a partir da coleção 'students'.
 
@@ -535,7 +535,7 @@ async def list_student_favorites(
             item.get("partner_id") for item in fav_result.get("items", [])
         ]
 
-        favorite_partners: list[Partner] = []
+        favorite_partners: list[PartnerModel] = []
         for pid in favorite_partner_ids:
             if not pid:
                 continue
@@ -543,7 +543,7 @@ async def list_student_favorites(
                 "partners", pid, tenant_id=current_user.tenant
             )
             if partner and partner.get("active", False):
-                favorite_partners.append(Partner(**partner))
+                favorite_partners.append(PartnerModel(**partner))
 
         return {"data": favorite_partners, "msg": "ok"}
 

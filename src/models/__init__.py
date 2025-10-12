@@ -2,6 +2,7 @@
 
 import uuid
 from datetime import datetime
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -13,37 +14,39 @@ from src.models.favorites import (
 from src.utils.id_generators import IDGenerators
 
 from .benefit import (
-    Benefit,
     BenefitAudience,
     BenefitCreationDTO,
     BenefitFirestoreDTO,
-    BenefitListResponse,
+    BenefitModel,
     BenefitResponse,
     BenefitStatus,
     BenefitType,
     BenefitValueType,
 )
 from .partner import (
-    Partner,
     PartnerAddress,
     PartnerCategory,
     PartnerContact,
     PartnerGeolocation,
+    PartnerModel,
     PartnerSocialNetworks,
 )
 from .student import (
-    Student,
     StudentAddressDTO,
     StudentContactDTO,
     StudentCreationDTO,
     StudentDTO,
     StudentGuardian,
+    StudentModel,
 )
 from .validation_code import (
     ValidationCode,
     ValidationCodeCreationRequest,
     ValidationCodeRedeemRequest,
 )
+
+# Define um tipo genérico para ser usado no modelo de paginação
+T = TypeVar("T")
 
 
 class Promotion(BaseModel):
@@ -90,7 +93,7 @@ def get_all_courses() -> list[dict]:
     return list(COURSES_MAP.values())
 
 
-class Employee(BaseModel):
+class EmployeeModel(BaseModel):
     """Modelo para funcionários."""
 
     id: str = Field(default="")
@@ -115,7 +118,7 @@ class Employee(BaseModel):
             )
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class Redemption(BaseModel):
@@ -127,7 +130,7 @@ class Redemption(BaseModel):
     used_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RedeemRequest(BaseModel):
@@ -169,7 +172,7 @@ class NotificationRequest(BaseModel):
 
 
 # Modelos para respostas
-class PartnerDetail(Partner):
+class PartnerDetail(PartnerModel):
     """Modelo para detalhes de parceiro com promoções."""
 
     promotions: list[Promotion] = []
@@ -178,7 +181,7 @@ class PartnerDetail(Partner):
 class PartnerListResponse(BaseResponse):
     """Modelo para resposta de listagem de parceiros."""
 
-    data: list[Partner]
+    data: list[PartnerModel]
 
 
 class PartnerDetailResponse(BaseResponse):
@@ -226,13 +229,14 @@ class HistoryResponse(BaseResponse):
 class FavoritesResponse(BaseResponse):
     """Modelo para resposta de favoritos."""
 
-    data: list[Partner]
+    data: list[PartnerModel]
 
 
-class EntityResponse(BaseModel):
+class EntityResponse(BaseModel, Generic[T]):
     """Modelo para resposta de entidade."""
 
-    data: dict
+    data: T
+    msg: str
 
 
 class EntityListResponse(BaseResponse):
@@ -247,13 +251,13 @@ __all__ = [
     "BaseResponse",
     "ErrorResponse",
     # Modelos de entidades
-    "Partner",
+    "PartnerModel",
     "PartnerAddress",
     "PartnerSocialNetworks",
     "PartnerGeolocation",
     "PartnerContact",
     "PartnerCategory",
-    "Benefit",
+    "BenefitModel",
     "BenefitCreationDTO",
     "BenefitFirestoreDTO",
     "BenefitType",
@@ -263,13 +267,13 @@ __all__ = [
     "FavoriteRequest",
     "FavoriteResponse",
     "StudentPartnerFavorite",
-    "Student",
+    "StudentModel",
     "StudentDTO",
     "StudentContactDTO",
     "StudentAddressDTO",
     "StudentGuardian",
     "StudentCreationDTO",
-    "Employee",
+    "EmployeeModel",
     "ValidationCode",
     "ValidationCodeCreationRequest",
     "ValidationCodeRedeemRequest",
@@ -282,7 +286,6 @@ __all__ = [
     "RedeemResponse",
     "ValidationCodeRedeemRequest",
     "BenefitResponse",
-    "BenefitListResponse",
     "ReportResponse",
     "MetricsResponse",
     "NotificationResponse",
