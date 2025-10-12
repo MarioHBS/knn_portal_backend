@@ -11,6 +11,7 @@ Data: 2025-01-06
 
 import os
 import sys
+import argparse
 from datetime import datetime
 
 # Importar os testadores específicos
@@ -297,10 +298,23 @@ def main():
     """Função principal do programa."""
     runner = AuthTestRunner()
 
-    # Verificar se foi passado argumento de linha de comando
-    if len(sys.argv) > 1:
-        entity = sys.argv[1]
-        runner.run_command_line_mode(entity)
+    parser = argparse.ArgumentParser(description="Runner de Testes de Autenticação - Portal KNN")
+    parser.add_argument(
+        "--test",
+        type=str,
+        choices=["admin", "partner", "student", "employee", "all"],
+        help="Executa um teste específico (admin, partner, student, employee) ou todos ('all'). Se omitido, entra em modo interativo."
+    )
+    args = parser.parse_args()
+
+    if args.test:
+        if args.test == "all":
+            runner.print_header()
+            all_results = runner.run_all_tests()
+            runner.print_summary(all_results)
+            sys.exit(1 if all_results.get("failed_tests", 0) > 0 else 0)
+        else:
+            runner.run_command_line_mode(args.test)
     else:
         # Modo interativo
         try:

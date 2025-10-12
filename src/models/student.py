@@ -92,7 +92,7 @@ class StudentDTO(BaseModel):
     contact: StudentContactDTO | None = None
     address: StudentAddressDTO | None = None
     guardian: StudentGuardian | None = None
-    active_until: date
+    active_until: datetime
     book: str | None = None
     name: str
 
@@ -187,3 +187,21 @@ class StudentCreationDTO(BaseModel):
         if v and "@" not in v:
             raise ValueError("Email inválido")
         return v
+
+
+class StudentUpdateDTO(BaseModel):
+    """DTO para atualização de um estudante existente."""
+
+    name: str | None = None
+    email: str | None = None
+    tenant_id: str | None = None
+    book: str | None = None
+    student_occupation: str | None = None
+    student_phone: str | None = None
+    zip: str | None = None
+    add_neighbor: str | None = None
+    add_complement: str | None = None
+    guardian_name: str | None = None
+    guardian_email: str | None = None
+    guardian_phone: str | None = None
+    active_until: date | None = None

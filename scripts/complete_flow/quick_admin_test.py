@@ -73,6 +73,13 @@ ENDPOINTS = {
         "description": "Lista de estudantes (admin)",
         "category": "admin",
     },
+    "get_specific_student": {
+        "url": "/admin/students/{student_id}",
+        "method": "GET",
+        "description": "Obter detalhes de um estudante específico",
+        "category": "admin",
+        "url_params": {"student_id": "STD_A1T0R088_K1"},
+    },
     "admin_employees": {
         "url": "/admin/employees",
         "method": "GET",
@@ -229,6 +236,46 @@ ENDPOINTS = {
             "benefit_id": "BNF_D80F96_DC",
         },
         "url_params": {"partner_id": "PTN_T4L5678_TEC", "benefit_id": "BNF_D80F96_DC"},
+    },
+    "create_student": {
+        "url": "/admin/students",
+        "method": "POST",
+        "description": "Criar novo aluno",
+        "category": "admin",
+        "data": {
+            "name": "Aluno Teste Rápido",
+            "email": "aluno.rapido@example.com",
+            "tenant_id": "knn-dev-tenant",
+            "book": "KIDS 1",
+            "student_occupation": "Estudante",
+            "student_phone": "(48) 99999-8888",
+            "zip": "88034-100",
+            "add_neighbor": "Itacorubi",
+            "add_complement": "apto 101",
+            "guardian_name": "Responsável Teste",
+            "guardian_email": "responsavel.teste@example.com",
+            "guardian_phone": "(48) 98888-7777",
+            "active_until": "2025-12-31T00:00:00",
+        },
+    },
+    "update_student": {
+        "url": "/admin/students/{student_id}",
+        "method": "PUT",
+        "description": "Editar um aluno existente",
+        "category": "admin",
+        "url_params": {"student_id": "STD_A1T0R088_K1"},
+        "data": {
+            "student_phone": "+55 (48) 99887-6655",
+            "student_occupation": "Desenvolvedor",
+            "email": "novo.email.do.aluno@example.com",
+        },
+    },
+    "delete_student": {
+        "url": "/admin/students/{student_id}",
+        "method": "DELETE",
+        "description": "Excluir um aluno",
+        "category": "admin",
+        "url_params": {"student_id": "STD_A1T0R088_K1"},
     },
 }
 
@@ -985,6 +1032,16 @@ class QuickAdminTester:
                         trade_name = partner_data.get("trade_name")
                         if trade_name:
                             success_message += f" - {trade_name}"
+                    if endpoint_key == "get_specific_student":
+                        student_data = response_data.get("data", {})
+                        student_name = student_data.get("student_name")
+                        if student_name:
+                            success_message += f" - {student_name}"
+                    if endpoint_key == "create_student":
+                        student_data = response_data.get("data", {})
+                        student_id = student_data.get("id")
+                        if student_id:
+                            success_message += f" - ID: {student_id}"
                     # Log específico para criação de parceiro: garantir que o código/id apareça
                     if endpoint_key == "create_partner":
                         partner_data = (

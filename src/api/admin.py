@@ -33,6 +33,7 @@ from src.models.student import (
     StudentDTO,
     StudentGuardian,
     StudentModel,
+    StudentUpdateDTO,
 )
 from src.utils.id_generators import IDGenerators
 from src.utils.logging import logger
@@ -370,7 +371,9 @@ async def get_student_individual(
     Busca um estudante pelo ID.
     """
     try:
-        student_data = await firestore_client.get_document("students", id)
+        student_data = await firestore_client.get_document(
+            "students", id, tenant_id=current_user.tenant
+        )
         if not student_data or student_data.get("tenant_id") != current_user.tenant:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -380,7 +383,9 @@ async def get_student_individual(
             )
 
         student = StudentDTO(**student_data).to_student()
-        return EntityResponse[StudentModel](data=student)
+        return EntityResponse[StudentModel](
+            data=student, msg="Estudante encontrado com sucesso"
+        )
 
     except HTTPException:
         raise
@@ -397,7 +402,7 @@ async def get_student_individual(
 @router.put("/students/{id}", response_model=EntityResponse[StudentModel])
 async def set_student_individual(
     id: str,
-    student_data: StudentDTO,
+    data: StudentUpdateDTO,
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
@@ -405,7 +410,9 @@ async def set_student_individual(
     """
     try:
         # Verificar se o estudante existe
-        existing_student = await firestore_client.get_document("students", id)
+        existing_student = await firestore_client.get_document(
+            "students", id, tenant_id=current_user.tenant
+        )
         if (
             not existing_student
             or existing_student.get("tenant_id") != current_user.tenant
@@ -417,14 +424,70 @@ async def set_student_individual(
                 },
             )
 
-        # Atualizar dados
-        update_data = student_data.model_dump(exclude_unset=True)
-        update_data["updated_at"] = datetime.now(UTC).isoformat()
+        # Mapeamento de campos do DTO para o documento do Firestore
+        field_mapping = {
+            "name": "name",
+            "student_occupation": "occupation",
+            "book": "book",
+            "active_until": "active_until",
+            "email": "contact.email",
+            "student_phone": "contact.phone",
+            "zip": "address.zip",
+            "add_complement": "address.complement",
+            "add_neighbor": "address.neighborhood",
+            "guardian_name": "guardian.name",
+            "guardian_email": "guardian.email",
+            "guardian_phone": "guardian.phone",
+        }
 
-        await firestore_client.update_document("students", id, update_data)
+        update_data = {}
+        update_payload = data.model_dump(exclude_unset=True)
+
+        for field, value in update_payload.items():
+            if field in field_mapping:
+                target_path = field_mapping[field]
+                if "." in target_path:
+                    parts = target_path.split(".")
+                    current_level_update = update_data
+                    current_level_existing = existing_student
+
+                    for i, part in enumerate(parts[:-1]):
+                        # Garante que o sub-dicionário exista no payload de atualização
+                        if part not in current_level_update:
+                            # Se já existir no documento original, usa-o para não sobrescrever outros campos
+                            current_level_update[part] = current_level_existing.get(
+                                part, {}
+                            )
+
+                        current_level_update = current_level_update[part]
+                        if current_level_existing:
+                            current_level_existing = current_level_existing.get(part)
+
+                    current_level_update[parts[-1]] = value
+                else:
+                    update_data[target_path] = value
+
+        if not update_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "error": {
+                        "code": "NO_DATA_TO_UPDATE",
+                        "msg": "Nenhum dado fornecido para atualização",
+                    }
+                },
+            )
+
+        update_data["updated_at"] = datetime.now(UTC)
+
+        await firestore_client.update_document(
+            "students", id, update_data, tenant_id=current_user.tenant
+        )
 
         # Obter dados atualizados
-        updated_student_data = await firestore_client.get_document("students", id)
+        updated_student_data = await firestore_client.get_document(
+            "students", id, tenant_id=current_user.tenant
+        )
         student = StudentDTO(**updated_student_data).to_student()
 
         return EntityResponse[StudentModel](
@@ -494,7 +557,7 @@ async def create_student(
         await metrics_service.update_metadata_on_crud(
             "students", current_user.tenant, operation="add", delta=1
         )
-        return {"data": result, "msg": "Estudante criado com sucesso"}
+        return {"data": the_student, "msg": "Estudante criado com sucesso"}
 
     except ValueError as e:
         raise HTTPException(
@@ -511,7 +574,7 @@ async def create_student(
         ) from e
 
 
-@router.delete("/students/{id}", response_model=EntityResponse)
+@router.delete("/students/{id}", response_model=BaseResponse)
 async def delete_student(
     id: str,
     current_user: JWTPayload = Depends(validate_admin_role),
@@ -521,7 +584,9 @@ async def delete_student(
     """
     try:
         # Verificar se o estudante existe
-        existing_student = await firestore_client.get_document("students", id)
+        existing_student = await firestore_client.get_document(
+            "students", id, tenant_id=current_user.tenant
+        )
         if (
             not existing_student
             or existing_student.get("tenant_id") != current_user.tenant
