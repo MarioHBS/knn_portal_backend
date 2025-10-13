@@ -321,7 +321,8 @@ class MetricsService:
                 op = "add"
 
             # Usar horário de Brasília (America/Sao_Paulo) para o campo last_updated
-            brt_now_iso = datetime.now(ZoneInfo("America/Sao_Paulo")).isoformat()
+            # O nome canônico do fuso horário para São Paulo é "America/Sao_Paulo".
+            brt_now_iso = datetime.utcnow().isoformat()
 
             # Preferência por documento por-tenant
             doc_id = f"{tenant_id}_{doc_name}"

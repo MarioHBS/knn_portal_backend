@@ -13,17 +13,6 @@ class EmployeeContactDTO(BaseModel):
     phone: str | None = None
 
 
-class EmployeeAddressDTO(BaseModel):
-    """Data Transfer Object for employee address information."""
-
-    zip: str | None = None
-    street: str | None = None
-    number: str | None = None
-    complement: str | None = None
-    city: str | None = None
-    state: str | None = None
-
-
 class EmployeeDTO(BaseModel):
     """
     Data Transfer Object for reading/writing Employee data in Firestore.
@@ -31,26 +20,24 @@ class EmployeeDTO(BaseModel):
     data/firestore_export/firestore_employees.json.
     """
 
-    id: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
     tenant_id: str
-    contact: EmployeeContactDTO | None = None
-    address: EmployeeAddressDTO | None = None
+    email: str
+    phone: str
     active: bool = True
     role: str
     name: str
-    admission_date: date | None = None
+    zip: str | None = None
 
-    def to_employee(self) -> "EmployeeModel":
+    def to_employee(self, emp_id: str) -> "EmployeeModel":
         """Converts DTO to an EmployeeModel instance."""
         return EmployeeModel(
-            id=self.id,
+            id=emp_id,
             tenant_id=self.tenant_id,
             name=self.name,
-            email=self.contact.email if self.contact else None,
-            phone=self.contact.phone if self.contact else None,
-            address=self.address,
+            contact=EmployeeContactDTO(email=self.email, phone=self.phone),
+            zip=self.zip,
             role=self.role,
             active=self.active,
             created_at=self.created_at,
@@ -64,16 +51,15 @@ class EmployeeModel(BaseModel):
     id: str
     tenant_id: str
     name: str
-    email: EmailStr | None = None
-    phone: str | None = None
-    address: EmployeeAddressDTO | None = None
+    contact: EmployeeContactDTO
+    zip: str | None = None
     role: str
     active: bool = True
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
-    @field_validator("id", "tenant_id", "name", "email", "role")
-    def field_not_empty(cls, v: str) -> str:
+    @field_validator("id", "tenant_id", "name", "role")
+    def field_not_empty(cls, v: str) -> str:  # noqa: N805
         """Ensures that specified string fields are not empty."""
         if not v or not v.strip():
             raise ValueError("Field cannot be empty")
@@ -86,7 +72,7 @@ class EmployeeModel(BaseModel):
             id=dto.id,
             tenant_id=dto.tenant_id,
             name=dto.name,
-            email=dto.contact.email if dto.contact else None,
+            contact=EmployeeContactDTO(email=dto.email, phone=dto.phone),
             role=dto.role,
             active=dto.active,
             created_at=dto.created_at,
@@ -99,8 +85,9 @@ class EmployeeModel(BaseModel):
             id=self.id,
             tenant_id=self.tenant_id,
             name=self.name,
-            contact=EmployeeContactDTO(email=self.email, phone=self.phone),
-            address=self.address,
+            email=self.contact.email,
+            phone=self.contact.phone,
+            zip=self.zip,
             role=self.role,
             active=self.active,
             created_at=self.created_at,
@@ -123,3 +110,14 @@ class EmployeeUpdateDTO(BaseModel):
     role: str | None = None
     active: bool | None = None
     admission_date: date | None = None
+
+
+class EmployeeCreateDTO(BaseModel):
+    """Data Transfer Object for creating an employee."""
+
+    name: str
+    email: EmailStr
+    phone: str | None = None
+    zip: str | None = None
+    role: str
+    active: bool = True

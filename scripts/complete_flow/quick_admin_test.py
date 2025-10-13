@@ -86,6 +86,13 @@ ENDPOINTS = {
         "description": "Lista de funcionários (admin)",
         "category": "admin",
     },
+    "get_specific_employee": {
+        "url": "/admin/employees/{id}",
+        "method": "GET",
+        "description": "Obter detalhes de um funcionário específico",
+        "category": "admin",
+        "url_params": {"id": "EMP_M0O0C000_XX"},
+    },
     "admin_benefits": {
         "url": "/admin/benefits",
         "method": "GET",
@@ -138,13 +145,17 @@ ENDPOINTS = {
         "data": {
             "name": "Funcionário Teste Rápido",
             "email": "funcionario.teste.rapido@example.com",
-            # Campos opcionais usados para geração de ID padronizado
-            # O endpoint /admin/employees irá gerar o ID via IDGenerators.gerar_id_funcionario
-            # com base em name, cargo/role, cep e telefone.
-            "cargo": "Analista",
-            "cep": "88000000",
-            "telefone": "+55 (48) 99999-0000",
+            "role": "Analista",
+            "zip": "88000000",
+            "phone": "+55 (48) 99999-0000",
         },
+    },
+    "delete_employee": {
+        "url": "/admin/employees/{id}",
+        "method": "DELETE",
+        "description": "Deletar funcionário por ID",
+        "category": "admin",
+        "url_params": {"id": "EMP_F0T0R000_XX"},
     },
     "delete_employee": {
         "url": "/admin/employees/{id}",

@@ -5,7 +5,6 @@ Implementação dos endpoints para o perfil de administrador (admin).
 import uuid
 from copy import deepcopy
 from datetime import UTC, datetime
-from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
@@ -25,7 +24,13 @@ from src.models.benefit import (
     BenefitFirestoreDTO,
     BenefitModel,
 )
-from src.models.employee import EmployeeDTO, EmployeeModel, EmployeeUpdateDTO
+from src.models.employee import (
+    EmployeeContactDTO,
+    EmployeeCreateDTO,
+    EmployeeDTO,
+    EmployeeModel,
+    EmployeeUpdateDTO,
+)
 from src.models.pagination import PaginatedResponse
 from src.models.partner import PartnerCreateDTO, PartnerModel, PartnerUpdateDTO
 from src.models.student import (
@@ -665,8 +670,10 @@ async def get_employee_individual(
     Busca um funcionário pelo ID.
     """
     try:
-        employee_data = await firestore_client.get_document("employees", id)
-        if not employee_data or employee_data.get("tenant_id") != current_user.tenant:
+        employee_data = await firestore_client.get_document(
+            "employees", id, tenant_id=current_user.tenant
+        )
+        if not employee_data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={
@@ -674,8 +681,8 @@ async def get_employee_individual(
                 },
             )
 
-        employee = EmployeeDTO(**employee_data).to_employee()
-        return EntityResponse[EmployeeModel](data=employee)
+        employee = EmployeeDTO(**employee_data).to_employee(id)
+        return EntityResponse(data=employee, msg="Funcionário encontrado com sucesso")
 
     except HTTPException:
         raise
@@ -745,42 +752,30 @@ async def set_employee_individual(
 
 @router.post("/employees", response_model=EntityResponse[EmployeeModel])
 async def create_employee(
-    data: dict[str, Any] = Body(..., description="Dados do funcionário"),
+    data: EmployeeCreateDTO = Body(..., description="Dados do funcionário"),
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
     Cria um novo funcionário.
     """
     try:
-        # Validar dados obrigatórios
-        required_fields = ["name", "email"]
-        for field in required_fields:
-            if field not in data:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail={
-                        "error": {
-                            "code": "VALIDATION_ERROR",
-                            "msg": f"Campo obrigatório: {field}",
-                        }
-                    },
-                )
-
         # Gerar ID padronizado utilizando gerador específico
-        cargo = str(data.get("cargo") or data.get("role") or "").strip()
-        cep = str(data.get("cep") or data.get("zip") or "").strip()
-        telefone = str(data.get("phone") or data.get("telefone") or "").strip()
         generated_id = IDGenerators.gerar_id_funcionario(
-            data["name"], cargo, cep, telefone
+            data.name, data.role, data.zip, data.phone
         )
 
-        # Não armazenar campo 'id' dentro do documento
-        # O ID do documento no Firestore será a chave 'generated_id'
-        data.pop("id", None)
+        # Estruturar dados para o Firestore
+        employee_data = {
+            "name": data.name,
+            "contact": {"email": data.email, "phone": data.phone},
+            "zip": data.zip,
+            "role": data.role,
+            "active": data.active,
+        }
 
         # Adicionar metadados
         current_time = datetime.now(UTC).isoformat()
-        data.update(
+        employee_data.update(
             {
                 "tenant_id": current_user.tenant,
                 "created_at": current_time,
@@ -789,13 +784,28 @@ async def create_employee(
             }
         )
 
-        # Criar funcionário
-        result = await firestore_client.create_document("employees", data, generated_id)
-        # Atualiza contadores agregados na coleção 'metadata'
+        # Criar funcionário no Firestore
+        await firestore_client.create_document("employees", employee_data, generated_id)
+
+        # Atualizar contadores agregados
         await metrics_service.update_metadata_on_crud(
             "employees", current_user.tenant, operation="add", delta=1
         )
-        return {"data": result, "msg": "Funcionário criado com sucesso"}
+
+        # Construir o modelo de resposta
+        created_employee = EmployeeModel(
+            id=generated_id,
+            tenant_id=current_user.tenant,
+            name=data.name,
+            contact=EmployeeContactDTO(email=data.email, phone=data.phone),
+            zip=data.zip,
+            role=data.role,
+            active=data.active,
+            created_at=datetime.fromisoformat(current_time),
+            updated_at=datetime.fromisoformat(current_time),
+        )
+
+        return {"data": created_employee, "msg": "Funcionário criado com sucesso"}
 
     except HTTPException:
         raise
