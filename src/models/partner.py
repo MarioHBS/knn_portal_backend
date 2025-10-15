@@ -11,7 +11,7 @@ Este módulo define os modelos de dados para parceiros, incluindo:
 
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Any, Self
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -343,6 +343,28 @@ class PartnerDTO:
     e facilitar futuras migrações de dados.
     """
 
+    trade_name: str = Field(
+        ..., min_length=1, max_length=50, description="Nome comercial do parceiro"
+    )
+    tenant_id: str = Field(
+        ..., min_length=1, max_length=20, description="ID do tenant do parceiro"
+    )
+    benefits_count: int | None = Field(
+        0, ge=0, description="Número total de benefícios oferecidos"
+    )
+    has_active_benefits: bool = Field(
+        False, description="Indica se o parceiro possui benefícios ativos"
+    )
+    cnpj: str
+    logo_url: str | None = Field(
+        None, description="URL do logo do parceiro no Firebase Storage"
+    )
+    category: PartnerCategory = Field(..., description="Categoria do parceiro")
+    address: PartnerAddress
+    contact: PartnerContact
+    geolocation: PartnerGeolocation
+    social_networks: PartnerSocialNetworks
+
     @staticmethod
     def from_firestore(doc_data: dict[str, Any], doc_id: str = None) -> dict[str, Any]:
         """
@@ -461,7 +483,9 @@ class PartnerDTO:
         }
 
     @staticmethod
-    def to_firestore(partner: PartnerModel) -> dict[str, Any]:
+    def to_firestore(
+        partner: PartnerCreateDTO, created_at: datetime, updated_at: datetime
+    ) -> Self:
         """
         Converte modelo Partner para formato Firestore.
 
@@ -469,43 +493,21 @@ class PartnerDTO:
             partner: Instância do modelo Partner
 
         Returns:
-            dict: Dados formatados para armazenamento no Firestore
+            PartnerDTO: Dados formatados para armazenamento no Firestore
         """
-        return {
-            "id": partner.id,
-            "trade_name": partner.trade_name,
-            "tenant_id": partner.tenant_id,
-            "benefits_count": partner.benefits_count,
-            "has_active_benefits": partner.has_active_benefits,
-            "cnpj": partner.cnpj,
-            "logo_url": partner.logo_url,
-            "address": {
-                "zip": partner.address.zip,
-                "street": partner.address.street,
-                "neighborhood": partner.address.neighborhood,
-                "city": partner.address.city,
-                "state": partner.address.state,
-            },
-            "social_networks": {
-                "instagram": partner.social_networks.instagram,
-                "facebook": partner.social_networks.facebook,
-                "website": partner.social_networks.website,
-            },
-            "geolocation": {
-                "google": partner.geolocation.google,
-                "waze": partner.geolocation.waze,
-            },
-            "contact": {
-                "phone": partner.contact.phone,
-                "whatsapp": partner.contact.whatsapp,
-                "email": partner.contact.email,
-            },
-            "category": partner.category,
-            "active": partner.active,
-            "created_at": partner.created_at.isoformat()
-            if partner.created_at
-            else None,
-            "updated_at": partner.updated_at.isoformat()
-            if partner.updated_at
-            else None,
-        }
+        return PartnerDTO(
+            trade_name=partner.trade_name,
+            tenant_id=partner.tenant_id,
+            benefits_count=partner.benefits_count,
+            has_active_benefits=partner.has_active_benefits,
+            cnpj=partner.cnpj,
+            logo_url=partner.logo_url,
+            address=partner.address,
+            social_networks=partner.social_networks,
+            geolocation=partner.geolocation,
+            contact=partner.contact,
+            category=partner.category,
+            active=partner.active,
+            created_at=created_at,
+            updated_at=updated_at,
+        )

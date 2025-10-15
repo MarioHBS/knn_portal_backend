@@ -15,7 +15,17 @@ from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from src.api import admin, admin_metrics, employee, logos, partner, student, sync, users
+from src.api import (
+    admin,
+    admin_metrics,
+    courses,
+    employee,
+    logos,
+    partner,
+    student,
+    sync,
+    users,
+)
 from src.config import (
     API_DESCRIPTION,
     API_TITLE,
@@ -83,6 +93,9 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Incluir routers
+app.include_router(
+    courses.router, prefix=f"/{API_VERSION}/courses", tags=["Courses"]
+)
 app.include_router(admin.router, prefix=f"/{API_VERSION}/admin", tags=["Admin"])
 app.include_router(
     admin_metrics.router, prefix=f"/{API_VERSION}", tags=["Admin Metrics"]

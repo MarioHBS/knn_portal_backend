@@ -7,6 +7,7 @@ from copy import deepcopy
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from pydantic import ValidationError
 
 from src.auth import JWTPayload, validate_admin_role
 from src.db import firestore_client, postgres_client, with_circuit_breaker
@@ -32,7 +33,12 @@ from src.models.employee import (
     EmployeeUpdateDTO,
 )
 from src.models.pagination import PaginatedResponse
-from src.models.partner import PartnerCreateDTO, PartnerModel, PartnerUpdateDTO
+from src.models.partner import (
+    PartnerCreateDTO,
+    PartnerDTO,
+    PartnerModel,
+    PartnerUpdateDTO,
+)
 from src.models.student import (
     StudentCreationDTO,
     StudentDTO,
@@ -225,51 +231,28 @@ async def create_partner(
     Cria um novo parceiro.
     """
     try:
-        # Converter para dict para manipulação segura
-        data_dict = data.model_dump()
-
-        # Validar dados obrigatórios de acordo com o modelo
-        required_fields = ["trade_name", "category"]
-        for field in required_fields:
-            if not data_dict.get(field):
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail={
-                        "error": {
-                            "code": "VALIDATION_ERROR",
-                            "msg": f"Campo obrigatório: {field}",
-                        }
-                    },
-                )
+        # Adicionar metadados
+        current_time = datetime.now(UTC).isoformat()
+        # Converter para PartnerDTO para manipulação segura
+        partner_data = PartnerDTO.to_firestore(data, current_time, current_time)
 
         # Geração de ID usando gerador padronizado
         try:
             partner_id = IDGenerators.gerar_id_parceiro(
-                trade_name=data_dict["trade_name"],
-                category=str(data_dict["category"]),
-                cnpj=data_dict["cnpj"],
+                trade_name=partner_data.trade_name,
+                category=str(partner_data.category),
+                cnpj=partner_data.cnpj,
             )
         except Exception:
             partner_id = str(uuid.uuid4())
 
-        # Adicionar metadados
-        current_time = datetime.now(UTC).isoformat()
-        data_dict.update(
-            {
-                "tenant_id": current_user.tenant,
-                "created_at": current_time,
-                "updated_at": current_time,
-                "active": data_dict.get("active", True),
-            }
-        )
-
         # Garantir logo_url padrão se não fornecido
-        if not data_dict.get("logo_url"):
-            data_dict["logo_url"] = "/data/placeholder.png"
+        if not partner_data.logo_url:
+            partner_data.logo_url = "/data/placeholder.png"
 
         # Criar parceiro
         result = await firestore_client.create_document(
-            "partners", data_dict, partner_id
+            "partners", partner_data.model_dump(), partner_id
         )
         # Atualiza contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
@@ -342,21 +325,45 @@ async def get_student_list(
     Lists all students with pagination.
     """
     try:
-        result = await firestore_client.query_documents(
+        # Buscar lista de estudantes
+        students = await firestore_client.query_documents(
             "students",
             tenant_id=current_user.tenant,
             limit=limit,
             offset=offset,
         )
 
-        items = [StudentDTO(**item).to_student() for item in result.get("items", [])]
+        # Buscar total de documentos na coleção
+        total = await firestore_client.get_collection_count(
+            "students",
+            tenant_id=current_user.tenant
+        )
+
+        items = []
+        for item in students:
+            try:
+                items.append(StudentDTO(**item).to_student())
+            except ValidationError as e:
+                student_id = item.get("id", "unknown")
+                logger.error(
+                    f"Pydantic Validation Error for student ID {student_id}: {e}, Data: {item}"
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail={
+                        "error": {
+                            "code": "VALIDATION_ERROR",
+                            "msg": f"Validation error for student ID {student_id}: {e}",
+                        }
+                    },
+                ) from e
 
         return PaginatedResponse[StudentModel](
             items=items,
-            total=result.get("total", 0),
+            total=total,
             page=(offset // limit) + 1,
             per_page=limit,
-            pages=(result.get("total", 0) + limit - 1) // limit,
+            pages=(total + limit - 1) // limit,
         )
 
     except Exception as e:
@@ -637,18 +644,29 @@ async def get_employee_list(
     Lists all employees with pagination.
     """
     try:
-        result = await firestore_client.query_documents(
+        # Fetch the list of employees
+        employee_list = await firestore_client.query_documents(
             "employees",
             tenant_id=current_user.tenant,
             limit=limit,
             offset=offset,
         )
+
+        # Fetch the total count of documents
+        total = await firestore_client.get_collection_count(
+            "employees", tenant_id=current_user.tenant
+        )
+
+        # The model validator will handle the data transformation.
+        items = [EmployeeModel(**item) for item in employee_list]
+        logger.info(f"Fetched {len(items)} employees for tenant {current_user.tenant}")
+
         return PaginatedResponse[EmployeeModel](
-            items=result.get("items", []),
-            total=result.get("total", 0),
+            items=items,
+            total=total,
             page=(offset // limit) + 1,
             per_page=limit,
-            pages=(result.get("total", 0) + limit - 1) // limit,
+            pages=(total + limit - 1) // limit if total > 0 else 1,
         )
 
     except Exception as e:
@@ -722,14 +740,15 @@ async def set_employee_individual(
             )
 
         # Atualizar dados
-        update_data = employee_data.model_dump(exclude_unset=True)
-        update_data["updated_at"] = datetime.now(UTC).isoformat()
+        update_data = EmployeeDTO.from_update(
+            employee_data, datetime.now(UTC).isoformat()
+        )
 
         await firestore_client.update_document("employees", id, update_data)
 
         # Obter dados atualizados
         updated_employee_data = await firestore_client.get_document("employees", id)
-        employee = EmployeeDTO(**updated_employee_data).to_employee()
+        employee = EmployeeDTO(**updated_employee_data).to_employee(id)
 
         return EntityResponse[EmployeeModel](
             data=employee, msg="Funcionário atualizado com sucesso"
@@ -886,7 +905,8 @@ async def get_benefit_list(
         if partner_id:
             filters.append(("partner_id", "==", partner_id))
 
-        result = await firestore_client.query_documents(
+        # Fetch the list of benefits
+        benefit_list = await firestore_client.query_documents(
             "benefits",
             tenant_id=current_user.tenant,
             limit=limit,
@@ -894,17 +914,21 @@ async def get_benefit_list(
             filters=filters,
         )
 
-        items_data = result.get("items", [])
+        # Fetch the total count of documents
+        total = await firestore_client.get_collection_count(
+            "benefits", tenant_id=current_user.tenant, filters=filters
+        )
+
         benefits = [
-            BenefitFirestoreDTO(**item).to_benefit(id=item["id"]) for item in items_data
+            BenefitFirestoreDTO(**item).to_benefit(id=item["id"]) for item in benefit_list
         ]
 
         return PaginatedResponse[BenefitModel](
             items=benefits,
-            total=result.get("total", 0),
+            total=total,
             page=(offset // limit) + 1,
             per_page=limit,
-            pages=(result.get("total", 0) + limit - 1) // limit,
+            pages=(total + limit - 1) // limit if total > 0 else 1,
         )
 
     except Exception as e:

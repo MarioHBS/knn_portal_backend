@@ -93,34 +93,6 @@ def get_all_courses() -> list[dict]:
     return list(COURSES_MAP.values())
 
 
-class EmployeeModel(BaseModel):
-    """Modelo para funcionários."""
-
-    id: str = Field(default="")
-    tenant_id: str
-    cpf_hash: str
-    name: str
-    email: str
-    department: str
-    cep: str | None = None
-    telefone: str | None = None
-    active: bool = True
-    favorite_partners: list[str] = Field(default_factory=list)
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        if not self.id:
-            self.id = IDGenerators.gerar_id_funcionario(
-                nome=self.name,
-                cargo=self.department,
-                cep=self.cep or "",
-                telefone=self.telefone or "",
-            )
-
-    class Config:
-        from_attributes = True
-
-
 class Redemption(BaseModel):
     """Modelo para resgates."""
 

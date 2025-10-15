@@ -92,8 +92,8 @@ class PartnersService:
                 )
 
             # Extrair dados dos parceiros e total
-            partners_data = result.get("items", [])
-            total = result.get("total", 0)
+            partners_data = result
+            total = len(result)
 
             # Converter dados brutos para objetos Partner
             partner_objects = []

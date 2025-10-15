@@ -6,6 +6,7 @@ import json
 import uuid
 from typing import Any
 
+from google.api_core.exceptions import FailedPrecondition
 from google.auth import default
 from google.cloud import firestore
 from google.cloud.firestore import Client
@@ -17,7 +18,6 @@ from src.config import (
     FIRESTORE_DATABASES_LIST,
     FIRESTORE_PROJECT,
     FIRESTORE_SERVICE_ACCOUNT_KEY,
-    GOOGLE_APPLICATION_CREDENTIALS,
 )
 from src.utils import logger
 
@@ -168,7 +168,9 @@ class FirestoreClient:
                 # Verificar se o tenant_id do documento corresponde
                 doc_data = doc.to_dict()
                 # Verificar tenant_id em system.tenant_id primeiro, depois em tenant_id direto
-                doc_tenant_id = doc_data.get("system", {}).get("tenant_id") or doc_data.get("tenant_id")
+                doc_tenant_id = doc_data.get("system", {}).get(
+                    "tenant_id"
+                ) or doc_data.get("tenant_id")
                 if doc_tenant_id == tenant_id:
                     return {**doc_data, "id": doc.id}
                 else:
@@ -185,68 +187,74 @@ class FirestoreClient:
     async def query_documents(
         collection: str,
         *,
-        tenant_id: str,
-        filters: list[tuple] | None = None,
-        order_by: list[tuple] | None = None,
-        limit: int = 20,
+        tenant_id: str | None = None,
+        filters: dict[str, Any] | None = None,
+        order_by: str | list[tuple] | None = None,
+        limit: int = 1000,
         offset: int = 0,
-    ) -> dict[str, Any]:
+    ) -> list[dict[str, Any]]:
         """
         Consulta documentos no Firestore com filtros e ordenação.
 
         Args:
-            collection: Nome da coleção
-            tenant_id: ID do tenant para filtrar os documentos
-            filters: Lista de tuplas (campo, operador, valor)
-            order_by: Lista de tuplas (campo, direção)
-            limit: Limite de documentos
-            offset: Offset para paginação
+            collection: Nome da coleção.
+            tenant_id: ID do tenant para filtrar os documentos (opcional).
+            filters: Dicionário de filtros (campo, valor) para consultas de igualdade.
+            order_by: Campo para ordenação ou lista de tuplas (campo, direção).
+            limit: Limite de documentos.
+            offset: Offset para paginação.
 
         Returns:
-            Dict com items, total, limit e offset
+            Uma lista de documentos que correspondem à consulta.
         """
         if not db:
             logger.error("Firestore não inicializado")
-            return {"items": [], "total": 0, "limit": limit, "offset": offset}
+            return []
 
         try:
-            # Iniciar query com filtro de tenant_id obrigatório
-            query = db.collection(collection).where("tenant_id", "==", tenant_id)
+            query = db.collection(collection)
+
+            # Aplicar filtro de tenant_id se fornecido
+            if tenant_id:
+                query = query.where("tenant_id", "==", tenant_id)
 
             # Aplicar filtros adicionais
             if filters:
-                for field, op, value in filters:
-                    query = query.where(field, op, value)
-
-            # Contar total (antes de aplicar limit/offset)
-            total_query = query
-            total_docs = len(list(total_query.stream()))
+                if isinstance(filters, dict):
+                    for key, value in filters.items():
+                        query = query.where(key, "==", value)
+                elif isinstance(filters, list):
+                    for f in filters:
+                        if len(f) == 3:
+                            field, op, value = f
+                            query = query.where(field, op, value)
 
             # Aplicar ordenação
             if order_by:
-                for field, direction in order_by:
-                    query = query.order_by(field, direction=direction)
+                if isinstance(order_by, str):
+                    query = query.order_by(order_by)
+                elif isinstance(order_by, list):
+                    for field, direction in order_by:
+                        query = query.order_by(field, direction=direction)
 
             # Aplicar paginação
             if offset > 0:
-                # No Firestore, precisamos usar cursor para offset
-                # Simplificação: obtemos todos e aplicamos slice
-                all_docs = list(query.limit(offset + limit).stream())
-                docs = all_docs[offset : offset + limit]
-            else:
-                docs = list(query.limit(limit).stream())
+                query = query.offset(offset)
+
+            docs = list(query.limit(limit).stream())
 
             # Converter para dicionários
-            items = [{**doc.to_dict(), "id": doc.id} for doc in docs]
+            return [{**doc.to_dict(), "id": doc.id} for doc in docs]
 
-            return {
-                "items": items,
-                "total": total_docs,
-                "limit": limit,
-                "offset": offset,
-            }
+        except FailedPrecondition as e:
+            logger.error(
+                f"Erro de pré-condição ao consultar documentos em {collection}: {e!r}"
+            )
+            raise e
         except Exception as e:
-            logger.error(f"Erro ao consultar documentos em {collection}: {str(e)}")
+            logger.error(
+                f"Erro detalhado ao consultar documentos em {collection}: {e!r}"
+            )
             raise Exception(f"Erro ao consultar documentos em {collection}") from e
 
     @staticmethod
@@ -280,30 +288,33 @@ class FirestoreClient:
             raise Exception(f"Erro ao criar documento em {collection}") from e
 
     @staticmethod
-    async def update_document(
-        collection: str, doc_id: str, data: dict[str, Any], tenant_id: str
+    def update_document(
+        collection: str, doc_id: str, data: dict[str, Any], tenant_id: str | None = None
     ) -> dict[str, Any]:
         """
-        Atualiza um documento no Firestore, verificando o tenant_id.
+        Atualiza um documento no Firestore, verificando opcionalmente o tenant_id.
         """
         if not db:
             logger.error("Firestore não inicializado")
             return None
 
         try:
-            # Primeiro, verificar se o documento pertence ao tenant correto
-            existing_doc = await FirestoreClient.get_document(
-                collection=collection, doc_id=doc_id, tenant_id=tenant_id
-            )
-            if not existing_doc:
-                raise Exception(f"Documento {collection}/{doc_id} não encontrado ou acesso negado.")
+            # Se um tenant_id for fornecido, verificar a propriedade do documento
+            if tenant_id:
+                existing_doc = FirestoreClient.get_document(
+                    collection=collection, doc_id=doc_id, tenant_id=tenant_id
+                )
+                if not existing_doc:
+                    raise Exception(
+                        f"Documento {collection}/{doc_id} não encontrado ou acesso negado."
+                    )
 
             # Adicionar timestamp de atualização
             data["updated_at"] = firestore.SERVER_TIMESTAMP
 
             # Atualizar documento
             doc_ref = db.collection(collection).document(doc_id)
-            doc_ref.update(data)
+            doc_ref.update(data)  # update() é síncrono
 
             # Obter documento atualizado
             doc = doc_ref.get()
@@ -353,7 +364,9 @@ class FirestoreClient:
             logger.error(
                 f"Erro ao remover campo {field_name} do documento {collection}/{doc_id}: {str(e)}"
             )
-            raise Exception(f"Erro ao remover campo {field_name} do documento {collection}/{doc_id}") from e
+            raise Exception(
+                f"Erro ao remover campo {field_name} do documento {collection}/{doc_id}"
+            ) from e
 
     @staticmethod
     async def batch_operation(operations: list[dict[str, Any]]) -> bool:
@@ -397,7 +410,51 @@ class FirestoreClient:
             return True
         except Exception as e:
             logger.error(f"Erro ao executar operações em lote: {str(e)}")
-            raise Exception(f"Erro ao executar operações em lote") from e
+            raise Exception("Erro ao executar operações em lote") from e
+
+    @staticmethod
+    async def get_collection_count(
+        collection: str,
+        tenant_id: str | None = None,
+        filters: dict[str, Any] | list[tuple] | None = None,
+    ) -> int:
+        """
+        Conta o número de documentos em uma coleção, com filtros opcionais.
+        """
+        if not db:
+            logger.error("Firestore não inicializado")
+            return 0
+
+        try:
+            query = db.collection(collection)
+
+            # Aplicar filtro de tenant_id se fornecido
+            if tenant_id:
+                query = query.where("tenant_id", "==", tenant_id)
+
+            # Aplicar filtros adicionais
+            if filters:
+                if isinstance(filters, dict):
+                    for field, value in filters.items():
+                        query = query.where(field, "==", value)
+                elif isinstance(filters, list):
+                    for f in filters:
+                        if len(f) == 3:
+                            field, op, value = f
+                            query = query.where(field, op, value)
+
+            # A contagem de documentos é feita com uma agregação
+            aggregation_query = query.count()
+            result = aggregation_query.get()
+
+            # O resultado é uma lista de alias de agregação
+            if result and result[0]:
+                return result[0].value
+
+            return 0
+        except Exception as e:
+            logger.error(f"Erro ao contar documentos em {collection}: {str(e)}")
+            return 0
 
 
 # Instância do cliente Firestore

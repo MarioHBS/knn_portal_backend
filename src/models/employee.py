@@ -1,9 +1,9 @@
 """Data models for Employee entity."""
 
 from datetime import date, datetime
-from typing import Self
+from typing import Any, Self
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 
 class EmployeeContactDTO(BaseModel):
@@ -23,7 +23,7 @@ class EmployeeDTO(BaseModel):
     created_at: datetime | None = None
     updated_at: datetime | None = None
     tenant_id: str
-    email: str
+    email: str = Field(alias="e-mail")
     phone: str
     active: bool = True
     role: str
@@ -44,6 +44,30 @@ class EmployeeDTO(BaseModel):
             updated_at=self.updated_at,
         )
 
+    @classmethod
+    def from_update(cls, update_data: "EmployeeUpdateDTO", updated_time: str) -> dict:
+        """
+        Cria um dicionário de atualização a partir de EmployeeUpdateDTO.
+
+        Args:
+            update_data: Dados de atualização do funcionário
+            updated_at: Timestamp de atualização
+
+        Returns:
+            Dicionário com os campos a serem atualizados no Firestore
+        """
+        dto = EmployeeDTO(
+            tenant_id=update_data.tenant_id,
+            name=update_data.name,
+            email=update_data.email,
+            phone=update_data.phone,
+            zip=update_data.zip,
+            role=update_data.role,
+            active=update_data.active,
+            updated_at=updated_time,
+        )
+        return dto.model_dump(exclude_none=True)
+
 
 class EmployeeModel(BaseModel):
     """API data model for an Employee."""
@@ -51,12 +75,23 @@ class EmployeeModel(BaseModel):
     id: str
     tenant_id: str
     name: str
-    contact: EmployeeContactDTO
+    contact: EmployeeContactDTO | None = None
     zip: str | None = None
     role: str
     active: bool = True
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def build_contact_from_flat(cls, data: Any) -> Any:
+        """Builds contact object from flat data structure."""
+        if isinstance(data, dict) and "contact" not in data:
+            email = data.get("e-mail") or data.get("email")
+            phone = data.get("phone")
+            if email or phone:
+                data["contact"] = {"email": email, "phone": phone}
+        return data
 
     @field_validator("id", "tenant_id", "name", "role")
     def field_not_empty(cls, v: str) -> str:  # noqa: N805
@@ -85,8 +120,8 @@ class EmployeeModel(BaseModel):
             id=self.id,
             tenant_id=self.tenant_id,
             name=self.name,
-            email=self.contact.email,
-            phone=self.contact.phone,
+            email=self.contact.email if self.contact else None,
+            phone=self.contact.phone if self.contact else None,
             zip=self.zip,
             role=self.role,
             active=self.active,
