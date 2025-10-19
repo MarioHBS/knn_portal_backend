@@ -1,9 +1,8 @@
 """Data models for Employee entity."""
 
 from datetime import date, datetime
-from typing import Any, Self
 
-from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
+from pydantic import BaseModel, EmailStr, Field
 
 
 class EmployeeContactDTO(BaseModel):
@@ -13,18 +12,28 @@ class EmployeeContactDTO(BaseModel):
     phone: str | None = None
 
 
-class EmployeeDTO(BaseModel):
+class EmployeeFirestoreDTO(BaseModel):
     """
-    Data Transfer Object for reading/writing Employee data in Firestore.
-    This structure mirrors the documents exported in
-    data/firestore_export/firestore_employees.json.
+    Este Objeto de Transferência de Dados é utilizado para mapear os dados de funcionários armazenados no Firestore
+    para o formato utilizado pela API.
+
+    Attributes:
+        created_at: Timestamp de criação do funcionário
+        updated_at: Timestamp de última atualização do funcionário
+        tenant_id: ID do tenant (empresa) ao qual o funcionário pertence
+        email: Endereço de e-mail do funcionário
+        phone: Número de telefone do funcionário
+        active: Indica se o funcionário está ativo ou não
+        role: Função ou cargo do funcionário
+        name: Nome do funcionário
+        zip: Código postal do funcionário
     """
 
     created_at: datetime | None = None
     updated_at: datetime | None = None
     tenant_id: str
     email: str = Field(alias="e-mail")
-    phone: str
+    phone: str | None = None
     active: bool = True
     role: str
     name: str
@@ -56,7 +65,7 @@ class EmployeeDTO(BaseModel):
         Returns:
             Dicionário com os campos a serem atualizados no Firestore
         """
-        dto = EmployeeDTO(
+        dto = EmployeeFirestoreDTO(
             tenant_id=update_data.tenant_id,
             name=update_data.name,
             email=update_data.email,
@@ -70,7 +79,22 @@ class EmployeeDTO(BaseModel):
 
 
 class EmployeeModel(BaseModel):
-    """API data model for an Employee."""
+    """
+    Este modelo é utilizado para representar os dados de um funcionário na aplicação.
+
+    Attributes:
+        id: ID único do funcionário
+        tenant_id: ID do tenant (empresa) ao qual o funcionário pertence
+        name: Nome do funcionário
+        contact: Contato do funcionário (e-mail e telefone)
+        zip: Código postal do funcionário
+        role: Função ou cargo do funcionário
+        active: Indica se o funcionário está ativo ou não
+        created_at: Timestamp de criação do funcionário
+        updated_at: Timestamp de última atualização do funcionário
+        benefits: Lista de benefícios associados ao funcionário
+        last_updated: Data da última atualização do funcionário
+    """
 
     id: str
     tenant_id: str
@@ -81,53 +105,12 @@ class EmployeeModel(BaseModel):
     active: bool = True
     created_at: datetime | None = None
     updated_at: datetime | None = None
-
-    @model_validator(mode="before")
-    @classmethod
-    def build_contact_from_flat(cls, data: Any) -> Any:
-        """Builds contact object from flat data structure."""
-        if isinstance(data, dict) and "contact" not in data:
-            email = data.get("e-mail") or data.get("email")
-            phone = data.get("phone")
-            if email or phone:
-                data["contact"] = {"email": email, "phone": phone}
-        return data
-
-    @field_validator("id", "tenant_id", "name", "role")
-    def field_not_empty(cls, v: str) -> str:  # noqa: N805
-        """Ensures that specified string fields are not empty."""
-        if not v or not v.strip():
-            raise ValueError("Field cannot be empty")
-        return v
-
-    @classmethod
-    def from_dto(cls, dto: EmployeeDTO) -> Self:
-        """Creates an EmployeeModel instance from an EmployeeDTO."""
-        return cls(
-            id=dto.id,
-            tenant_id=dto.tenant_id,
-            name=dto.name,
-            contact=EmployeeContactDTO(email=dto.email, phone=dto.phone),
-            role=dto.role,
-            active=dto.active,
-            created_at=dto.created_at,
-            updated_at=dto.updated_at,
-        )
-
-    def to_dto(self) -> "EmployeeDTO":
-        """Converts EmployeeModel to an EmployeeDTO instance."""
-        return EmployeeDTO(
-            id=self.id,
-            tenant_id=self.tenant_id,
-            name=self.name,
-            email=self.contact.email if self.contact else None,
-            phone=self.contact.phone if self.contact else None,
-            zip=self.zip,
-            role=self.role,
-            active=self.active,
-            created_at=self.created_at,
-            updated_at=self.updated_at,
-        )
+    benefits: list[str] | None = Field(
+        None, description="Lista de benefícios associados ao funcionário."
+    )
+    last_updated: datetime | None = Field(
+        None, description="Data da última atualização do funcionário."
+    )
 
 
 class EmployeeUpdateDTO(BaseModel):
@@ -156,3 +139,4 @@ class EmployeeCreateDTO(BaseModel):
     zip: str | None = None
     role: str
     active: bool = True
+    tenant_id: str

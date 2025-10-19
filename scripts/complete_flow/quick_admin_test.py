@@ -19,6 +19,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from contextlib import suppress
 from datetime import datetime
 from typing import Any
@@ -144,18 +145,12 @@ ENDPOINTS = {
         "category": "admin",
         "data": {
             "name": "Funcionário Teste Rápido",
-            "email": "funcionario.teste.rapido@example.com",
+            "email": f"funcionario.teste.rapido.{int(time.time())}@example.com",
             "role": "Analista",
             "zip": "88000000",
             "phone": "+55 (48) 99999-0000",
+            "tenant_id": "knn-dev-tenant",
         },
-    },
-    "delete_employee": {
-        "url": "/admin/employees/{id}",
-        "method": "DELETE",
-        "description": "Deletar funcionário por ID",
-        "category": "admin",
-        "url_params": {"id": "EMP_F0T0R000_XX"},
     },
     "delete_employee": {
         "url": "/admin/employees/{id}",
@@ -276,9 +271,9 @@ ENDPOINTS = {
         "category": "admin",
         "url_params": {"student_id": "STD_A1T0R088_K1"},
         "data": {
-            "student_phone": "+55 (48) 99887-6655",
-            "student_occupation": "Desenvolvedor",
-            "email": "novo.email.do.aluno@example.com",
+            "student_phone": "+55 (48) 99887-6969",
+            "student_occupation": "Eletricista",
+            "email": "eletricista.aluno@example.com",
         },
     },
     "delete_student": {
@@ -410,7 +405,7 @@ class QuickAdminTester:
                     or "expirado" in error_msg
                     or "expired" in error_msg
                 )
-            except:
+            except Exception:
                 return True  # Assume token expirado para qualquer 401
         return False
 
@@ -1195,7 +1190,7 @@ class QuickAdminTester:
             return None
         try:
             # Epoch em segundos
-            if isinstance(ts, (int, float)):
+            if isinstance(ts, int | float):
                 dt = datetime.utcfromtimestamp(ts)
                 return dt.strftime("%Y-%m-%d %H:%M:%S")
 

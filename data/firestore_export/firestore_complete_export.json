@@ -2864,8 +2864,7 @@
       "tenant_id": "knn-dev-tenant",
       "first_access": true,
       "entity_id": "STD_TEST_20250907191047",
-      "name": "João Silva Santos",
-      "id": "4IFJpVB7dLRvijxW1TQaqjzFGM33"
+      "name": "João Silva Santos"
     },
     "6m9KyWtNPGejUqK8xKVZ2f0HLwA2": {
       "role": "employee",
@@ -2873,8 +2872,7 @@
       "tenant_id": "knn-dev-tenant",
       "first_access": true,
       "entity_id": "EMP_TEST_20250907191051",
-      "name": "Maria Oliveira Costa",
-      "id": "6m9KyWtNPGejUqK8xKVZ2f0HLwA2"
+      "name": "Maria Oliveira Costa"
     },
     "WaPnrhF1nZXmvwJFawqnfJqB96a2": {
       "role": "partner",
@@ -2882,8 +2880,7 @@
       "tenant_id": "knn-dev-tenant",
       "first_access": true,
       "entity_id": "PTR_TEST_20250907191053",
-      "name": "Parceiro Teste",
-      "id": "WaPnrhF1nZXmvwJFawqnfJqB96a2"
+      "name": "Parceiro Teste"
     },
     "zRC8AsHsjlTDTHVf71AxyFmkEpx1": {
       "role": "admin",
@@ -2891,8 +2888,7 @@
       "tenant_id": "knn-dev-tenant",
       "first_access": true,
       "entity_id": "EMP_F0F0O069_CC",
-      "name": "Felipe Oliveira",
-      "id": "zRC8AsHsjlTDTHVf71AxyFmkEpx1"
+      "name": "Felipe Oliveira"
     }
   },
   "_export_metadata": {

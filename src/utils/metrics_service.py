@@ -8,7 +8,6 @@ de métricas de negócio e performance do sistema.
 import logging
 from datetime import datetime, timedelta
 from typing import Any
-from zoneinfo import ZoneInfo
 
 from google.cloud import firestore
 
@@ -626,6 +625,60 @@ class MetricsService:
         if current == 0:
             return 0.0
         return round((new / current) * 100, 2)
+
+    async def update_last_updated_on_crud(
+        self,
+        collection_name: str,
+        tenant_id: str,
+    ) -> None:
+        """
+        Atualiza apenas o campo 'last_updated' do documento correspondente em 'metadata'
+        sem alterar a contagem total.
+
+        Args:
+            collection_name: Nome da coleção (ex: "students", "benefits").
+            tenant_id: ID do tenant.
+        """
+        try:
+            names_map = {
+                "students": "student_info",
+                "employees": "employee_info",
+                "partners": "partner_info",
+                "benefits": "benefit_info",
+            }
+
+            doc_name = names_map.get(collection_name)
+            if not doc_name:
+                logger.warning(
+                    f"Coleção '{collection_name}' não suportada para atualização de metadata"
+                )
+                return
+
+            doc_id = f"{tenant_id}_{doc_name}"
+            doc_ref = self.db.collection("metadata").document(doc_id)
+
+            doc_snapshot = await doc_ref.get()
+            if not doc_snapshot.exists:
+                # Se o documento não existe, criá-lo com total=0 e last_updated
+                await doc_ref.set(
+                    {
+                        "tenant_id": tenant_id,
+                        "total": 0,
+                        "last_updated": datetime.utcnow().isoformat(),
+                    },
+                    merge=True,
+                )
+                logger.info(f"Metadata '{doc_id}' criada com total=0 e last_updated.")
+            else:
+                # Se o documento existe, apenas atualizar last_updated
+                await doc_ref.update({"last_updated": datetime.utcnow().isoformat()})
+                logger.info(f"Metadata '{doc_id}' atualizada apenas com last_updated.")
+
+        except Exception as e:
+            logger.error(
+                f"Erro ao atualizar apenas last_updated para coleção '{collection_name}' (tenant {tenant_id}): {str(e)}"
+            )
+            raise
 
 
 # Instância global do serviço

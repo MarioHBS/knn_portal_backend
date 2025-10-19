@@ -38,37 +38,25 @@ class StudentModel(BaseModel):
     add_neighbor: str | None = None
     add_complement: str | None = None
     guardian: StudentGuardian | None = None
-    active_until: date
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        if not self.id:
-            self.id = IDGenerators.gerar_id_aluno(
-                nome=self.student_name,
-                curso=self.book,
-                cep=self.zip or "",
-                celular=self.student_phone or self.guardian.phone
-                if self.guardian
-                else "",
-                email=self.student_email or self.guardian.email
-                if self.guardian
-                else "",
-            )
-
-    class Config:
-        from_attributes = True
+    active_until: date | None = None
+    benefits: list[str] | None = Field(
+        None, description="Lista de benefícios associados ao estudante."
+    )
+    last_updated: datetime | None = Field(
+        None, description="Data da última atualização do estudante."
+    )
 
 
-# DTOs de Aluno para Firestore
+
 class StudentContactDTO(BaseModel):
-    """Subdocumento de contato do aluno (Firestore)."""
+    """DTO para informações de contato do estudante."""
 
     email: str | None = None
     phone: str | None = None
 
 
 class StudentAddressDTO(BaseModel):
-    """Subdocumento de endereço do aluno (Firestore)."""
+    """DTO para informações de endereço do estudante."""
 
     zip: str | None = None
     complement: str | None = None
@@ -125,7 +113,9 @@ class StudentDTO(BaseModel):
             )
             if self.guardian
             else None,
-            active_until=self.active_until,
+            active_until=self.active_until.date()
+            if isinstance(self.active_until, datetime)
+            else self.active_until,
         )
 
     @classmethod

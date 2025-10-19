@@ -1,5 +1,6 @@
 """Modelos de dados para o Portal de Benefícios KNN."""
 
+import enum
 import uuid
 from datetime import datetime
 from typing import Generic, TypeVar
@@ -39,6 +40,7 @@ from .student import (
     StudentGuardian,
     StudentModel,
 )
+from .user import UserModel
 from .validation_code import (
     ValidationCode,
     ValidationCodeCreationRequest,
@@ -47,6 +49,25 @@ from .validation_code import (
 
 # Define um tipo genérico para ser usado no modelo de paginação
 T = TypeVar("T")
+
+
+class EntityType(str, enum.Enum):
+    """Tipos de entidades no sistema."""
+
+    STUDENT = "student"
+    PARTNER = "partner"
+    EMPLOYEE = "employee"
+
+
+class CollectionType(str, enum.Enum):
+    """Tipos de coleções no Firestore."""
+
+    STUDENT = "students"
+    PARTNER = "partners"
+    EMPLOYEE = "employees"
+    BENEFIT = "benefits"
+    COURSE = "courses"
+    USER = "users"
 
 
 class Promotion(BaseModel):
@@ -265,6 +286,7 @@ __all__ = [
     "FavoritesResponse",
     "EntityResponse",
     "EntityListResponse",
+    "UserModel",
     # Funções utilitárias
     "get_course_by_name",
     "get_course_by_code",

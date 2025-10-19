@@ -8,8 +8,6 @@ from enum import Enum
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pytz import UTC
 
-from src.utils.id_generators import IDGenerators
-
 
 class BenefitValueType(str, Enum):
     """Tipos de valor de benefício."""
@@ -83,14 +81,6 @@ class BenefitModel(BaseModel):
 
 
 # DTOs para Firestore
-class BenefitSystemDTO(BaseModel):
-    """Subdocumento de sistema do benefício (Firestore)."""
-
-    tenant_id: str
-    type: BenefitType
-    status: BenefitStatus
-    audience: str  # No Firestore: 'students', 'employees', 'all'
-    category: str = "Parceiro"
 
 
 class BenefitMetadataDTO(BaseModel):
@@ -99,41 +89,23 @@ class BenefitMetadataDTO(BaseModel):
     tags: list[str] = Field(default_factory=list)
 
 
-class BenefitDatesDTO(BaseModel):
-    """Subdocumento de datas do benefício (Firestore)."""
-
-    created_at: datetime
-    updated_at: datetime
-    valid_from: datetime
-    valid_until: datetime  # Corresponde a 'valid_to' no modelo de domínio
-
-
 # DTO para API
 class BenefitCreationDTO(BaseModel):
-    """DTO para a criação de um novo benefício via API."""
+    """
+    DTO para a criação de um novo benefício via API.
+    Os campos são todos opcionais para permitir a atualização parcial do benefício.
+    """
 
-    partner_id: str
-    tenant_id: str
-    title: str
-    description: str
-    value: int
-    value_type: BenefitValueType = BenefitValueType.PERCENTAGE
-    type: BenefitType = BenefitType.DISCOUNT
-    valid_from: datetime
-    valid_to: datetime
-    active: bool = True
-    audience: list[BenefitAudience] = Field(
-        default_factory=lambda: [BenefitAudience.STUDENT, BenefitAudience.EMPLOYEE]
-    )
-    tags: list[str] = Field(default_factory=list)
-
-    @field_validator("partner_id")
-    def validate_partner_id_format(cls, v: str) -> str:  # noqa: N805
-        """Valida o formato do partner_id: PTN_XXXXXXX_XXX."""
-
-        if not IDGenerators.validate_id_format(v, "partner"):
-            raise ValueError("partner_id deve seguir o formato PTN_XXXXXXX_XXX")
-        return v
+    title: str | None = None
+    description: str | None = None
+    value: int | None = None
+    value_type: BenefitValueType | None = None
+    type: BenefitType | None = None
+    valid_from: datetime | None = None
+    valid_to: datetime | None = None
+    active: bool | None = None
+    audience: list[BenefitAudience] | None = None
+    tags: list[str] | None = None
 
     @field_validator("value")
     def validate_value_range(cls, v: int) -> int:  # noqa: N805
@@ -148,6 +120,31 @@ class BenefitCreationDTO(BaseModel):
         if self.valid_from and self.valid_to and self.valid_to <= self.valid_from:
             raise ValueError("Data de término deve ser posterior à data de início")
         return self
+
+    def prepare_to_update(self, updated_at: datetime) -> dict:
+        update_data = {}
+        if self.title is not None:
+            update_data["title"] = self.title
+        if self.description is not None:
+            update_data["description"] = self.description
+        if self.value is not None:
+            update_data["configuration.value"] = self.value
+        if self.value_type is not None:
+            update_data["configuration.value_type"] = self.value_type
+        if self.type is not None:
+            update_data["type"] = self.type
+        if self.valid_from is not None:
+            update_data["valid_from"] = self.valid_from
+        if self.valid_to is not None:
+            update_data["valid_until"] = self.valid_to
+        if self.active is not None:
+            update_data["status"] = "active" if self.active else "inactive"
+        if self.audience is not None:
+            update_data["audience"] = self.audience
+        if self.tags is not None:
+            update_data["tags"] = self.tags
+        update_data["updated_at"] = updated_at
+        return update_data
 
 
 # Modelos de Resposta da API
@@ -221,3 +218,13 @@ class BenefitFirestoreDTO(BaseModel):
             created_at=self.created_at,
             updated_at=self.updated_at,
         )
+
+
+class BenefitSystemDTO(BaseModel):
+    """Subdocumento de sistema do benefício (Firestore)."""
+
+    tenant_id: str
+    type: BenefitType
+    status: BenefitStatus
+    audience: str  # No Firestore: 'students', 'employees', 'all'
+    category: str = "Parceiro"

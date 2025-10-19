@@ -7,17 +7,23 @@ from copy import deepcopy
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from firebase_admin import auth
+from firebase_admin.auth import UserNotFoundError
 from pydantic import ValidationError
 
 from src.auth import JWTPayload, validate_admin_role
+from src.config import EMAIL_SERVICE_ENABLED
 from src.db import firestore_client, postgres_client, with_circuit_breaker
 from src.db.firestore import db
 from src.models import (
     BaseResponse,
+    CollectionType,
     EntityResponse,
+    EntityType,
     NotificationRequest,
     PartnerDetail,
     PartnerDetailResponse,
+    UserModel,
 )
 from src.models.benefit import (
     BenefitConfigurationDTO,
@@ -28,7 +34,7 @@ from src.models.benefit import (
 from src.models.employee import (
     EmployeeContactDTO,
     EmployeeCreateDTO,
-    EmployeeDTO,
+    EmployeeFirestoreDTO,
     EmployeeModel,
     EmployeeUpdateDTO,
 )
@@ -46,6 +52,8 @@ from src.models.student import (
     StudentModel,
     StudentUpdateDTO,
 )
+from src.utils.auth_service import AuthService, generate_temporary_password
+from src.utils.email_service import EmailService
 from src.utils.id_generators import IDGenerators
 from src.utils.logging import logger
 from src.utils.metrics_service import metrics_service
@@ -230,6 +238,7 @@ async def create_partner(
     """
     Cria um novo parceiro.
     """
+    partner_id = None  # Inicializa o ID do parceiro como None
     try:
         # Adicionar metadados
         current_time = datetime.now(UTC).isoformat()
@@ -250,10 +259,40 @@ async def create_partner(
         if not partner_data.logo_url:
             partner_data.logo_url = "/data/placeholder.png"
 
-        # Criar parceiro
+        # Criar parceiro no Firestore
         result = await firestore_client.create_document(
             "partners", partner_data.model_dump(), partner_id
         )
+
+        # Criar usuário no Firebase Auth
+        try:
+            temp_password = generate_temporary_password()
+            await AuthService.create_user(
+                email=partner_data.email,
+                password=temp_password,
+                display_name=partner_data.trade_name,
+            )
+            # Enviar e-mail com a senha temporária
+            EmailService.send_email(
+                recipient_email=partner_data.email,
+                subject="Bem-vindo ao Portal KNN!",
+                body=f"Sua senha temporária é: {temp_password}",
+            )
+        except Exception as auth_error:
+            # Rollback: Excluir o parceiro do Firestore se a criação do usuário falhar
+            if partner_id:
+                await firestore_client.delete_document("partners", partner_id)
+            logger.error(f"Erro ao criar usuário de parceiro no Firebase: {auth_error}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail={
+                    "error": {
+                        "code": "USER_CREATION_FAILED",
+                        "msg": "Erro ao criar o usuário do parceiro.",
+                    }
+                },
+            ) from auth_error
+
         # Atualiza contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
             "partners", current_user.tenant, operation="add", delta=1
@@ -264,6 +303,9 @@ async def create_partner(
         raise
     except Exception as e:
         logger.error(f"Erro ao criar parceiro: {str(e)}")
+        # Rollback em caso de outros erros
+        if partner_id:
+            await firestore_client.delete_document("partners", partner_id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": {"code": "SERVER_ERROR", "msg": "Erro ao criar parceiro"}},
@@ -290,6 +332,21 @@ async def delete_partner(
                     "error": {"code": "NOT_FOUND", "msg": "Parceiro não encontrado"}
                 },
             )
+
+        # Excluir usuário do Firebase Authentication
+        try:
+            partner_email = existing_partner.get("contact", {}).get("email")
+            if partner_email:
+                await AuthService.delete_user(email=partner_email)
+        except UserNotFoundError:
+            logger.warning(
+                f"Usuário com e-mail {partner_email} não encontrado no Firebase Auth."
+            )
+        except Exception as auth_error:
+            logger.error(
+                f"Erro ao excluir usuário do Firebase Auth para o parceiro {id}: {auth_error}"
+            )
+            # Decide-se por prosseguir com a exclusão no Firestore mesmo que a exclusão no Auth falhe
 
         # Excluir parceiro
         await firestore_client.delete_document("partners", id)
@@ -335,8 +392,7 @@ async def get_student_list(
 
         # Buscar total de documentos na coleção
         total = await firestore_client.get_collection_count(
-            "students",
-            tenant_id=current_user.tenant
+            "students", tenant_id=current_user.tenant
         )
 
         items = []
@@ -463,7 +519,7 @@ async def set_student_individual(
                     current_level_update = update_data
                     current_level_existing = existing_student
 
-                    for i, part in enumerate(parts[:-1]):
+                    for _, part in enumerate(parts[:-1]):
                         # Garante que o sub-dicionário exista no payload de atualização
                         if part not in current_level_update:
                             # Se já existir no documento original, usa-o para não sobrescrever outros campos
@@ -560,6 +616,22 @@ async def create_student(
         dto.created_at = current_time
         dto.updated_at = current_time
 
+        # Criar usuário no Firebase Authentication
+        auth_service = AuthService()
+        temp_password = generate_temporary_password()
+        try:
+            auth_service.create_user(email=student_data.email, password=temp_password)
+            # Enviar e-mail com a senha temporária
+            email_service = EmailService()
+            email_service.send_email(
+                to_email=student_data.email,
+                subject="Bem-vindo ao Journey Club!",
+                body=f"Sua senha temporária é: {temp_password}",
+            )
+        except Exception as e:
+            logger.error(f"Erro ao criar usuário no Firebase Auth: {str(e)}")
+            # Decidir se a falha na criação do usuário no Auth deve impedir a criação do estudante no Firestore
+
         # Criar estudante no Firestore
         result = await firestore_client.create_document(
             "students", dto.model_dump(exclude_none=True), the_student.id
@@ -594,6 +666,7 @@ async def delete_student(
     """
     Exclui um estudante existente.
     """
+    auth_service = AuthService()
     try:
         # Verificar se o estudante existe
         existing_student = await firestore_client.get_document(
@@ -610,12 +683,36 @@ async def delete_student(
                 },
             )
 
-        # Excluir estudante
+        # Excluir usuário do Firebase Authentication
+        try:
+            user = auth.get_user_by_email(existing_student["contact"]["email"])
+            auth_service.delete_user(user.uid)
+        except auth.UserNotFoundError:
+            logger.warning(
+                f"Usuário com e-mail {existing_student['contact']['email']} não encontrado no Firebase Authentication."
+            )
+        except Exception as e:
+            logger.error(
+                f"Erro ao excluir usuário do Firebase Authentication: {str(e)}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail={
+                    "error": {
+                        "code": "AUTH_ERROR",
+                        "msg": "Erro ao excluir usuário do Firebase Authentication",
+                    }
+                },
+            ) from e
+
+        # Excluir estudante do Firestore
         await firestore_client.delete_document("students", id)
+
         # Atualiza contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
             "students", current_user.tenant, operation="delete", delta=-1
         )
+
         return EntityResponse(data={"id": id}, msg="Estudante excluído com sucesso")
 
     except HTTPException:
@@ -699,7 +796,7 @@ async def get_employee_individual(
                 },
             )
 
-        employee = EmployeeDTO(**employee_data).to_employee(id)
+        employee = EmployeeFirestoreDTO(**employee_data).to_employee(id)
         return EntityResponse(data=employee, msg="Funcionário encontrado com sucesso")
 
     except HTTPException:
@@ -740,7 +837,7 @@ async def set_employee_individual(
             )
 
         # Atualizar dados
-        update_data = EmployeeDTO.from_update(
+        update_data = EmployeeFirestoreDTO.from_update(
             employee_data, datetime.now(UTC).isoformat()
         )
 
@@ -748,7 +845,7 @@ async def set_employee_individual(
 
         # Obter dados atualizados
         updated_employee_data = await firestore_client.get_document("employees", id)
-        employee = EmployeeDTO(**updated_employee_data).to_employee(id)
+        employee = EmployeeFirestoreDTO(**updated_employee_data).to_employee(id)
 
         return EntityResponse[EmployeeModel](
             data=employee, msg="Funcionário atualizado com sucesso"
@@ -777,57 +874,62 @@ async def create_employee(
     """
     Cria um novo funcionário.
     """
+    logger.info(
+        f"Recebida requisição para criar funcionário com dados: {data.model_dump()}"
+    )
     try:
         # Gerar ID padronizado utilizando gerador específico
         generated_id = IDGenerators.gerar_id_funcionario(
             data.name, data.role, data.zip, data.phone
         )
+        logger.info(f"ID de funcionário gerado: {generated_id}")
 
-        # Estruturar dados para o Firestore
-        employee_data = {
-            "name": data.name,
-            "contact": {"email": data.email, "phone": data.phone},
-            "zip": data.zip,
-            "role": data.role,
-            "active": data.active,
-        }
-
-        # Adicionar metadados
-        current_time = datetime.now(UTC).isoformat()
-        employee_data.update(
-            {
-                "tenant_id": current_user.tenant,
-                "created_at": current_time,
-                "updated_at": current_time,
-                "type": "employee",
-            }
+        # Criar instância do modelo Pydantic para validação e conversão
+        logger.info(
+            f"Criando EmployeeContactDTO com email: {data.email} e phone: {data.phone}"
         )
+        contact = EmployeeContactDTO(email=data.email, phone=data.phone)
+        logger.info("EmployeeContactDTO criado com sucesso.")
 
-        # Criar funcionário no Firestore
-        await firestore_client.create_document("employees", employee_data, generated_id)
-
-        # Atualizar contadores agregados
-        await metrics_service.update_metadata_on_crud(
-            "employees", current_user.tenant, operation="add", delta=1
-        )
-
-        # Construir o modelo de resposta
-        created_employee = EmployeeModel(
-            id=generated_id,
-            tenant_id=current_user.tenant,
+        logger.info("Criando EmployeeModel...")
+        the_employee = EmployeeFirestoreDTO(
+            tenant_id=data.tenant_id,
             name=data.name,
-            contact=EmployeeContactDTO(email=data.email, phone=data.phone),
+            contact=contact,
             zip=data.zip,
             role=data.role,
             active=data.active,
-            created_at=datetime.fromisoformat(current_time),
-            updated_at=datetime.fromisoformat(current_time),
+        )
+        logger.info(
+            f"EmployeeFirestoreDTO instanciado com sucesso: {the_employee.model_dump()}"
         )
 
-        return {"data": created_employee, "msg": "Funcionário criado com sucesso"}
+        # Criar funcionário no Firestore
+        logger.info(f"Criando funcionário no Firestore com ID: {generated_id}")
+        result = await firestore_client.create_document(
+            "employees", doc_id=generated_id, data=the_employee.model_dump()
+        )
+        logger.info(f"Funcionário criado com sucesso no Firestore: {result}")
 
-    except HTTPException:
-        raise
+        await create_firebase_user(
+            entity=CollectionType.EMPLOYEE,
+            entity_name=the_employee.name,
+            entity_email=the_employee.contact.email,
+            entity_id=the_employee.id,
+            tenant_id=the_employee.tenant_id,
+        )
+
+        # Atualiza contadores agregados na coleção 'metadata'
+        await metrics_service.update_metadata_on_crud(
+            "employees", current_user.tenant, operation="add", delta=1
+        )
+        return {"data": the_employee, "msg": "Funcionário criado com sucesso"}
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={"error": {"code": "VALIDATION_ERROR", "msg": str(e)}},
+        ) from e
     except Exception as e:
         logger.error(f"Erro ao criar funcionário: {str(e)}")
         raise HTTPException(
@@ -846,20 +948,46 @@ async def delete_employee(
     """
     Remove um funcionário existente.
     """
+    auth_service = AuthService()
     try:
-        # Remover funcionário
-        success = await firestore_client.delete_document("employees", id)
-
-        if not success:
+        # Verificar se o funcionário existe
+        existing_employee = await firestore_client.get_document("employees", id)
+        if (
+            not existing_employee
+            or existing_employee.get("tenant_id") != current_user.tenant
+        ):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={
-                    "error": {
-                        "code": "NOT_FOUND",
-                        "msg": "Funcionário não encontrado",
-                    }
+                    "error": {"code": "NOT_FOUND", "msg": "Funcionário não encontrado"}
                 },
             )
+
+        # Excluir usuário do Firebase Authentication
+        try:
+            user = auth.get_user_by_email(existing_employee["contact"]["email"])
+            auth_service.delete_user(user.uid)
+        except auth.UserNotFoundError:
+            # O usuário não existe no Firebase, pode prosseguir com a exclusão no Firestore
+            logger.warning(
+                f"Usuário com e-mail {existing_employee['contact']['email']} não encontrado no Firebase Authentication."
+            )
+        except Exception as e:
+            logger.error(
+                f"Erro ao excluir usuário do Firebase Authentication: {str(e)}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail={
+                    "error": {
+                        "code": "AUTH_ERROR",
+                        "msg": "Erro ao excluir usuário do Firebase Authentication",
+                    }
+                },
+            ) from e
+
+        # Remover funcionário do Firestore
+        await firestore_client.delete_document("employees", id)
 
         # Atualiza contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
@@ -920,7 +1048,8 @@ async def get_benefit_list(
         )
 
         benefits = [
-            BenefitFirestoreDTO(**item).to_benefit(id=item["id"]) for item in benefit_list
+            BenefitFirestoreDTO(**item).to_benefit(id=item["id"])
+            for item in benefit_list
         ]
 
         return PaginatedResponse[BenefitModel](
@@ -1027,7 +1156,9 @@ async def get_benefit_individual(
 @router.put("/benefits/{benefit_id}", response_model=EntityResponse[BenefitModel])
 async def set_benefit_individual(
     benefit_id: str = Path(..., description="ID do benefício"),
-    benefit_data: BenefitCreationDTO = None,
+    benefit_data: BenefitCreationDTO = Body(
+        ..., description="Dados para atualização do benefício"
+    ),
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
@@ -1039,182 +1170,64 @@ async def set_benefit_individual(
     try:
         logger.info(f"Admin {current_user.sub} atualizando benefício {benefit_id}")
 
-        # Validar campos obrigatórios do benefício
-        if not benefit_data.title:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={
-                    "error": {
-                        "code": "VALIDATION_ERROR",
-                        "msg": "Campo obrigatório: title",
-                    }
-                },
-            )
-
-        current_time = datetime.now(UTC).isoformat()
-
-        # Função para atualizar no Firestore
         async def update_benefit_firestore():
-            logger.info(f"🔍 Iniciando atualização do benefício {benefit_id}")
-            logger.info(f"🔍 Tenant do usuário: {current_user.tenant}")
+            """Função interna para atualizar benefício no Firestore."""
+            # Buscar o benefício existente para confirmar existência
+            await verify_existence(
+                collection=CollectionType.BENEFIT,
+                entity_id=benefit_id,
+                user_tenant=current_user.tenant,
+            )
 
-            # Buscar o benefício na coleção 'benefits' usando query
-            # Como não temos o partner_id, precisamos buscar em todos os documentos
-            result = await firestore_client.query_documents(
-                "benefits",
+            # Converter documento existente para DTO
+            # existing_benefit = BenefitFirestoreDTO(**existing_benefit_doc)
+            # Preparar dados de atualização apenas com campos fornecidos
+            update_data = benefit_data.prepare_to_update(updated_at=datetime.now(UTC))
+
+            # Atualizar documento no Firestore
+            await firestore_client.update_document(
+                CollectionType.BENEFIT,
+                benefit_id,
+                update_data,
                 tenant_id=current_user.tenant,
-                limit=1000,  # Limite alto para buscar em todos os documentos
-                offset=0,
             )
 
-            logger.info(
-                f"🔍 Encontrados {len(result.get('items', []))} documentos de parceiros"
+            # Buscar documento atualizado
+            updated_doc = await firestore_client.get_document(
+                "benefits", benefit_id, tenant_id=current_user.tenant
             )
 
-            # Procurar o benefício em todos os documentos de parceiros
-            for partner_doc in result.get("items", []):
-                partner_id = partner_doc.get("id")
-                logger.info(f"🔍 Verificando parceiro {partner_id}")
+            # Converter para DTO e depois para modelo
+            updated_benefit_dto = BenefitFirestoreDTO(**updated_doc)
+            return updated_benefit_dto.to_benefit(benefit_id)
 
-                # Verificar se o benefício existe neste documento
-                benefit_data_existing = partner_doc.get(benefit_id)
-
-                if benefit_data_existing:
-                    logger.info(
-                        f"✅ Benefício {benefit_id} encontrado no parceiro {partner_id}"
-                    )
-
-                    # Obter o benefício existente e atualizar mantendo a estrutura original
-                    existing_benefit = benefit_data_existing.copy()
-
-                    # Atualizar campos principais
-                    existing_benefit["title"] = benefit_data.title
-                    if (
-                        hasattr(benefit_data, "description")
-                        and benefit_data.description
-                    ):
-                        existing_benefit["description"] = benefit_data.description
-
-                    # Atualizar campos do system
-                    if "system" not in existing_benefit:
-                        existing_benefit["system"] = {}
-                    existing_benefit["system"]["type"] = benefit_data.type
-                    existing_benefit["system"]["status"] = getattr(
-                        benefit_data, "status", "active"
-                    )
-
-                    # Converter audience se necessário
-                    if hasattr(benefit_data, "audience"):
-                        if isinstance(benefit_data.audience, list):
-                            audience_mapping = {
-                                frozenset(["student"]): "students",
-                                frozenset(["employee"]): "employees",
-                                frozenset(["student", "employee"]): "all",
-                            }
-                            firestore_audience = audience_mapping.get(
-                                frozenset(benefit_data.audience), "students"
-                            )
-                            existing_benefit["system"]["audience"] = firestore_audience
-                        else:
-                            existing_benefit["system"]["audience"] = (
-                                benefit_data.audience
-                            )
-
-                    # Atualizar campos de datas
-                    if "dates" not in existing_benefit:
-                        existing_benefit["dates"] = {}
-                    existing_benefit["dates"]["updated_at"] = current_time
-
-                    if hasattr(benefit_data, "valid_from") and benefit_data.valid_from:
-                        existing_benefit["dates"]["valid_from"] = (
-                            benefit_data.valid_from.isoformat()
-                        )
-                    if hasattr(benefit_data, "valid_to") and benefit_data.valid_to:
-                        existing_benefit["dates"]["valid_until"] = (
-                            benefit_data.valid_to.isoformat()
-                        )
-
-                    # Atualizar configuração se fornecida
-                    if "configuration" not in existing_benefit:
-                        existing_benefit["configuration"] = {}
-
-                    if hasattr(benefit_data, "value"):
-                        existing_benefit["configuration"]["value"] = benefit_data.value
-                    if hasattr(benefit_data, "value_type"):
-                        existing_benefit["configuration"]["value_type"] = (
-                            benefit_data.value_type
-                        )
-
-                    # Atualizar o documento com o benefício modificado
-                    doc_ref = db.collection("benefits").document(partner_id)
-                    update_data = {benefit_id: existing_benefit}
-                    doc_ref.update(update_data)
-
-                    logger.info(
-                        f"Benefício {benefit_id} atualizado no Firestore com sucesso"
-                    )
-                    return {
-                        "success": True,
-                        "benefit_id": benefit_id,
-                        "partner_id": partner_id,
-                        "updated_benefit": existing_benefit,
-                    }
-
-            # Se chegou até aqui, o benefício não foi encontrado
-            logger.warning(
-                f"❌ Benefício {benefit_id} não encontrado em nenhum parceiro"
-            )
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {
-                        "code": "BENEFIT_NOT_FOUND",
-                        "msg": "Benefício não encontrado",
-                    }
-                },
-            )
-
-        # Função de fallback para PostgreSQL (placeholder)
         async def update_benefit_postgres():
-            # TODO: Implementar fallback para PostgreSQL quando necessário
-            logger.warning(
-                "Fallback para PostgreSQL não implementado para update_benefit"
+            """Função interna de fallback para PostgreSQL (placeholder)."""
+            # Implementação placeholder para PostgreSQL
+            # Em uma implementação real, seria necessário mapear os campos
+            # do BenefitCreationDTO para a estrutura da tabela PostgreSQL
+            return await postgres_client.update_document(
+                "benefits",
+                benefit_id,
+                benefit_data.model_dump(exclude_none=True),
+                tenant_id=current_user.tenant,
             )
-            return {"success": True}
 
-        # Usar circuit breaker corretamente
+        # Usar circuit breaker para executar a atualização
         result = await with_circuit_breaker(
             update_benefit_firestore, update_benefit_postgres
         )
 
-        # Verificar se a atualização foi bem-sucedida
-        if not result or not result.get("success"):
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail={
-                    "error": {
-                        "code": "UPDATE_FAILED",
-                        "msg": "Falha ao atualizar benefício",
-                    }
-                },
-            )
-
         logger.info(f"Benefício {benefit_id} atualizado com sucesso")
 
+        # Atualiza 'last_updated' na coleção 'metadata' (benefits)
+        await metrics_service.update_last_updated_on_crud(
+            CollectionType.BENEFIT, tenant_id=current_user.tenant
+        )
+
         # Converter o benefício atualizado para o modelo de resposta
-        from src.models.benefit import BenefitFirestoreDTO
-
-        updated_benefit_data = result.get("updated_benefit", {})
-        # Adicionar IDs necessários para a conversão
-        updated_benefit_data["benefit_id"] = benefit_id
-        updated_benefit_data["partner_id"] = result.get("partner_id")
-
-        # Criar DTO e converter para modelo de domínio
-        benefit_dto = BenefitFirestoreDTO(**updated_benefit_data)
-        benefit_model = benefit_dto.to_benefit(id=benefit_id)
-
         return EntityResponse[BenefitModel](
-            data=benefit_model, msg="Benefício atualizado com sucesso"
+            data=result, msg="Benefício atualizado com sucesso"
         )
 
     except HTTPException:
@@ -1224,7 +1237,10 @@ async def set_benefit_individual(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao atualizar benefício"}
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": "Erro interno do servidor ao atualizar benefício",
+                }
             },
         ) from e
 
@@ -1298,12 +1314,7 @@ async def create_benefit(
         logger.error(f"Erro ao criar benefício: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": "Erro ao criar benefício",
-                }
-            },
+            detail={"error": {"code": "SERVER_ERROR", "msg": str(e)}},
         ) from e
 
 
@@ -1615,5 +1626,87 @@ async def send_notifications(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao enviar notificações"}
+            },
+        ) from e
+
+
+# ==========================================================================
+# UTILS
+async def verify_existence(
+    collection: CollectionType, entity_id: str, user_tenant: str
+):
+    mapping = {
+        CollectionType.BENEFIT: "Benefício",
+        CollectionType.PARTNER: "Parceiro",
+        CollectionType.STUDENT: "Aluno",
+        CollectionType.EMPLOYEE: "Funcionário",
+    }
+    existing = await firestore_client.get_document(collection, entity_id)
+    if not existing or existing.get("tenant_id") != user_tenant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": {
+                    "code": "NOT_FOUND",
+                    "msg": f"{mapping.get(collection, 'Entidade')} não encontrado",
+                }
+            },
+        )
+
+
+async def create_firebase_user(
+    entity: EntityType,
+    entity_name: str,
+    entity_email: str,
+    entity_id: str,
+    tenant_id: str,
+) -> auth.UserRecord:
+    """Cria um usuário no Firebase Authentication e no Firestore."""
+    auth_service = AuthService()
+    user_record = None
+    try:
+        user_record, temp_password = auth_service.create_user_with_temp_password(
+            email=entity_email, display_name=entity_name
+        )
+
+        # Criar documento na coleção 'users' do Firestore usando UserModel
+        user_data = UserModel(
+            email=entity_email,
+            entity_id=entity_id,
+            first_access=True,
+            name=entity_name,
+            role=entity.value,
+            tenant_id=tenant_id,
+            updated_at=datetime.now(UTC),
+        )
+        await firestore_client.create_document(
+            CollectionType.USER, doc_id=user_record.uid, data=user_data.model_dump()
+        )
+
+        if EMAIL_SERVICE_ENABLED:
+            # Enviar e-mail com a senha temporária
+            email_service = EmailService()
+            email_service.send_email(
+                to_email=entity_email,
+                subject="Bem-vindo ao KNN Portal Journey Club!",
+                body=f"Olá {entity_name}, sua conta foi criada com sucesso. Sua senha temporária é: {temp_password}",
+            )
+        return user_record
+
+    except Exception as e:
+        logger.error(
+            f"Erro ao criar usuário no Firebase para {entity.value} {entity_id}: {str(e)}"
+        )
+        # Reverter a criação do funcionário no Firestore
+        await firestore_client.delete_document(entity.value, entity_id)
+        if user_record:
+            await auth_service.delete_user(user_record.uid)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "FIREBASE_ERROR",
+                    "msg": "Erro ao criar usuário de autenticação",
+                }
             },
         ) from e

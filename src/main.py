@@ -10,6 +10,7 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
@@ -92,10 +93,19 @@ app.add_middleware(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    """Handler para exceções de validação."""
+    logger.error(f"Erro de validação: {exc.errors()}", exc_info=True)
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors()},
+    )
+
+
 # Incluir routers
-app.include_router(
-    courses.router, prefix=f"/{API_VERSION}/courses", tags=["Courses"]
-)
+app.include_router(courses.router, prefix=f"/{API_VERSION}/courses", tags=["Courses"])
 app.include_router(admin.router, prefix=f"/{API_VERSION}/admin", tags=["Admin"])
 app.include_router(
     admin_metrics.router, prefix=f"/{API_VERSION}", tags=["Admin Metrics"]

@@ -508,3 +508,45 @@ async def test_firebase_token(request: FirebaseTokenRequest):
             message=f"OK, token recebido mas erro na validação: {str(e)}",
             token_valid=False,
         )
+
+
+class SetPasswordRequest(BaseModel):
+    """Modelo para requisição de definição de senha."""
+
+    new_password: str
+
+
+@router.post("/set-password")
+async def set_password(
+    request: SetPasswordRequest,
+    current_user: JWTPayload = Depends(get_current_user),
+):
+    """Endpoint para que o usuário defina sua senha no primeiro acesso.
+
+    Args:
+        request: Requisição com a nova senha.
+        current_user: Usuário autenticado.
+
+    Returns:
+        Mensagem de sucesso.
+    """
+    try:
+        from src.db.firestore import get_database
+        from src.utils.auth_service import AuthService
+
+        # Atualizar senha no Firebase Authentication
+        auth_service = AuthService()
+        auth_service.update_password(current_user.sub, request.new_password)
+
+        # Atualizar o campo 'first_access' no Firestore
+        db = get_database()
+        user_ref = db.collection("users").document(current_user.sub)
+        user_ref.update({"first_access": False})
+
+        return {"message": "Senha atualizada com sucesso."}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao atualizar a senha: {str(e)}",
+        ) from e

@@ -44,6 +44,7 @@ def initialize_firebase():
         # Procurar arquivo de credenciais
         possible_paths = [
             "credentials/default-service-account-key.json",
+            "credentials/knn-benefits-service-account-key.json",
             "data/firestore_import/default-service-account-key.json",
             "default-service-account-key.json",
             os.getenv("GOOGLE_APPLICATION_CREDENTIALS", ""),
