@@ -32,7 +32,6 @@ from src.models.benefit import (
     BenefitModel,
 )
 from src.models.employee import (
-    EmployeeContactDTO,
     EmployeeCreateDTO,
     EmployeeFirestoreDTO,
     EmployeeModel,
@@ -52,6 +51,7 @@ from src.models.student import (
     StudentModel,
     StudentUpdateDTO,
 )
+from src.models.user import UserFirestoreDTO
 from src.utils.auth_service import AuthService, generate_temporary_password
 from src.utils.email_service import EmailService
 from src.utils.id_generators import IDGenerators
@@ -884,54 +884,42 @@ async def create_employee(
         )
         logger.info(f"ID de funcionário gerado: {generated_id}")
 
-        # Criar instância do modelo Pydantic para validação e conversão
-        logger.info(
-            f"Criando EmployeeContactDTO com email: {data.email} e phone: {data.phone}"
-        )
-        contact = EmployeeContactDTO(email=data.email, phone=data.phone)
-        logger.info("EmployeeContactDTO criado com sucesso.")
-
-        logger.info("Criando EmployeeModel...")
-        the_employee = EmployeeFirestoreDTO(
-            tenant_id=data.tenant_id,
-            name=data.name,
-            contact=contact,
-            zip=data.zip,
-            role=data.role,
-            active=data.active,
-        )
-        logger.info(
-            f"EmployeeFirestoreDTO instanciado com sucesso: {the_employee.model_dump()}"
+        employee_dto = EmployeeFirestoreDTO.from_create(
+            create_data=data, tenant=current_user.tenant
         )
 
         # Criar funcionário no Firestore
         logger.info(f"Criando funcionário no Firestore com ID: {generated_id}")
         result = await firestore_client.create_document(
-            "employees", doc_id=generated_id, data=the_employee.model_dump()
+            CollectionType.EMPLOYEE, doc_id=generated_id, data=employee_dto.model_dump()
         )
         logger.info(f"Funcionário criado com sucesso no Firestore: {result}")
 
         await create_firebase_user(
             entity=CollectionType.EMPLOYEE,
-            entity_name=the_employee.name,
-            entity_email=the_employee.contact.email,
-            entity_id=the_employee.id,
-            tenant_id=the_employee.tenant_id,
+            entity_name=employee_dto.name,
+            entity_email=employee_dto.email,
+            entity_id=generated_id,
+            tenant_id=employee_dto.tenant_id,
         )
 
         # Atualiza contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
             "employees", current_user.tenant, operation="add", delta=1
         )
-        return {"data": the_employee, "msg": "Funcionário criado com sucesso"}
+        return {
+            "data": employee_dto.to_employee(generated_id),
+            "msg": "Funcionário criado com sucesso",
+        }
 
     except ValueError as e:
+        logger.error(f"Erro de validação ao criar funcionário: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail={"error": {"code": "VALIDATION_ERROR", "msg": str(e)}},
         ) from e
     except Exception as e:
-        logger.error(f"Erro ao criar funcionário: {str(e)}")
+        logger.error(f"Erro ao criar funcionário: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
@@ -950,23 +938,20 @@ async def delete_employee(
     """
     auth_service = AuthService()
     try:
-        # Verificar se o funcionário existe
-        existing_employee = await firestore_client.get_document("employees", id)
-        if (
-            not existing_employee
-            or existing_employee.get("tenant_id") != current_user.tenant
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Funcionário não encontrado"}
-                },
-            )
+        existing_employee = await verify_existence(
+            CollectionType.EMPLOYEE, id, current_user.tenant
+        )
+
+        user = await search_employee_user(
+            CollectionType.EMPLOYEE, id, current_user.tenant
+        )
+        logger.info(f"Usuário associado ao funcionário {user.uid}: {user}")
 
         # Excluir usuário do Firebase Authentication
         try:
-            user = auth.get_user_by_email(existing_employee["contact"]["email"])
+            user = auth.get_user(user_id=user.uid)
             auth_service.delete_user(user.uid)
+
         except auth.UserNotFoundError:
             # O usuário não existe no Firebase, pode prosseguir com a exclusão no Firestore
             logger.warning(
@@ -987,7 +972,7 @@ async def delete_employee(
             ) from e
 
         # Remover funcionário do Firestore
-        await firestore_client.delete_document("employees", id)
+        await firestore_client.delete_document(CollectionType.EMPLOYEE, id)
 
         # Atualiza contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
@@ -1641,14 +1626,16 @@ async def verify_existence(
         CollectionType.STUDENT: "Aluno",
         CollectionType.EMPLOYEE: "Funcionário",
     }
-    existing = await firestore_client.get_document(collection, entity_id)
+    existing = await firestore_client.get_document(
+        collection, doc_id=entity_id, tenant_id=user_tenant
+    )
     if not existing or existing.get("tenant_id") != user_tenant:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "error": {
                     "code": "NOT_FOUND",
-                    "msg": f"{mapping.get(collection, 'Entidade')} não encontrado",
+                    "msg": f"Usuário associado ao {mapping.get(collection, 'Entidade')} {entity_id} não encontrado no Firestore.",
                 }
             },
         )
@@ -1669,8 +1656,8 @@ async def create_firebase_user(
             email=entity_email, display_name=entity_name
         )
 
-        # Criar documento na coleção 'users' do Firestore usando UserModel
-        user_data = UserModel(
+        # Criar documento na coleção 'users' do Firestore usando UserFirestoreDTO
+        user_data = UserFirestoreDTO(
             email=entity_email,
             entity_id=entity_id,
             first_access=True,
@@ -1700,7 +1687,7 @@ async def create_firebase_user(
         # Reverter a criação do funcionário no Firestore
         await firestore_client.delete_document(entity.value, entity_id)
         if user_record:
-            await auth_service.delete_user(user_record.uid)
+            auth_service.delete_user(user_record.uid)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
@@ -1710,3 +1697,35 @@ async def create_firebase_user(
                 }
             },
         ) from e
+
+
+async def search_employee_user(
+    collection: CollectionType, entity_id: str, tenant: str
+) -> UserModel:
+    """Busca o usuário do funcionário no Firestore."""
+    user_doc = await firestore_client.query_documents(
+        collection,
+        tenant_id=tenant,
+        filters=[("entity_id", "==", entity_id)],
+        limit=1,
+    )
+
+    if not user_doc or not user_doc.get("items"):
+        logger.warning(
+            f"Usuário associado ao {collection.value} {entity_id} não encontrado no Firestore."
+        )
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": {
+                    "code": "NOT_FOUND",
+                    "msg": f"Usuário associado ao {collection.value} {entity_id} não encontrado",
+                }
+            },
+        )
+
+    user_data = user_doc["items"][0]
+    user_dto = UserFirestoreDTO(**user_data)
+    user_model = user_dto.to_model(user_data["id"])
+
+    return user_model

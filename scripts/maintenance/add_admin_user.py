@@ -77,7 +77,7 @@ def create_admin_user(employee_data: dict, password: str) -> str | None:
         str: UID do usuário criado ou None se erro
     """
     try:
-        email = employee_data.get("e-mail")
+        email = employee_data.get("email")
         name = employee_data.get("name")
 
         if not email:
@@ -149,7 +149,7 @@ def update_users_collection(old_uid: str, new_uid: str, employee_data: dict) -> 
         # Preparar dados do novo documento
         user_data = {
             "role": "admin",
-            "email": employee_data.get("e-mail"),
+            "email": employee_data.get("email"),
             "tenant_id": "knn-dev-tenant",
             "first_access": True,
             "entity_id": employee_data.get("id"),
@@ -201,7 +201,7 @@ def main():
             return False
 
         print(
-            f"✅ Dados obtidos: {employee_data.get('name')} - {employee_data.get('e-mail')}\n"
+            f"✅ Dados obtidos: {employee_data.get('name')} - {employee_data.get('email')}\n"
         )
 
         # Criar usuário administrador no Firebase Auth
@@ -226,7 +226,7 @@ def main():
 
         # Resumo final
         print("🎉 PROCESSO CONCLUÍDO COM SUCESSO!")
-        print(f"📧 Email: {employee_data.get('e-mail')}")
+        print(f"📧 Email: {employee_data.get('email')}")
         print(f"🔑 Senha: {PASSWORD}")
         print(f"🆔 Novo UID: {new_uid}")
         print(f"👤 Nome: {employee_data.get('name')}")

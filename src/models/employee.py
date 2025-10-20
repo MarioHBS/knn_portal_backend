@@ -1,6 +1,7 @@
 """Data models for Employee entity."""
 
 from datetime import date, datetime
+from typing import Self
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -29,10 +30,10 @@ class EmployeeFirestoreDTO(BaseModel):
         zip: Código postal do funcionário
     """
 
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
     tenant_id: str
-    email: str = Field(alias="e-mail")
+    email: str
     phone: str | None = None
     active: bool = True
     role: str
@@ -76,6 +77,31 @@ class EmployeeFirestoreDTO(BaseModel):
             updated_at=updated_time,
         )
         return dto.model_dump(exclude_none=True)
+
+    @classmethod
+    def from_create(cls, create_data: "EmployeeCreateDTO", tenant: str) -> Self:
+        """
+        Cria um dicionário a partir de EmployeeCreateDTO.
+
+        Args:
+            create_data: Dados de criação do funcionário
+
+        Returns:
+            Dicionário com os campos a serem criados no Firestore
+        """
+        now = datetime.now()
+        dto = EmployeeFirestoreDTO(
+            tenant_id=tenant,
+            name=create_data.name,
+            email=create_data.email,
+            phone=create_data.phone,
+            zip=create_data.zip,
+            role=create_data.role,
+            active=create_data.active,
+            created_at=now,
+            updated_at=now,
+        )
+        return dto
 
 
 class EmployeeModel(BaseModel):
