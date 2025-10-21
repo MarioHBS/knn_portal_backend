@@ -54,9 +54,9 @@ T = TypeVar("T")
 class EntityType(str, enum.Enum):
     """Tipos de entidades no sistema."""
 
-    STUDENT = "student"
-    PARTNER = "partner"
-    EMPLOYEE = "employee"
+    STUDENT = "Aluno"
+    PARTNER = "Parceiro"
+    EMPLOYEE = "Funcionário"
 
 
 class CollectionType(str, enum.Enum):

@@ -28,6 +28,19 @@ class UserFirestoreDTO(BaseModel):
         ..., description="Timestamp da última atualização do registro do usuário."
     )
 
+    def to_model(self, user_id: str) -> "UserModel":
+        """Converts DTO to a UserModel instance."""
+        return UserModel(
+            uid=user_id,
+            email=self.email,
+            entity_id=self.entity_id,
+            first_access=self.first_access,
+            name=self.name,
+            role=self.role,
+            tenant_id=self.tenant_id,
+            updated_at=self.updated_at,
+        )
+
 
 class UserModel(BaseModel):
     """

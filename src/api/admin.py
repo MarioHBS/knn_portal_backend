@@ -936,47 +936,25 @@ async def delete_employee(
     """
     Remove um funcionário existente.
     """
-    auth_service = AuthService()
     try:
+        # 1. Verifica a existência do funcionário no Firestore
         existing_employee = await verify_existence(
             CollectionType.EMPLOYEE, id, current_user.tenant
         )
 
-        user = await search_employee_user(
-            CollectionType.EMPLOYEE, id, current_user.tenant
+        # 2. Deleta o usuário associado no Firebase Authentication e na coleção 'users' do Firestore
+        await delete_firebase_user(
+            entity=CollectionType.EMPLOYEE,
+            entity_id=id,
+            tenant_id=current_user.tenant,
         )
-        logger.info(f"Usuário associado ao funcionário {user.uid}: {user}")
 
-        # Excluir usuário do Firebase Authentication
-        try:
-            user = auth.get_user(user_id=user.uid)
-            auth_service.delete_user(user.uid)
-
-        except auth.UserNotFoundError:
-            # O usuário não existe no Firebase, pode prosseguir com a exclusão no Firestore
-            logger.warning(
-                f"Usuário com e-mail {existing_employee['contact']['email']} não encontrado no Firebase Authentication."
-            )
-        except Exception as e:
-            logger.error(
-                f"Erro ao excluir usuário do Firebase Authentication: {str(e)}"
-            )
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail={
-                    "error": {
-                        "code": "AUTH_ERROR",
-                        "msg": "Erro ao excluir usuário do Firebase Authentication",
-                    }
-                },
-            ) from e
-
-        # Remover funcionário do Firestore
+        # 3. Remove o documento do funcionário da coleção 'employees' no Firestore
         await firestore_client.delete_document(CollectionType.EMPLOYEE, id)
 
-        # Atualiza contadores agregados na coleção 'metadata'
+        # 4. Atualiza os contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
-            "employees", current_user.tenant, operation="sub", delta=1
+            CollectionType.EMPLOYEE.value, current_user.tenant, operation="sub", delta=1
         )
 
         return BaseResponse(msg=f"Funcionário {id} removido com sucesso")
@@ -1699,33 +1677,88 @@ async def create_firebase_user(
         ) from e
 
 
-async def search_employee_user(
-    collection: CollectionType, entity_id: str, tenant: str
-) -> UserModel:
-    """Busca o usuário do funcionário no Firestore."""
-    user_doc = await firestore_client.query_documents(
-        collection,
+async def delete_firebase_user(
+    entity: EntityType,
+    entity_id: str,
+    tenant_id: str,
+) -> bool:
+    """Deleta um usuário do Firebase Authentication e do Firestore."""
+    auth_service = AuthService()
+    try:
+        user = await search_correspondent_user(entity, entity_id, tenant_id)
+        logger.info(f"Usuário associado ao funcionário {user.uid}: {user}")
+
+        try:
+            # Busca o usuário no Firebase Authentication pelo e-mail
+            user = auth.get_user(uid=user.uid)
+            logger.info(f"Usuário encontrado: {user}")
+            # Deleta o usuário no Firebase Authentication
+            auth_service.delete_user(user.uid)
+            logger.info(f"Usuário {user.uid} excluído do Firebase Authentication.")
+
+        except Exception as e:
+            logger.error(
+                f"Erro ao excluir usuário do Firebase Authentication: {str(e)}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail={
+                    "error": {
+                        "code": "AUTH_ERROR",
+                        "msg": "Erro ao excluir usuário do Firebase Authentication",
+                    }
+                },
+            ) from e
+
+        # Deleta o documento do usuário na coleção 'users' do Firestore
+        await firestore_client.delete_document(CollectionType.USER, doc_id=user.uid)
+
+        # Deleta o documento da entidade na coleção correspondente
+        # await firestore_client.delete_document(entity.value, doc_id=entity_id)
+
+        return True
+
+    except Exception as e:
+        logger.error(
+            f"Erro ao deletar usuário no Firebase para {entity} {entity_id}: {str(e)}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "FIREBASE_DELETE_ERROR",
+                    "msg": "Erro ao deletar usuário de autenticação",
+                }
+            },
+        ) from e
+
+
+async def search_correspondent_user(
+    entity: EntityType, entity_id: str, tenant: str
+) -> UserModel | None:
+    """Busca o documento correspondente à entidade na coleção 'users' no Firestore."""
+    user_docs = await firestore_client.query_documents(
+        CollectionType.USER,
         tenant_id=tenant,
         filters=[("entity_id", "==", entity_id)],
         limit=1,
     )
+    logger.info(f"Resposta da busca do usuário: {user_docs}")
 
-    if not user_doc or not user_doc.get("items"):
+    if not user_docs:
         logger.warning(
-            f"Usuário associado ao {collection.value} {entity_id} não encontrado no Firestore."
+            f"Usuário associado ao {entity.value} {entity_id} não encontrado no Firestore."
         )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "error": {
                     "code": "NOT_FOUND",
-                    "msg": f"Usuário associado ao {collection.value} {entity_id} não encontrado",
+                    "msg": f"Usuário associado ao {entity.value} {entity_id} não encontrado",
                 }
             },
         )
 
-    user_data = user_doc["items"][0]
-    user_dto = UserFirestoreDTO(**user_data)
-    user_model = user_dto.to_model(user_data["id"])
-
-    return user_model
+    user_data = user_docs[0]
+    user_data["uid"] = user_data.pop("id")
+    return UserModel(**user_data)

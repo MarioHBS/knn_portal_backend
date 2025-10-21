@@ -11,8 +11,8 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from src.api.admin import router
 from src.auth import JWTPayload
+from src.main import app
 
 
 @pytest.fixture
@@ -69,25 +69,23 @@ class TestListPartners:
     """Testes para o endpoint de listagem de parceiros."""
 
     @pytest.mark.asyncio
-    @patch("src.api.admin.with_circuit_breaker")
+    @patch("src.db.firestore.firestore_client.query_documents")
+    @patch("src.db.postgres.postgres_client.query_documents")
     @patch("src.api.admin.validate_admin_role")
     async def test_list_partners_success(
         self,
         mock_validate_role,
-        mock_circuit_breaker,
+        mock_postgres_query,
+        mock_firestore_query,
         mock_admin_user,
         mock_partner_data,
     ):
         """Testa listagem bem-sucedida de parceiros."""
         mock_validate_role.return_value = mock_admin_user
-        mock_circuit_breaker.return_value = {
-            "items": [mock_partner_data],
-            "total": 1,
-            "page": 1,
-            "per_page": 10,
-        }
+        mock_firestore_query.return_value = [mock_partner_data]
+        mock_postgres_query.return_value = []  # Em caso de fallback, retornar vazio para este teste
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.get("/partners")
 
         assert response.status_code == status.HTTP_200_OK
@@ -115,7 +113,7 @@ class TestListPartners:
             "per_page": 10,
         }
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.get("/partners?cat=food&ord=name&limit=5&offset=10")
 
         assert response.status_code == status.HTTP_200_OK
@@ -132,7 +130,7 @@ class TestListPartners:
         mock_validate_role.return_value = mock_admin_user
         mock_circuit_breaker.side_effect = Exception("Circuit breaker open")
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.get("/partners")
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -155,7 +153,7 @@ class TestGetPartnerDetails:
         mock_validate_role.return_value = mock_admin_user
         mock_circuit_breaker.return_value = mock_partner_data
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.get("/partners/partner_123")
 
         assert response.status_code == status.HTTP_200_OK
@@ -173,7 +171,7 @@ class TestGetPartnerDetails:
         mock_validate_role.return_value = mock_admin_user
         mock_circuit_breaker.return_value = None
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.get("/partners/nonexistent")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -200,7 +198,7 @@ class TestCreateEntity:
             "data": {"name": "Novo Parceiro", "active": True},
         }
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.post("/entities", json=request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -220,7 +218,7 @@ class TestCreateEntity:
             "data": {"name": "Test"},
         }
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.post("/entities", json=request_data)
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -242,7 +240,7 @@ class TestCreateEntity:
             "data": {"name": "Test Partner"},
         }
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.post("/entities", json=request_data)
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -268,7 +266,7 @@ class TestUpdateEntity:
             "data": {"name": "Parceiro Atualizado"},
         }
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.put("/entities/partner_123", json=request_data)
 
         assert response.status_code == status.HTTP_200_OK
@@ -290,7 +288,7 @@ class TestUpdateEntity:
             "data": {"name": "Test"},
         }
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.put("/entities/nonexistent", json=request_data)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -311,7 +309,7 @@ class TestDeleteEntity:
         mock_doc.exists = True
         mock_firestore.collection.return_value.document.return_value.get.return_value = mock_doc
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.delete("/entities/partner_123?entity_type=partner")
 
         assert response.status_code == status.HTTP_200_OK
@@ -328,7 +326,7 @@ class TestDeleteEntity:
         mock_doc.exists = False
         mock_firestore.collection.return_value.document.return_value.get.return_value = mock_doc
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.delete("/entities/nonexistent?entity_type=partner")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -352,7 +350,7 @@ class TestGetMetrics:
             MagicMock(),
         ]
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.get("/metrics")
 
         assert response.status_code == status.HTTP_200_OK
@@ -374,7 +372,7 @@ class TestGetMetrics:
         mock_validate_role.return_value = mock_admin_user
         mock_firestore.collection.side_effect = Exception("Firestore error")
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.get("/metrics")
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -403,7 +401,7 @@ class TestSendNotifications:
             "filter": {},
         }
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.post("/notifications", json=request_data)
 
         assert response.status_code == status.HTTP_200_OK
@@ -424,7 +422,7 @@ class TestSendNotifications:
             "filter": {},
         }
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.post("/notifications", json=request_data)
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -445,7 +443,7 @@ class TestSendNotifications:
             "filter": {},
         }
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.post("/notifications", json=request_data)
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -464,7 +462,7 @@ class TestAuthenticationAndAuthorization:
             status_code=401, detail="Unauthorized"
         )
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.get("/partners")
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -479,7 +477,7 @@ class TestAuthenticationAndAuthorization:
             status_code=403, detail="Forbidden"
         )
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.get("/partners")
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -508,7 +506,7 @@ class TestIntegrationScenarios:
         mock_doc.exists = True
         mock_firestore.collection.return_value.document.return_value.get.return_value = mock_doc
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             # Criar
             create_response = client.post(
                 "/entities",
@@ -561,7 +559,7 @@ class TestIntegrationScenarios:
             mock_stream_side_effect
         )
 
-        with TestClient(router) as client:
+        with TestClient(app) as client:
             response = client.get("/metrics")
 
         assert response.status_code == status.HTTP_200_OK
