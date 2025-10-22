@@ -35,7 +35,7 @@ from .partner import (
 from .student import (
     StudentAddressDTO,
     StudentContactDTO,
-    StudentCreationDTO,
+    StudentCreateDTO,
     StudentFirestoreDTO,
     StudentGuardian,
     StudentModel,
@@ -265,7 +265,7 @@ __all__ = [
     "StudentContactDTO",
     "StudentAddressDTO",
     "StudentGuardian",
-    "StudentCreationDTO",
+    "StudentCreateDTO",
     "EmployeeModel",
     "ValidationCode",
     "ValidationCodeCreationRequest",

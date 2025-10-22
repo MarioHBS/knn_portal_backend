@@ -478,7 +478,7 @@ async def get_student_profile(
         # Validar/normalizar usando StudentDTO
         try:
             student_dto = StudentFirestoreDTO(**student_doc)
-            student_obj = student_dto.to_student()
+            student_obj = student_dto.to_model()
             # student_dto = StudentDTO.from_student(student_obj)  # Depois para StudentDTO
         except Exception as e:
             logger.error(

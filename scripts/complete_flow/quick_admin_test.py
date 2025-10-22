@@ -249,7 +249,7 @@ ENDPOINTS = {
         "description": "Criar novo aluno",
         "category": "admin",
         "data": {
-            "name": f"Aluno Teste Rápido {int(time.time())}",
+            "name": "Aluno Teste Rápido",
             "email": f"aluno.teste.rapido.{int(time.time())}@example.com",
             "tenant_id": "knn-dev-tenant",
             "book": "SEEDS 3",

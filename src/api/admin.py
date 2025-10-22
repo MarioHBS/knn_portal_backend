@@ -8,8 +8,7 @@ from datetime import UTC, datetime
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from firebase_admin import auth
-from firebase_admin.auth import UserNotFoundError
-from pydantic import ValidationError
+from pydantic import BaseModel
 
 from src.auth import JWTPayload, validate_admin_role
 from src.config import EMAIL_SERVICE_ENABLED
@@ -44,15 +43,8 @@ from src.models.partner import (
     PartnerModel,
     PartnerUpdateDTO,
 )
-from src.models.student import (
-    StudentCreationDTO,
-    StudentFirestoreDTO,
-    StudentGuardian,
-    StudentModel,
-    StudentUpdateDTO,
-)
 from src.models.user import UserFirestoreDTO
-from src.utils.auth_service import AuthService, generate_temporary_password
+from src.utils.auth_service import AuthService
 from src.utils.email_service import EmailService
 from src.utils.id_generators import IDGenerators
 from src.utils.logging import logger
@@ -190,33 +182,18 @@ async def set_partner_individual(
     """
     try:
         # Verificar se o parceiro existe
-        existing_partner = await firestore_client.get_document(
-            "partners", id, tenant_id=current_user.tenant
+        verify_existence(
+            collection=CollectionType.PARTNER,
+            entity_id=id,
+            tenant_id=current_user.tenant,
         )
-        if not existing_partner:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Parceiro não encontrado"}
-                },
-            )
 
-        # Converte o DTO em um dicionário, excluindo valores não definidos
-        update_data = data.model_dump(exclude_unset=True)
-
-        if not update_data:
-            raise HTTPException(
-                status_code=400, detail="Nenhum dado fornecido para atualização"
-            )
-
-        # Atualizar metadados
-        update_data["updated_at"] = datetime.now(UTC).isoformat()
-
-        # Atualizar parceiro
-        result = await firestore_client.update_document(
-            "partners", id, update_data, tenant_id=current_user.tenant
+        return update_entity(
+            entity_id=id,
+            model=data,
+            collection=CollectionType.PARTNER,
+            tenant=current_user.tenant,
         )
-        return EntityResponse(data=result, msg="Parceiro atualizado com sucesso")
 
     except HTTPException:
         raise
@@ -238,74 +215,82 @@ async def create_partner(
     """
     Cria um novo parceiro.
     """
-    partner_id = None  # Inicializa o ID do parceiro como None
     try:
-        # Adicionar metadados
-        current_time = datetime.now(UTC).isoformat()
-        # Converter para PartnerDTO para manipulação segura
-        partner_data = PartnerDTO.to_firestore(data, current_time, current_time)
-
-        # Geração de ID usando gerador padronizado
+        # 1. Gerar ID do parceiro
         try:
-            partner_id = IDGenerators.gerar_id_parceiro(
-                trade_name=partner_data.trade_name,
-                category=str(partner_data.category),
-                cnpj=partner_data.cnpj,
+            partner_id = IDGenerators.generate_partner_id(
+                trade_name=data.trade_name,
+                category=str(data.category),
+                cnpj=data.cnpj,
             )
         except Exception:
             partner_id = str(uuid.uuid4())
 
-        # Garantir logo_url padrão se não fornecido
+        # 2. Verificar se o parceiro já existe
+        verify_existence(
+            collection=CollectionType.PARTNER,
+            entity_id=partner_id,
+            tenant_id=current_user.tenant,
+        )
+
+        existing_user_by_email = await firestore_client.query_documents(
+            collection=CollectionType.USER.value,
+            filters=[("email", "==", data.email)],
+            tenant_id=current_user.tenant,
+        )
+        if existing_user_by_email:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error": {
+                        "code": "EMAIL_ALREADY_IN_USE",
+                        "msg": "Já existe um usuário com este e-mail.",
+                    }
+                },
+            )
+
+        # 3. Criar usuário no Firebase e na coleção 'users'
+        await create_firebase_user(
+            entity=EntityType.PARTNER,
+            entity_name=data.trade_name,
+            entity_email=data.email,
+            entity_id=partner_id,
+            tenant_id=current_user.tenant,
+        )
+
+        # 4. Preparar e salvar dados do parceiro no Firestore
+        current_time = datetime.now(UTC).isoformat()
+        partner_data = PartnerDTO.to_firestore(data, current_time, current_time)
+
         if not partner_data.logo_url:
             partner_data.logo_url = "/data/placeholder.png"
 
-        # Criar parceiro no Firestore
-        result = await firestore_client.create_document(
-            "partners", partner_data.model_dump(), partner_id
+        await firestore_client.create_document(
+            CollectionType.PARTNER.value, partner_data.model_dump(), partner_id
         )
 
-        # Criar usuário no Firebase Auth
-        try:
-            temp_password = generate_temporary_password()
-            await AuthService.create_user(
-                email=partner_data.email,
-                password=temp_password,
-                display_name=partner_data.trade_name,
-            )
-            # Enviar e-mail com a senha temporária
-            EmailService.send_email(
-                recipient_email=partner_data.email,
-                subject="Bem-vindo ao Portal KNN!",
-                body=f"Sua senha temporária é: {temp_password}",
-            )
-        except Exception as auth_error:
-            # Rollback: Excluir o parceiro do Firestore se a criação do usuário falhar
-            if partner_id:
-                await firestore_client.delete_document("partners", partner_id)
-            logger.error(f"Erro ao criar usuário de parceiro no Firebase: {auth_error}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail={
-                    "error": {
-                        "code": "USER_CREATION_FAILED",
-                        "msg": "Erro ao criar o usuário do parceiro.",
-                    }
-                },
-            ) from auth_error
-
-        # Atualiza contadores agregados na coleção 'metadata'
+        # 5. Atualizar metadados
         await metrics_service.update_metadata_on_crud(
-            "partners", current_user.tenant, operation="add", delta=1
+            CollectionType.PARTNER.value, current_user.tenant, operation="add", delta=1
         )
-        return EntityResponse(data=result, msg="Parceiro criado com sucesso")
+
+        # 6. Retornar resposta
+        created_partner_doc = await firestore_client.get_document(
+            CollectionType.PARTNER.value, partner_id
+        )
+        if not created_partner_doc:
+            raise HTTPException(
+                status_code=500, detail="Falha ao recuperar parceiro após a criação."
+            )
+
+        partner_model = PartnerModel(**created_partner_doc)
+
+        return EntityResponse(data=partner_model, msg="Parceiro criado com sucesso")
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Erro ao criar parceiro: {str(e)}")
-        # Rollback em caso de outros erros
-        if partner_id:
-            await firestore_client.delete_document("partners", partner_id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": {"code": "SERVER_ERROR", "msg": "Erro ao criar parceiro"}},
@@ -321,40 +306,24 @@ async def delete_partner(
     Exclui um parceiro existente.
     """
     try:
-        # Verificar se o parceiro existe e pertence ao tenant
-        existing_partner = await firestore_client.get_document(
-            "partners", id, tenant_id=current_user.tenant
-        )
-        if not existing_partner:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Parceiro não encontrado"}
-                },
-            )
+        # 1. Verificar a existência do parceiro
+        await verify_existence(CollectionType.PARTNER, id, current_user.tenant)
 
-        # Excluir usuário do Firebase Authentication
-        try:
-            partner_email = existing_partner.get("contact", {}).get("email")
-            if partner_email:
-                await AuthService.delete_user(email=partner_email)
-        except UserNotFoundError:
-            logger.warning(
-                f"Usuário com e-mail {partner_email} não encontrado no Firebase Auth."
-            )
-        except Exception as auth_error:
-            logger.error(
-                f"Erro ao excluir usuário do Firebase Auth para o parceiro {id}: {auth_error}"
-            )
-            # Decide-se por prosseguir com a exclusão no Firestore mesmo que a exclusão no Auth falhe
+        # 2. Deletar usuário do Firebase e da coleção 'users'
+        await delete_firebase_user(EntityType.PARTNER, id, current_user.tenant)
 
-        # Excluir parceiro
-        await firestore_client.delete_document("partners", id)
-        # Atualiza contadores agregados na coleção 'metadata'
+        # 3. Deletar o documento do parceiro do Firestore
+        await firestore_client.delete_document(CollectionType.PARTNER.value, id)
+
+        # 4. Atualizar metadados
         await metrics_service.update_metadata_on_crud(
-            "partners", current_user.tenant, operation="delete", delta=-1
+            CollectionType.PARTNER.value,
+            current_user.tenant,
+            operation="remove",
+            delta=1,
         )
-        return EntityResponse(data={"id": id}, msg="Parceiro excluído com sucesso")
+
+        return BaseResponse(msg="Parceiro deletado com sucesso")
 
     except HTTPException:
         raise
@@ -364,386 +333,6 @@ async def delete_partner(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao excluir parceiro"}
-            },
-        ) from e
-
-
-# ==========================================================================
-# CRUD STUDENT
-
-
-@router.get("/students", response_model=PaginatedResponse[StudentModel])
-async def get_student_list(
-    limit: int = Query(10, ge=1, le=100, description="Limit per page"),
-    offset: int = Query(0, ge=0, description="Offset to start from"),
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Lists all students with pagination.
-    """
-    try:
-        # Buscar lista de estudantes
-        students = await firestore_client.query_documents(
-            "students",
-            tenant_id=current_user.tenant,
-            limit=limit,
-            offset=offset,
-        )
-
-        # Buscar total de documentos na coleção
-        total = await firestore_client.get_collection_count(
-            "students", tenant_id=current_user.tenant
-        )
-
-        items = []
-        for item in students:
-            try:
-                items.append(StudentFirestoreDTO(**item).to_student())
-            except ValidationError as e:
-                student_id = item.get("id", "unknown")
-                logger.error(
-                    f"Pydantic Validation Error for student ID {student_id}: {e}, Data: {item}"
-                )
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail={
-                        "error": {
-                            "code": "VALIDATION_ERROR",
-                            "msg": f"Validation error for student ID {student_id}: {e}",
-                        }
-                    },
-                ) from e
-
-        return PaginatedResponse[StudentModel](
-            items=items,
-            total=total,
-            page=(offset // limit) + 1,
-            per_page=limit,
-            pages=(total + limit - 1) // limit,
-        )
-
-    except Exception as e:
-        logger.error(f"Error listing students: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"error": {"code": "SERVER_ERROR", "msg": "Error listing students"}},
-        ) from e
-
-
-@router.get("/students/{id}", response_model=EntityResponse[StudentModel])
-async def get_student_individual(
-    id: str,
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Busca um estudante pelo ID.
-    """
-    try:
-        student_data = await firestore_client.get_document(
-            "students", id, tenant_id=current_user.tenant
-        )
-        if not student_data or student_data.get("tenant_id") != current_user.tenant:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Estudante não encontrado"}
-                },
-            )
-
-        student = StudentFirestoreDTO(**student_data).to_student()
-        return EntityResponse[StudentModel](
-            data=student, msg="Estudante encontrado com sucesso"
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao buscar estudante: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao buscar estudante"}
-            },
-        ) from e
-
-
-@router.put("/students/{id}", response_model=EntityResponse[StudentModel])
-async def set_student_individual(
-    id: str,
-    data: StudentUpdateDTO,
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Atualiza um estudante existente.
-    """
-    try:
-        # Verificar se o estudante existe
-        existing_student = await firestore_client.get_document(
-            "students", id, tenant_id=current_user.tenant
-        )
-        if (
-            not existing_student
-            or existing_student.get("tenant_id") != current_user.tenant
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Estudante não encontrado"}
-                },
-            )
-
-        # Mapeamento de campos do DTO para o documento do Firestore
-        field_mapping = {
-            "name": "name",
-            "student_occupation": "occupation",
-            "book": "book",
-            "active_until": "active_until",
-            "email": "contact.email",
-            "student_phone": "contact.phone",
-            "zip": "address.zip",
-            "add_complement": "address.complement",
-            "add_neighbor": "address.neighborhood",
-            "guardian_name": "guardian.name",
-            "guardian_email": "guardian.email",
-            "guardian_phone": "guardian.phone",
-        }
-
-        update_data = {}
-        update_payload = data.model_dump(exclude_unset=True)
-
-        for field, value in update_payload.items():
-            if field in field_mapping:
-                target_path = field_mapping[field]
-                if "." in target_path:
-                    parts = target_path.split(".")
-                    current_level_update = update_data
-                    current_level_existing = existing_student
-
-                    for _, part in enumerate(parts[:-1]):
-                        # Garante que o sub-dicionário exista no payload de atualização
-                        if part not in current_level_update:
-                            # Se já existir no documento original, usa-o para não sobrescrever outros campos
-                            current_level_update[part] = current_level_existing.get(
-                                part, {}
-                            )
-
-                        current_level_update = current_level_update[part]
-                        if current_level_existing:
-                            current_level_existing = current_level_existing.get(part)
-
-                    current_level_update[parts[-1]] = value
-                else:
-                    update_data[target_path] = value
-
-        if not update_data:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail={
-                    "error": {
-                        "code": "NO_DATA_TO_UPDATE",
-                        "msg": "Nenhum dado fornecido para atualização",
-                    }
-                },
-            )
-
-        update_data["updated_at"] = datetime.now(UTC)
-
-        await firestore_client.update_document(
-            "students", id, update_data, tenant_id=current_user.tenant
-        )
-
-        # Obter dados atualizados
-        updated_student_data = await firestore_client.get_document(
-            "students", id, tenant_id=current_user.tenant
-        )
-        student = StudentFirestoreDTO(**updated_student_data).to_student()
-
-        return EntityResponse[StudentModel](
-            data=student, msg="Estudante atualizado com sucesso"
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao atualizar estudante: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao atualizar estudante"}
-            },
-        ) from e
-
-
-@router.post("/students", response_model=EntityResponse[StudentModel])
-@router.post("/students", response_model=EntityResponse[StudentModel])
-async def create_student(
-    student_data: StudentCreationDTO,
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Cria um novo estudante.
-    """
-    try:
-        print("DEBUG: Iniciando create_student")
-        # 1. Gerar ID do estudante
-        student_id = IDGenerators.generate_student_id(
-            nome=student_data.name,
-            curso=student_data.book,  # Assumindo que 'book' é o curso
-            cep=student_data.zip or "",
-            celular=student_data.student_phone or "",
-            email=student_data.email,
-        )
-        print(f"DEBUG: ID do estudante gerado: {student_id}")
-
-        # 2. Verificar se o estudante já existe (pelo ID gerado ou e-mail)
-        existing_student_by_id = await firestore_client.get_document(
-            CollectionType.STUDENT, student_id, current_user.tenant
-        )
-        print(
-            f"DEBUG: Verificação de estudante por ID concluída. Existe: {bool(existing_student_by_id)}"
-        )
-        if existing_student_by_id:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail={
-                    "error": {
-                        "code": "STUDENT_ALREADY_EXISTS",
-                        "msg": f"Já existe um estudante com o ID {student_id}.",
-                    }
-                },
-            )
-
-        # Verificar se já existe um usuário com este e-mail no Firebase/Firestore
-        existing_user_by_email = await firestore_client.query_documents(
-            collection=CollectionType.USER.value,
-            filters=[("email", "==", student_data.email)],
-            tenant_id=current_user.tenant
-        )
-        print(
-            f"DEBUG: Verificação de usuário por e-mail concluída. Existe: {bool(existing_user_by_email)}"
-        )
-        if existing_user_by_email:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail={
-                    "error": {
-                        "code": "EMAIL_ALREADY_IN_USE",
-                        "msg": "Já existe um usuário com este e-mail.",
-                    }
-                },
-            )
-
-        # 3. Criar usuário no Firebase Authentication e na coleção 'users' do Firestore
-        user_record = await create_firebase_user(
-            entity=EntityType.STUDENT,
-            entity_name=student_data.name,
-            entity_email=student_data.email,
-            entity_id=student_id,
-            tenant_id=current_user.tenant,
-        )
-        print(f"DEBUG: Usuário Firebase criado para {student_id}")
-
-        # 4. Preparar dados do estudante para o Firestore
-        guardian = None
-        if student_data.guardian_name and student_data.guardian_email:
-            guardian = StudentGuardian(
-                name=student_data.guardian_name,
-                email=student_data.guardian_email,
-                phone=student_data.guardian_phone or "",
-            )
-        print("DEBUG: Dados do guardião preparados")
-
-        the_student = StudentModel(
-            id=student_id,  # Usar o ID gerado
-            tenant_id=current_user.tenant,
-            student_name=student_data.name,
-            book=student_data.book,
-            student_occupation=student_data.student_occupation,
-            student_email=student_data.email,
-            student_phone=student_data.student_phone,
-            zip=student_data.zip,
-            add_neighbor=student_data.add_neighbor,
-            add_complement=student_data.add_complement,
-            guardian=guardian,
-            active_until=student_data.active_until,
-        )
-        print("DEBUG: StudentModel criado")
-
-        # Converter o modelo de domínio para o DTO do Firestore
-        dto = StudentFirestoreDTO.from_student(the_student)
-        print("DEBUG: StudentDTO criado")
-
-        # 5. Salvar estudante na coleção 'students' do Firestore
-        await firestore_client.create_document(
-            CollectionType.STUDENT, doc_id=student_id, data=dto.model_dump()
-        )
-
-        # 6. Atualizar contadores agregados na coleção 'metadata'
-        await metrics_service.update_metadata_on_crud(
-            CollectionType.STUDENT.value, current_user.tenant, operation="add", delta=1
-        )
-
-        # 7. Retornar resposta
-        return EntityResponse[StudentModel](
-            data=the_student, msg="Estudante criado com sucesso"
-        )
-
-    except HTTPException as e:
-        print(f"DEBUG: HTTPException capturada: {e.detail}")
-        raise e
-    except Exception as e:
-        logger.error(f"Erro ao criar estudante: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": f"Erro ao criar estudante: {e}",
-                }
-            },
-        ) from e
-
-
-@router.delete("/students/{id}", response_model=BaseResponse)
-async def delete_student(
-    id: str,
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Deleta um estudante pelo ID.
-    """
-    try:
-        # 1. Verificar a existência do estudante
-        await verify_existence(
-            CollectionType.STUDENT, id, current_user.tenant
-        )
-
-        # 2. Deletar usuário do Firebase Authentication e da coleção 'users' do Firestore
-        await delete_firebase_user(EntityType.STUDENT, id, current_user.tenant)
-
-        # 3. Deletar o documento do estudante da coleção 'students' do Firestore
-        await firestore_client.delete_document(
-            CollectionType.STUDENT.value, id
-        )
-
-        # 4. Atualizar contadores agregados na coleção 'metadata'
-        await metrics_service.update_metadata_on_crud(
-            CollectionType.STUDENT.value,
-            current_user.tenant,
-            operation="remove",
-            delta=1,
-        )
-
-        return BaseResponse(msg="Estudante deletado com sucesso")
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao deletar estudante: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao deletar estudante"}
             },
         ) from e
 
@@ -889,24 +478,34 @@ async def set_employee_individual(
 
 @router.post("/employees", response_model=EntityResponse[EmployeeModel])
 async def create_employee(
-    data: EmployeeCreateDTO = Body(..., description="Dados do funcionário"),
+    employee_data: EmployeeCreateDTO = Body(..., description="Dados do funcionário"),
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
     Cria um novo funcionário.
     """
     logger.info(
-        f"Recebida requisição para criar funcionário com dados: {data.model_dump()}"
+        f"Recebida requisição para criar funcionário com dados: {employee_data.model_dump()}"
     )
     try:
-        # Gerar ID padronizado utilizando gerador específico
+        # 1. Gerar ID do funcionário
         generated_id = IDGenerators.gerar_id_funcionario(
-            data.name, data.role, data.zip, data.phone
+            employee_data.name,
+            employee_data.role,
+            employee_data.zip,
+            employee_data.phone,
         )
-        logger.info(f"ID de funcionário gerado: {generated_id}")
+        logger.debug(f"ID de funcionário gerado: {generated_id}")
+
+        # 2. Verificar se o funcionário já existe (pelo ID gerado ou e-mail)
+        verify_existence(
+            collection=CollectionType.EMPLOYEE,
+            doc_id=generated_id,
+            tenant_id=current_user.tenant,
+        )
 
         employee_dto = EmployeeFirestoreDTO.from_create(
-            create_data=data, tenant=current_user.tenant
+            create_data=employee_data, tenant=current_user.tenant
         )
 
         # Criar funcionário no Firestore
@@ -926,12 +525,12 @@ async def create_employee(
 
         # Atualiza contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
-            "employees", current_user.tenant, operation="add", delta=1
+            "employees", current_user.tenant, operation="add"
         )
-        return {
-            "data": employee_dto.to_employee(generated_id),
-            "msg": "Funcionário criado com sucesso",
-        }
+        return EntityResponse[EmployeeModel](
+            data=employee_dto.to_employee(generated_id),
+            msg="Funcionário criado com sucesso",
+        )
 
     except ValueError as e:
         logger.error(f"Erro de validação ao criar funcionário: {str(e)}")
@@ -1783,3 +1382,47 @@ async def search_correspondent_user(
     user_data = user_docs[0]
     user_data["uid"] = user_data.pop("id")
     return UserModel(**user_data)
+
+
+def update_entity(
+    entity_id: str, model: BaseModel, collection: CollectionType, tenant: str
+) -> EntityResponse:
+    """Atualiza um documento na coleção especificada."""
+    try:
+        # Converte o modelo para um dicionário
+        update_data = model.model_dump(exclude_unset=True)
+
+        if not update_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "error": {
+                        "code": "UPDATE_ERROR",
+                        "msg": f"Nenhum dado para atualizar {collection.value} {entity_id}",
+                    }
+                },
+            )
+
+        # Atualize metadado de atualização
+        update_data["updated_at"] = datetime.now(UTC).isoformat()
+
+        # Atualiza o documento no Firestore
+        result = firestore_client.update_document(
+            collection.value, entity_id, update_data, tenant_id=tenant
+        )
+
+        return EntityResponse(
+            data=result, msg=f"{collection.value} {entity_id} atualizado com sucesso"
+        )
+
+    except Exception as e:
+        logger.error(f"Erro ao atualizar {collection.value} {entity_id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "UPDATE_ERROR",
+                    "msg": f"Erro ao atualizar {collection.value} {entity_id}",
+                }
+            },
+        ) from e

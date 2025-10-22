@@ -8,7 +8,7 @@ __all__ = [
     "StudentModel",
     "StudentAddressDTO",
     "StudentContactDTO",
-    "StudentCreationDTO",
+    "StudentCreateDTO",
     "StudentFirestoreDTO",
     "StudentGuardian",
 ]
@@ -92,12 +92,59 @@ class StudentFirestoreDTO(BaseModel):
             date: lambda v: v.isoformat(),
         }
 
-    def to_student(self) -> "StudentModel":
+    @classmethod
+    def from_create(
+        cls, create_data: "StudentCreateDTO", tenant: str
+    ) -> "StudentFirestoreDTO":
+        """
+        Cria um StudentFirestoreDTO a partir de StudentCreationDTO.
+
+        Args:
+            create_data: DTO com os dados de criação do estudante.
+            tenant: ID do tenant ao qual o estudante pertence.
+
+        Returns:
+            Uma instância de StudentFirestoreDTO.
+        """
+        now = datetime.now(UTC)
+
+        contact_dto = StudentContactDTO(
+            email=create_data.email, phone=create_data.student_phone
+        )
+        address_dto = StudentAddressDTO(
+            zip=create_data.zip,
+            complement=create_data.add_complement,
+            neighborhood=create_data.add_neighbor,
+        )
+        guardian_dto = (
+            StudentGuardian(
+                name=create_data.guardian_name,
+                email=create_data.guardian_email,
+                phone=create_data.guardian_phone,
+            )
+            if create_data.guardian_name
+            else None
+        )
+
+        return cls(
+            created_at=now,
+            updated_at=now,
+            occupation=create_data.student_occupation,
+            tenant_id=tenant,
+            contact=contact_dto,
+            address=address_dto,
+            guardian=guardian_dto,
+            active_until=create_data.active_until,
+            book=create_data.book,
+            name=create_data.name,
+        )
+
+    def to_model(self, student_id: str) -> "StudentModel":
         """
         Converte o DTO do aluno para o modelo Student.
         """
         return StudentModel(
-            id="",  # Será gerado automaticamente pelo construtor de Student
+            id=student_id,
             tenant_id=self.tenant_id,
             student_name=self.name,
             book=self.book or "CURSO_PADRAO",  # TODO: Mapear o curso real
@@ -158,8 +205,25 @@ class StudentFirestoreDTO(BaseModel):
         )
 
 
-class StudentCreationDTO(BaseModel):
-    """DTO para a criação de um novo estudante."""
+class StudentCreateDTO(BaseModel):
+    """
+    DTO para a criação de um novo estudante.
+
+    Args:
+        name: Nome do estudante.
+        email: Email do estudante.
+        tenant_id: ID do tenant ao qual o estudante pertence.
+        book: Livro associado ao estudante.
+        student_occupation: Ocupação do estudante.
+        student_phone: Telefone do estudante.
+        zip: Código postal do endereço do estudante.
+        add_neighbor: Bairro do endereço do estudante.
+        add_complement: Complemento do endereço do estudante.
+        guardian_name: Nome do responsável do estudante.
+        guardian_email: Email do responsável do estudante.
+        guardian_phone: Telefone do responsável do estudante.
+        active_until: Data de expiração da associação do estudante.
+    """
 
     name: str
     email: str

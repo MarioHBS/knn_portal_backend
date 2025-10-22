@@ -286,9 +286,9 @@ class IDGenerators:
         iniciais = cls.extrair_iniciais(nome)
 
         # 2. Obter código do curso
-        print(f"DEBUG: Curso recebido: '{curso}'")
-        print(f"DEBUG: Curso em maiúsculas: '{curso.upper()}'")
-        print(f"DEBUG: CURSO_CODES: {cls.CURSO_CODES}")
+        # logger.debug(f"Curso recebido: {curso}")
+        # logger.debug(f"Curso em maiúsculas: {curso.upper()}")
+        # logger.debug(f"CURSO_CODES: {CURSO_CODES}")
         codigo_curso = cls.CURSO_CODES.get(curso.upper(), "XX")
 
         # 3. Calcular tamanho da seção central
