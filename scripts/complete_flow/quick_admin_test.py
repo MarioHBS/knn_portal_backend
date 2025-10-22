@@ -249,18 +249,18 @@ ENDPOINTS = {
         "description": "Criar novo aluno",
         "category": "admin",
         "data": {
-            "name": "Aluno Teste Rápido",
-            "email": "aluno.rapido@example.com",
+            "name": f"Aluno Teste Rápido {int(time.time())}",
+            "email": f"aluno.teste.rapido.{int(time.time())}@example.com",
             "tenant_id": "knn-dev-tenant",
-            "book": "KIDS 1",
+            "book": "SEEDS 3",
             "student_occupation": "Estudante",
             "student_phone": "(48) 99999-8888",
             "zip": "88034-100",
             "add_neighbor": "Itacorubi",
             "add_complement": "apto 101",
-            "guardian_name": "Responsável Teste",
-            "guardian_email": "responsavel.teste@example.com",
-            "guardian_phone": "(48) 98888-7777",
+            # "guardian_name": "Responsável Teste",
+            # "guardian_email": "responsavel.teste@example.com",
+            # "guardian_phone": "(48) 98888-7777",
             "active_until": "2025-12-31T00:00:00",
         },
     },
@@ -281,7 +281,13 @@ ENDPOINTS = {
         "method": "DELETE",
         "description": "Excluir um aluno",
         "category": "admin",
-        "url_params": {"student_id": "STD_A1T0R088_K1"},
+        "url_params": {"student_id": "STD_A1T0R0H7_S3"},
+    },
+    "create_and_delete_student": {
+        "url": "/admin/students",  # Placeholder, a lógica será customizada
+        "method": "CUSTOM",
+        "description": "Criar e Excluir Aluno (Fluxo Completo)",
+        "category": "admin",
     },
 }
 
@@ -436,6 +442,72 @@ class QuickAdminTester:
         self.print_colored(f" {title} ", "cyan")
         self.print_colored("=" * 60, "cyan")
 
+    def _execute_custom_create_delete_student_flow(self) -> dict[str, Any]:
+        """
+        Executa o fluxo completo de criação e exclusão de um aluno.
+        """
+        results = []
+        student_id = None
+
+        # 1. Criar Aluno
+        self.print_colored("\n🚀 Iniciando fluxo: Criar e Excluir Aluno", "cyan")
+        self.print_colored("   Tentando criar aluno...", "blue")
+        create_result = self._execute_endpoint_request("create_student")
+        results.append(create_result)
+
+        if create_result["success"]:
+            self.print_colored("   ✅ Aluno criado com sucesso!", "green")
+            # Extrair student_id da resposta aninhada
+            student_id = create_result["response_data"].get("data", {}).get("id")
+            if not student_id:
+                self.print_colored(
+                    "   ❌ Não foi possível extrair o ID do aluno criado.", "red"
+                )
+                return {
+                    "endpoint_key": "create_and_delete_student",
+                    "success": False,
+                    "error": "ID do aluno não encontrado na resposta de criação",
+                    "timestamp": datetime.now().isoformat(),
+                    "details": results,
+                }
+            self.print_colored(f"   🆔 ID do aluno criado: {student_id}", "green")
+        else:
+            self.print_colored("   ❌ Falha ao criar aluno.", "red")
+            return {
+                "endpoint_key": "create_and_delete_student",
+                "success": False,
+                "error": "Falha na criação do aluno",
+                "timestamp": datetime.now().isoformat(),
+                "details": results,
+            }
+
+        # 2. Excluir Aluno
+        self.print_colored(f"   Tentando excluir aluno com ID: {student_id}...", "blue")
+        # Modificar a configuração de delete_student para usar o ID dinâmico
+        original_delete_student_url_params = ENDPOINTS["delete_student"]["url_params"]
+        ENDPOINTS["delete_student"]["url_params"] = {"student_id": student_id}
+
+        delete_result = self._execute_endpoint_request("delete_student")
+        results.append(delete_result)
+
+        # Restaurar a configuração original
+        ENDPOINTS["delete_student"]["url_params"] = original_delete_student_url_params
+
+        if delete_result["success"]:
+            self.print_colored("   ✅ Aluno excluído com sucesso!", "green")
+        else:
+            self.print_colored("   ❌ Falha ao excluir aluno.", "red")
+
+        overall_success = create_result["success"] and delete_result["success"]
+
+        return {
+            "endpoint_key": "create_and_delete_student",
+            "success": overall_success,
+            "error": None if overall_success else "Falha no fluxo de criação/exclusão",
+            "timestamp": datetime.now().isoformat(),
+            "details": results,
+        }
+
     def test_endpoint(self, endpoint_key: str) -> dict[str, Any]:
         """
         Testa um endpoint específico com renovação automática de JWT se necessário.
@@ -453,6 +525,19 @@ class QuickAdminTester:
                 "error": "Endpoint não encontrado",
                 "timestamp": datetime.now().isoformat(),
             }
+
+        endpoint_config = ENDPOINTS[endpoint_key]
+
+        if endpoint_config["method"] == "CUSTOM":
+            if endpoint_key == "create_and_delete_student":
+                return self._execute_custom_create_delete_student_flow()
+            else:
+                return {
+                    "endpoint_key": endpoint_key,
+                    "success": False,
+                    "error": f"Método CUSTOM não implementado para {endpoint_key}",
+                    "timestamp": datetime.now().isoformat(),
+                }
 
         # Primeira tentativa
         result = self._execute_endpoint_request(endpoint_key)

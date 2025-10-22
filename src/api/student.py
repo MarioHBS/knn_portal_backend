@@ -30,7 +30,7 @@ from src.models import (
     ValidationCodeCreationRequest,
 )
 from src.models.benefit import BenefitListResponse
-from src.models.student import StudentDTO, StudentModel
+from src.models.student import StudentFirestoreDTO, StudentModel
 from src.utils import logger
 from src.utils.partners_service import PartnersService
 
@@ -446,7 +446,7 @@ async def create_validation_code(
 
 
 # Endpoint de Perfil do Estudante
-@router.get("/me", response_model=StudentDTO)
+@router.get("/me", response_model=StudentFirestoreDTO)
 async def get_student_profile(
     current_user: JWTPayload = Depends(validate_student_role),
 ) -> StudentModel:
@@ -477,7 +477,7 @@ async def get_student_profile(
 
         # Validar/normalizar usando StudentDTO
         try:
-            student_dto = StudentDTO(**student_doc)
+            student_dto = StudentFirestoreDTO(**student_doc)
             student_obj = student_dto.to_student()
             # student_dto = StudentDTO.from_student(student_obj)  # Depois para StudentDTO
         except Exception as e:

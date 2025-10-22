@@ -66,7 +66,7 @@ class TestIDGenerators(unittest.TestCase):
 
     def test_gerar_id_aluno_completo(self):
         """Testa geração de ID completo para aluno."""
-        resultado = IDGenerators.gerar_id_aluno(
+        resultado = IDGenerators.generate_student_id(
             nome="João Silva Santos",
             curso="KIDS 1",
             cep="12345-678",
@@ -145,7 +145,7 @@ class TestIDGenerators(unittest.TestCase):
 
     def test_casos_extremos_dados_incompletos(self):
         """Testa geração de ID com dados incompletos."""
-        resultado = IDGenerators.gerar_id_aluno(
+        resultado = IDGenerators.generate_student_id(
             nome="João Silva", curso="KIDS 1", cep="", celular="11999999999", email=""
         )
         self.assertTrue(resultado.startswith("STD_"))
@@ -167,7 +167,7 @@ class TestIDGenerators(unittest.TestCase):
 
     def test_id_aluno_esperado_1(self):
         """Testa geração de ID específico para aluno - Caso 1."""
-        resultado = IDGenerators.gerar_id_aluno(
+        resultado = IDGenerators.generate_student_id(
             nome="João Silva Santos",
             curso="KIDS 1",
             cep="12345-678",
@@ -179,7 +179,7 @@ class TestIDGenerators(unittest.TestCase):
 
     def test_id_aluno_esperado_2(self):
         """Testa geração de ID específico para aluno - Caso 2."""
-        resultado = IDGenerators.gerar_id_aluno(
+        resultado = IDGenerators.generate_student_id(
             nome="Maria da Silva",
             curso="TEENS 2",
             cep="54321-123",
@@ -191,7 +191,7 @@ class TestIDGenerators(unittest.TestCase):
 
     def test_id_aluno_esperado_3(self):
         """Testa geração de ID específico para aluno - Caso 3."""
-        resultado = IDGenerators.gerar_id_aluno(
+        resultado = IDGenerators.generate_student_id(
             nome="Ana Paula",
             curso="ADVANCED 1",
             cep="98765-432",

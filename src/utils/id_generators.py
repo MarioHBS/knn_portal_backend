@@ -8,7 +8,9 @@ Este módulo implementa os algoritmos complexos de criação de IDs para:
 Todos os IDs têm exatamente 15 caracteres seguindo padrões específicos.
 """
 
+import random
 import re
+import string
 
 
 class IDGenerators:
@@ -265,7 +267,7 @@ class IDGenerators:
         return "".join(resultado)
 
     @classmethod
-    def gerar_id_aluno(
+    def generate_student_id(
         cls, nome: str, curso: str, cep: str = "", celular: str = "", email: str = ""
     ) -> str:
         """Gera ID para aluno seguindo o padrão STD_XXXXXXXX_XX.
@@ -284,6 +286,9 @@ class IDGenerators:
         iniciais = cls.extrair_iniciais(nome)
 
         # 2. Obter código do curso
+        print(f"DEBUG: Curso recebido: '{curso}'")
+        print(f"DEBUG: Curso em maiúsculas: '{curso.upper()}'")
+        print(f"DEBUG: CURSO_CODES: {cls.CURSO_CODES}")
         codigo_curso = cls.CURSO_CODES.get(curso.upper(), "XX")
 
         # 3. Calcular tamanho da seção central
@@ -304,11 +309,17 @@ class IDGenerators:
             iniciais, todos_digitos, tamanho_secao
         )
 
+        # 5. Adicionar um sufixo aleatório para garantir a unicidade
+        sufixo_aleatorio = "".join(
+            random.choices(string.ascii_uppercase + string.digits, k=2)
+        )
+        secao_central = secao_central[:-2] + sufixo_aleatorio
+
         # 6. Construir ID final
         return f"STD_{secao_central}_{codigo_curso}"
 
     @classmethod
-    def gerar_id_funcionario(
+    def generate_employee_id(
         cls, nome: str, cargo: str, cep: str = "", telefone: str = ""
     ) -> str:
         """Gera ID para funcionário seguindo o padrão EMP_XXXXXXXX_XX.
@@ -347,7 +358,7 @@ class IDGenerators:
         return f"EMP_{secao_central}_{codigo_cargo}"
 
     @classmethod
-    def gerar_id_parceiro(cls, trade_name: str, category: str, cnpj: str) -> str:
+    def generate_partner_id(cls, trade_name: str, category: str, cnpj: str) -> str:
         """Gera ID para parceiro seguindo o padrão PTN_XXXXXXX_XXX.
 
         Args:
@@ -380,6 +391,42 @@ class IDGenerators:
 
         # 7. Construir ID final
         return f"PTN_{secao_central}_{codigo_categoria}"
+
+    @classmethod
+    def generate_benefit_id(
+        cls, nome_parceiro: str, contador: int, tipo_beneficio: str
+    ) -> str:
+        """Gera ID único para benefício seguindo padrão simplificado.
+
+        Formato: BNF_[INICIAIS]_[CONTADOR]_[TIPO]
+
+        Args:
+            nome_parceiro: Nome completo do parceiro
+            contador: Número sequencial do benefício (0, 1, 2...)
+            tipo_beneficio: Tipo do benefício (DESCONTO, CASHBACK, etc.)
+
+        Returns:
+            ID único do benefício no formato BNF_[INICIAIS]_[CONTADOR]_[TIPO]
+
+        Examples:
+            >>> cls.gerar_id_beneficio("Autoescola Escórcio", 0, "DESCONTO")
+            'BNF_AE_00_DC'
+            >>> cls.gerar_id_beneficio("Colégio Adventista", 1, "FRETE GRÁTIS")
+            'BNF_CA_01_FG'
+        """
+        # Extrair iniciais do parceiro
+        iniciais = "".join(cls.extrair_iniciais(nome_parceiro))
+
+        # Formatar contador com 2 dígitos
+        contador_formatado = f"{contador:02d}"
+
+        # Obter código do tipo de benefício
+        codigo_tipo = cls.TIPO_BENEFICIO_CODES.get(tipo_beneficio.upper(), "DC")
+
+        # Montar ID final
+        id_beneficio = f"BNF_{iniciais}_{contador_formatado}_{codigo_tipo}"
+
+        return id_beneficio
 
     @classmethod
     def extract_partner_initials(cls, nome: str) -> str:
@@ -420,42 +467,6 @@ class IDGenerators:
         if len(parts) != 3:
             raise ValueError(f"ID do parceiro inválido: {partner_id}")
         return "".join(ch for ch in parts[1] if ch.isalpha())
-
-    @classmethod
-    def gerar_id_beneficio(
-        cls, nome_parceiro: str, contador: int, tipo_beneficio: str
-    ) -> str:
-        """Gera ID único para benefício seguindo padrão simplificado.
-
-        Formato: BNF_[INICIAIS]_[CONTADOR]_[TIPO]
-
-        Args:
-            nome_parceiro: Nome completo do parceiro
-            contador: Número sequencial do benefício (0, 1, 2...)
-            tipo_beneficio: Tipo do benefício (DESCONTO, CASHBACK, etc.)
-
-        Returns:
-            ID único do benefício no formato BNF_[INICIAIS]_[CONTADOR]_[TIPO]
-
-        Examples:
-            >>> cls.gerar_id_beneficio("Autoescola Escórcio", 0, "DESCONTO")
-            'BNF_AE_00_DC'
-            >>> cls.gerar_id_beneficio("Colégio Adventista", 1, "FRETE GRÁTIS")
-            'BNF_CA_01_FG'
-        """
-        # Extrair iniciais do parceiro
-        iniciais = "".join(cls.extrair_iniciais(nome_parceiro))
-
-        # Formatar contador com 2 dígitos
-        contador_formatado = f"{contador:02d}"
-
-        # Obter código do tipo de benefício
-        codigo_tipo = cls.TIPO_BENEFICIO_CODES.get(tipo_beneficio.upper(), "DC")
-
-        # Montar ID final
-        id_beneficio = f"BNF_{iniciais}_{contador_formatado}_{codigo_tipo}"
-
-        return id_beneficio
 
     @classmethod
     def gerar_id_beneficio_timestamp(

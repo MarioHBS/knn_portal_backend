@@ -36,7 +36,7 @@ from .student import (
     StudentAddressDTO,
     StudentContactDTO,
     StudentCreationDTO,
-    StudentDTO,
+    StudentFirestoreDTO,
     StudentGuardian,
     StudentModel,
 )
@@ -261,7 +261,7 @@ __all__ = [
     "FavoriteResponse",
     "StudentPartnerFavorite",
     "StudentModel",
-    "StudentDTO",
+    "StudentFirestoreDTO",
     "StudentContactDTO",
     "StudentAddressDTO",
     "StudentGuardian",

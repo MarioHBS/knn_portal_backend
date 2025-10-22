@@ -1,17 +1,15 @@
 """Modelos de dados para Estudantes."""
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 from pydantic import BaseModel, Field, field_validator
-
-from src.utils.id_generators import IDGenerators
 
 __all__ = [
     "StudentModel",
     "StudentAddressDTO",
     "StudentContactDTO",
     "StudentCreationDTO",
-    "StudentDTO",
+    "StudentFirestoreDTO",
     "StudentGuardian",
 ]
 
@@ -42,10 +40,13 @@ class StudentModel(BaseModel):
     benefits: list[str] | None = Field(
         None, description="Lista de benefícios associados ao estudante."
     )
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        description="Data de criação do estudante.",
+    )
     last_updated: datetime | None = Field(
         None, description="Data da última atualização do estudante."
     )
-
 
 
 class StudentContactDTO(BaseModel):
@@ -63,7 +64,7 @@ class StudentAddressDTO(BaseModel):
     neighborhood: str | None = None
 
 
-class StudentDTO(BaseModel):
+class StudentFirestoreDTO(BaseModel):
     """
     DTO do Aluno para leitura/escrita no Firestore.
 
@@ -73,8 +74,8 @@ class StudentDTO(BaseModel):
     como doc_id no Firestore.
     """
 
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
     occupation: str | None = None
     tenant_id: str
     contact: StudentContactDTO | None = None
@@ -119,9 +120,9 @@ class StudentDTO(BaseModel):
         )
 
     @classmethod
-    def from_student(cls, student: "StudentModel") -> "StudentDTO":
+    def from_student(cls, student: "StudentModel") -> "StudentFirestoreDTO":
         """
-        Converte um objeto Student para um StudentDTO.
+        Converte um objeto Student para um StudentFirestoreDTO.
         """
         contact_dto = StudentContactDTO(
             email=student.student_email, phone=student.student_phone
@@ -142,8 +143,10 @@ class StudentDTO(BaseModel):
         )
 
         return cls(
-            created_at=datetime.now(),  # Ou a data de criação real se disponível
-            updated_at=datetime.now(),  # Ou a data de atualização real se disponível
+            created_at=student.created_at,
+            updated_at=student.last_updated
+            if student.last_updated
+            else datetime.now(UTC),
             occupation=student.student_occupation,
             tenant_id=student.tenant_id,
             contact=contact_dto,

@@ -46,7 +46,7 @@ from src.models.partner import (
 )
 from src.models.student import (
     StudentCreationDTO,
-    StudentDTO,
+    StudentFirestoreDTO,
     StudentGuardian,
     StudentModel,
     StudentUpdateDTO,
@@ -398,7 +398,7 @@ async def get_student_list(
         items = []
         for item in students:
             try:
-                items.append(StudentDTO(**item).to_student())
+                items.append(StudentFirestoreDTO(**item).to_student())
             except ValidationError as e:
                 student_id = item.get("id", "unknown")
                 logger.error(
@@ -450,7 +450,7 @@ async def get_student_individual(
                 },
             )
 
-        student = StudentDTO(**student_data).to_student()
+        student = StudentFirestoreDTO(**student_data).to_student()
         return EntityResponse[StudentModel](
             data=student, msg="Estudante encontrado com sucesso"
         )
@@ -556,7 +556,7 @@ async def set_student_individual(
         updated_student_data = await firestore_client.get_document(
             "students", id, tenant_id=current_user.tenant
         )
-        student = StudentDTO(**updated_student_data).to_student()
+        student = StudentFirestoreDTO(**updated_student_data).to_student()
 
         return EntityResponse[StudentModel](
             data=student, msg="Estudante atualizado com sucesso"
@@ -575,6 +575,7 @@ async def set_student_individual(
 
 
 @router.post("/students", response_model=EntityResponse[StudentModel])
+@router.post("/students", response_model=EntityResponse[StudentModel])
 async def create_student(
     student_data: StudentCreationDTO,
     current_user: JWTPayload = Depends(validate_admin_role),
@@ -583,8 +584,66 @@ async def create_student(
     Cria um novo estudante.
     """
     try:
-        # O Pydantic já validou os dados de entrada ao converter para StudentCreationDTO
-        # Agora, convertemos o DTO de criação para o modelo de domínio Student
+        print("DEBUG: Iniciando create_student")
+        # 1. Gerar ID do estudante
+        student_id = IDGenerators.generate_student_id(
+            nome=student_data.name,
+            curso=student_data.book,  # Assumindo que 'book' é o curso
+            cep=student_data.zip or "",
+            celular=student_data.student_phone or "",
+            email=student_data.email,
+        )
+        print(f"DEBUG: ID do estudante gerado: {student_id}")
+
+        # 2. Verificar se o estudante já existe (pelo ID gerado ou e-mail)
+        existing_student_by_id = await firestore_client.get_document(
+            CollectionType.STUDENT, student_id, current_user.tenant
+        )
+        print(
+            f"DEBUG: Verificação de estudante por ID concluída. Existe: {bool(existing_student_by_id)}"
+        )
+        if existing_student_by_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error": {
+                        "code": "STUDENT_ALREADY_EXISTS",
+                        "msg": f"Já existe um estudante com o ID {student_id}.",
+                    }
+                },
+            )
+
+        # Verificar se já existe um usuário com este e-mail no Firebase/Firestore
+        existing_user_by_email = await firestore_client.query_documents(
+            collection=CollectionType.USER.value,
+            filters=[("email", "==", student_data.email)],
+            tenant_id=current_user.tenant
+        )
+        print(
+            f"DEBUG: Verificação de usuário por e-mail concluída. Existe: {bool(existing_user_by_email)}"
+        )
+        if existing_user_by_email:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error": {
+                        "code": "EMAIL_ALREADY_IN_USE",
+                        "msg": "Já existe um usuário com este e-mail.",
+                    }
+                },
+            )
+
+        # 3. Criar usuário no Firebase Authentication e na coleção 'users' do Firestore
+        user_record = await create_firebase_user(
+            entity=EntityType.STUDENT,
+            entity_name=student_data.name,
+            entity_email=student_data.email,
+            entity_id=student_id,
+            tenant_id=current_user.tenant,
+        )
+        print(f"DEBUG: Usuário Firebase criado para {student_id}")
+
+        # 4. Preparar dados do estudante para o Firestore
         guardian = None
         if student_data.guardian_name and student_data.guardian_email:
             guardian = StudentGuardian(
@@ -592,8 +651,10 @@ async def create_student(
                 email=student_data.guardian_email,
                 phone=student_data.guardian_phone or "",
             )
+        print("DEBUG: Dados do guardião preparados")
 
         the_student = StudentModel(
+            id=student_id,  # Usar o ID gerado
             tenant_id=current_user.tenant,
             student_name=student_data.name,
             book=student_data.book,
@@ -606,54 +667,39 @@ async def create_student(
             guardian=guardian,
             active_until=student_data.active_until,
         )
+        print("DEBUG: StudentModel criado")
 
-        # O ID do estudante é gerado no construtor de Student
-        # Agora, convertemos o modelo de domínio para o DTO do Firestore
-        dto = StudentDTO.from_student(the_student)
+        # Converter o modelo de domínio para o DTO do Firestore
+        dto = StudentFirestoreDTO.from_student(the_student)
+        print("DEBUG: StudentDTO criado")
 
-        # Adicionar metadados de tempo
-        current_time = datetime.now(UTC)
-        dto.created_at = current_time
-        dto.updated_at = current_time
-
-        # Criar usuário no Firebase Authentication
-        auth_service = AuthService()
-        temp_password = generate_temporary_password()
-        try:
-            auth_service.create_user(email=student_data.email, password=temp_password)
-            # Enviar e-mail com a senha temporária
-            email_service = EmailService()
-            email_service.send_email(
-                to_email=student_data.email,
-                subject="Bem-vindo ao Journey Club!",
-                body=f"Sua senha temporária é: {temp_password}",
-            )
-        except Exception as e:
-            logger.error(f"Erro ao criar usuário no Firebase Auth: {str(e)}")
-            # Decidir se a falha na criação do usuário no Auth deve impedir a criação do estudante no Firestore
-
-        # Criar estudante no Firestore
-        result = await firestore_client.create_document(
-            "students", dto.model_dump(exclude_none=True), the_student.id
+        # 5. Salvar estudante na coleção 'students' do Firestore
+        await firestore_client.create_document(
+            CollectionType.STUDENT, doc_id=student_id, data=dto.model_dump()
         )
 
-        # Atualiza contadores agregados na coleção 'metadata'
+        # 6. Atualizar contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
-            "students", current_user.tenant, operation="add", delta=1
+            CollectionType.STUDENT.value, current_user.tenant, operation="add", delta=1
         )
-        return {"data": the_student, "msg": "Estudante criado com sucesso"}
 
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail={"error": {"code": "VALIDATION_ERROR", "msg": str(e)}},
-        ) from e
+        # 7. Retornar resposta
+        return EntityResponse[StudentModel](
+            data=the_student, msg="Estudante criado com sucesso"
+        )
+
+    except HTTPException as e:
+        print(f"DEBUG: HTTPException capturada: {e.detail}")
+        raise e
     except Exception as e:
         logger.error(f"Erro ao criar estudante: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao criar estudante"}
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": f"Erro ao criar estudante: {e}",
+                }
             },
         ) from e
 
@@ -664,65 +710,40 @@ async def delete_student(
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
-    Exclui um estudante existente.
+    Deleta um estudante pelo ID.
     """
-    auth_service = AuthService()
     try:
-        # Verificar se o estudante existe
-        existing_student = await firestore_client.get_document(
-            "students", id, tenant_id=current_user.tenant
+        # 1. Verificar a existência do estudante
+        await verify_existence(
+            CollectionType.STUDENT, id, current_user.tenant
         )
-        if (
-            not existing_student
-            or existing_student.get("tenant_id") != current_user.tenant
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Estudante não encontrado"}
-                },
-            )
 
-        # Excluir usuário do Firebase Authentication
-        try:
-            user = auth.get_user_by_email(existing_student["contact"]["email"])
-            auth_service.delete_user(user.uid)
-        except auth.UserNotFoundError:
-            logger.warning(
-                f"Usuário com e-mail {existing_student['contact']['email']} não encontrado no Firebase Authentication."
-            )
-        except Exception as e:
-            logger.error(
-                f"Erro ao excluir usuário do Firebase Authentication: {str(e)}"
-            )
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail={
-                    "error": {
-                        "code": "AUTH_ERROR",
-                        "msg": "Erro ao excluir usuário do Firebase Authentication",
-                    }
-                },
-            ) from e
+        # 2. Deletar usuário do Firebase Authentication e da coleção 'users' do Firestore
+        await delete_firebase_user(EntityType.STUDENT, id, current_user.tenant)
 
-        # Excluir estudante do Firestore
-        await firestore_client.delete_document("students", id)
+        # 3. Deletar o documento do estudante da coleção 'students' do Firestore
+        await firestore_client.delete_document(
+            CollectionType.STUDENT.value, id
+        )
 
-        # Atualiza contadores agregados na coleção 'metadata'
+        # 4. Atualizar contadores agregados na coleção 'metadata'
         await metrics_service.update_metadata_on_crud(
-            "students", current_user.tenant, operation="delete", delta=-1
+            CollectionType.STUDENT.value,
+            current_user.tenant,
+            operation="remove",
+            delta=1,
         )
 
-        return EntityResponse(data={"id": id}, msg="Estudante excluído com sucesso")
+        return BaseResponse(msg="Estudante deletado com sucesso")
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Erro ao excluir estudante: {str(e)}")
+        logger.error(f"Erro ao deletar estudante: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao excluir estudante"}
+                "error": {"code": "SERVER_ERROR", "msg": "Erro ao deletar estudante"}
             },
         ) from e
 
