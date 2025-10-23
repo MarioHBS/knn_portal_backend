@@ -25,7 +25,12 @@ from datetime import datetime
 from typing import Any
 
 import requests
-from base_auth_test import BACKEND_BASE_URL, TEST_USERS, BaseAuthenticationTester
+
+from scripts.complete_flow.base_auth_test import (
+    BACKEND_BASE_URL,
+    TEST_USERS,
+    BaseAuthenticationTester,
+)
 
 # Garantir que o diretório raiz do projeto esteja no PYTHONPATH para importar 'src.*'
 try:
@@ -281,7 +286,7 @@ ENDPOINTS = {
         "method": "DELETE",
         "description": "Excluir um aluno",
         "category": "admin",
-        "url_params": {"student_id": "STD_A1T0R0H7_S3"},
+        "url_params": {"student_id": "STD_A1T0R088_S3"},
     },
     "create_and_delete_student": {
         "url": "/admin/students",  # Placeholder, a lógica será customizada
@@ -1036,7 +1041,7 @@ class QuickAdminTester:
                     "method": method,
                     "description": endpoint_config["description"],
                     "status_code": response.status_code,
-                    "success": response.status_code in [200, 201],
+                    "success": response.status_code in [200, 201, 204],
                     "timestamp": datetime.now().isoformat(),
                     "token_expired": False,
                 }
