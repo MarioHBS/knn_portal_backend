@@ -19,6 +19,7 @@ from slowapi.errors import RateLimitExceeded
 from src.api import (
     admin,
     admin_metrics,
+    admin_partner,
     admin_student,
     courses,
     employee,
@@ -109,6 +110,7 @@ async def validation_exception_handler(request, exc):
 app.include_router(courses.router, prefix=f"/{API_VERSION}/courses", tags=["Courses"])
 app.include_router(admin.router, prefix=f"/{API_VERSION}/admin", tags=["Admin"])
 app.include_router(admin_student.router, prefix=f"/{API_VERSION}/admin", tags=["Admin - Students"])
+app.include_router(admin_partner.router, prefix=f"/{API_VERSION}/admin", tags=["Admin - Partners"])
 app.include_router(
     admin_metrics.router, prefix=f"/{API_VERSION}", tags=["Admin Metrics"]
 )
