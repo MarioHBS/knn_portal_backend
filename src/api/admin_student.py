@@ -17,10 +17,9 @@ from src.models.student import (
     StudentModel,
     StudentUpdateDTO,
 )
-from src.utils import metrics_service
 from src.utils.id_generators import IDGenerators
 from src.utils.logging import logger
-from src.utils.metrics_service import MetricsService
+from src.utils.metrics_service import CrudOperation, MetricsService
 
 metrics_service_instance = MetricsService()
 
@@ -51,7 +50,7 @@ async def create_student(
             celular=student_data.student_phone or "",
             email=student_data.email,
         )
-        logger.debug(f"ID do estudante gerado: {student_id}")
+        logger.debug(f"ID do aluno gerado: {student_id}")
 
         # 2. Verificar se o estudante já existe (pelo ID gerado ou e-mail)
         verify_existence(
@@ -83,9 +82,11 @@ async def create_student(
         )
         # logger.info(f"Usuário Firebase criado para {student_id}")
 
-        # 4. Atualiza contadores agregados na coleção 'metadata'
+        # 4. Atualizar contadores agregados na coleção 'metadata'
         await metrics_service_instance.update_metadata_on_crud(
-            CollectionType.STUDENT.value, student_dto.tenant_id, operation="add"
+            CollectionType.STUDENT.value,
+            student_dto.tenant_id,
+            operation=CrudOperation.ADD,
         )
 
         # 5. Retornar resposta
@@ -275,10 +276,10 @@ async def delete_student(
         await firestore_client.delete_document(CollectionType.STUDENT.value, id)
 
         # 4. Atualizar contadores agregados na coleção 'metadata'
-        await metrics_service.update_metadata_on_crud(
-            CollectionType.STUDENT.value,
+        await metrics_service_instance.update_metadata_on_crud(
+            CollectionType.STUDENT,
             current_user.tenant,
-            operation="remove",
+            operation=CrudOperation.SUB,
         )
 
         return BaseResponse(msg="Estudante excluído com sucesso")

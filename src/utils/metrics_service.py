@@ -7,6 +7,7 @@ de métricas de negócio e performance do sistema.
 
 import logging
 from datetime import datetime, timedelta
+from enum import Enum
 from typing import Any
 
 from google.cloud import firestore
@@ -15,8 +16,15 @@ from src.config import FIRESTORE_PROJECT
 from src.db.firestore import firestore_client
 from src.db.postgres import postgres_client
 from src.db.unified_client import with_circuit_breaker
+from src.models import CollectionType
 
 logger = logging.getLogger(__name__)
+
+
+class CrudOperation(Enum):
+    ADD = "add"
+    SUB = "sub"
+    SET = "set"
 
 
 class MetricsService:
@@ -279,9 +287,9 @@ class MetricsService:
 
     async def update_metadata_on_crud(
         self,
-        collection_name: str,
+        collection: CollectionType,
         tenant_id: str,
-        operation: str = "add",
+        operation: CrudOperation = CrudOperation.ADD,
         delta: int = 1,
         set_total: int | None = None,
     ) -> None:
@@ -290,7 +298,7 @@ class MetricsService:
         em 'metadata' após operações CRUD nas coleções informadas.
 
         Agora suporta atualizações eficientes via operação incremental:
-        - operation: "add" (incrementa), "sub" (decrementa) ou "set" (define valor);
+        - operation: CrudOperation.ADD (incrementa), CrudOperation.SUB (decrementa) ou CrudOperation.SET (define valor);
         - delta: quantidade a incrementar/decrementar (default: 1);
         - set_total: quando informado, força o total explicitamente.
 
@@ -298,26 +306,27 @@ class MetricsService:
         """
         try:
             names_map = {
-                "students": "student_info",
-                "employees": "employee_info",
-                "partners": "partner_info",
-                "benefits": "benefit_info",
+                CollectionType.STUDENT: "student_info",
+                CollectionType.EMPLOYEE: "employee_info",
+                CollectionType.PARTNER: "partner_info",
+                CollectionType.BENEFIT: "benefit_info",
             }
 
-            doc_name = names_map.get(collection_name)
+            doc_name = names_map.get(collection)
             if not doc_name:
                 logger.warning(
-                    f"Coleção '{collection_name}' não suportada para atualização de metadata"
+                    f"Coleção '{collection}' não suportada para atualização de metadata"
                 )
                 return
 
             # Normalizar operação
-            op = (operation or "add").lower()
-            if op not in {"add", "sub", "set"}:
-                logger.warning(
-                    f"Operação '{operation}' inválida para update_metadata_on_crud; usando 'add'"
-                )
-                op = "add"
+            # A operação já é um Enum, então podemos usar diretamente
+            # op = (operation or CrudOperation.ADD).value
+            # if op not in {CrudOperation.ADD.value, CrudOperation.SUB.value, CrudOperation.SET.value}:
+            #     logger.warning(
+            #         f"Operação '{operation.value}' inválida para update_metadata_on_crud; usando 'add'"
+            #     )
+            #     op = CrudOperation.ADD.value
 
             # Usar horário de Brasília (America/Sao_Paulo) para o campo last_updated
             # O nome canônico do fuso horário para São Paulo é "America/Sao_Paulo".
@@ -328,7 +337,7 @@ class MetricsService:
             doc_ref = self.db.collection("metadata").document(doc_id)
 
             # Se for 'set' ou set_total fornecido, definir valor explicitamente
-            if op == "set" or set_total is not None:
+            if operation == CrudOperation.SET or set_total is not None:
                 total_val = set_total if set_total is not None else int(delta)
                 await doc_ref.set(
                     {
@@ -344,7 +353,9 @@ class MetricsService:
                 return
 
             # Operação incremental: add/sub
-            increment_value = abs(int(delta)) if op == "add" else -abs(int(delta))
+            increment_value = (
+                abs(int(delta)) if operation == CrudOperation.ADD else -abs(int(delta))
+            )
 
             # Garantir existência do documento para permitir update com Increment
             doc_snapshot = await doc_ref.get()
@@ -360,12 +371,12 @@ class MetricsService:
             )
 
             logger.info(
-                f"Metadata '{doc_id}' atualizada via {op.upper()} delta={delta}, last_updated={brt_now_iso}"
+                f"Metadata '{doc_id}' atualizada via {operation.value.upper()} delta={delta}, last_updated={brt_now_iso}"
             )
 
         except Exception as e:
             logger.error(
-                f"Erro ao atualizar metadata para coleção '{collection_name}' (tenant {tenant_id}): {str(e)}"
+                f"Erro ao atualizar metadata para coleção '{collection}' (tenant {tenant_id}): {str(e)}"
             )
 
     async def _get_user_metrics(self, tenant_id: str) -> dict[str, Any]:

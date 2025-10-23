@@ -309,12 +309,6 @@ class IDGenerators:
             iniciais, todos_digitos, tamanho_secao
         )
 
-        # 5. Adicionar um sufixo aleatório para garantir a unicidade
-        sufixo_aleatorio = "".join(
-            random.choices(string.ascii_uppercase + string.digits, k=2)
-        )
-        secao_central = secao_central[:-2] + sufixo_aleatorio
-
         # 6. Construir ID final
         return f"STD_{secao_central}_{codigo_curso}"
 
