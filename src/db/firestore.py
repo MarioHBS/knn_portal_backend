@@ -2,13 +2,11 @@
 Implementação da camada de acesso ao Firestore.
 """
 
+import asyncio
 import json
-import uuid
 from typing import Any
 
-from google.api_core.exceptions import FailedPrecondition
 from google.auth import default
-from google.cloud import firestore
 from google.cloud.firestore import Client
 from google.oauth2 import service_account
 
@@ -221,205 +219,49 @@ class FirestoreClient:
             # Aplicar filtros adicionais
             if filters:
                 if isinstance(filters, dict):
-                    for key, value in filters.items():
-                        query = query.where(key, "==", value)
+                    for field, value in filters.items():
+                        query = query.filter(field, "==", value)
                 elif isinstance(filters, list):
                     for f in filters:
                         if len(f) == 3:
                             field, op, value = f
-                            query = query.where(field, op, value)
+                            query = query.filter(field, op, value)
 
             # Aplicar ordenação
             if order_by:
                 if isinstance(order_by, str):
                     query = query.order_by(order_by)
                 elif isinstance(order_by, list):
-                    for field, direction in order_by:
-                        query = query.order_by(field, direction=direction)
+                    for ob_field, ob_direction in order_by:
+                        query = query.order_by(ob_field, direction=ob_direction)
 
             # Aplicar paginação
-            if offset > 0:
-                query = query.offset(offset)
+            query = query.limit(limit).offset(offset)
 
-            docs = list(query.limit(limit).stream())
+            def sync_stream():
+                docs = []
+                for doc in query.stream():
+                    doc_data = doc.to_dict()
+                    doc_data["id"] = doc.id
+                    docs.append(doc_data)
+                return docs
 
-            # Converter para dicionários
-            return [{**doc.to_dict(), "id": doc.id} for doc in docs]
+            documents = await asyncio.to_thread(sync_stream)
 
-        except FailedPrecondition as e:
-            logger.error(
-                f"Erro de pré-condição ao consultar documentos em {collection}: {e!r}"
-            )
-            raise e
+            return documents
         except Exception as e:
-            logger.error(
-                f"Erro detalhado ao consultar documentos em {collection}: {e!r}"
-            )
-            raise Exception(f"Erro ao consultar documentos em {collection}") from e
-
-    @staticmethod
-    async def create_document(
-        collection: str, data: dict[str, Any], doc_id: str | None = None
-    ) -> dict[str, Any]:
-        """
-        Cria um documento no Firestore.
-        """
-        if not db:
-            logger.error("Firestore não inicializado")
-            return None
-
-        try:
-            # Gerar ID se não fornecido
-            if not doc_id:
-                doc_id = str(uuid.uuid4())
-
-            # Adicionar timestamp de criação
-            data["created_at"] = firestore.SERVER_TIMESTAMP
-
-            # Criar documento
-            doc_ref = db.collection(collection).document(doc_id)
-            doc_ref.set(data)
-
-            # Obter documento criado
-            doc = doc_ref.get()
-            return {**doc.to_dict(), "id": doc.id}
-        except Exception as e:
-            logger.error(f"Erro ao criar documento em {collection}: {str(e)}")
-            raise Exception(f"Erro ao criar documento em {collection}") from e
-
-    @staticmethod
-    def update_document(
-        collection: str, doc_id: str, data: dict[str, Any], tenant_id: str | None = None
-    ) -> dict[str, Any]:
-        """
-        Atualiza um documento no Firestore, verificando opcionalmente o tenant_id.
-        """
-        if not db:
-            logger.error("Firestore não inicializado")
-            return None
-
-        try:
-            # Se um tenant_id for fornecido, verificar a propriedade do documento
-            if tenant_id:
-                existing_doc = FirestoreClient.get_document(
-                    collection=collection, doc_id=doc_id, tenant_id=tenant_id
-                )
-                if not existing_doc:
-                    raise Exception(
-                        f"Documento {collection}/{doc_id} não encontrado ou acesso negado."
-                    )
-
-            # Adicionar timestamp de atualização
-            data["updated_at"] = firestore.SERVER_TIMESTAMP
-
-            # Atualizar documento
-            doc_ref = db.collection(collection).document(doc_id)
-            doc_ref.update(data)  # update() é síncrono
-
-            # Obter documento atualizado
-            doc = doc_ref.get()
-            return {**doc.to_dict(), "id": doc.id}
-        except Exception as e:
-            logger.error(f"Erro ao atualizar documento {collection}/{doc_id}: {str(e)}")
-            raise Exception(f"Erro ao atualizar documento {collection}/{doc_id}") from e
-
-    @staticmethod
-    async def delete_document(collection: str, doc_id: str) -> bool:
-        """
-        Remove um documento do Firestore.
-        """
-        if not db:
-            logger.error("Firestore não inicializado")
-            return False
-
-        try:
-            db.collection(collection).document(doc_id).delete()
-            return True
-        except Exception as e:
-            logger.error(f"Erro ao remover documento {collection}/{doc_id}: {str(e)}")
-            raise Exception(f"Erro ao remover documento {collection}/{doc_id}") from e
-
-    @staticmethod
-    async def delete_field(collection: str, doc_id: str, field_name: str) -> bool:
-        """
-        Remove um campo específico de um documento no Firestore.
-
-        Args:
-            collection: Nome da coleção
-            doc_id: ID do documento
-            field_name: Nome do campo a ser removido
-
-        Returns:
-            bool: True se a operação foi bem-sucedida
-        """
-        if not db:
-            logger.error("Firestore não inicializado")
-            return False
-
-        try:
-            doc_ref = db.collection(collection).document(doc_id)
-            doc_ref.update({field_name: firestore.DELETE_FIELD})
-            return True
-        except Exception as e:
-            logger.error(
-                f"Erro ao remover campo {field_name} do documento {collection}/{doc_id}: {str(e)}"
-            )
-            raise Exception(
-                f"Erro ao remover campo {field_name} do documento {collection}/{doc_id}"
-            ) from e
-
-    @staticmethod
-    async def batch_operation(operations: list[dict[str, Any]]) -> bool:
-        """
-        Executa operações em lote no Firestore.
-
-        Args:
-            operations: Lista de operações no formato:
-                {
-                    "operation": "create|update|delete",
-                    "collection": "nome_colecao",
-                    "doc_id": "id_documento",
-                    "data": {...}  # Apenas para create/update
-                }
-        """
-        if not db:
-            logger.error("Firestore não inicializado")
-            return False
-
-        try:
-            batch = db.batch()
-
-            for op in operations:
-                operation = op.get("operation")
-                collection = op.get("collection")
-                doc_id = op.get("doc_id")
-                data = op.get("data", {})
-
-                doc_ref = db.collection(collection).document(doc_id)
-
-                if operation == "create":
-                    data["created_at"] = firestore.SERVER_TIMESTAMP
-                    batch.set(doc_ref, data)
-                elif operation == "update":
-                    data["updated_at"] = firestore.SERVER_TIMESTAMP
-                    batch.update(doc_ref, data)
-                elif operation == "delete":
-                    batch.delete(doc_ref)
-
-            batch.commit()
-            return True
-        except Exception as e:
-            logger.error(f"Erro ao executar operações em lote: {str(e)}")
-            raise Exception("Erro ao executar operações em lote") from e
+            logger.error(f"Erro ao consultar documentos em {collection}: {str(e)}")
+            return []
 
     @staticmethod
     async def get_collection_count(
         collection: str,
+        *,
         tenant_id: str | None = None,
-        filters: dict[str, Any] | list[tuple] | None = None,
+        filters: dict[str, Any] | None = None,
     ) -> int:
         """
-        Conta o número de documentos em uma coleção, com filtros opcionais.
+        Conta documentos em uma coleção com base em filtros.
         """
         if not db:
             logger.error("Firestore não inicializado")
@@ -436,20 +278,20 @@ class FirestoreClient:
             if filters:
                 if isinstance(filters, dict):
                     for field, value in filters.items():
-                        query = query.where(field, "==", value)
+                        query = query.filter(field, "==", value)
                 elif isinstance(filters, list):
                     for f in filters:
                         if len(f) == 3:
                             field, op, value = f
-                            query = query.where(field, op, value)
+                            query = query.filter(field, op, value)
 
             # A contagem de documentos é feita com uma agregação
             aggregation_query = query.count()
-            result = aggregation_query.get()
+            result = await asyncio.to_thread(aggregation_query.get)
 
-            # O resultado é uma lista de alias de agregação
-            if result and result[0]:
-                return result[0].value
+            # O resultado é uma lista de listas de alias de agregação
+            if result and result[0] and hasattr(result[0][0], "value"):
+                return result[0][0].value
 
             return 0
         except Exception as e:

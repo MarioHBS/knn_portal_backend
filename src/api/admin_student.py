@@ -129,25 +129,43 @@ async def get_student_list(
     Lista todos os estudantes com paginação.
     """
     try:
+        logger.info("🔍 INICIANDO BUSCA DE ESTUDANTES")
+        logger.info(
+            f"📋 Parâmetros: limit={limit}, offset={offset}, tenant={current_user.tenant}"
+        )
+
         # 1. Buscar lista de estudantes
+        logger.info("🔄 Executando query_documents...")
         items = await firestore_client.query_documents(
             CollectionType.STUDENT.value,
             tenant_id=current_user.tenant,
             limit=limit,
             offset=offset,
         )
-        # logger.info(f"Busca realizada com sucesso. Lista: {items}")
+        logger.info(f"📊 Query retornou {len(items)} documentos")
+
+        if items:
+            logger.info(
+                f"📝 Primeiro documento: {items[0].get('id', 'sem_id')} - {items[0].get('name', 'sem_nome')}"
+            )
+        else:
+            logger.warning("⚠️ Nenhum documento retornado pela query!")
 
         students = []
-        for item in items:
+        for i, item in enumerate(items):
             try:
-                students.append(
-                    StudentFirestoreDTO(**item).to_model(item.get("id", "unknown"))
+                logger.info(
+                    f"🔄 Processando estudante {i+1}/{len(items)}: {item.get('id', 'sem_id')}"
                 )
+                student_model = StudentFirestoreDTO(**item).to_model(
+                    item.get("id", "unknown")
+                )
+                students.append(student_model)
+                logger.info(f"✅ Estudante {i+1} processado com sucesso")
             except ValidationError as e:
                 student_id = item.get("id", "unknown")
                 logger.error(
-                    f"Pydantic Validation Error for student ID {student_id}: {e}, Data: {item}"
+                    f"❌ Pydantic Validation Error for student ID {student_id}: {e}, Data: {item}"
                 )
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -159,17 +177,36 @@ async def get_student_list(
                     },
                 ) from e
 
-        total = len(students)
-        return PaginatedResponse[StudentModel](
-            items=students,
-            total=total,
-            page=(offset // limit) + 1,
-            per_page=limit,
-            pages=(total + limit - 1) // limit,
+        logger.info(f"📊 Total de estudantes processados: {len(students)}")
+
+        # 2. Obter a contagem total de estudantes
+        logger.info("🔄 Obtendo contagem total...")
+        total = await firestore_client.get_collection_count(
+            CollectionType.STUDENT.value, tenant_id=current_user.tenant
+        )
+        logger.info(f"📊 Contagem total: {total}")
+
+        # 3. Criar resposta paginada
+        pages = (total + limit - 1) // limit if limit > 0 else 0
+        page = (offset // limit) + 1
+
+        logger.info(
+            f"📄 Criando resposta paginada: items={len(students)}, total={total}, page={page}, per_page={limit}, pages={pages}"
         )
 
+        response = PaginatedResponse[StudentModel](
+            items=students,
+            total=total,
+            page=page,
+            per_page=limit,
+            pages=pages,
+        )
+
+        logger.info(f"✅ RESPOSTA FINAL: {len(response.items)} estudantes retornados")
+        return response
+
     except Exception as e:
-        logger.error(f"Error listing students: {str(e)}")
+        logger.error(f"❌ Error listing students: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": {"code": "SERVER_ERROR", "msg": "Error listing students"}},

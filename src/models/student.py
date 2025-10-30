@@ -227,7 +227,7 @@ class StudentCreateDTO(BaseModel):
 
     name: str
     email: str
-    tenant_id: str
+    # tenant_id: str
     book: str
     student_occupation: str | None = None
     student_phone: str | None = None

@@ -1,3 +1,4 @@
+import random
 import secrets
 import string
 
@@ -6,10 +7,27 @@ from firebase_admin import auth, credentials
 
 
 def generate_temporary_password(length: int = 12) -> str:
-    """Gera uma senha temporária segura."""
+    """Gera uma senha temporária segura atendendo aos requisitos do Firebase"""
+    if length < 8:
+        length = 8
+
+    # Define o alfabeto
     alphabet = string.ascii_letters + string.digits
-    password = "".join(secrets.choice(alphabet) for i in range(length))
-    return password
+    # Garante pelo menos um dígito, uma letra maiúscula e uma minúscula
+    password_chars = [
+        secrets.choice(string.digits),
+        secrets.choice(string.ascii_uppercase),
+        secrets.choice(string.ascii_lowercase),
+    ]
+
+    # Preenche o restante da senha com caracteres aleatórios
+    for _ in range(length - len(password_chars)):
+        password_chars.append(secrets.choice(alphabet))
+
+    # Embaralha a lista para garantir a aleatoriedade
+    random.shuffle(password_chars)
+
+    return "".join(password_chars)
 
 
 class AuthService:
