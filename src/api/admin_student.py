@@ -42,7 +42,7 @@ async def create_student(
     Cria um novo Aluno.
     """
     try:
-        # 1. Gerar ID do estudante
+        # 1. Gerar ID do aluno
         student_id = IDGenerators.generate_student_id(
             nome=student_data.name,
             curso=student_data.book,  # Assumindo que 'book' é o curso
@@ -72,7 +72,7 @@ async def create_student(
         )
         logger.info(f"Aluno criado com sucesso no Firestore: {student_id}")
 
-        # 3. Criar usuário no Firebase Authentication e na coleção 'users' do Firestore
+        # 4. Criar usuário no Firebase Authentication e na coleção 'users' do Firestore
         await create_firebase_user(
             entity=EntityType.STUDENT,
             entity_name=student_dto.name,
@@ -82,9 +82,9 @@ async def create_student(
         )
         # logger.info(f"Usuário Firebase criado para {student_id}")
 
-        # 4. Atualizar contadores agregados na coleção 'metadata'
+        # 5. Atualizar contadores agregados na coleção 'metadata'
         await metrics_service_instance.update_metadata_on_crud(
-            CollectionType.STUDENT.value,
+            CollectionType.STUDENT,
             student_dto.tenant_id,
             operation=CrudOperation.ADD,
         )
@@ -136,11 +136,14 @@ async def get_student_list(
             limit=limit,
             offset=offset,
         )
+        # logger.info(f"Busca realizada com sucesso. Lista: {items}")
 
         students = []
         for item in items:
             try:
-                students.append(StudentFirestoreDTO(**item).to_model())
+                students.append(
+                    StudentFirestoreDTO(**item).to_model(item.get("id", "unknown"))
+                )
             except ValidationError as e:
                 student_id = item.get("id", "unknown")
                 logger.error(

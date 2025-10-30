@@ -16,7 +16,7 @@ from src.utils.id_generators import IDGenerators
 
 from .benefit import (
     BenefitAudience,
-    BenefitCreationDTO,
+    BenefitCreateDTO,
     BenefitFirestoreDTO,
     BenefitModel,
     BenefitResponse,
@@ -251,7 +251,7 @@ __all__ = [
     "PartnerContact",
     "PartnerCategory",
     "BenefitModel",
-    "BenefitCreationDTO",
+    "BenefitCreateDTO",
     "BenefitFirestoreDTO",
     "BenefitType",
     "BenefitValueType",

@@ -18,6 +18,8 @@ from slowapi.errors import RateLimitExceeded
 
 from src.api import (
     admin,
+    admin_benefit,
+    admin_employee,
     admin_metrics,
     admin_partner,
     admin_student,
@@ -109,8 +111,19 @@ async def validation_exception_handler(request, exc):
 # Incluir routers
 app.include_router(courses.router, prefix=f"/{API_VERSION}/courses", tags=["Courses"])
 app.include_router(admin.router, prefix=f"/{API_VERSION}/admin", tags=["Admin"])
-app.include_router(admin_student.router, prefix=f"/{API_VERSION}/admin", tags=["Admin - Students"])
-app.include_router(admin_partner.router, prefix=f"/{API_VERSION}/admin", tags=["Admin - Partners"])
+app.include_router(
+    admin_benefit.router, prefix=f"/{API_VERSION}/admin", tags=["Admin - Benefits"]
+)
+app.include_router(
+    admin_employee.router, prefix=f"/{API_VERSION}/admin", tags=["Admin - Employees"]
+)
+app.include_router(
+    admin_partner.router, prefix=f"/{API_VERSION}/admin", tags=["Admin - Partners"]
+)
+app.include_router(
+    admin_student.router, prefix=f"/{API_VERSION}/admin", tags=["Admin - Students"]
+)
+
 app.include_router(
     admin_metrics.router, prefix=f"/{API_VERSION}", tags=["Admin Metrics"]
 )

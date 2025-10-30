@@ -8,9 +8,7 @@ Este módulo implementa os algoritmos complexos de criação de IDs para:
 Todos os IDs têm exatamente 15 caracteres seguindo padrões específicos.
 """
 
-import random
 import re
-import string
 
 
 class IDGenerators:
@@ -387,7 +385,7 @@ class IDGenerators:
         return f"PTN_{secao_central}_{codigo_categoria}"
 
     @classmethod
-    def generate_benefit_id(
+    def generate_benefit_id_old(
         cls, nome_parceiro: str, contador: int, tipo_beneficio: str
     ) -> str:
         """Gera ID único para benefício seguindo padrão simplificado.
@@ -463,7 +461,7 @@ class IDGenerators:
         return "".join(ch for ch in parts[1] if ch.isalpha())
 
     @classmethod
-    def gerar_id_beneficio_timestamp(
+    def generate_benefit_id(
         cls, iniciais_parceiro: str, tipo_beneficio: str = "DESCONTO"
     ) -> str:
         """Gera ID único para benefício baseado em timestamp + hash.

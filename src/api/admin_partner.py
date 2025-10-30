@@ -36,7 +36,7 @@ from src.utils.partners_service import PartnersService
 metrics_service_instance = MetricsService()
 
 router = APIRouter(
-    tags=["Admin - Students"], dependencies=[Depends(validate_admin_role)]
+    tags=["Admin - Partners"], dependencies=[Depends(validate_admin_role)]
 )
 
 

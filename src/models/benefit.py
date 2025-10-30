@@ -90,7 +90,7 @@ class BenefitMetadataDTO(BaseModel):
 
 
 # DTO para API
-class BenefitCreationDTO(BaseModel):
+class BenefitCreateDTO(BaseModel):
     """
     DTO para a criação de um novo benefício via API.
     Os campos são todos opcionais para permitir a atualização parcial do benefício.
@@ -115,7 +115,7 @@ class BenefitCreationDTO(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def validate_dates(self) -> "BenefitCreationDTO":
+    def validate_dates(self) -> "BenefitCreateDTO":
         """Valida se a data de término é posterior à data de início."""
         if self.valid_from and self.valid_to and self.valid_to <= self.valid_from:
             raise ValueError("Data de término deve ser posterior à data de início")
@@ -217,6 +217,39 @@ class BenefitFirestoreDTO(BaseModel):
             audience=self.audience,
             created_at=self.created_at,
             updated_at=self.updated_at,
+        )
+
+    @classmethod
+    def from_create(
+        cls, create_data: "BenefitCreateDTO", partner: str, tenant: str
+    ) -> "BenefitFirestoreDTO":
+        """
+        Cria um BenefitFirestoreDTO a partir de BenefitCreateDTO.
+
+        Args:
+            create_data: DTO com os dados de criação do benefício.
+            tenant: O ID do tenant associado ao benefício.
+
+        Returns:
+            Uma instância de BenefitFirestoreDTO.
+        """
+        now = datetime.now(UTC)
+        return cls(
+            created_at=now,
+            updated_at=now,
+            partner_id=partner,
+            tenant_id=tenant,
+            title=create_data.title,
+            description=create_data.description,
+            configuration=BenefitConfigurationDTO(
+                value=create_data.value,
+                value_type=create_data.value_type,
+            ),
+            tags=create_data.tags,
+            valid_from=create_data.valid_from,
+            valid_until=create_data.valid_to,
+            type=create_data.type,
+            audience=create_data.audience,
         )
 
 

@@ -100,8 +100,8 @@ class StudentFirestoreDTO(BaseModel):
         Cria um StudentFirestoreDTO a partir de StudentCreationDTO.
 
         Args:
-            create_data: DTO com os dados de criação do estudante.
-            tenant: ID do tenant ao qual o estudante pertence.
+            create_data: DTO com os dados de criação do aluno.
+            tenant: ID do tenant ao qual o aluno pertence.
 
         Returns:
             Uma instância de StudentFirestoreDTO.
