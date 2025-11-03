@@ -17,6 +17,7 @@ from src.config import (
     FIRESTORE_PROJECT,
     FIRESTORE_SERVICE_ACCOUNT_KEY,
 )
+from src.models import CollectionType
 from src.utils import logger
 
 # Inicializar múltiplos bancos Firestore
@@ -297,6 +298,25 @@ class FirestoreClient:
         except Exception as e:
             logger.error(f"Erro ao contar documentos em {collection}: {str(e)}")
             return 0
+
+    @staticmethod
+    async def create_document(
+        collection: CollectionType, doc_id: str, data: dict[str, Any]
+    ) -> None:
+        """
+        Cria um novo documento no Firestore.
+        """
+        if not db:
+            logger.error("Firestore não inicializado")
+            return
+
+        try:
+            doc_ref = db.collection(collection).document(doc_id)
+            await asyncio.to_thread(doc_ref.set, data)
+            logger.info(f"Documento {collection}/{doc_id} criado com sucesso.")
+        except Exception as e:
+            logger.error(f"Erro ao criar documento {collection}/{doc_id}: {str(e)}")
+            raise Exception(f"Erro ao criar documento {collection}/{doc_id}") from e
 
 
 # Instância do cliente Firestore

@@ -89,7 +89,7 @@ async def create_student(
             operation=CrudOperation.ADD,
         )
 
-        # 5. Retornar resposta
+        # 6. Retornar resposta
         return EntityResponse[StudentModel](
             data=student_dto.to_model(student_id), msg="Estudante criado com sucesso"
         )
@@ -121,8 +121,8 @@ async def create_student(
 # C .R. U D
 @router.get("/students", response_model=PaginatedResponse[StudentModel])
 async def get_student_list(
-    limit: int = Query(10, ge=1, le=100, description="Limit per page"),
-    offset: int = Query(0, ge=0, description="Offset to start from"),
+    limit: int = Query(10, ge=1, le=100, description="Número máximo de itens por página"),
+    offset: int = Query(0, ge=0, description="Offset para paginação"),
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """

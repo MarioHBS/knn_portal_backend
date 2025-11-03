@@ -320,7 +320,7 @@ class QuickAdminTester:
                     cache_data = json.load(f)
                     token = cache_data.get("jwt_token")
                     if token:
-                        self.print_colored("🔑 Token carregado do cache", "blue")
+                        self.print_colored("Token carregado do cache", "blue")
                         return token
         except Exception as e:
             self.print_colored(f"⚠️ Erro ao carregar token do cache: {e}", "yellow")
@@ -588,11 +588,11 @@ class QuickAdminTester:
             "Content-Type": "application/json",
         }
 
-        self.print_colored(f"🔍 Testando: {endpoint_config['description']}", "blue")
+        self.print_colored(f"Testando: {endpoint_config['description']}", "blue")
         self.print_colored(f"   {method} {url}", "white")
 
         # Debug: Mostrar URL final construída
-        self.print_colored(f"   🔧 URL final: {url}", "magenta")
+        self.print_colored(f"   URL final: {url}", "magenta")
 
         try:
             # Fluxo especial para criação de funcionário com verificação de contadores antes/depois
@@ -680,7 +680,7 @@ class QuickAdminTester:
                     result["error"] = "Token inválido ou expirado"
                     try:
                         result["response_data"] = create_resp.json()
-                    except:
+                    except (ValueError, json.JSONDecodeError):
                         result["response_text"] = create_resp.text[:200]
                     return result
 
@@ -854,7 +854,7 @@ class QuickAdminTester:
                     result["error"] = "Token inválido ou expirado"
                     try:
                         result["response_data"] = delete_resp.json()
-                    except:
+                    except (ValueError, json.JSONDecodeError):
                         result["response_text"] = delete_resp.text[:200]
                     return result
 
@@ -1088,7 +1088,7 @@ class QuickAdminTester:
                 return result
 
             if method == "GET":
-                response = self.session.get(url, headers=headers, timeout=30)
+                response = self.session.get(url, headers=headers, timeout=120)
             elif method == "POST":
                 response = self.session.post(
                     url, json=data, headers=headers, timeout=30
@@ -1123,6 +1123,23 @@ class QuickAdminTester:
                 response_data = None
                 try:
                     response_data = response.json()
+                    if endpoint_key == "admin_students":
+                        # A resposta paginada usa 'items' em vez de 'data'
+                        students_data = response_data.get("items", [])
+                        total_students = len(students_data)
+                        total_count = response_data.get("total", 0)
+                        current_page = response_data.get("page", 1)
+                        total_pages = response_data.get("pages", 1)
+
+                        self.print_colored(f"   📊 Total de alunos encontrados: {total_students} (página {current_page}/{total_pages})", "cyan")
+                        self.print_colored(f"   📈 Total geral no sistema: {total_count} alunos", "cyan")
+
+                        if total_students > 0:
+                            self.print_colored("   📋 Mostrando os 5 primeiros alunos:", "cyan")
+                            for student in students_data[:5]:
+                                student_id = student.get("id", "N/A")
+                                student_name = student.get("name", "N/A")
+                                self.print_colored(f"     - ID: {student_id}, Nome: {student_name}", "white")
                     if endpoint_key == "get_specific_partner":
                         partner_data = response_data.get("data", {})
                         trade_name = partner_data.get("trade_name")
@@ -1250,7 +1267,7 @@ class QuickAdminTester:
         except Exception as e:
             # Captura erro não tratado na execução deste endpoint
             self.print_colored(
-                f"   💥 Erro inesperado durante a requisição: {e}", "red"
+                f"   Erro inesperado durante a requisição: {e}", "red"
             )
             return {
                 "endpoint_key": endpoint_key,
@@ -1401,29 +1418,24 @@ class QuickAdminTester:
                 print(f" {config['url']:<25}", end="")
                 self.print_colored(f" - {config['description']}", "white")
 
-    def save_results(
-        self, results: list[dict[str, Any]], filename_suffix: str = ""
-    ) -> str:
+    def save_report(self, results: list[dict[str, Any]], filename: str) -> str:
         """
-        Salva os resultados em arquivo JSON.
+        Salva o relatório em um arquivo JSON no diretório 'output'.
 
         Args:
-            results: Lista de resultados dos testes
-            filename_suffix: Sufixo para o nome do arquivo
+            results: Lista de resultados dos testes.
+            filename: Nome do arquivo para o relatório.
 
         Returns:
-            Caminho do arquivo salvo
+            Caminho do arquivo salvo.
         """
-        # Criar diretório de relatórios se não existir
-        os.makedirs(REPORTS_DIR, exist_ok=True)
+        output_dir = os.path.join(os.path.dirname(__file__), "output")
+        os.makedirs(output_dir, exist_ok=True)
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"quick_admin_test_report_{timestamp}"
-        if filename_suffix:
-            filename += f"_{filename_suffix}"
-        filename += ".json"
+        if not filename.endswith(".json"):
+            filename += ".json"
 
-        filepath = os.path.join(REPORTS_DIR, filename)
+        filepath = os.path.join(output_dir, filename)
 
         report_data = {
             "test_type": "quick_admin_test",
@@ -1508,8 +1520,12 @@ Exemplos de uso:
     )
 
     parser.add_argument(
-        "--save", action="store_true", help="Salva resultados em arquivo JSON"
+        "--output",
+        type=str,
+        help="Salva o relatório em um arquivo JSON no diretório 'output'",
+        metavar="FILENAME",
     )
+
 
     args = parser.parse_args()
 
@@ -1545,20 +1561,13 @@ Exemplos de uso:
         if results:
             tester.print_summary(results)
 
-            # Salvar resultados se solicitado
-            if args.save:
-                suffix = ""
-                if args.category:
-                    suffix = args.category
-                elif args.endpoint and len(args.endpoint) == 1:
-                    suffix = args.endpoint[0]
-                tester.save_results(results, suffix)
+            # Salvar relatório se o nome do arquivo foi fornecido
+            if args.output:
+                tester.save_report(results, args.output)
 
-    except KeyboardInterrupt:
-        tester.print_colored("\n⚠️ Teste interrompido pelo usuário", "yellow")
-        sys.exit(1)
+
     except Exception as e:
-        tester.print_colored(f"\n💥 Erro inesperado: {str(e)}", "red")
+        tester.print_colored(f"\n Erro inesperado: {str(e)}", "red")
         sys.exit(1)
 
 

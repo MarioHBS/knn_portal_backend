@@ -217,15 +217,21 @@ class PartnerCreateDTO(BaseModel):
     logo_url: str | None = Field(
         None, description="URL do logo do parceiro no Firebase Storage"
     )
-    address: PartnerAddress | None = Field(None, description="Endereço do parceiro")
+    add_zip: str = Field(..., description="CEP do parceiro no formato XXXXX-XXX")
+    add_street: str = Field(..., description="Rua do parceiro")
+    add_number: str = Field(..., description="Número do endereço")
+    add_complement: str | None = Field(None, description="Complemento do endereço")
+    add_neighborhood: str = Field(..., description="Bairro do endereço")
+    add_city: str = Field(..., description="Cidade do endereço")
+    add_state: str = Field(..., description="Estado do endereço")
     social_networks: PartnerSocialNetworks = Field(
         ..., description="Redes sociais do parceiro"
     )
     geolocation: PartnerGeolocation = Field(..., description="Links de geolocalização")
     category: PartnerCategory = Field(..., description="Categoria do parceiro")
-    contact: PartnerContact = Field(
-        ..., description="Informações de contato do parceiro"
-    )
+    phone: str = Field(..., description="Número de telefone do parceiro")
+    whatsapp: str = Field(..., description="Número de WhatsApp do parceiro")
+    email: str = Field(..., description="Email do parceiro")
     active: bool = Field(True, description="Status ativo/inativo do parceiro")
 
     @field_validator("cnpj")
@@ -335,7 +341,7 @@ class PartnerUpdateDTO(BaseModel):
         }
 
 
-class PartnerDTO:
+class PartnerFirestoreDTO(BaseModel):
     """
     Data Transfer Object para conversão de dados entre Firestore e modelo Partner.
 
@@ -343,6 +349,7 @@ class PartnerDTO:
     e facilitar futuras migrações de dados.
     """
 
+    active: bool = True
     trade_name: str = Field(
         ..., min_length=1, max_length=50, description="Nome comercial do parceiro"
     )
@@ -364,6 +371,8 @@ class PartnerDTO:
     contact: PartnerContact
     geolocation: PartnerGeolocation
     social_networks: PartnerSocialNetworks
+    created_at: datetime | None = Field(None, description="Data de criação")
+    updated_at: datetime | None = Field(None, description="Data de última atualização")
 
     @staticmethod
     def from_firestore(doc_data: dict[str, Any], doc_id: str = None) -> dict[str, Any]:
@@ -422,10 +431,12 @@ class PartnerDTO:
         )
 
         # Campos complexos com estruturas padrão
-        partner_data["address"] = PartnerDTO._extract_address(doc_data)
-        partner_data["social_networks"] = PartnerDTO._extract_social_networks(doc_data)
-        partner_data["geolocation"] = PartnerDTO._extract_geolocation(doc_data)
-        partner_data["contact"] = PartnerDTO._extract_contact(doc_data)
+        partner_data["address"] = PartnerFirestoreDTO._extract_address(doc_data)
+        partner_data["social_networks"] = PartnerFirestoreDTO._extract_social_networks(
+            doc_data
+        )
+        partner_data["geolocation"] = PartnerFirestoreDTO._extract_geolocation(doc_data)
+        partner_data["contact"] = PartnerFirestoreDTO._extract_contact(doc_data)
 
         return partner_data
 
@@ -484,7 +495,7 @@ class PartnerDTO:
 
     @staticmethod
     def to_firestore(
-        partner: PartnerCreateDTO, created_at: datetime, updated_at: datetime
+        partner: PartnerModel, created_at: datetime, updated_at: datetime
     ) -> Self:
         """
         Converte modelo Partner para formato Firestore.
@@ -495,7 +506,7 @@ class PartnerDTO:
         Returns:
             PartnerDTO: Dados formatados para armazenamento no Firestore
         """
-        return PartnerDTO(
+        return PartnerFirestoreDTO(
             trade_name=partner.trade_name,
             tenant_id=partner.tenant_id,
             benefits_count=partner.benefits_count,
@@ -510,4 +521,67 @@ class PartnerDTO:
             active=partner.active,
             created_at=created_at,
             updated_at=updated_at,
+        )
+
+    @classmethod
+    def from_create(cls, create_data: PartnerCreateDTO, tenant: str) -> Self:
+        """
+        Cria instância de PartnerFirestoreDTO a partir de PartnerCreateDTO.
+
+        Args:
+            create_data: Dados de criação do parceiro
+            tenant: ID do tenant associado
+
+        Returns:
+            PartnerFirestoreDTO: Instância pronta para Firestore
+        """
+
+        now = datetime.now()
+        return cls(
+            created_at=now,
+            updated_at=now,
+            trade_name=create_data.trade_name,
+            tenant_id=tenant,
+            benefits_count=create_data.benefits_count,
+            has_active_benefits=create_data.has_active_benefits,
+            cnpj=create_data.cnpj,
+            logo_url=create_data.logo_url,
+            address=PartnerAddress(
+                zip=create_data.add_zip,
+                street=create_data.add_street,
+                neighborhood=create_data.add_neighborhood,
+                city=create_data.add_city,
+                state=create_data.add_state,
+            ),
+            social_networks=create_data.social_networks,
+            geolocation=create_data.geolocation,
+            category=create_data.category,
+            contact=PartnerContact(
+                phone=create_data.phone,
+                whatsapp=create_data.whatsapp,
+                email=create_data.email,
+            ),
+            active=create_data.active,
+        )
+
+    def to_model(self, partner_id: str) -> PartnerModel:
+        """
+        Converte a instância atual de PartnerFirestoreDTO para PartnerModel.
+        """
+        return PartnerModel(
+            id=partner_id,
+            trade_name=self.trade_name,
+            tenant_id=self.tenant_id,
+            benefits_count=self.benefits_count,
+            has_active_benefits=self.has_active_benefits,
+            cnpj=self.cnpj,
+            logo_url=self.logo_url,
+            address=self.address,
+            social_networks=self.social_networks,
+            geolocation=self.geolocation,
+            category=self.category,
+            contact=self.contact,
+            active=self.active,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
         )
