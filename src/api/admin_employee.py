@@ -1,6 +1,7 @@
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from pydantic_core import ValidationError
 
 from src.api.admin import (
     create_firebase_user,
@@ -32,141 +33,7 @@ router = APIRouter(
 )
 
 
-@router.get("/employees", response_model=PaginatedResponse[EmployeeModel])
-async def get_employee_list(
-    limit: int = Query(10, ge=1, le=100, description="Limit per page"),
-    offset: int = Query(0, ge=0, description="Offset to start from"),
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Lists all employees with pagination.
-    """
-    try:
-        # Fetch the list of employees
-        employee_list = await firestore_client.query_documents(
-            "employees",
-            tenant_id=current_user.tenant,
-            limit=limit,
-            offset=offset,
-        )
-
-        # Fetch the total count of documents
-        total = await firestore_client.get_collection_count(
-            "employees", tenant_id=current_user.tenant
-        )
-
-        # The model validator will handle the data transformation.
-        items = [EmployeeModel(**item) for item in employee_list]
-        logger.info(f"Fetched {len(items)} employees for tenant {current_user.tenant}")
-
-        return PaginatedResponse[EmployeeModel](
-            items=items,
-            total=total,
-            page=(offset // limit) + 1,
-            per_page=limit,
-            pages=(total + limit - 1) // limit if total > 0 else 1,
-        )
-
-    except Exception as e:
-        logger.error(f"Error listing employees: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Error listing employees"}
-            },
-        ) from e
-
-
-@router.get("/employees/{id}", response_model=EntityResponse[EmployeeModel])
-async def get_employee_individual(
-    id: str,
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Busca um funcionário pelo ID.
-    """
-    try:
-        employee_data = await firestore_client.get_document(
-            "employees", id, tenant_id=current_user.tenant
-        )
-        if not employee_data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Funcionário não encontrado"}
-                },
-            )
-
-        employee = EmployeeFirestoreDTO(**employee_data).to_employee(id)
-        return EntityResponse(data=employee, msg="Funcionário encontrado com sucesso")
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao buscar funcionário: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {"code": "SERVER_ERROR", "msg": "Erro ao buscar funcionário"}
-            },
-        ) from e
-
-
-@router.put("/employees/{id}", response_model=EntityResponse[EmployeeModel])
-async def set_employee_individual(
-    id: str = Path(..., description="ID do funcionário"),
-    employee_data: EmployeeUpdateDTO = Body(
-        ..., description="Dados do funcionário para atualizar"
-    ),
-    current_user: JWTPayload = Depends(validate_admin_role),
-):
-    """
-    Atualiza um funcionário existente.
-    """
-    try:
-        # Verificar se o funcionário existe
-        existing_employee = await firestore_client.get_document("employees", id)
-        if (
-            not existing_employee
-            or existing_employee.get("tenant_id") != current_user.tenant
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": {"code": "NOT_FOUND", "msg": "Funcionário não encontrado"}
-                },
-            )
-
-        # Atualizar dados
-        update_data = EmployeeFirestoreDTO.from_update(
-            employee_data, datetime.now(UTC).isoformat()
-        )
-
-        await firestore_client.update_document("employees", id, update_data)
-
-        # Obter dados atualizados
-        updated_employee_data = await firestore_client.get_document("employees", id)
-        employee = EmployeeFirestoreDTO(**updated_employee_data).to_employee(id)
-
-        return EntityResponse[EmployeeModel](
-            data=employee, msg="Funcionário atualizado com sucesso"
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao atualizar funcionário: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": {
-                    "code": "SERVER_ERROR",
-                    "msg": "Erro ao atualizar funcionário",
-                }
-            },
-        ) from e
-
-
+# .C. R U D
 @router.post("/employees", response_model=EntityResponse[EmployeeModel])
 async def create_employee(
     employee_data: EmployeeCreateDTO = Body(..., description="Dados do funcionário"),
@@ -219,7 +86,7 @@ async def create_employee(
             CollectionType.EMPLOYEE, current_user.tenant, operation=CrudOperation.ADD
         )
         return EntityResponse[EmployeeModel](
-            data=employee_dto.to_employee(generated_id),
+            data=employee_dto.to_model(generated_id),
             msg="Funcionário criado com sucesso",
         )
 
@@ -239,6 +106,197 @@ async def create_employee(
         ) from e
 
 
+# C .R. U D
+@router.get("/employees", response_model=PaginatedResponse[EmployeeModel])
+async def get_employee_list(
+    limit: int = Query(
+        10, ge=1, le=100, description="Número máximo de itens por página"
+    ),
+    offset: int = Query(0, ge=0, description="Offset para pafinação"),
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Lista todos os funcionários com paginação.
+    """
+    try:
+        logger.info("🔍 INICIANDO BUSCA DE FUNCIONÁRIOS")
+        logger.info(
+            f"📋 Parâmetros: limit={limit}, offset={offset}, tenant={current_user.tenant}"
+        )
+
+        # 1. Buscar lista de funcionários
+        logger.info("🔄 Executando query_documents...")
+        items = await firestore_client.query_documents(
+            CollectionType.EMPLOYEE.value,
+            tenant_id=current_user.tenant,
+            limit=limit,
+            offset=offset,
+        )
+        logger.info(f"📊 Query retornou {len(items)} documentos")
+
+        if items:
+            logger.info(
+                f"📝 Primeiro documento: {items[0].get('id', 'sem_id')} - {items[0].get('name', 'sem_nome')}"
+            )
+        else:
+            logger.warning("⚠️ Nenhum documento retornado pela query!")
+
+        employees = []
+        for i, item in enumerate(items):
+            try:
+                logger.info(
+                    f"🔄 Processando funcionário {i+1}/{len(items)}: {item.get('id', 'sem_id')}"
+                )
+                employee_model = EmployeeFirestoreDTO(**item).to_model(
+                    item.get("id", "unknown")
+                )
+                employees.append(employee_model)
+                logger.info(f"✅ Funcionário {i+1} processado com sucesso")
+            except ValidationError as e:
+                employee_id = item.get("id", "unknown")
+                logger.error(
+                    f"❌ Pydantic Validation Error for employee ID {employee_id}: {e}, Data: {item}"
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail={
+                        "error": {
+                            "code": "VALIDATION_ERROR",
+                            "msg": f"Validation error for employee ID {employee_id}: {e}",
+                        }
+                    },
+                ) from e
+
+        logger.info(f"📊 Total de funcionários processados: {len(employees)}")
+
+        # 2. Obter a contagem total de funcionários
+        logger.info("🔄 Obtendo contagem total...")
+        total = await firestore_client.get_collection_count(
+            CollectionType.EMPLOYEE.value, tenant_id=current_user.tenant
+        )
+        logger.info(f"📊 Contagem total: {total}")
+
+        # 3. Criar resposta paginada
+        pages = (total + limit - 1) // limit if limit > 0 else 0
+        page = (offset // limit) + 1
+
+        logger.info(
+            f"📄 Criando resposta paginada: items={len(employees)}, total={total}, page={page}, per_page={limit}, pages={pages}"
+        )
+
+        response = PaginatedResponse[EmployeeModel](
+            items=employees,
+            total=total,
+            page=page,
+            per_page=limit,
+            pages=pages,
+        )
+
+        logger.info(f"✅ RESPOSTA FINAL: {len(response.items)} funcionários retornados")
+        return response
+
+    except Exception as e:
+        logger.error(f"❌ Error listing employees: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {"code": "SERVER_ERROR", "msg": "Error listing employees"}
+            },
+        ) from e
+
+
+@router.get("/employees/{id}", response_model=EntityResponse[EmployeeModel])
+async def get_employee_individual(
+    id: str,
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Busca um funcionário pelo ID.
+    """
+    try:
+        employee_data = await firestore_client.get_document(
+            "employees", id, tenant_id=current_user.tenant
+        )
+        if not employee_data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": {"code": "NOT_FOUND", "msg": "Funcionário não encontrado"}
+                },
+            )
+
+        employee = EmployeeFirestoreDTO(**employee_data).to_model(id)
+        return EntityResponse(data=employee, msg="Funcionário encontrado com sucesso")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao buscar funcionário: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {"code": "SERVER_ERROR", "msg": "Erro ao buscar funcionário"}
+            },
+        ) from e
+
+
+# C R .U. D
+@router.put("/employees/{id}", response_model=EntityResponse[EmployeeModel])
+async def set_employee_individual(
+    id: str = Path(..., description="ID do funcionário"),
+    employee_data: EmployeeUpdateDTO = Body(
+        ..., description="Dados do funcionário para atualizar"
+    ),
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Atualiza um funcionário existente.
+    """
+    try:
+        # Verificar se o funcionário existe
+        existing_employee = await firestore_client.get_document("employees", id)
+        if (
+            not existing_employee
+            or existing_employee.get("tenant_id") != current_user.tenant
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": {"code": "NOT_FOUND", "msg": "Funcionário não encontrado"}
+                },
+            )
+
+        # Atualizar dados
+        update_data = EmployeeFirestoreDTO.from_update(
+            employee_data, datetime.now(UTC).isoformat()
+        )
+
+        await firestore_client.update_document("employees", id, update_data)
+
+        # Obter dados atualizados
+        updated_employee_data = await firestore_client.get_document("employees", id)
+        employee = EmployeeFirestoreDTO(**updated_employee_data).to_model(id)
+
+        return EntityResponse[EmployeeModel](
+            data=employee, msg="Funcionário atualizado com sucesso"
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao atualizar funcionário: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": "Erro ao atualizar funcionário",
+                }
+            },
+        ) from e
+
+
+# C R U .D.
 @router.delete("/employees/{id}", response_model=BaseResponse)
 async def delete_employee(
     id: str = Path(..., description="ID do funcionário"),

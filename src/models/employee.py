@@ -40,7 +40,7 @@ class EmployeeFirestoreDTO(BaseModel):
     name: str
     zip: str | None = None
 
-    def to_employee(self, emp_id: str) -> "EmployeeModel":
+    def to_model(self, emp_id: str) -> "EmployeeModel":
         """Converts DTO to an EmployeeModel instance."""
         return EmployeeModel(
             id=emp_id,
