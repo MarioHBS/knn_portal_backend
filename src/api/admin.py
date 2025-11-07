@@ -338,10 +338,20 @@ async def create_firebase_user(
         if EMAIL_SERVICE_ENABLED:
             # Enviar e-mail com a senha temporária
             email_service = EmailService()
+
+            body_text = f"Olá {entity_name}, sua conta foi criada com sucesso. Sua senha temporária é: {temp_password}"
+            body_html = f"""
+                <p>Olá <strong>{entity_name}</strong>,</p>
+                <p>Sua conta foi criada com sucesso no KNN Portal Journey Club.</p>
+                <p>Sua senha temporária é: <strong>{temp_password}</strong></p>
+                <p>Recomendamos que você altere sua senha no primeiro acesso.</p>
+            """
+
             email_service.send_email(
                 to_email=entity_email,
                 subject="Bem-vindo ao KNN Portal Journey Club!",
-                body=f"Olá {entity_name}, sua conta foi criada com sucesso. Sua senha temporária é: {temp_password}",
+                body_html=body_html,
+                body_text=body_text,
             )
         return user_record
 
