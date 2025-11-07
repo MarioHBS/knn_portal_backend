@@ -47,7 +47,7 @@ async def create_employee(
     )
     try:
         # 1. Gerar ID do funcionário
-        generated_id = IDGenerators.gerar_id_funcionario(
+        generated_id = IDGenerators.generate_employee_id(
             employee_data.name,
             employee_data.role,
             employee_data.zip,
@@ -58,8 +58,8 @@ async def create_employee(
         # 2. Verificar se o funcionário já existe (pelo ID gerado ou e-mail)
         verify_existence(
             collection=CollectionType.EMPLOYEE,
-            doc_id=generated_id,
-            tenant_id=current_user.tenant,
+            entity_id=generated_id,
+            user_tenant=current_user.tenant,
         )
 
         employee_dto = EmployeeFirestoreDTO.from_create(
@@ -306,17 +306,13 @@ async def delete_employee(
     Remove um funcionário existente.
     """
     try:
-        # 1. Verifica a existência do funcionário no Firestore
+        # 1. Verifica a existência do funcionário
         await verify_existence(CollectionType.EMPLOYEE, id, current_user.tenant)
 
-        # 2. Deleta o usuário associado no Firebase Authentication e na coleção 'users' do Firestore
-        await delete_firebase_user(
-            entity=CollectionType.EMPLOYEE,
-            entity_id=id,
-            tenant_id=current_user.tenant,
-        )
+        # 2. Exclui o usuário associado no Firebase Authentication e na coleção 'users' do Firestore
+        await delete_firebase_user(CollectionType.EMPLOYEE, id, current_user.tenant)
 
-        # 3. Remove o documento do funcionário da coleção 'employees' no Firestore
+        # 3. Exclui o documento associado da coleção 'employees'
         await firestore_client.delete_document(CollectionType.EMPLOYEE, id)
 
         # 4. Atualiza os contadores agregados na coleção 'metadata'

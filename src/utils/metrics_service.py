@@ -212,10 +212,10 @@ class MetricsService:
 
         Estrutura esperada dos docs de metadata (por documento, ex.: student_info):
         {
-          tenant_id?: string,
-          last_updated: iso-string,
-          total: number
-          // windows não são armazenadas; o backend pode retorná-las como None
+            tenant_id?: string,
+            last_updated: iso-string,
+            total: number
+            // windows não são armazenadas; o backend pode retorná-las como None
         }
         """
         try:

@@ -2,6 +2,7 @@
 Implementação dos endpoints para o perfil de administrador (admin).
 """
 
+import os
 import uuid
 from datetime import UTC, datetime
 
@@ -315,6 +316,10 @@ async def create_firebase_user(
         user_record, temp_password = auth_service.create_user_with_temp_password(
             email=entity_email, display_name=entity_name
         )
+
+        # Log da senha temporária para fins de desenvolvimento
+        if os.getenv("ENVIRONMENT") == "development":
+            logger.info(f"Senha temporária para {entity_email}: {temp_password}")
 
         # Criar documento na coleção 'users' do Firestore usando UserFirestoreDTO
         user_data = UserFirestoreDTO(

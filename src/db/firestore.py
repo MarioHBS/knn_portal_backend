@@ -221,12 +221,12 @@ class FirestoreClient:
             if filters:
                 if isinstance(filters, dict):
                     for field, value in filters.items():
-                        query = query.filter(field, "==", value)
+                        query = query.where(field, "==", value)
                 elif isinstance(filters, list):
                     for f in filters:
                         if len(f) == 3:
                             field, op, value = f
-                            query = query.filter(field, op, value)
+                            query = query.where(field, op, value)
 
             # Aplicar ordenação
             if order_by:
@@ -279,12 +279,12 @@ class FirestoreClient:
             if filters:
                 if isinstance(filters, dict):
                     for field, value in filters.items():
-                        query = query.filter(field, "==", value)
+                        query = query.where(field, "==", value)
                 elif isinstance(filters, list):
                     for f in filters:
                         if len(f) == 3:
                             field, op, value = f
-                            query = query.filter(field, op, value)
+                            query = query.where(field, op, value)
 
             # A contagem de documentos é feita com uma agregação
             aggregation_query = query.count()
@@ -317,6 +317,23 @@ class FirestoreClient:
         except Exception as e:
             logger.error(f"Erro ao criar documento {collection}/{doc_id}: {str(e)}")
             raise Exception(f"Erro ao criar documento {collection}/{doc_id}") from e
+
+    @staticmethod
+    async def delete_document(collection: str, doc_id: str) -> None:
+        """
+        Deleta um documento do Firestore.
+        """
+        if not db:
+            logger.error("Firestore não inicializado")
+            return
+
+        try:
+            doc_ref = db.collection(collection).document(doc_id)
+            await asyncio.to_thread(doc_ref.delete)
+            logger.info(f"Documento {collection}/{doc_id} deletado com sucesso.")
+        except Exception as e:
+            logger.error(f"Erro ao deletar documento {collection}/{doc_id}: {str(e)}")
+            raise Exception(f"Erro ao deletar documento {collection}/{doc_id}") from e
 
 
 # Instância do cliente Firestore

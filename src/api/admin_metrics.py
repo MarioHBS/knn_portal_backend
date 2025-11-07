@@ -74,9 +74,7 @@ class CounterItem(BaseModel):
     last_updated: datetime | None = Field(
         default=None, description="Última atualização do contador"
     )
-    windows: dict[str, Any] | None = Field(
-        default=None, description="Contagem por janelas (24h, 7d, 30d)"
-    )
+    # windows: dict[str, Any] | None = Field( default=None, description="Contagem por janelas (24h, 7d, 30d)" )
 
 
 class AdminCountersData(BaseModel):

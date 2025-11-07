@@ -165,4 +165,3 @@ class EmployeeCreateDTO(BaseModel):
     zip: str | None = None
     role: str
     active: bool = True
-    tenant_id: str

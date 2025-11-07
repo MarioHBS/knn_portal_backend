@@ -121,7 +121,9 @@ async def create_student(
 # C .R. U D
 @router.get("/students", response_model=PaginatedResponse[StudentModel])
 async def get_student_list(
-    limit: int = Query(10, ge=1, le=100, description="Número máximo de itens por página"),
+    limit: int = Query(
+        10, ge=1, le=100, description="Número máximo de itens por página"
+    ),
     offset: int = Query(0, ge=0, description="Offset para paginação"),
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
@@ -306,13 +308,13 @@ async def delete_student(
     Exclui um estudante pelo ID.
     """
     try:
-        # 1. Verificar a existência do estudante
+        # 1. Verifica a existência do estudante
         await verify_existence(CollectionType.STUDENT, id, current_user.tenant)
 
-        # 2. Excluir usuário do Firebase Authentication e da coleção 'users' do Firestore
+        # 2. Exclui o usuário associado no Firebase Authentication e na coleção 'users' do Firestore
         await delete_firebase_user(EntityType.STUDENT, id, current_user.tenant)
 
-        # 3. Excluir o documento do estudante da coleção 'students' do Firestore
+        # 3. Exclui o documento associado da coleção 'students'
         await firestore_client.delete_document(CollectionType.STUDENT.value, id)
 
         # 4. Atualizar contadores agregados na coleção 'metadata'
@@ -322,7 +324,7 @@ async def delete_student(
             operation=CrudOperation.SUB,
         )
 
-        return BaseResponse(msg="Estudante excluído com sucesso")
+        return BaseResponse(msg=f"Aluno {id} excluído com sucesso")
 
     except HTTPException:
         raise
