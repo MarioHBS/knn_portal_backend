@@ -40,37 +40,41 @@ router = APIRouter(
 # .C. R U D
 @router.post("/partners", response_model=EntityResponse[PartnerModel])
 async def create_partner(
-    data: PartnerCreateDTO = Body(..., description="Dados do parceiro"),
+    create_data: PartnerCreateDTO = Body(..., description="Dados do Parceiro"),
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
     Cria um Parceiro.
     """
+    logger.info(
+        f"Recebida requisição para criar parceiro com dados: {create_data.model_dump()}"
+    )
     try:
         # 1. Gerar ID do parceiro
-
         partner_id = IDGenerators.generate_partner_id(
-            trade_name=data.trade_name,
-            category=str(data.category),
-            cnpj=data.cnpj,
+            create_data.trade_name,
+            create_data.cnpj,
+            str(create_data.category),
         )
-        logger.debug(f"ID gerado para o parceiro: {partner_id}")
+        logger.debug(f"ID gerado do parceiro: {partner_id}")
 
         # 2. Verificar se o parceiro já existe
-        verify_existence(
-            collection=CollectionType.PARTNER,
-            entity_id=partner_id,
-            tenant_id=current_user.tenant,
+        await verify_existence(
+            CollectionType.PARTNER,
+            partner_id,
+            current_user.tenant,
         )
 
         partner_dto = PartnerFirestoreDTO.from_create(
-            create_data=data, tenant=current_user.tenant
+            create_data=create_data, tenant=current_user.tenant
         )
 
         # 3. Cria Parceiro na coleção 'partners'
-        logger.info(f"Criando parceiro no Firestore com ID: {partner_id}")
+        logger.info(f"Criando Parceiro no Firestore com ID: {partner_id}")
         await firestore_client.create_document(
-            CollectionType.PARTNER, partner_id, partner_dto.model_dump()
+            collection=CollectionType.PARTNER,
+            doc_id=partner_id,
+            data=partner_dto.model_dump(),
         )
         logger.info(f"Parceiro criado com sucesso: {partner_id}")
 
@@ -83,20 +87,18 @@ async def create_partner(
             tenant_id=partner_dto.tenant_id,
         )
 
-        # 5. Salvar e  atualizar a url da logo do Parceiro
-
-        # 6. Atualizar metadados
+        # 5. Atualizar contadores agregados na coleção 'metadata'
         await metrics_service_instance.update_metadata_on_crud(
             CollectionType.PARTNER, partner_dto.tenant_id, operation=CrudOperation.ADD
         )
 
-        # 7. Retornar resposta
+        # 6. Retornar resposta
         return EntityResponse(
             data=partner_dto.to_model(partner_id), msg="Parceiro criado com sucesso"
         )
 
     except ValueError as e:
-        logger.error(f"Erro de validação ao criar aluno: {str(e)}")
+        logger.error(f"Erro de validação ao criar parceiro: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={
@@ -329,24 +331,24 @@ async def delete_partner(
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
-    Exclui um parceiro existente.
+    Exclui um parceiro pelo ID.
     """
     try:
-        # 1. Verificar a existência do parceiro
+        # 1. Verifica a existência do parceiro
         await verify_existence(CollectionType.PARTNER, id, current_user.tenant)
 
-        # 2. Deletar usuário do Firebase e da coleção 'users'
+        # 2. Exclui usuário associado no Firebase Authentication e na coleção 'users' do Firestore
         await delete_firebase_user(EntityType.PARTNER, id, current_user.tenant)
 
-        # 3. Deletar o documento do parceiro do Firestore
+        # 3. Exclui o documento associado da coleção 'partners'
         await firestore_client.delete_document(CollectionType.PARTNER.value, id)
 
-        # 4. Atualizar metadados
+        # 4. Atualizar contadores agregados na coleção 'metadata'
         await metrics_service_instance.update_metadata_on_crud(
             CollectionType.PARTNER, current_user.tenant, operation=CrudOperation.SUB
         )
 
-        return BaseResponse(msg="Parceiro deletado com sucesso")
+        return BaseResponse(msg=f"Parceiro {id} excluído com sucesso")
 
     except HTTPException:
         raise
@@ -358,3 +360,67 @@ async def delete_partner(
                 "error": {"code": "SERVER_ERROR", "msg": "Erro ao excluir parceiro"}
             },
         ) from e
+
+
+# =================================================================
+# AUXILIARES
+
+
+async def _set_partner_status(
+    partner_id: str, tenant_id: str, is_active: bool
+) -> BaseResponse:
+    """
+    Define o status de ativação de um parceiro.
+    """
+    try:
+        # 1. Verificar se o parceiro existe
+        await verify_existence(CollectionType.PARTNER, partner_id, tenant_id)
+
+        # 2. Atualizar o status 'is_active' no Firestore
+        await firestore_client.update_document(
+            collection=CollectionType.PARTNER,
+            doc_id=partner_id,
+            data={"is_active": is_active},
+        )
+
+        status_msg = "ativado" if is_active else "desativado"
+        logger.info(f"Parceiro {partner_id} {status_msg} com sucesso.")
+        return BaseResponse(msg=f"Parceiro {partner_id} {status_msg} com sucesso.")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            f"Erro ao {'ativar' if is_active else 'desativar'} parceiro {partner_id}: {str(e)}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "msg": f"Erro ao {'ativar' if is_active else 'desativar'} parceiro",
+                }
+            },
+        ) from e
+
+
+@router.post("/partners/{id}/activate", response_model=BaseResponse)
+async def activate_partner(
+    id: str = Path(..., description="ID do parceiro a ser ativado"),
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Ativa um parceiro existente.
+    """
+    return await _set_partner_status(id, current_user.tenant, True)
+
+
+@router.post("/partners/{id}/deactivate", response_model=BaseResponse)
+async def deactivate_partner(
+    id: str = Path(..., description="ID do parceiro a ser desativado"),
+    current_user: JWTPayload = Depends(validate_admin_role),
+):
+    """
+    Desativa um parceiro existente.
+    """
+    return await _set_partner_status(id, current_user.tenant, False)

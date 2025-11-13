@@ -25,8 +25,7 @@ from datetime import datetime
 from typing import Any
 
 import requests
-
-from scripts.complete_flow.base_auth_test import (
+from base_auth_test import (
     BACKEND_BASE_URL,
     TEST_USERS,
     BaseAuthenticationTester,
@@ -207,16 +206,16 @@ ENDPOINTS = {
         "data": {
             "partner_id": "PTN_T4L5678_TEC",
             "tenant_id": "knn-dev-tenant",
-            "title": "Benefício de Teste Rápido",
-            "description": "Descrição do benefício de teste criado pelo quick test",
+            "title": "Benefício sem validade",
+            "description": "Este benefício está sendo criado sem uma data de término",
             "value": 15,
             "value_type": "percentage",
             "type": "discount",
             "valid_from": "2025-01-01T00:00:00Z",
-            "valid_to": "2025-12-31T23:59:59Z",
+            "valid_to": None,
             "active": True,
             "audience": ["employee"],
-            "tags": ["teste", "quick"],
+            "tags": ["teste", "perene", "desconto"],
         },
     },
     "update_benefit": {
@@ -1131,15 +1130,26 @@ class QuickAdminTester:
                         current_page = response_data.get("page", 1)
                         total_pages = response_data.get("pages", 1)
 
-                        self.print_colored(f"   📊 Total de alunos encontrados: {total_students} (página {current_page}/{total_pages})", "cyan")
-                        self.print_colored(f"   📈 Total geral no sistema: {total_count} alunos", "cyan")
+                        self.print_colored(
+                            f"   📊 Total de alunos encontrados: {total_students} (página {current_page}/{total_pages})",
+                            "cyan",
+                        )
+                        self.print_colored(
+                            f"   📈 Total geral no sistema: {total_count} alunos",
+                            "cyan",
+                        )
 
                         if total_students > 0:
-                            self.print_colored("   📋 Mostrando os 5 primeiros alunos:", "cyan")
+                            self.print_colored(
+                                "   📋 Mostrando os 5 primeiros alunos:", "cyan"
+                            )
                             for student in students_data[:5]:
                                 student_id = student.get("id", "N/A")
                                 student_name = student.get("name", "N/A")
-                                self.print_colored(f"     - ID: {student_id}, Nome: {student_name}", "white")
+                                self.print_colored(
+                                    f"     - ID: {student_id}, Nome: {student_name}",
+                                    "white",
+                                )
                     if endpoint_key == "get_specific_partner":
                         partner_data = response_data.get("data", {})
                         trade_name = partner_data.get("trade_name")
@@ -1266,9 +1276,7 @@ class QuickAdminTester:
 
         except Exception as e:
             # Captura erro não tratado na execução deste endpoint
-            self.print_colored(
-                f"   Erro inesperado durante a requisição: {e}", "red"
-            )
+            self.print_colored(f"   Erro inesperado durante a requisição: {e}", "red")
             return {
                 "endpoint_key": endpoint_key,
                 "endpoint_url": endpoint_config["url"],
@@ -1526,7 +1534,6 @@ Exemplos de uso:
         metavar="FILENAME",
     )
 
-
     args = parser.parse_args()
 
     tester = QuickAdminTester()
@@ -1564,7 +1571,6 @@ Exemplos de uso:
             # Salvar relatório se o nome do arquivo foi fornecido
             if args.output:
                 tester.save_report(results, args.output)
-
 
     except Exception as e:
         tester.print_colored(f"\n Erro inesperado: {str(e)}", "red")

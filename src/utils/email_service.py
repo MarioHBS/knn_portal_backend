@@ -8,6 +8,7 @@ from src.config import (
     EMAIL_PORT,
     EMAIL_USER,
 )
+from src.utils.logging import logger
 
 
 class EmailService:
@@ -26,6 +27,7 @@ class EmailService:
             body_text: O corpo do e-mail em texto plano (fallback).
         """
         if not all([EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD]):
+            logger.error("As variáveis de ambiente do e-mail não estão configuradas.")
             raise ValueError("As variáveis de ambiente do e-mail não estão configuradas.")
 
         msg = MIMEMultipart("alternative")
@@ -40,14 +42,14 @@ class EmailService:
         # Anexa o corpo em HTML
         msg.attach(MIMEText(body_html, "html", "utf-8"))
 
+        logger.info(f"Tentando enviar e-mail para: {to_email}")
         try:
             with smtplib.SMTP_SSL(EMAIL_HOST, int(EMAIL_PORT)) as server:
                 server.login(EMAIL_USER, EMAIL_PASSWORD)
-                server.send_message(msg)
+                server.sendmail(EMAIL_USER, to_email, msg.as_string())
         except smtplib.SMTPAuthenticationError as e:
-            # Idealmente, logar o erro com um sistema de logging
-            print(f"Erro de autenticação SMTP: {e}")
+            logger.error(f"Erro de autenticação SMTP: {e}")
             raise ConnectionRefusedError("Credenciais de e-mail inválidas.") from e
         except Exception as e:
-            print(f"Erro ao enviar e-mail: {e}")
+            logger.error(f"Erro ao enviar e-mail: {e}")
             raise ConnectionError("Não foi possível conectar ao servidor de e-mail.") from e

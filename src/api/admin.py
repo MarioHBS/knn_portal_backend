@@ -327,7 +327,7 @@ async def create_firebase_user(
             entity_id=entity_id,
             first_access=True,
             name=entity_name,
-            role=entity.value,
+            role=entity.name.lower(),
             tenant_id=tenant_id,
             updated_at=datetime.now(UTC),
         )
@@ -337,6 +337,7 @@ async def create_firebase_user(
 
         if EMAIL_SERVICE_ENABLED:
             # Enviar e-mail com a senha temporária
+            logger.info(f"Iniciando envio de e-mail de boas-vindas para {entity_email}")
             email_service = EmailService()
 
             body_text = f"Olá {entity_name}, sua conta foi criada com sucesso. Sua senha temporária é: {temp_password}"
@@ -347,12 +348,16 @@ async def create_firebase_user(
                 <p>Recomendamos que você altere sua senha no primeiro acesso.</p>
             """
 
-            email_service.send_email(
-                to_email=entity_email,
-                subject="Bem-vindo ao KNN Portal Journey Club!",
-                body_html=body_html,
-                body_text=body_text,
-            )
+            try:
+                email_service.send_email(
+                    to_email=entity_email,
+                    subject="Bem-vindo ao KNN Portal Journey Club!",
+                    body_html=body_html,
+                    body_text=body_text,
+                )
+                logger.info(f"E-mail de boas-vindas enviado para {entity_email}")
+            except Exception as e:
+                logger.error(f"Falha ao enviar e-mail para {entity_email}: {str(e)}")
         return user_record
 
     except Exception as e:

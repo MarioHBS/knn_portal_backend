@@ -15,14 +15,14 @@ from src.models.favorites import (
 from src.utils.id_generators import IDGenerators
 
 from .benefit import (
-    BenefitAudience,
+    BenefitAudienceOPTIONS,
     BenefitCreateDTO,
     BenefitFirestoreDTO,
     BenefitModel,
     BenefitResponse,
-    BenefitStatus,
-    BenefitType,
-    BenefitValueType,
+    BenefitStatusOPTIONS,
+    BenefitTypeOPTIONS,
+    BenefitValueTypeFIELD,
 )
 from .partner import (
     PartnerAddress,
@@ -253,10 +253,10 @@ __all__ = [
     "BenefitModel",
     "BenefitCreateDTO",
     "BenefitFirestoreDTO",
-    "BenefitType",
-    "BenefitValueType",
-    "BenefitAudience",
-    "BenefitStatus",
+    "BenefitTypeOPTIONS",
+    "BenefitValueTypeFIELD",
+    "BenefitAudienceOPTIONS",
+    "BenefitStatusOPTIONS",
     "FavoriteRequest",
     "FavoriteResponse",
     "StudentPartnerFavorite",
