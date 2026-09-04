@@ -22,7 +22,7 @@ from .benefit import (
     BenefitResponse,
     BenefitStatusOPTIONS,
     BenefitTypeOPTIONS,
-    BenefitValueTypeFIELD,
+    BenefitValueType,
 )
 from .partner import (
     PartnerAddress,
@@ -254,7 +254,7 @@ __all__ = [
     "BenefitCreateDTO",
     "BenefitFirestoreDTO",
     "BenefitTypeOPTIONS",
-    "BenefitValueTypeFIELD",
+    "BenefitValueType",
     "BenefitAudienceOPTIONS",
     "BenefitStatusOPTIONS",
     "FavoriteRequest",
