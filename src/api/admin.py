@@ -279,7 +279,10 @@ async def send_notifications(
 # ==========================================================================
 # UTILS
 async def verify_existence(
-    collection: CollectionType, entity_id: str, user_tenant: str
+    collection: CollectionType,
+    entity_id: str,
+    user_tenant: str,
+    should_exist: bool = True,
 ):
     mapping = {
         CollectionType.BENEFIT: "Benefício",
@@ -290,16 +293,29 @@ async def verify_existence(
     existing = await firestore_client.get_document(
         collection, doc_id=entity_id, tenant_id=user_tenant
     )
-    if not existing or existing.get("tenant_id") != user_tenant:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={
-                "error": {
-                    "code": "NOT_FOUND",
-                    "msg": f"Usuário associado ao {mapping.get(collection, 'Entidade')} {entity_id} não encontrado no Firestore.",
-                }
-            },
-        )
+
+    if should_exist:
+        if not existing or existing.get("tenant_id") != user_tenant:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "msg": f"Usuário associado ao {mapping.get(collection, 'Entidade')} {entity_id} não encontrado no Firestore.",
+                    }
+                },
+            )
+    else:
+        if existing and existing.get("tenant_id") == user_tenant:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error": {
+                        "code": "DUPLICATE_ENTITY",
+                        "msg": f"O {mapping.get(collection, 'Entidade')} com ID {entity_id} já existe.",
+                    }
+                },
+            )
 
 
 async def create_firebase_user(
@@ -466,7 +482,7 @@ async def search_correspondent_user(
     return UserModel(**user_data)
 
 
-def update_entity(
+async def update_entity(
     entity_id: str, model: BaseModel, collection: CollectionType, tenant: str
 ) -> EntityResponse:
     """Atualiza um documento na coleção especificada."""
@@ -489,7 +505,7 @@ def update_entity(
         update_data["updated_at"] = datetime.now(UTC).isoformat()
 
         # Atualiza o documento no Firestore
-        result = firestore_client.update_document(
+        result = await firestore_client.update_document(
             collection.value, entity_id, update_data, tenant_id=tenant
         )
 

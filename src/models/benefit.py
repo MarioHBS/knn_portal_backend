@@ -8,43 +8,51 @@ from enum import Enum
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pytz import UTC
 
+DEFAULT_NO_EXPIRY_DATE = datetime(2050, 12, 31, 23, 59, 59, tzinfo=UTC)
 
+
+# Tipos auxiliares para os campos compostos
 class BenefitValueType(str, Enum):
     """Tipos de valor de benefício."""
 
-    PERCENTAGE = "percentage"
+    PERCENTAGE = "percentage"  # valor padrão
     FIXED = "fixed"
 
 
-class BenefitType(str, Enum):
-    """Tipos de benefício."""
+class BenefitConfigurationFIELD(BaseModel):
+    """Configuração do benefício para DTO."""
+
+    value: int = Field(..., ge=0, description="Valor do benefício")
+    value_type: BenefitValueType = Field(default=BenefitValueType.PERCENTAGE)
+
+
+# class BenefitTagsFIELD(BaseModel):
+#     """Subdocumento de metadados do benefício (Firestore)."""
+
+#     tags: list[str] = Field(default_factory=list, min_length=3)
+
+
+class BenefitTypeOPTIONS(str, Enum):
+    """Tipos do benefício."""
 
     DISCOUNT = "discount"
     GIFT = "gift"
     SERVICE = "service"
 
 
-class BenefitAudience(str, Enum):
+class BenefitAudienceOPTIONS(str, Enum):
     """Público-alvo do benefício."""
 
     STUDENT = "student"
     EMPLOYEE = "employee"
 
 
-class BenefitStatus(str, Enum):
+class BenefitStatusOPTIONS(str, Enum):
     """Status do benefício."""
 
     ACTIVE = "active"
     INACTIVE = "inactive"
-    PENDING = "pending"
     EXPIRED = "expired"
-
-
-class BenefitConfigurationDTO(BaseModel):
-    """Configuração do benefício para DTO."""
-
-    value: int = Field(..., ge=0, description="Valor do benefício")
-    value_type: BenefitValueType = Field(default=BenefitValueType.PERCENTAGE)
 
 
 class BenefitModel(BaseModel):
@@ -57,13 +65,16 @@ class BenefitModel(BaseModel):
     description: str
     value: int
     value_type: BenefitValueType = BenefitValueType.PERCENTAGE
-    tags: list[str] = Field(default_factory=list)
-    type: BenefitType = BenefitType.DISCOUNT
+    tags: list[str] = Field(default_factory=list, min_length=3)
+    type: BenefitTypeOPTIONS = BenefitTypeOPTIONS.DISCOUNT
     valid_from: datetime
-    valid_to: datetime
+    valid_to: datetime | None = None
     active: bool = True
-    audience: list[BenefitAudience] = Field(
-        default_factory=lambda: [BenefitAudience.STUDENT, BenefitAudience.EMPLOYEE]
+    audience: list[BenefitAudienceOPTIONS] = Field(
+        default_factory=lambda: [
+            BenefitAudienceOPTIONS.STUDENT,
+            BenefitAudienceOPTIONS.EMPLOYEE,
+        ]
     )
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
@@ -80,15 +91,6 @@ class BenefitModel(BaseModel):
         from_attributes = True
 
 
-# DTOs para Firestore
-
-
-class BenefitMetadataDTO(BaseModel):
-    """Subdocumento de metadados do benefício (Firestore)."""
-
-    tags: list[str] = Field(default_factory=list)
-
-
 # DTO para API
 class BenefitCreateDTO(BaseModel):
     """
@@ -96,16 +98,32 @@ class BenefitCreateDTO(BaseModel):
     Os campos são todos opcionais para permitir a atualização parcial do benefício.
     """
 
-    title: str | None = None
+    title: str = Field(..., description="Título do benefício")
     description: str | None = None
-    value: int | None = None
-    value_type: BenefitValueType | None = None
-    type: BenefitType | None = None
-    valid_from: datetime | None = None
-    valid_to: datetime | None = None
-    active: bool | None = None
-    audience: list[BenefitAudience] | None = None
-    tags: list[str] | None = None
+    value: int = Field(..., ge=0, description="Valor do benefício")
+    value_type: BenefitValueType = Field(
+        default=BenefitValueType.PERCENTAGE,
+        description="Tipo de valor do benefício",
+    )
+    type: BenefitTypeOPTIONS = Field(
+        default=BenefitTypeOPTIONS.DISCOUNT, description="Tipo do benefício"
+    )
+    valid_from: datetime = Field(
+        default_factory=lambda: datetime.now(UTC), description="Data de início"
+    )
+    valid_to: datetime | None = None  # O Front pode enviar este campo nulo
+    active: bool = Field(
+        default=True, description="Status do benefício (ativo/inativo)"
+    )
+    audience: list[BenefitAudienceOPTIONS] = Field(
+        default_factory=lambda: [
+            BenefitAudienceOPTIONS.STUDENT,
+            BenefitAudienceOPTIONS.EMPLOYEE,
+        ],
+        description="Público-alvo do benefício",
+    )
+    partner_id: str = Field(..., description="ID do parceiro")
+    tags: list[str] = Field(default_factory=list, description="Tags do benefício")
 
     @field_validator("value")
     def validate_value_range(cls, v: int) -> int:  # noqa: N805
@@ -169,18 +187,21 @@ class BenefitFirestoreDTO(BaseModel):
     tenant_id: str = Field(..., description="ID do tenant associado ao benefício")
     title: str = Field(..., min_length=1, description="Título do benefício")
     description: str = Field(..., min_length=1, description="Descrição do benefício")
-    configuration: BenefitConfigurationDTO = Field(
+    configuration: BenefitConfigurationFIELD = Field(
         ..., description="Configuração do benefício"
     )
     tags: list[str] = Field(default_factory=list, description="Tags do benefício")
     valid_from: datetime
-    valid_until: datetime
+    valid_until: datetime | None = None  # permite NULO para benefícios sem expiração
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    status: BenefitStatus = Field(default=BenefitStatus.ACTIVE)
-    type: BenefitType = Field(default=BenefitType.DISCOUNT)
-    audience: list[BenefitAudience] = Field(
-        default_factory=lambda: [BenefitAudience.STUDENT, BenefitAudience.EMPLOYEE]
+    status: BenefitStatusOPTIONS = Field(default=BenefitStatusOPTIONS.ACTIVE)
+    type: BenefitTypeOPTIONS = Field(default=BenefitTypeOPTIONS.DISCOUNT)
+    audience: list[BenefitAudienceOPTIONS] = Field(
+        default_factory=lambda: [
+            BenefitAudienceOPTIONS.STUDENT,
+            BenefitAudienceOPTIONS.EMPLOYEE,
+        ]
     )
 
     @model_validator(mode="after")
@@ -190,7 +211,7 @@ class BenefitFirestoreDTO(BaseModel):
             raise ValueError("Data de término deve ser posterior à data de início")
         return self
 
-    def to_benefit(self, id: str) -> "BenefitModel":
+    def to_model(self, id: str) -> "BenefitModel":
         """
         Converte o DTO do Firestore para o modelo de domínio Benefit.
 
@@ -201,6 +222,11 @@ class BenefitFirestoreDTO(BaseModel):
         Returns:
             Uma instância do modelo Benefit.
         """
+        # Converte data especial para None quando enviar para o frontend
+        valid_to = (
+            None if self.valid_until == DEFAULT_NO_EXPIRY_DATE else self.valid_until
+        )
+
         return BenefitModel(
             id=id,
             tenant_id=self.tenant_id,
@@ -212,8 +238,8 @@ class BenefitFirestoreDTO(BaseModel):
             tags=self.tags,
             type=self.type,
             valid_from=self.valid_from,
-            valid_to=self.valid_until,
-            active=self.status == BenefitStatus.ACTIVE,
+            valid_to=valid_to,
+            active=self.status == BenefitStatusOPTIONS.ACTIVE,
             audience=self.audience,
             created_at=self.created_at,
             updated_at=self.updated_at,
@@ -241,7 +267,7 @@ class BenefitFirestoreDTO(BaseModel):
             tenant_id=tenant,
             title=create_data.title,
             description=create_data.description,
-            configuration=BenefitConfigurationDTO(
+            configuration=BenefitConfigurationFIELD(
                 value=create_data.value,
                 value_type=create_data.value_type,
             ),
@@ -253,11 +279,11 @@ class BenefitFirestoreDTO(BaseModel):
         )
 
 
-class BenefitSystemDTO(BaseModel):
-    """Subdocumento de sistema do benefício (Firestore)."""
+# class BenefitSystemDTO(BaseModel):
+#     """Subdocumento de sistema do benefício (Firestore)."""
 
-    tenant_id: str
-    type: BenefitType
-    status: BenefitStatus
-    audience: str  # No Firestore: 'students', 'employees', 'all'
-    category: str = "Parceiro"
+#     tenant_id: str
+#     type: BenefitTypeOPTIONS
+#     status: BenefitStatusOPTIONS
+#     audience: str  # No Firestore: 'students', 'employees', 'all'
+#     category: str = "Parceiro"

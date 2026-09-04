@@ -300,13 +300,13 @@ async def set_partner_individual(
     """
     try:
         # Verificar se o parceiro existe
-        verify_existence(
+        await verify_existence(
             collection=CollectionType.PARTNER,
             entity_id=id,
-            tenant_id=current_user.tenant,
+            user_tenant=current_user.tenant,
         )
 
-        return update_entity(
+        return await update_entity(
             entity_id=id,
             model=data,
             collection=CollectionType.PARTNER,

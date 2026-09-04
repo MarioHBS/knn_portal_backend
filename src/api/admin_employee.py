@@ -14,6 +14,7 @@ from src.models import (
     BaseResponse,
     CollectionType,
     EntityResponse,
+    EntityType,
 )
 from src.models.employee import (
     EmployeeCreateDTO,
@@ -40,7 +41,7 @@ async def create_employee(
     current_user: JWTPayload = Depends(validate_admin_role),
 ):
     """
-    Cria um novo funcionário.
+    Cria um Funcionário.
     """
     logger.info(
         f"Recebida requisição para criar funcionário com dados: {employee_data.model_dump()}"
@@ -52,21 +53,24 @@ async def create_employee(
             employee_data.role,
             employee_data.zip,
             employee_data.phone,
+            employee_data.email,
         )
         logger.debug(f"ID de funcionário gerado: {generated_id}")
 
         # 2. Verificar se o funcionário já existe (pelo ID gerado ou e-mail)
-        verify_existence(
+        # Passamos should_exist=False para garantir que NÃO exista (evitar duplicatas)
+        await verify_existence(
             collection=CollectionType.EMPLOYEE,
             entity_id=generated_id,
             user_tenant=current_user.tenant,
+            should_exist=False,
         )
 
         employee_dto = EmployeeFirestoreDTO.from_create(
             create_data=employee_data, tenant=current_user.tenant
         )
 
-        # Criar funcionário no Firestore
+        # 3. Criar funcionário no Firestore
         logger.info(f"Criando funcionário no Firestore com ID: {generated_id}")
         result = await firestore_client.create_document(
             CollectionType.EMPLOYEE, doc_id=generated_id, data=employee_dto.model_dump()
@@ -74,7 +78,7 @@ async def create_employee(
         logger.info(f"Funcionário criado com sucesso no Firestore: {result}")
 
         await create_firebase_user(
-            entity=CollectionType.EMPLOYEE,
+            entity=EntityType.EMPLOYEE,
             entity_name=employee_dto.name,
             entity_email=employee_dto.email,
             entity_id=generated_id,

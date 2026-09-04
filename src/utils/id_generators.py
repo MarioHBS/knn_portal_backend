@@ -28,6 +28,7 @@ class IDGenerators:
         "CONSULTOR COMERCIAL": "CC",
         "ADM. FINANCEIRO": "AF",
         "COORD. PEDAGÓGICA": "CP",
+        "GERENTE": "GE",
     }
 
     # Mapeamento de cursos para códigos
@@ -90,21 +91,21 @@ class IDGenerators:
     }
 
     @classmethod
-    def extract_initials(cls, nome: str, max_iniciais: int = 4) -> str:
+    def extract_initials(cls, name: str, max_initials: int = 4) -> str:
         """Extrai as iniciais de um nome, ignorando preposições.
 
         Args:
-            nome: Nome completo
-            max_iniciais: Número máximo de iniciais a extrair
+            name: Nome completo
+            max_initials: Número máximo de iniciais a extrair
 
         Returns:
             String com as iniciais em maiúsculo
         """
-        if not nome:
+        if not name:
             return ""
 
         # Remover acentos e caracteres especiais, mas manter hífens e apóstrofos
-        nome_limpo = re.sub(r"[^a-zA-ZÀ-ÿ\s'-]", "", nome)
+        nome_limpo = re.sub(r"[^a-zA-ZÀ-ÿ\s'-]", "", name)
 
         # Normalizar acentos (conversão básica)
         acentos = {
@@ -157,20 +158,20 @@ class IDGenerators:
         return "".join(iniciais)
 
     @classmethod
-    def extract_cep_digits(cls, cep: str) -> str:
+    def extract_cep_digits(cls, zip_code: str) -> str:
         """Extrai os últimos 3 dígitos do CEP.
 
         Args:
-            cep: CEP no formato XXXXX-XXX
+            zip_code: CEP no formato XXXXX-XXX
 
         Returns:
             Últimos 3 dígitos do CEP
         """
-        if not cep:
+        if not zip_code:
             return ""
 
         # Remover hífen e manter apenas dígitos
-        digitos = re.sub(r"[^0-9]", "", cep)
+        digitos = re.sub(r"[^0-9]", "", zip_code)
 
         if len(digitos) >= 3:
             return digitos[-3:]
@@ -178,20 +179,20 @@ class IDGenerators:
         return digitos.ljust(3, "0")  # Preencher com zeros se necessário
 
     @classmethod
-    def extract_phone_digits(cls, telefone: str) -> str:
+    def extract_phone_digits(cls, phone: str) -> str:
         """Extrai os últimos 3 dígitos do telefone.
 
         Args:
-            telefone: Número de telefone
+            phone: Número de telefone
 
         Returns:
             Últimos 3 dígitos do telefone
         """
-        if not telefone:
+        if not phone:
             return ""
 
         # Remover caracteres não numéricos
-        digitos = re.sub(r"[^0-9]", "", telefone)
+        digitos = re.sub(r"[^0-9]", "", phone)
 
         if len(digitos) >= 3:
             return digitos[-3:]
@@ -199,18 +200,18 @@ class IDGenerators:
         return digitos.ljust(3, "0")  # Preencher com zeros se necessário
 
     @classmethod
-    def extract_cnpj_digits(cls, cnpj: str, quantidade: int) -> str:
+    def extract_cnpj_digits(cls, cnpj: str, amount: int) -> str:
         """Extrai os últimos N dígitos da base de 8 dígitos do CNPJ.
 
         Args:
-            cnpj: CNPJ (pode estar formatado ou não)
-            quantidade: Quantidade de dígitos a extrair
+            tax_id: CNPJ (pode estar formatado ou não)
+            amount: Quantidade de dígitos a extrair
 
         Returns:
             Últimos N dígitos da base do CNPJ
         """
         if not cnpj:
-            return "0" * quantidade
+            return "0" * amount
 
         # Remover caracteres não numéricos para obter o CNPJ limpo
         digitos_limpos = re.sub(r"[^0-9]", "", cnpj)
@@ -219,21 +220,21 @@ class IDGenerators:
         base_cnpj = digitos_limpos[:8]
 
         # Pega os dígitos necessários do final do CNPJ base
-        digitos = base_cnpj[-quantidade:]
+        digitos = base_cnpj[-amount:]
 
         # Preenche com zeros à esquerda se a quantidade for menor que o esperado
-        return digitos.zfill(quantidade)
+        return digitos.zfill(amount)
 
     @classmethod
     def interleave_initials_digits(
-        cls, iniciais: list[str], digitos: str, tamanho_secao: int
+        cls, initials: list[str], digits: str, section_size: int
     ) -> str:
         """Intercala iniciais com dígitos para formar a seção central do ID.
 
         Args:
-            iniciais: Lista de iniciais
-            digitos: String de dígitos para intercalar
-            tamanho_secao: Tamanho da seção central
+            initials: Lista de iniciais
+            digits: String de dígitos para intercalar
+            section_size: Tamanho da seção central
 
         Returns:
             Seção central intercalada
@@ -242,46 +243,46 @@ class IDGenerators:
         idx_inicial = 0
         idx_digito = 0
 
-        while len(resultado) < tamanho_secao:
+        while len(resultado) < section_size:
             # Adiciona uma inicial se ainda houver iniciais
-            if idx_inicial < len(iniciais):
-                resultado.append(iniciais[idx_inicial])
+            if idx_inicial < len(initials):
+                resultado.append(initials[idx_inicial])
                 idx_inicial += 1
 
             # Se o resultado ainda não atingiu o tamanho, adiciona um dígito
-            if len(resultado) < tamanho_secao and idx_digito < len(digitos):
-                resultado.append(digitos[idx_digito])
+            if len(resultado) < section_size and idx_digito < len(digits):
+                resultado.append(digits[idx_digito])
                 idx_digito += 1
             # Se acabaram os dígitos mas não as iniciais, continue com as iniciais
-            elif len(resultado) < tamanho_secao and idx_inicial < len(iniciais):
+            elif len(resultado) < section_size and idx_inicial < len(initials):
                 continue
             # Se acabaram ambos, preencha com o que for necessário (ou nada, se a lógica for outra)
-            elif len(resultado) < tamanho_secao:
+            elif len(resultado) < section_size:
                 # Se acabaram os dígitos, mas o tamanho da seção ainda não foi atingido,
                 # preenche com as iniciais restantes (se houver)
-                if idx_inicial < len(iniciais):
-                    resultado.append(iniciais[idx_inicial])
+                if idx_inicial < len(initials):
+                    resultado.append(initials[idx_inicial])
                     idx_inicial += 1
                 else:
                     # Se não há mais iniciais nem dígitos, preenche com '0'
                     resultado.append("0")
 
-        return "".join(resultado[:tamanho_secao])
+        return "".join(resultado[:section_size])
 
     @classmethod
-    def extract_partner_initials(cls, nome: str) -> str:
+    def extract_partner_initials(cls, name: str) -> str:
         """Extrai iniciais do nome do parceiro ignorando preposições.
 
         Método específico para benefícios que retorna string ao invés de lista.
 
         Args:
-            nome: Nome completo do parceiro
+            name: Nome completo do parceiro
 
         Returns:
             String com iniciais em maiúsculo
         """
         preposicoes = {"da", "de", "do", "dos", "das", "e", "&", "em", "na", "no"}
-        palavras = nome.split()
+        palavras = name.split()
         iniciais = ""
 
         for palavra in palavras:
@@ -311,90 +312,93 @@ class IDGenerators:
     @classmethod
     def generate_student_id(
         cls,
-        nome: str,
-        curso: str = "",
-        cep: str = "",
-        celular: str = "",
+        name: str,
+        course: str = "",
+        zip_code: str = "",
+        phone: str = "",
         email: str = "",
     ) -> str:
         """Gera ID para aluno seguindo o padrão STD_XXXXXXXX_XX.
 
         Args:
-            nome: Nome completo do aluno
-            curso: Curso do aluno
-            cep: CEP do aluno
-            celular: Celular do aluno
+            name: Nome completo do aluno
+            course: Curso do aluno
+            zip_code: CEP do aluno
+            phone: Celular do aluno
             email: Email do aluno
 
         Returns:
             ID do aluno no formato STD_XXXXXXXX_XX
         """
         # 1. Extrair iniciais
-        iniciais = cls.extract_initials(nome)
+        initials = cls.extract_initials(name)
 
         # 2. Obter código do curso
-        # logger.debug(f"Curso recebido: {curso}")
-        # logger.debug(f"Curso em maiúsculas: {curso.upper()}")
+        # logger.debug(f"Curso recebido: {course}")
+        # logger.debug(f"Curso em maiúsculas: {course.upper()}")
         # logger.debug(f"CURSO_CODES: {CURSO_CODES}")
-        codigo_curso = cls.CURSO_CODES.get(curso.upper(), "XX")
+        course_code = cls.CURSO_CODES.get(course.upper(), "XX")
 
         # 3. Calcular tamanho da seção central
-        tamanho_secao = 15 - 4 - len(codigo_curso) - 1  # STD_ + _ + codigo
+        section_size = 15 - 4 - len(course_code) - 1  # STD_ + _ + codigo
 
         # 4. Obter dígitos de preenchimento
-        digitos_cep = cls.extract_cep_digits(cep)
-        digitos_celular = cls.extract_phone_digits(celular)
+        zip_digits = cls.extract_cep_digits(zip_code)
+        phone_digits = cls.extract_phone_digits(phone)
 
         # Extrair dígitos do email se necessário
-        digitos_email = re.sub(r"[^0-9]", "", email) if email else ""
+        email_digits = re.sub(r"[^0-9]", "", email) if email else ""
 
         # Combinar todos os dígitos
-        todos_digitos = digitos_cep + digitos_celular + digitos_email
+        all_digits = zip_digits + phone_digits + email_digits
 
         # 5. Intercalar iniciais com dígitos
-        secao_central = cls.interleave_initials_digits(
-            iniciais, todos_digitos, tamanho_secao
+        central_section = cls.interleave_initials_digits(
+            initials, all_digits, section_size
         )
 
         # 6. Construir ID final
-        return f"STD_{secao_central}_{codigo_curso}"
+        return f"STD_{central_section}_{course_code}"
 
     @classmethod
     def generate_employee_id(
-        cls, nome: str, cpf: str, cargo: str, cep: str = "", telefone: str = ""
+        cls,
+        name: str,
+        role: str,
+        zip_code: str = "",
+        phone: str = "",
+        email: str = "",
     ) -> str:
         """Gera ID para funcionário seguindo o padrão EMP_XXXXXXXX_XX.
         Args:
-            nome: Nome completo do funcionário
-            cpf: CPF do funcionário (deve conter 11 dígitos)
-            cargo: Cargo do funcionário
-            cep: CEP do funcionário
-            telefone: Telefone do funcionário
+            name: Nome completo do funcionário
+            role: Cargo do funcionário
+            zip_code: CEP do funcionário
+            phone: Telefone do funcionário
+            email: Email do funcionário
         Returns:
             ID do funcionário no formato EMP_XXXXXXXX_XX
         """
-        # 0. Validar CPF
-        cpf_limpo = re.sub(r"[^0-9]", "", cpf)
-        if len(cpf_limpo) != 11:
-            raise ValueError("O CPF deve conter exatamente 11 dígitos.")
-
         # 1. Extrair iniciais
-        iniciais = cls.extract_initials(nome)
+        initials = cls.extract_initials(name)
         # 2. Obter código do cargo
-        codigo_cargo = cls.CARGO_CODES.get(cargo.upper(), "XX")
+        role_code = cls.CARGO_CODES.get(role.upper(), "XX")
         # 3. Calcular tamanho da seção central
-        tamanho_secao = 15 - 4 - len(codigo_cargo) - 1  # EMP_ + _ + codigo
+        section_size = 15 - 4 - len(role_code) - 1  # EMP_ + _ + codigo
         # 4. Obter dígitos de preenchimento
-        digitos_cep = cls.extract_cep_digits(cep)
-        digitos_telefone = cls.extract_phone_digits(telefone)
+        zip_digits = cls.extract_cep_digits(zip_code)
+        phone_digits = cls.extract_phone_digits(phone)
+        email_digits = re.sub(r"[^0-9]", "", email) if email else ""
+
         # Combinar dígitos
-        todos_digitos = digitos_cep + digitos_telefone + cpf_limpo
+        all_digits = zip_digits + phone_digits + email_digits
+
         # 5. Intercalar iniciais com dígitos
-        secao_central = cls.interleave_initials_digits(
-            iniciais, todos_digitos, tamanho_secao
+        central_section = cls.interleave_initials_digits(
+            initials, all_digits, section_size
         )
         # 6. Construir ID final
-        return f"EMP_{secao_central}_{codigo_cargo}"
+        return f"EMP_{central_section}_{role_code}"
 
     @classmethod
     def generate_partner_id(
@@ -411,46 +415,46 @@ class IDGenerators:
             ID do parceiro no formato PTN_XXXXXXX_XXX
         """
         # 0. Validar CNPJ
-        cnpj_limpo = re.sub(r"[^0-9]", "", cnpj)
-        if len(cnpj_limpo) != 14:
+        clean_cnpj = re.sub(r"[^0-9]", "", cnpj)
+        if len(clean_cnpj) != 14:
             raise ValueError("O CNPJ deve conter exatamente 14 dígitos.")
 
         # 1. Extrair iniciais
-        iniciais = cls.extract_initials(trade_name)
+        initials = cls.extract_initials(trade_name)
 
         # 2. Obter código da categoria
-        codigo_categoria = cls.CATEGORY_CODES.get(category, "OUT")
+        category_code = cls.CATEGORY_CODES.get(category, "OUT")
 
         # 3. Definir tamanho da seção central
-        tamanho_secao = 7
+        section_size = 7
 
         # 4. Calcular quantos dígitos do CNPJ são necessários
         # Garante que não seja negativo se as iniciais forem muito longas
-        digitos_necessarios = max(0, tamanho_secao - len(iniciais))
+        needed_digits = max(0, section_size - len(initials))
 
         # 5. Extrair dígitos do CNPJ
-        digitos_cnpj = cls.extract_cnpj_digits(cnpj, digitos_necessarios)
+        cnpj_digits = cls.extract_cnpj_digits(cnpj, needed_digits)
 
         # 6. Intercalar iniciais com dígitos do CNPJ
-        secao_central = cls.interleave_initials_digits(
-            iniciais, digitos_cnpj, tamanho_secao
+        central_section = cls.interleave_initials_digits(
+            initials, cnpj_digits, section_size
         )
 
         # 7. Construir ID final
-        return f"PTN_{secao_central}_{codigo_categoria}"
+        return f"PTN_{central_section}_{category_code}"
 
     @classmethod
     def generate_benefit_id_old(
-        cls, nome_parceiro: str, contador: int, tipo_beneficio: str
+        cls, partner_name: str, counter: int, benefit_type: str
     ) -> str:
         """Gera ID único para benefício seguindo padrão simplificado.
 
         Formato: BNF_[INICIAIS]_[CONTADOR]_[TIPO]
 
         Args:
-            nome_parceiro: Nome completo do parceiro
-            contador: Número sequencial do benefício (0, 1, 2...)
-            tipo_beneficio: Tipo do benefício (DESCONTO, CASHBACK, etc.)
+            partner_name: Nome completo do parceiro
+            counter: Número sequencial do benefício (0, 1, 2...)
+            benefit_type: Tipo do benefício (DESCONTO, CASHBACK, etc.)
 
         Returns:
             ID único do benefício no formato BNF_[INICIAIS]_[CONTADOR]_[TIPO]
@@ -462,22 +466,22 @@ class IDGenerators:
             'BNF_CA_01_FG'
         """
         # Extrair iniciais do parceiro
-        iniciais = "".join(cls.extract_initials(nome_parceiro))
+        initials = "".join(cls.extract_initials(partner_name))
 
         # Formatar contador com 2 dígitos
-        contador_formatado = f"{contador:02d}"
+        formatted_counter = f"{counter:02d}"
 
         # Obter código do tipo de benefício
-        codigo_tipo = cls.TIPO_BENEFICIO_CODES.get(tipo_beneficio.upper(), "DC")
+        type_code = cls.TIPO_BENEFICIO_CODES.get(benefit_type.upper(), "DC")
 
         # Montar ID final
-        id_beneficio = f"BNF_{iniciais}_{contador_formatado}_{codigo_tipo}"
+        benefit_id = f"BNF_{initials}_{formatted_counter}_{type_code}"
 
-        return id_beneficio
+        return benefit_id
 
     @classmethod
     def generate_benefit_id(
-        cls, iniciais_parceiro: str, tipo_beneficio: str = "DESCONTO"
+        cls, partner_initials: str, benefit_type: str = "DESCONTO"
     ) -> str:
         """Gera ID único para benefício baseado em timestamp + hash.
 
@@ -491,8 +495,8 @@ class IDGenerators:
         - Mantém ordem cronológica aproximada
 
         Args:
-            iniciais_parceiro: Iniciais do parceiro (ex: "TL", "AE")
-            tipo_beneficio: Tipo do benefício (DESCONTO, CASHBACK, etc.)
+            partner_initials: Iniciais do parceiro (ex: "TL", "AE")
+            benefit_type: Tipo do benefício (DESCONTO, CASHBACK, etc.)
 
         Returns:
             ID único do benefício no formato BNF_[INICIAIS]_[ID5]_[TIPO]
@@ -521,7 +525,7 @@ class IDGenerators:
             return result
 
         # Gerar hash curto para garantir unicidade adicional
-        hash_input = f"{iniciais_parceiro}_{timestamp_ms}_{tipo_beneficio}"
+        hash_input = f"{partner_initials}_{timestamp_ms}_{benefit_type}"
         hash_short = hashlib.md5(hash_input.encode()).hexdigest()[:2].upper()
 
         # Timestamp em base36 (mais compacto)
@@ -530,23 +534,23 @@ class IDGenerators:
         timestamp_b36 = to_base36(timestamp_ms)[-3:]  # Últimos 3 caracteres
 
         # Combinar timestamp + hash para garantir unicidade
-        identificador = f"{timestamp_b36}{hash_short}"
+        identifier = f"{timestamp_b36}{hash_short}"
 
         # Obter código do tipo de benefício
-        codigo_tipo = cls.TIPO_BENEFICIO_CODES.get(tipo_beneficio.upper(), "DC")
+        type_code = cls.TIPO_BENEFICIO_CODES.get(benefit_type.upper(), "DC")
 
         # Montar ID final
-        id_beneficio = f"BNF_{iniciais_parceiro}_{identificador}_{codigo_tipo}"
+        benefit_id = f"BNF_{partner_initials}_{identifier}_{type_code}"
 
-        return id_beneficio
+        return benefit_id
 
     @classmethod
-    def validate_id_format(cls, id_str: str, tipo: str) -> bool:
+    def validate_id_format(cls, id_str: str, id_type: str) -> bool:
         """Valida se um ID está no formato correto.
 
         Args:
             id_str: ID a ser validado
-            tipo: Tipo do ID ('student', 'employee', 'partner', 'benefit')
+            id_type: Tipo do ID ('student', 'employee', 'partner', 'benefit')
 
         Returns:
             True se o formato estiver correto
@@ -554,22 +558,22 @@ class IDGenerators:
         if not id_str or len(id_str) < 10:
             return False
 
-        if tipo == "student":
+        if id_type == "student":
             return (
                 bool(re.match(r"^STD_[A-Z0-9]{8}_[A-Z0-9]{2}$", id_str))
                 and len(id_str) == 15
             )
-        elif tipo == "employee":
+        elif id_type == "employee":
             return (
                 bool(re.match(r"^EMP_[A-Z0-9]{7,8}_[A-Z]{2,3}$", id_str))
                 and len(id_str) == 15
             )
-        elif tipo == "partner":
+        elif id_type == "partner":
             return (
                 bool(re.match(r"^PTN_[A-Z0-9]{7}_[A-Z]{3}$", id_str))
                 and len(id_str) == 15
             )
-        elif tipo == "benefit":
+        elif id_type == "benefit":
             # Suporte a ambos os formatos:
             # Formato antigo (sequencial): BNF_[INICIAIS]_[00-99]_[TIPO]
             # Formato novo (timestamp): BNF_[INICIAIS]_[ID5]_[TIPO]

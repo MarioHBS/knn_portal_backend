@@ -44,10 +44,10 @@ async def create_student(
     try:
         # 1. Gerar ID do aluno
         student_id = IDGenerators.generate_student_id(
-            nome=student_data.name,
-            curso=student_data.book,  # Assumindo que 'book' é o curso
-            cep=student_data.zip or "",
-            celular=student_data.student_phone or "",
+            name=student_data.name,
+            course=student_data.book,  # Assumindo que 'book' é o curso
+            zip_code=student_data.zip or "",
+            phone=student_data.student_phone or "",
             email=student_data.email,
         )
         logger.debug(f"ID do aluno gerado: {student_id}")
@@ -235,7 +235,7 @@ async def get_student_individual(
                 },
             )
 
-        student = StudentFirestoreDTO(**student_data).to_model()
+        student = StudentFirestoreDTO(**student_data).to_model(id)
         return EntityResponse[StudentModel](
             data=student, msg="Estudante encontrado com sucesso"
         )
@@ -269,14 +269,14 @@ async def set_student_individual(
     """
     try:
         # Verificar se o estudante existe
-        verify_existence(
+        await verify_existence(
             CollectionType.STUDENT.value,
             id,
             current_user.tenant,
             "Estudante não encontrado",
         )
 
-        return update_entity(
+        return await update_entity(
             entity_id=id,
             model=data,
             collection=CollectionType.STUDENT,
@@ -311,7 +311,7 @@ async def delete_student(
         # 1. Verifica a existência do estudante
         await verify_existence(CollectionType.STUDENT, id, current_user.tenant)
 
-        # 2. Exclui o usuário associado no Firebase Authentication e na coleção 'users' do Firestore
+        # 2. Exclui usuário associado no Firebase Authentication e na coleção 'users' do Firestore
         await delete_firebase_user(EntityType.STUDENT, id, current_user.tenant)
 
         # 3. Exclui o documento associado da coleção 'students'

@@ -32,7 +32,7 @@ class StudentModel(BaseModel):
     student_occupation: str | None = None
     student_email: str | None = None
     student_phone: str | None = None
-    zip: str | None = None
+    add_zip: str | None = None
     add_neighbor: str | None = None
     add_complement: str | None = None
     guardian: StudentGuardian | None = None

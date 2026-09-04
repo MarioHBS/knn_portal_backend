@@ -400,7 +400,7 @@ async def create_custom_metric(
                     "msg": "Erro ao criar métrica customizada",
                 }
             },
-        )
+        ) from e
 
 
 @router.get("/performance", response_model=BaseResponse)
@@ -457,7 +457,7 @@ async def get_performance_metrics(
                     "msg": "Erro ao obter métricas de performance",
                 }
             },
-        )
+        ) from e
 
 
 @router.get("/alerts", response_model=BaseResponse)
@@ -513,7 +513,7 @@ async def get_system_alerts(
                     "msg": "Erro ao obter alertas do sistema",
                 }
             },
-        )
+        ) from e
 
 
 @router.get("/export", response_model=BaseResponse)
@@ -585,4 +585,4 @@ async def export_metrics(
             detail={
                 "error": {"code": "EXPORT_ERROR", "msg": "Erro ao exportar métricas"}
             },
-        )
+        ) from e
