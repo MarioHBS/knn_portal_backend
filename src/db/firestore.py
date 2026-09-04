@@ -319,6 +319,26 @@ class FirestoreClient:
             raise Exception(f"Erro ao criar documento {collection}/{doc_id}") from e
 
     @staticmethod
+    async def update_document(
+        collection: str, doc_id: str, data: dict[str, Any], tenant_id: str | None = None
+    ) -> dict[str, Any]:
+        """
+        Atualiza um documento no Firestore.
+        """
+        if not db:
+            logger.error("Firestore não inicializado")
+            raise Exception("Firestore não inicializado")
+
+        try:
+            doc_ref = db.collection(collection).document(doc_id)
+            await asyncio.to_thread(doc_ref.update, data)
+            logger.info(f"Documento {collection}/{doc_id} atualizado com sucesso.")
+            return {**data, "id": doc_id}
+        except Exception as e:
+            logger.error(f"Erro ao atualizar documento {collection}/{doc_id}: {str(e)}")
+            raise Exception(f"Erro ao atualizar documento {collection}/{doc_id}") from e
+
+    @staticmethod
     async def delete_document(collection: str, doc_id: str) -> None:
         """
         Deleta um documento do Firestore.

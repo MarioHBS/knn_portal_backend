@@ -47,7 +47,7 @@ def import_data_to_firestore(project_id: str, data_file: str, use_emulator: bool
                     credential=mock_credentials,
                     options={"projectId": project_id}
                 )
-            except:
+            except Exception:
                 firebase_admin.initialize_app(options={"projectId": project_id})
 
     db = firestore.client()

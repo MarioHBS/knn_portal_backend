@@ -33,7 +33,7 @@ class PostgresClient:
                 logger.info("Pool de conexões PostgreSQL criado com sucesso")
             except Exception as e:
                 logger.error(f"Erro ao criar pool PostgreSQL: {str(e)}", exc_info=True)
-                raise Exception(f"Erro ao criar pool PostgreSQL") from e
+                raise Exception("Erro ao criar pool PostgreSQL") from e
         return cls._pool
 
     @staticmethod
@@ -47,7 +47,7 @@ class PostgresClient:
             return conn
         except Exception as e:
             logger.error(f"Erro ao conectar ao PostgreSQL: {str(e)}", exc_info=True)
-            raise Exception(f"Erro ao conectar ao PostgreSQL") from e
+            raise Exception("Erro ao conectar ao PostgreSQL") from e
 
     @staticmethod
     async def release_connection(conn):
@@ -256,7 +256,7 @@ class PostgresClient:
                 await conn.close()
         except Exception as e:
             logger.error(f"Erro ao executar transação: {str(e)}")
-            raise Exception(f"Erro ao executar transação") from e
+            raise Exception("Erro ao executar transação") from e
 
 
 # Instância do cliente PostgreSQL
