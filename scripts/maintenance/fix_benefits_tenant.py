@@ -64,11 +64,7 @@ def fix_benefits_tenant(
         updates: dict[str, Any] = {}
 
         # Decidir atualização de nível de documento
-        need_update_doc = False
-        if only_missing:
-            need_update_doc = not bool(current_doc_tenant)
-        else:
-            need_update_doc = True
+        need_update_doc = not bool(current_doc_tenant) if only_missing else True
 
         if need_update_doc:
             updates["tenant_id"] = tenant_id
@@ -81,11 +77,7 @@ def fix_benefits_tenant(
                 system = value.get("system", {}) if isinstance(value, dict) else {}
                 current_b_tenant = system.get("tenant_id")
 
-                need_update_benefit = False
-                if only_missing:
-                    need_update_benefit = not bool(current_b_tenant)
-                else:
-                    need_update_benefit = True
+                need_update_benefit = not bool(current_b_tenant) if only_missing else True
 
                 if need_update_benefit:
                     # Campo aninhado: BNF_xxx.system.tenant_id

@@ -22,8 +22,8 @@ try:
 except ImportError:
     print("python-dotenv não encontrado, usando variáveis de ambiente do sistema")
 
-from src.db.firestore import db
-from src.utils.logging import logger
+from src.db.firestore import db  # noqa: E402
+from src.utils.logging import logger  # noqa: E402
 
 
 async def fix_student_name(tenant_id: str, student_id: str, new_name: str):

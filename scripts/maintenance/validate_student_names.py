@@ -22,8 +22,8 @@ except ImportError:
     print("python-dotenv não encontrado, usando variáveis de ambiente do sistema")
 
 
-from src.db.firestore import db  # Import the initialized db object
-from src.utils.logging import logger
+from src.db.firestore import db  # noqa: E402
+from src.utils.logging import logger  # noqa: E402
 
 
 async def validate_student_names():
@@ -50,7 +50,7 @@ async def validate_student_names():
             logger.info(f"Verificando estudantes para o tenant: {tenant_id}")
             # Query students for the current tenant
             students_ref = db.collection("students").where("tenant_id", "==", tenant_id)
-            students = [doc for doc in students_ref.stream()]
+            students = list(students_ref.stream())
 
             if not students:
                 logger.info(f"Nenhum estudante encontrado para o tenant: {tenant_id}")

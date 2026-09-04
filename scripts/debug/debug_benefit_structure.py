@@ -11,7 +11,7 @@ current_dir = Path(__file__).parent
 src_path = current_dir / "src"
 sys.path.insert(0, str(src_path))
 
-from db.firestore import db
+from db.firestore import db  # noqa: E402
 
 
 def debug_benefit_structure():

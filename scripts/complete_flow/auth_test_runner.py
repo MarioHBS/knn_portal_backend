@@ -9,9 +9,9 @@ Autor: Sistema de Testes KNN
 Data: 2025-01-06
 """
 
+import argparse
 import os
 import sys
-import argparse
 from datetime import datetime
 
 # Importar os testadores específicos

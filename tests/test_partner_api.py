@@ -14,11 +14,11 @@ from fastapi.testclient import TestClient
 from src.api.partner import router
 from src.auth import JWTPayload
 from src.models import (
-    BenefitAudience,
-    BenefitCreationDTO,
+    BenefitAudienceOPTIONS,
+    BenefitCreateDTO,
     BenefitModel,
-    BenefitStatus,
-    BenefitType,
+    BenefitStatusOPTIONS,
+    BenefitTypeOPTIONS,
     BenefitValueType,
     RedeemRequest,
 )
@@ -76,11 +76,11 @@ def mock_benefit():
         tenant_id="knn",
         title="Desconto 20%",
         description="20% de desconto em todos os produtos.",
-        benefit_type=BenefitType.DISCOUNT,
+        benefit_type=BenefitTypeOPTIONS.DISCOUNT,
         value=20.0,
         value_type=BenefitValueType.PERCENTAGE,
-        status=BenefitStatus.ACTIVE,
-        audience=BenefitAudience.STUDENT,
+        status=BenefitStatusOPTIONS.ACTIVE,
+        audience=BenefitAudienceOPTIONS.STUDENT,
         start_date=now,
         end_date=now + timedelta(days=30),
     ).model_dump(mode="json")
@@ -282,14 +282,14 @@ class TestPartnerBenefitsEndpoints:
 
             from src.api.partner import create_benefit
 
-            request_data = BenefitCreationDTO(
+            request_data = BenefitCreateDTO(
                 title="Novo Benefício",
                 description="Descrição do novo benefício.",
-                benefit_type=BenefitType.DISCOUNT,
+                benefit_type=BenefitTypeOPTIONS.DISCOUNT,
                 value=10.0,
                 value_type=BenefitValueType.PERCENTAGE,
-                status=BenefitStatus.ACTIVE,
-                audience=BenefitAudience.ALL,
+                status=BenefitStatusOPTIONS.ACTIVE,
+                audience=BenefitAudienceOPTIONS.ALL,
                 start_date=datetime.now(),
                 end_date=datetime.now() + timedelta(days=30),
             )
@@ -307,14 +307,14 @@ class TestPartnerBenefitsEndpoints:
         ):
             from src.api.partner import create_benefit
 
-            request_data = BenefitCreationDTO(
+            request_data = BenefitCreateDTO(
                 title="Benefício Inválido",
                 description="Descrição.",
-                benefit_type=BenefitType.DISCOUNT,
+                benefit_type=BenefitTypeOPTIONS.DISCOUNT,
                 value=10.0,
                 value_type=BenefitValueType.PERCENTAGE,
-                status=BenefitStatus.ACTIVE,
-                audience=BenefitAudience.ALL,
+                status=BenefitStatusOPTIONS.ACTIVE,
+                audience=BenefitAudienceOPTIONS.ALL,
                 start_date=datetime.now() + timedelta(days=30),  # Data futura
                 end_date=datetime.now(),  # Data passada
             )
@@ -340,14 +340,14 @@ class TestPartnerBenefitsEndpoints:
 
             from src.api.partner import update_benefit
 
-            request_data = BenefitCreationDTO(
+            request_data = BenefitCreateDTO(
                 title="Benefício Atualizado",
                 description="Descrição atualizada.",
-                benefit_type=BenefitType.DISCOUNT,
+                benefit_type=BenefitTypeOPTIONS.DISCOUNT,
                 value=15.0,
                 value_type=BenefitValueType.PERCENTAGE,
-                status=BenefitStatus.ACTIVE,
-                audience=BenefitAudience.STUDENT,
+                status=BenefitStatusOPTIONS.ACTIVE,
+                audience=BenefitAudienceOPTIONS.STUDENT,
                 start_date=datetime.now(),
                 end_date=datetime.now() + timedelta(days=60),
             )
@@ -369,14 +369,14 @@ class TestPartnerBenefitsEndpoints:
         ):
             from src.api.partner import update_benefit
 
-            request_data = BenefitCreationDTO(
+            request_data = BenefitCreateDTO(
                 title="Benefício",
                 description="Descrição.",
-                benefit_type=BenefitType.DISCOUNT,
+                benefit_type=BenefitTypeOPTIONS.DISCOUNT,
                 value=10.0,
                 value_type=BenefitValueType.PERCENTAGE,
-                status=BenefitStatus.ACTIVE,
-                audience=BenefitAudience.ALL,
+                status=BenefitStatusOPTIONS.ACTIVE,
+                audience=BenefitAudienceOPTIONS.ALL,
                 start_date=datetime.now(),
                 end_date=datetime.now() + timedelta(days=30),
             )
@@ -400,14 +400,14 @@ class TestPartnerBenefitsEndpoints:
         ):
             from src.api.partner import update_benefit
 
-            request_data = BenefitCreationDTO(
+            request_data = BenefitCreateDTO(
                 title="Benefício",
                 description="Descrição.",
-                benefit_type=BenefitType.DISCOUNT,
+                benefit_type=BenefitTypeOPTIONS.DISCOUNT,
                 value=10.0,
                 value_type=BenefitValueType.PERCENTAGE,
-                status=BenefitStatus.ACTIVE,
-                audience=BenefitAudience.ALL,
+                status=BenefitStatusOPTIONS.ACTIVE,
+                audience=BenefitAudienceOPTIONS.ALL,
                 start_date=datetime.now(),
                 end_date=datetime.now() + timedelta(days=30),
             )
@@ -435,7 +435,7 @@ class TestPartnerBenefitsEndpoints:
 
             assert result["msg"] == "ok"
             mock_firestore.update_document.assert_called_once_with(
-                "benefits", "benefit-123", {"status": BenefitStatus.ARCHIVED}
+                "benefits", "benefit-123", {"status": BenefitStatusOPTIONS.ARCHIVED}
             )
 
     @pytest.mark.asyncio

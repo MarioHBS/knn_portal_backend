@@ -155,7 +155,7 @@ def generate_recommendations(partners, existing_images):
             if partner["id"] in existing_images:
                 categories[cat]["with_images"] += 1
 
-    for cat, info in categories.items():
+    for _cat, info in categories.items():
         info["coverage_percentage"] = (
             (info["with_images"] / info["total"]) * 100 if info["total"] > 0 else 0
         )

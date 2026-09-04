@@ -223,7 +223,7 @@ class QuickEmployeeTester:
                     or "expirado" in error_msg
                     or "expired" in error_msg
                 )
-            except:
+            except Exception:
                 return True  # Assume token expirado para qualquer 401
         return False
 

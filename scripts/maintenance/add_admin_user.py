@@ -182,9 +182,9 @@ def main():
     print("🚀 Iniciando processo de adição de administrador...\n")
 
     # Configurações
-    EMPLOYEE_ID = "EMP_F0F0O069_CC"
-    OLD_UID = "zRC8AsHsjlTDTHVf71AxyFmkEpx1"
-    PASSWORD = "Fo654321"
+    employee_id = "EMP_F0F0O069_CC"
+    old_uid = "zRC8AsHsjlTDTHVf71AxyFmkEpx1"
+    password = "Fo654321"
 
     try:
         # Inicializar Firebase
@@ -193,8 +193,8 @@ def main():
         print("✅ Firebase inicializado com sucesso\n")
 
         # Obter dados do funcionário
-        print(f"📋 Obtendo dados do funcionário {EMPLOYEE_ID}...")
-        employee_data = get_employee_data(EMPLOYEE_ID)
+        print(f"📋 Obtendo dados do funcionário {employee_id}...")
+        employee_data = get_employee_data(employee_id)
 
         if not employee_data:
             print("❌ Não foi possível obter dados do funcionário")
@@ -206,7 +206,7 @@ def main():
 
         # Criar usuário administrador no Firebase Auth
         print("👤 Criando usuário administrador no Firebase Authentication...")
-        new_uid = create_admin_user(employee_data, PASSWORD)
+        new_uid = create_admin_user(employee_data, password)
 
         if not new_uid:
             print("❌ Falha ao criar usuário administrador")
@@ -216,7 +216,7 @@ def main():
 
         # Atualizar coleção 'users'
         print("📝 Atualizando coleção 'users' no Firestore...")
-        success = update_users_collection(OLD_UID, new_uid, employee_data)
+        success = update_users_collection(old_uid, new_uid, employee_data)
 
         if not success:
             print("❌ Falha ao atualizar coleção 'users'")
@@ -227,7 +227,7 @@ def main():
         # Resumo final
         print("🎉 PROCESSO CONCLUÍDO COM SUCESSO!")
         print(f"📧 Email: {employee_data.get('email')}")
-        print(f"🔑 Senha: {PASSWORD}")
+        print(f"🔑 Senha: {password}")
         print(f"🆔 Novo UID: {new_uid}")
         print(f"👤 Nome: {employee_data.get('name')}")
         print("🏢 Função: admin")

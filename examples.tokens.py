@@ -46,7 +46,9 @@ async def get_file_url_with_token(file_path: str, method: str = "signed"):
             raise HTTPException(status_code=400, detail="Método inválido")
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao obter URL: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Erro ao obter URL: {str(e)}"
+        ) from e
 
 
 async def get_signed_url(file_path: str) -> dict:
@@ -168,7 +170,7 @@ async def upload_file_and_get_url(file_path: str, file_content: bytes):
         return {"message": "Arquivo enviado com sucesso", "file_info": url_info}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro no upload: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro no upload: {str(e)}") from e
 
 
 @app.get("/storage/file-info/{file_path:path}")
@@ -201,7 +203,7 @@ async def get_file_info(file_path: str):
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Erro ao obter informações: {str(e)}"
-        )
+        ) from e
 
 
 # Exemplo de uso com diferentes configurações
@@ -234,7 +236,7 @@ async def get_url_examples(file_path: str):
         return results
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro: {str(e)}") from e
 
 
 if __name__ == "__main__":
