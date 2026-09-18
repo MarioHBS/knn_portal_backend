@@ -113,16 +113,16 @@ Analisa a estrutura dos documentos no Firestore para debugging
 
 ```bash
 # 1. Gerar token
-python scripts/complete_flow/generate_token.py
+python scripts/testing/e2e/generate_token.py
 
 # 2. Testar endpoint
-python scripts/complete_flow/test_direct_endpoint.py
+python scripts/testing/e2e/test_direct_endpoint.py
 
 # 3. Verificar tenant (se necessário)
-python scripts/complete_flow/check_tenant.py
+python scripts/debug/check_tenant.py
 
 # 4. Corrigir tenant do documento (se necessário)
-python scripts/complete_flow/fix_document_tenant.py
+python scripts/migration/fix_document_tenant.py
 ```
 
 ## Configurações Importantes

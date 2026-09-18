@@ -24,7 +24,7 @@ import requests
 
 # Adiciona o diretório raiz do projeto ao sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from scripts.complete_flow.base_auth_test import (
+from scripts.testing.e2e.base_auth_test import (
     BACKEND_BASE_URL,
     TEST_USERS,
     BaseAuthenticationTester,

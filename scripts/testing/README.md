@@ -21,20 +21,51 @@ A suíte de testes foi desenvolvida para:
 
 ## 📁 Estrutura do Projeto
 
+> Atualizado em 2026-09-18 (stage `limpeza-dados-infra`) para refletir os
+> arquivos reais em disco — a versão anterior desta seção citava
+> `test_student_endpoints.py`/`test_employee_endpoints.py`/etc., que nunca
+> existiram neste diretório.
+
 ```text
 scripts/testing/
-├── 📄 README.md                    # Esta documentação
-├── ⚙️ test_config.py              # Configurações centralizadas
-├── 🎯 test_runner.py               # Executor principal de testes
-├── 📊 report_generator.py          # Gerador de relatórios
-├── 🚀 start_backend.py             # Gerenciador do backend
-├── 🎮 run_all_tests.py             # Script principal
-├── 👨‍🎓 test_student_endpoints.py   # Testes de Student
-├── 👨‍💼 test_employee_endpoints.py  # Testes de Employee
-├── 👨‍💻 test_admin_endpoints.py     # Testes de Admin
-└── 🏢 test_partner_endpoints.py    # Testes de Partner
+├── README.md                          # Esta documentação
+├── README_COMPLETE_AUTH_TEST.md       # Doc específica do fluxo em e2e/complete_auth_flow_test.py
+├── test_config.py                      # Configurações centralizadas
+├── test_runner.py                      # Executor principal de testes
+├── report_generator.py                 # Gerador de relatórios
+├── start_backend.py                    # Gerenciador do backend
+├── run_all_tests.py                    # Script principal
+├── setup_auth_test_env.py
+├── quick_auth_test.py
+├── debug_partner_benefits_search.py
+├── fix_partner_benefits_structure.py
+├── test_audience_implementation.py
+├── test_benefits_comparison.py
+├── test_benefits_direct_access.py
+├── test_endpoint_direct.py
+├── test_partner_benefits_direct.py
+├── test_student_partner_details.py
+├── test_suite.py
+├── verify_partner_entity_mapping.py
+├── requirements.txt
+└── e2e/                                 # Ex-`scripts/complete_flow/` (absorvido nesta
+    │                                     # stage): suíte completa de autenticação +
+    │                                     # fluxo ponta a ponta por perfil (admin,
+    │                                     # employee, partner, student)
+    ├── base_auth_test.py
+    ├── auth_test_runner.py
+    ├── complete_auth_flow_test.py
+    ├── generate_token.py
+    ├── admin_auth_test.py / quick_admin_test.py
+    ├── employee_auth_test.py / quick_employee_test.py
+    ├── partner_auth_test.py / quick_partner_test.py
+    ├── student_auth_test.py / quick_student_test.py / quick_courses_test.py
+    ├── test_direct_benefit.py / test_direct_endpoint.py / test_list_benefits.py
+    │   / test_with_real_benefit.py
+    └── README.md                        # Histórico da investigação original (2025-09)
+                                          # que deu origem a este fluxo
 
-reports/                           # Relatórios gerados
+reports/                           # Relatórios gerados (gitignorados, regeneráveis)
 ├── 📄 test_report_YYYYMMDD_HHMMSS.html
 ├── 📄 test_report_YYYYMMDD_HHMMSS.json
 ├── 📄 test_report_YYYYMMDD_HHMMSS.txt
