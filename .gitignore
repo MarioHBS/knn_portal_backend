@@ -111,6 +111,8 @@ docs/_build/
 
 # Environment variables
 .env
+.env.*
+!.env.example
 
 # Docker
 *.pid
