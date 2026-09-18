@@ -10,7 +10,7 @@ from pathlib import Path
 def check_partners():
     """Verifica os parceiros no arquivo firestore_employees_partners.json"""
 
-    firestore_file = Path("data/firestore_employees_partners.json")
+    firestore_file = Path("data/firestore_export/firestore_employees_partners.json")
 
     if not firestore_file.exists():
         print(f"Erro: Arquivo {firestore_file} não encontrado")

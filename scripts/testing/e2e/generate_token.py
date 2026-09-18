@@ -40,10 +40,10 @@ def generate_token(role: str = "admin", user_id: str = "admin-test-123", entity_
     print(f"🔑 Token: {token}")
 
     # Salvar token em arquivo
-    with open("scripts/complete_flow/access_token.txt", "w") as f:
+    with open("scripts/testing/e2e/access_token.txt", "w") as f:
         f.write(token)
 
-    print("💾 Token salvo em scripts/complete_flow/access_token.txt")
+    print("💾 Token salvo em scripts/testing/e2e/access_token.txt")
 
     return token
 
