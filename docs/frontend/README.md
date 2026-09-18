@@ -20,7 +20,6 @@ Esta pasta contém toda a documentação necessária para o **Frontend** integra
 ### 2. ✅ [validacoes_frontend.md](./validacoes_frontend.md)
 
 **Validações que devem ser implementadas no Frontend**
-
 - Funções JavaScript para validação de campos
 - Máscaras de entrada (telefone, CEP, CNPJ)
 - Validações específicas por tipo de entidade
@@ -61,7 +60,7 @@ Esta pasta contém toda a documentação necessária para o **Frontend** integra
 
 ## 🎯 Pontos Importantes
 
-### ✅ O que o Frontend DEVE fazer
+### ✅ O que o Frontend DEVE fazer:
 
 - **Validar dados** antes de enviar para API
 - **Aplicar máscaras** nos campos de entrada
@@ -70,7 +69,7 @@ Esta pasta contém toda a documentação necessária para o **Frontend** integra
 - **Usar HTTPS** em produção
 - **Incluir headers obrigatórios** em todas as requisições
 
-### ❌ O que o Frontend NÃO precisa fazer
+### ❌ O que o Frontend NÃO precisa fazer:
 
 - **Gerar IDs** - isso é feito automaticamente pelo Backend
 - **Conhecer algoritmos** de geração de IDs
@@ -82,12 +81,10 @@ Esta pasta contém toda a documentação necessária para o **Frontend** integra
 ### Variáveis de Ambiente
 
 ```env
-
 # .env
-
 REACT_APP_API_URL=http://localhost:8000/api/v1
 REACT_APP_TENANT_ID=sua_escola_id
-`$language
+```
 
 ### Headers Padrão
 
@@ -97,7 +94,7 @@ const headers = {
   'Authorization': `Bearer ${token}`,
   'X-Tenant-ID': process.env.REACT_APP_TENANT_ID
 };
-`$language
+```
 
 ### Exemplo de Requisição
 
@@ -116,7 +113,7 @@ const response = await fetch('/api/v1/students', {
 
 const estudante = await response.json();
 console.log('ID gerado:', estudante.id); // Ex: STD_J6S7S899_K1
-`$language
+```
 
 ## 📊 Formatos de ID Gerados
 
