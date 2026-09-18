@@ -24,6 +24,7 @@ from .benefit import (
     BenefitTypeOPTIONS,
     BenefitValueType,
 )
+from .employee import EmployeeModel
 from .partner import (
     PartnerAddress,
     PartnerCategory,
