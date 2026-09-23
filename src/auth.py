@@ -1,9 +1,5 @@
-"""
-Módulo de autenticação e autorização para o Portal de Benefícios KNN.
-Implementa verificação de JWT com JWKS e validação de roles.
-"""
+"""Firebase ID-token authentication and role authorization for the API."""
 
-# Importações Firebaseimport time
 from datetime import datetime
 from typing import Any, Literal
 
@@ -13,89 +9,57 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from firebase_admin import auth
 from pydantic import BaseModel, model_validator
 
-from src.config import (
-    ENVIRONMENT,
-    FIRESTORE_PROJECT,
-    TESTING_MODE,
-)
+from src.config import FIRESTORE_PROJECT, TESTING_MODE
 
-# Segurança para autenticação via Bearer token
 security = HTTPBearer(auto_error=not TESTING_MODE)
-
-# Cache para JWKS
-jwks_cache = {"keys": None, "last_updated": 0}
+VALID_ROLES = {"admin", "employee", "student", "partner"}
 
 
-# Inicialização do Firebase
-def initialize_firebase():
-    """Inicializa Firebase Admin SDK se não estiver inicializado."""
+def initialize_firebase() -> None:
+    """Initialize Firebase Admin SDK or fail startup outside test mode."""
+    if firebase_admin._apps:
+        return
+
+    import os
+    from pathlib import Path
+
+    from firebase_admin import credentials
+
+    possible_paths = [
+        "credentials/default-service-account-key.json",
+        "credentials/knn-benefits-service-account-key.json",
+        "data/firestore_import/default-service-account-key.json",
+        "default-service-account-key.json",
+        os.getenv("GOOGLE_APPLICATION_CREDENTIALS", ""),
+    ]
+
     try:
-        # Verificar se Firebase já foi inicializado
-        if firebase_admin._apps:
-            print("Firebase já inicializado, reutilizando conexão")
-            return
-
-        # Tentar carregar credenciais do arquivo padrão
-        import os
-        from pathlib import Path
-
-        from firebase_admin import credentials
-
-        # Procurar arquivo de credenciais
-        possible_paths = [
-            "credentials/default-service-account-key.json",
-            "credentials/knn-benefits-service-account-key.json",
-            "data/firestore_import/default-service-account-key.json",
-            "default-service-account-key.json",
-            os.getenv("GOOGLE_APPLICATION_CREDENTIALS", ""),
-        ]
-
-        cred_path = None
-        for path in possible_paths:
-            if path and Path(path).exists():
-                cred_path = path
-                break
-
+        cred_path = next(
+            (path for path in possible_paths if path and Path(path).exists()), None
+        )
         if cred_path:
-            cred = credentials.Certificate(cred_path)
-            firebase_admin.initialize_app(cred, {"projectId": FIRESTORE_PROJECT})
-            print(f"Firebase inicializado com credenciais: {cred_path}")
+            firebase_admin.initialize_app(
+                credentials.Certificate(cred_path), {"projectId": FIRESTORE_PROJECT}
+            )
         else:
-            # Tentar inicializar com credenciais padrão do ambiente
-            try:
-                cred = credentials.ApplicationDefault()
-                firebase_admin.initialize_app(cred, {"projectId": FIRESTORE_PROJECT})
-                print("Firebase inicializado com credenciais padrão do ambiente")
-            except Exception as e:
-                print(f"Aviso: Não foi possível usar credenciais padrão: {e}")
-                # Fallback para modo emulador/teste
-                firebase_admin.initialize_app(options={"projectId": FIRESTORE_PROJECT})
-                print("Firebase inicializado em modo emulador/teste")
-
-    except Exception as e:
-        print(f"Erro ao inicializar Firebase: {e}")
-        # Não falhar se Firebase não puder ser inicializado
-        pass
+            firebase_admin.initialize_app(
+                credentials.ApplicationDefault(), {"projectId": FIRESTORE_PROJECT}
+            )
+    except Exception as exc:
+        if not TESTING_MODE:
+            raise RuntimeError("Firebase Admin SDK não pôde ser inicializado") from exc
+        try:
+            firebase_admin.initialize_app(options={"projectId": FIRESTORE_PROJECT})
+        except ValueError:
+            if not firebase_admin._apps:
+                raise
 
 
-# Inicializar Firebase na importação do módulo
 initialize_firebase()
 
 
 class JWTPayload(BaseModel):
-    """Modelo para o payload do JWT.
-
-    Attributes:
-        sub: Subject - Identificador único do usuário (user ID)
-        role: Papel/função do usuário no sistema (admin, employee, student, partner)
-        tenant: Identificador do tenant/organização do usuário
-        exp: Expiration time - Timestamp Unix de quando o token expira
-        iat: Issued at - Timestamp Unix de quando o token foi emitido
-        iss: Issuer - Identificador do emissor do token (opcional)
-        aud: Audience - Audiência pretendida do token, pode ser string ou lista (opcional)
-        name: Nome do usuário (opcional)
-        entity_id: ID da entidade associada ao usuário
-    """
+    """Normalized claims from a verified Firebase ID token."""
 
     sub: str
     role: Literal["admin", "employee", "student", "partner"]
@@ -109,272 +73,152 @@ class JWTPayload(BaseModel):
 
     @model_validator(mode="before")
     def exp_must_be_after_iat(cls, data: Any) -> Any:  # noqa: N805
-        """Valida se o tempo de expiração (exp) é maior que o tempo de emissão (iat)."""
         if isinstance(data, dict):
             iat = data.get("iat")
             exp = data.get("exp")
-
             if iat is not None and exp is not None and exp <= iat:
-                raise ValueError(
-                    "O tempo de expiração (exp) deve ser maior que o tempo de emissão (iat)"
-                )
+                raise ValueError("exp deve ser maior que iat")
         return data
 
     def expires_iso(self) -> str:
         return datetime.utcfromtimestamp(self.exp).isoformat() + "Z"
 
 
-async def extract_data_from_firebase_token(token: str) -> JWTPayload:
-    """
-    Verifica o token de ID do Firebase e retorna o payload padronizado.
-    """
+def _claims_error(code: str, message: str) -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail={"error": {"code": code, "msg": message}},
+    )
+
+
+async def extract_data_from_firebase_token(
+    token: str, *, check_revoked: bool = False
+) -> JWTPayload:
+    """Verify a Firebase ID token and normalize its authorization claims."""
     try:
-        decoded_token = auth.verify_id_token(token)
-        # Padroniza o payload para o modelo JWTPayload
+        decoded_token = auth.verify_id_token(token, check_revoked=check_revoked)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"error": {"code": "INVALID_FIREBASE_TOKEN", "msg": str(exc)}},
+        ) from exc
+
+    role = decoded_token.get("role")
+    if role is None or role == "":
+        raise _claims_error("MISSING_ROLE", "O token não contém a role obrigatória")
+    if role not in VALID_ROLES:
+        raise _claims_error("INVALID_ROLE", f"Role '{role}' não é válida")
+
+    tenant = decoded_token.get("tenant")
+    if not isinstance(tenant, str) or not tenant:
+        raise _claims_error(
+            "MISSING_TENANT", "O token não contém o tenant obrigatório"
+        )
+
+    try:
         return JWTPayload(
-            sub=decoded_token.get("uid", ""),
-            role=decoded_token.get("role", "student"),
-            tenant=decoded_token.get("tenant", "knn-dev-tenant"),
-            exp=decoded_token.get("exp", 0),
-            iat=decoded_token.get("iat", 0),
+            sub=decoded_token["uid"],
+            role=role,
+            tenant=tenant,
+            exp=decoded_token["exp"],
+            iat=decoded_token["iat"],
             iss=decoded_token.get("iss"),
             aud=decoded_token.get("aud"),
             name=decoded_token.get("name"),
             entity_id=decoded_token.get("entity_id"),
         )
-    except Exception as e:
+    except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"error": {"code": "INVALID_FIREBASE_TOKEN", "msg": str(e)}},
-        ) from e
+            detail={"error": {"code": "INVALID_FIREBASE_TOKEN", "msg": str(exc)}},
+        ) from exc
 
 
-async def verify_local_jwt(token: str) -> JWTPayload:
-    """
-    Verifica um token JWT local (HS256) usado para desenvolvimento e testes.
-    """
-    import jwt
-
-    from src.config import JWT_SECRET_KEY
-
-    try:
-        payload_dict = jwt.decode(
-            token,
-            JWT_SECRET_KEY,
-            algorithms=["HS256"],
-            options={"verify_aud": False},
-        )
-        return JWTPayload(**payload_dict)
-    except jwt.InvalidTokenError as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"error": {"code": "INVALID_LOCAL_JWT", "msg": str(e)}},
-        ) from e
+def _testing_user() -> JWTPayload:
+    return JWTPayload(
+        sub="test-user-123",
+        role="student",
+        tenant="test-tenant",
+        exp=9_999_999_999,
+        iat=1_000_000_000,
+    )
 
 
-async def get_current_user(
-    authorization: HTTPAuthorizationCredentials | None = Security(security),
+async def _get_current_user(
+    authorization: HTTPAuthorizationCredentials | None,
+    *,
+    check_revoked: bool,
 ) -> JWTPayload:
-    """
-    Dependência FastAPI para obter o usuário atual.
-
-    - Em modo de teste, retorna um usuário mock.
-    - Em produção, valida estritamente com o Firebase.
-    - Em desenvolvimento, tenta Firebase e, como fallback, valida JWT local.
-    """
-    import logging
-
-    logger = logging.getLogger(__name__)
-
     if TESTING_MODE:
-        logger.info("🔧 Modo de teste ativo - retornando usuário mock")
-        return JWTPayload(
-            sub="test-user-123",
-            role="student",
-            tenant="test-tenant",
-            exp=9999999999,
-            iat=1000000000,
-        )
-
+        return _testing_user()
     if not authorization:
-        logger.warning("❌ Token não fornecido")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
                 "error": {"code": "TOKEN_NOT_PROVIDED", "msg": "Token não fornecido"}
             },
         )
+    return await extract_data_from_firebase_token(
+        authorization.credentials, check_revoked=check_revoked
+    )
 
-    token = authorization.credentials
-    logger.info(f"🔍 Token recebido: {token[:50]}...")
-    logger.info(f"🌍 Ambiente: {ENVIRONMENT}")
 
-    if ENVIRONMENT == "production":
-        logger.info("🏭 Modo produção - validando com JWT local")
-        return await verify_local_jwt(token)
+async def get_current_user(
+    authorization: HTTPAuthorizationCredentials | None = Security(security),
+) -> JWTPayload:
+    """Return the authenticated user from a Firebase ID token."""
+    return await _get_current_user(authorization, check_revoked=False)
 
-    # Em desenvolvimento, tentar Firebase primeiro, depois JWT local
-    logger.info("🔧 Modo desenvolvimento - tentando Firebase primeiro")
-    try:
-        result = await extract_data_from_firebase_token(token)
-        logger.info("✅ Token Firebase válido")
-        return result
-    except HTTPException as e:
-        logger.info(f"❌ Firebase falhou: {e.detail}")
-        logger.info("🔄 Tentando JWT local como fallback")
-        # Se a verificação do Firebase falhar, tente o JWT local
-        try:
-            result = await verify_local_jwt(token)
-            logger.info("✅ Token JWT local válido")
-            return result
-        except HTTPException as local_e:
-            logger.error(f"❌ JWT local também falhou: {local_e.detail}")
-            raise local_e
+
+async def get_current_admin_user(
+    authorization: HTTPAuthorizationCredentials | None = Security(security),
+) -> JWTPayload:
+    """Authenticate an admin request with Firebase revocation checking."""
+    return await _get_current_user(authorization, check_revoked=True)
+
+
+def _require_role(token: JWTPayload, role: str, label: str) -> JWTPayload:
+    if token.role != role:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "error": {
+                    "code": "FORBIDDEN",
+                    "msg": f"Acesso permitido apenas para {label}",
+                }
+            },
+        )
+    return token
 
 
 async def validate_student_role(
     token: JWTPayload = Depends(get_current_user),
 ) -> JWTPayload:
-    """
-    Valida se o usuário tem role de aluno.
-    """
-    # Se estiver em modo de teste, retornar dados mock
-    if TESTING_MODE:
-        return JWTPayload(
-            sub="test-student-123",
-            role="student",
-            tenant="test-tenant",
-            exp=9999999999,
-            iat=1000000000,
-        )
-
-    if token.role != "student":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={
-                "error": {
-                    "code": "FORBIDDEN",
-                    "msg": "Acesso permitido apenas para alunos",
-                }
-            },
-        )
-    return token
+    return _require_role(token, "student", "alunos")
 
 
 async def validate_partner_role(
     token: JWTPayload = Depends(get_current_user),
 ) -> JWTPayload:
-    """
-    Valida se o usuário tem role de parceiro.
-    """
-    # Se estiver em modo de teste, retornar dados mock
-    if TESTING_MODE:
-        return JWTPayload(
-            sub="test-partner-123",
-            role="partner",
-            tenant="test-tenant",
-            exp=9999999999,
-            iat=1000000000,
-        )
-
-    if token.role != "partner":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={
-                "error": {
-                    "code": "FORBIDDEN",
-                    "msg": "Acesso permitido apenas para parceiros",
-                }
-            },
-        )
-    return token
+    return _require_role(token, "partner", "parceiros")
 
 
 async def validate_admin_role(
-    token: JWTPayload = Depends(get_current_user),
+    token: JWTPayload = Depends(get_current_admin_user),
 ) -> JWTPayload:
-    """
-    Valida se o usuário tem role de administrador.
-    """
-    # Se estiver em modo de teste, retornar dados mock
-    if TESTING_MODE:
-        return JWTPayload(
-            sub="test-admin-123",
-            role="admin",
-            tenant="test-tenant",
-            exp=9999999999,
-            iat=1000000000,
-        )
-
-    if token.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={
-                "error": {
-                    "code": "FORBIDDEN",
-                    "msg": "Acesso permitido apenas para administradores",
-                }
-            },
-        )
-    return token
+    return _require_role(token, "admin", "administradores")
 
 
 async def validate_employee_role(
     token: JWTPayload = Depends(get_current_user),
 ) -> JWTPayload:
-    """
-    Valida se o usuário tem role de funcionário.
-    """
-    # Se estiver em modo de teste, retornar dados mock
-    if TESTING_MODE:
-        return JWTPayload(
-            sub="test-employee-123",
-            role="employee",
-            tenant="test-tenant",
-            exp=9999999999,
-            iat=1000000000,
-        )
-
-    if token.role != "employee":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={
-                "error": {
-                    "code": "FORBIDDEN",
-                    "msg": "Acesso permitido apenas para funcionários",
-                }
-            },
-        )
-    return token
+    return _require_role(token, "employee", "funcionários")
 
 
 async def validate_authenticated_user(
     token: JWTPayload = Depends(get_current_user),
 ) -> JWTPayload:
-    """
-    Valida se o usuário está autenticado (qualquer role válida).
-    """
-    # Se estiver em modo de teste, retornar dados mock
-    if TESTING_MODE:
-        return JWTPayload(
-            sub="test-user-123",
-            role="student",
-            tenant="test-tenant",
-            exp=9999999999,
-            iat=1000000000,
-        )
-
-    # Verificar se o token tem uma role válida
-    valid_roles = ["student", "partner", "admin", "employee"]
-    if token.role not in valid_roles:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={
-                "error": {
-                    "code": "INVALID_ROLE",
-                    "msg": f"Role '{token.role}' não é válida",
-                }
-            },
-        )
-
+    """Validate that the token carries one of the supported roles."""
+    if token.role not in VALID_ROLES:
+        raise _claims_error("INVALID_ROLE", f"Role '{token.role}' não é válida")
     return token

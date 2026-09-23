@@ -18,16 +18,29 @@ except ImportError:
     pass
 
 # --- Configurações de Ambiente ---
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+_environment_env = os.getenv("ENVIRONMENT")
+_environment_is_explicit = _environment_env is not None
+ENVIRONMENT = _environment_env or "development"
 IS_PRODUCTION = ENVIRONMENT == "production"
 
-# Compatibilidade: manter TESTING_MODE disponível para módulos existentes.
-# Se não definido explicitamente, assume True em desenvolvimento e False em produção.
+# TESTING_MODE só pode ser habilitado explicitamente. Nunca habilitar o modo
+# mock por inferência do ambiente: um deploy sem configuração deve falhar
+# fechado, não iniciar com autenticação desabilitada.
 _testing_mode_env = os.getenv("TESTING_MODE")
 if _testing_mode_env is None:
-    TESTING_MODE = not IS_PRODUCTION
+    TESTING_MODE = False
 else:
     TESTING_MODE = _testing_mode_env.lower() in ("true", "1", "t", "yes", "y")
+
+_running_on_cloud_run = "K_SERVICE" in os.environ
+if TESTING_MODE and (IS_PRODUCTION or _running_on_cloud_run):
+    raise RuntimeError(
+        "TESTING_MODE não pode ser habilitado em produção ou no Cloud Run"
+    )
+if _running_on_cloud_run and not _environment_is_explicit:
+    raise RuntimeError(
+        "ENVIRONMENT deve ser definido explicitamente quando K_SERVICE estiver presente"
+    )
 
 # --- Configurações da API ---
 API_VERSION = "v1"
@@ -91,14 +104,6 @@ else:
         "http://127.0.0.1:3000",
         "http://127.0.0.1:8080",
     ]
-
-# --- Configurações de Autenticação ---
-JWKS_URL = os.getenv("JWKS_URL", "https://auth.knnidiomas.com.br/.well-known/jwks.json")
-JWKS_CACHE_TTL = int(os.getenv("JWKS_CACHE_TTL", "600"))  # 10 minutos
-JWT_ALGORITHM = "RS256"
-JWT_SECRET_KEY = os.getenv(
-    "JWT_SECRET_KEY", "knn-dev-jwt-secret-key-change-in-production"
-)
 
 # --- Configurações de Credenciais ---
 # A variável GOOGLE_APPLICATION_CREDENTIALS é lida automaticamente pelo Google Cloud

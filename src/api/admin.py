@@ -337,6 +337,15 @@ async def create_firebase_user(
         if os.getenv("ENVIRONMENT") == "development":
             logger.info(f"Senha temporária para {entity_email}: {temp_password}")
 
+        auth.set_custom_user_claims(
+            user_record.uid,
+            {
+                "role": entity.name.lower(),
+                "tenant": tenant_id,
+                "entity_id": entity_id,
+            },
+        )
+
         # Criar documento na coleção 'users' do Firestore usando UserFirestoreDTO
         user_data = UserFirestoreDTO(
             email=entity_email,
