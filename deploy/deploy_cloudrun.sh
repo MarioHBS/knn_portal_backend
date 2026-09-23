@@ -46,11 +46,10 @@ gcloud run deploy ${SERVICE_NAME} \
   --cpu 1 \
   --concurrency 80 \
   --max-instances 10 \
-  --set-env-vars="MODE=production" \
+  --set-env-vars="ENVIRONMENT=production" \
+  --set-env-vars="TESTING_MODE=false" \
   --set-env-vars="FIRESTORE_PROJECT=${PROJECT_ID}" \
   --set-env-vars="POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}" \
-  --set-env-vars="JWKS_URL=${JWKS_URL}" \
-  --set-env-vars="JWKS_CACHE_TTL=600" \
   --set-env-vars="CNPJ_HASH_SALT=${CNPJ_HASH_SALT}"
 
 # Obter a URL do serviço

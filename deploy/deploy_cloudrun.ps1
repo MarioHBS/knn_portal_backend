@@ -133,9 +133,6 @@ Write-ColorOutput Yellow "Implantando no Cloud Run..."
 if (-not $env:POSTGRES_CONNECTION_STRING) {
     Write-ColorOutput Red "Aviso: POSTGRES_CONNECTION_STRING não está definida"
 }
-if (-not $env:JWKS_URL) {
-    Write-ColorOutput Red "Aviso: JWKS_URL não está definida"
-}
 if (-not $env:CNPJ_HASH_SALT) {
     Write-ColorOutput Red "Aviso: CNPJ_HASH_SALT não está definida"
 }
@@ -150,7 +147,8 @@ $deployArgs = @(
     "--cpu", "1",
     "--concurrency", "80",
     "--max-instances", "10",
-    "--set-env-vars", "MODE=production",
+    "--set-env-vars", "ENVIRONMENT=production",
+    "--set-env-vars", "TESTING_MODE=false",
     "--set-env-vars", "FIRESTORE_PROJECT=$ProjectId"
 )
 
@@ -158,14 +156,9 @@ $deployArgs = @(
 if ($env:POSTGRES_CONNECTION_STRING) {
     $deployArgs += "--set-env-vars", "POSTGRES_CONNECTION_STRING=$env:POSTGRES_CONNECTION_STRING"
 }
-if ($env:JWKS_URL) {
-    $deployArgs += "--set-env-vars", "JWKS_URL=$env:JWKS_URL"
-}
 if ($env:CNPJ_HASH_SALT) {
     $deployArgs += "--set-env-vars", "CNPJ_HASH_SALT=$env:CNPJ_HASH_SALT"
 }
-
-$deployArgs += "--set-env-vars", "JWKS_CACHE_TTL=600"
 
 & gcloud @deployArgs
 if ($LASTEXITCODE -ne 0) {

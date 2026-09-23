@@ -48,7 +48,7 @@ Write-Host "✅ APIs habilitadas" -ForegroundColor Green
 Write-Host "`n4. Fazendo deploy do source code..." -ForegroundColor Cyan
 Write-Host "Isso pode levar alguns minutos..." -ForegroundColor Yellow
 
-$env_vars = "MODE=production,FIRESTORE_PROJECT=$PROJECT_ID,POSTGRES_CONNECTION_STRING=$env:POSTGRES_CONNECTION_STRING,JWKS_URL=$env:JWKS_URL,CNPJ_HASH_SALT=$env:CNPJ_HASH_SALT"
+$env_vars = "ENVIRONMENT=production,TESTING_MODE=false,FIRESTORE_PROJECT=$PROJECT_ID,POSTGRES_CONNECTION_STRING=$env:POSTGRES_CONNECTION_STRING,CNPJ_HASH_SALT=$env:CNPJ_HASH_SALT"
 
 gcloud run deploy $SERVICE_NAME `
     --source . `

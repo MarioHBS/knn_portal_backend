@@ -60,11 +60,10 @@ jobs:
           --cpu=1 \
           --concurrency=80 \
           --max-instances=10 \
-          --set-env-vars="MODE=production" \
+          --set-env-vars="ENVIRONMENT=production" \
+          --set-env-vars="TESTING_MODE=false" \
           --set-env-vars="FIRESTORE_PROJECT=${{ secrets.GCP_PROJECT_ID }}" \
           --set-env-vars="POSTGRES_CONNECTION_STRING=${{ secrets.POSTGRES_CONNECTION_STRING }}" \
-          --set-env-vars="JWKS_URL=${{ secrets.JWKS_URL }}" \
-          --set-env-vars="JWKS_CACHE_TTL=600" \
           --set-env-vars="CNPJ_HASH_SALT=${{ secrets.CNPJ_HASH_SALT }}"
           
         URL=$(gcloud run services describe portal-beneficios-api --platform managed --region us-central1 --format 'value(status.url)')

@@ -15,10 +15,18 @@ Produção: https://knn-portal.cloudrun.app/api/v1
 ## Headers Obrigatórios
 
 ```http
-Authorization: Bearer <jwt_token>
+Authorization: Bearer <firebase_id_token>
 Content-Type: application/json
-X-Tenant-ID: <school_id>
 ```
+
+`<firebase_id_token>` is the Firebase ID token returned by the Firebase
+client SDK. The backend verifies its signature and uses the `role` and
+`tenant` custom claims for authorization and tenant isolation. `X-Tenant-ID`
+is not part of the contract and is ignored if sent.
+
+The frontend must not call `/users/login`, `/users/refresh` or
+`/users/validate`; use `GET /users/me` for the authenticated profile and
+`POST /users/set-password` for the first-access password change.
 
 ## Endpoints
 
@@ -218,7 +226,7 @@ GET /partners?page=1&limit=20
 ```json
 {
   "error": "Unauthorized",
-  "message": "Token JWT inválido ou expirado"
+  "message": "Firebase ID token inválido ou expirado"
 }
 ```
 
@@ -379,8 +387,8 @@ GET /partners?categoria=Tecnologia
 ## Observações Importantes
 
 1. **IDs são gerados automaticamente** pelo Backend - não envie no request
-2. **Todos os endpoints requerem autenticação** via JWT
-3. **Use o header X-Tenant-ID** para multi-tenancy
+2. **Todos os endpoints protegidos requerem** `Authorization: Bearer <firebase_id_token>`
+3. **O tenant vem da claim `tenant`** do Firebase ID token; não envie `X-Tenant-ID` como requisito
 4. **Respeite os rate limits** para evitar bloqueios
 5. **Valide dados no Frontend** antes de enviar para a API
 6. **Trate todos os códigos de erro** adequadamente
